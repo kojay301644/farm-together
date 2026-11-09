@@ -16,7 +16,8 @@ const A = n => `assets/${n}.webp?v=${typeof BUILD!=='undefined'?BUILD:''}`;
 
 /* 田地位置（格座標，3 排 × 6 塊） */
 const PS=1.45, PG=1.65;
-const PLOTS=Array.from({length:18},(_,i)=>[4.35+(i%6)*PG, 6.75+Math.floor(i/6)*PG]);
+// 第 1、2 塊在穀倉右邊、農田上方；其餘 18 塊是原本 3 排 × 6
+const PLOTS=[[4.35+1*PG, 6.75-PG],[4.35+2*PG, 6.75-PG]].concat(Array.from({length:18},(_,i)=>[4.35+(i%6)*PG, 6.75+Math.floor(i/6)*PG]));
 const plotCenter=i=>iso(PLOTS[i][0]+PS/2, PLOTS[i][1]+PS/2);
 const FARM_C=[9.2,9.2];
 
