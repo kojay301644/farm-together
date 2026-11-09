@@ -41,7 +41,7 @@ function openGearBag(){
     : `<div class="empty" style="padding:8px 0">還沒有插上裝備</div>`;
   if(cur && cur.func==='plant'){
     const opts = CROPS.filter(c=>me.lv>=c.lv).map(c=>`<option value="${c.id}" ${me.auto_seed===c.id?'selected':''}>${c.name}（背包 ${me.seeds[c.id]||0} 包）</option>`).join('');
-    body += `<div class="autoseed">🌱 自動種：<select id="aSeed"><option value="">（不種）</option>${opts}</select></div><div class="hint">會用背包裡的種子，種子用完就停</div>`;
+    body += `<div class="autoseed">🌱 自動種：<select id="aSeed"><option value="">（不種）</option>${opts}</select></div><div class="rhint">會用背包裡的種子，種子用完就停</div>`;
   }
   body += `<div class="sec">背包裡的裝備</div>`;
   body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span><div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
@@ -121,7 +121,7 @@ function openSkinShop(t){
     const price = k ? (k.gold!=null?`${k.gold.toLocaleString()} 金`:`💎${k.gems}`) : '';
     return `<div class="skcard${cur?' on':''}"><img src="${A('th_'+st+'_'+SKIN_PART[skinTab])}" alt=""><b>${def?'預設':(k?k.name:SKIN_NAME[st])}</b>
       ${cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-skuse="${def?'def':st}">套用</button>`:`<button class="mini ${k&&k.gems!=null?'gem':''}" data-skbuy="${k.id}" ${(k.gold!=null?me.gold<k.gold:(me.gems||0)<k.gems)?'disabled':''}>${price}</button>`}</div>`; }).join('')}</div>
-    <div class="hint" style="text-align:center;margin-top:8px">買過的外觀可以隨時免費切換，好友來拜訪也看得到</div>`;
+    <div class="rhint" style="text-align:center;margin-top:8px">買過的外觀可以隨時免費切換，好友來拜訪也看得到</div>`;
   modal(`建築外觀　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`, body);
   const md=$('md');
   md.querySelectorAll('[data-skt]').forEach(b=>b.onclick=()=>openSkinShop(b.dataset.skt));

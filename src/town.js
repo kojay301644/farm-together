@@ -62,7 +62,7 @@ const BLD = [
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
-  {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78, locked:'牧場將在第四階段開放'},
+  {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
   {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
 
@@ -300,7 +300,7 @@ function buildWorld(){
     .concat([out,gin,inside,inside2,inside,gin,out]).concat([[620,520],[690,500]].map(H_));
   addMover('',{x:C0[0],y:C0[1],path:WP,tgt:1,speed:0.55,s:1.25,farmer:true});
   farmerMover=movers[movers.length-1]; farmerAv=null;
-  for(let k=0;k<4;k++) addMover(CHICK,{x:RX+0.6+rnd()*(RW-1.2),y:RY+0.6+rnd()*(RD-1.0),chick:true,area:[RX+0.3,RY+0.3,RX+RW-0.3,RY+RD-0.3],speed:0.5,s:1.25,wait:rnd()*2});
+  ranchMovers=[]; ranchSig='';
   ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
 
@@ -360,6 +360,7 @@ function animate(now){
     }
     let [sx,sy]=iso(m.x,m.y); if(m.fly) sy -= 30 + Math.sin(now/400 + m.x)*8;
     m.el.setAttribute('transform',`translate(${sx.toFixed(1)} ${sy.toFixed(1)}) scale(${m.face*m.s} ${m.s})`);
+    if(m.tag) m.tag.setAttribute('transform',`scale(${m.face} 1)`);
     if(m.moving!==moving){ m.moving=moving; m.el.classList.toggle('walk',moving); }
   }
   requestAnimationFrame(animate);

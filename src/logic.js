@@ -31,8 +31,8 @@ let V = null;          // 拜訪中的好友農場：{owner, plots, off}
 let mode = 'home';
 const ui = {tool:'hand', seed:'radish', busy:false};
 
-function applyState(st){ if(st) S = {me:st.me, plots:st.plots, off:st.now - Date.now()}; }
-function applyVisit(v){ if(v) V = {owner:v.owner, plots:v.plots, off:v.now - Date.now(), friend:!!v.friend, protected:!!v.protected}; }
+function applyState(st){ if(st) S = {me:st.me, plots:st.plots, ranch:st.ranch||[], off:st.now - Date.now()}; }
+function applyVisit(v){ if(v) V = {owner:v.owner, plots:v.plots, ranch:v.ranch||[], off:v.now - Date.now(), friend:!!v.friend, protected:!!v.protected}; }
 
 // 依伺服器時間預測目前生長進度（實際以伺服器為準）
 function pred(p, off){
@@ -225,11 +225,13 @@ function openBag(){
   body += sd.length ? sd.map(([id,n])=>{ const c=CROP[id];
     return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}種子</b> <span class="tag">×${n}</span><div>成熟 ${dur(c.time)}</div></div><button class="mini" data-use="${id}">拿來種</button></div>`; }).join('')
     : `<div class="empty">沒有種子</div>`;
+  body += goodsHTML(me);
   modal('穀倉（倉庫）', body, cr.length?[[`一鍵全部賣出（${total} 金）`,'o',async()=>{ const r=await doAct('sell_all'); if(r){ sfx('coin'); toast(`全部賣出，獲得 ${r.amt} 金`); closeModal(); } }]]:null);
   $('md').querySelectorAll('[data-sell]').forEach(b=>b.onclick=async()=>{
     const id=b.dataset.sell; const r = await doAct('sell', null, id);
     if(r){ sfx('coin'); toast(`賣出 ${CROP[id].name}，獲得 ${r.amt} 金`); openBag(); }
   });
+  if($('sellGoods')) $('sellGoods').onclick=()=>ranchAct('sell_goods');
   $('md').querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{ ui.seed=b.dataset.use; setTool('seed'); closeModal(); toast(`點空地就能種下${CROP[ui.seed].name}`); });
 }
 async function openHome(){
@@ -264,7 +266,7 @@ async function openSettings(){
     <div class="admrow"><span>等級</span><input id="aLv" type="number" min="1" max="30" value="${me.lv}"><span>金幣</span><input id="aGold" type="number" min="0" value="${me.gold}"><span>鑽石</span><input id="aGems" type="number" min="0" value="${me.gems||0}"></div>
     <div class="admquick"><button class="mini" data-q="lv">等級 30</button><button class="mini" data-q="gold">金幣 +10萬</button><button class="mini" data-q="gems">鑽石 +1000</button><button class="mini o" data-q="seeds">每種種子 +20</button></div>
     <div class="homebtns"><button class="btn" id="aSave">儲存</button><a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">營運後台</a></div>
-    <div class="hint">只會改到你自己的帳號，每次修改都記錄在後台的操作紀錄</div></div>`;
+    <div class="rhint">只會改到你自己的帳號，每次修改都記錄在後台的操作紀錄</div></div>`;
   body += `<div style="text-align:center;margin-top:12px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`;
   modal('設定', body);
   $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openSettings(); };
@@ -290,6 +292,7 @@ let boardTab = 'friends', rankScope = 'f';
 function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60) return '剛剛'; if(s<3600) return `${Math.floor(s/60)} 分鐘前`; if(s<86400) return `${Math.floor(s/3600)} 小時前`; return `${Math.floor(s/86400)} 天前`; }
 const LOG_TXT = {help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了水`, steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
   prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`,
+  r_steal:(l)=>`偷走了你牧場的 ${l.qty} 個${(ANIMALS.find(a=>a.good===l.crop)||{}).good_name||'產品'}`, r_feed:(l)=>`幫你餵了${(ANI[l.crop]||{}).name||'動物'} 🌾`, r_swat:(l)=>`幫你的${(ANI[l.crop]||{}).name||'動物'}拍掉蚊子`, r_prank:(l)=>`在你的${(ANI[l.crop]||{}).name||'動物'}旁邊放了蚊子 😈`,
   dog:(l)=>`想偷你的${CROP[l.crop]?.name||'作物'}，被看門狗趕走了 🐶`, scare:(l)=>`想惡作劇，被稻草人擋下了 🎃`, auto_harvest:(l)=>`幫你自動收成了 ${l.qty} 個${CROP[l.crop]?.name||''} 🧺`};
 
 async function openBoard(tab){
@@ -384,6 +387,7 @@ function tapBuilding(g){
   if(id==='shop') return openShop();
   if(id==='barn') return openBag();
   if(id==='home') return openHome();
+  if(id==='coop') return openRanch();
   const o = BLD.find(b=>b.id===id); if(o && o.locked) toast(o.locked);
 }
 
@@ -465,7 +469,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } syncRanchMovers(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -479,7 +483,7 @@ async function sync(){
   }catch(e){ if(/還不是好友/.test(e.message)){ toast(e.message); goHome(); } }
   finally{ syncing = false; }
 }
-setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); } }, 1000);
+setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); try{ syncRanchMovers(); }catch(e){} } }, 1000);
 setInterval(sync, 15000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sync(); });
 
@@ -551,7 +555,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins);
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings);
   }catch(e){}
 }
 async function showNotices(){

@@ -172,6 +172,9 @@ async function pageCf(){
       <td><input id="g_${g.id}_name" value="${esc(g.name)}" style="width:7em"></td><td><input class="num" id="g_${g.id}_val" type="number" step="any" value="${g.val}"></td>
       <td><input class="num" id="g_${g.id}_gold" type="number" value="${g.gold??''}"></td><td><input class="num" id="g_${g.id}_gems" type="number" value="${g.gems??''}"></td>
       <td><input class="num" id="g_${g.id}_lv" type="number" value="${g.lv}"></td><td><button class="btn" data-gid="${g.id}">儲存</button></td></tr>`).join('')}</table></div>
+    <div class="card"><h2>牧場動物</h2><div class="muted" style="margin-bottom:8px">生產秒數：餵飽後多久產出；飼料＝要幾個作物。牧場開放等級和格數在上方「玩法設定」。</div>
+    <table><tr><th>動物</th><th>解鎖等級</th><th>價格</th><th>飼料</th><th>生產秒數</th><th>產量</th><th>產品單價</th><th>經驗</th><th></th></tr>
+    ${(C.animals||[]).map(a=>`<tr><td><b>${esc(a.name)}</b><div class="muted">${esc(a.good_name)}</div></td>${['lv','price','feed','prod_sec','yield','good_price','exp'].map(f=>`<td><input class="num" id="a_${a.id}_${f}" type="number" value="${a[f]}"></td>`).join('')}<td><button class="btn" data-aid="${a.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>建築外觀</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；兩個都留空＝不能購買。</div>
     <table><tr><th>外觀</th><th>建築</th><th>名稱</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.skins||[]).map(k=>`<tr><td><img src="assets/th_${k.style}_${({home:'academy',barn:'farm',shop:'shop',fountain:'fountain',pen:'play',decor:'forge'})[k.bld]}.webp" style="width:40px;height:40px;object-fit:contain"></td><td>${({home:'我的家',barn:'穀倉',shop:'種子商店',fountain:'噴水池',pen:'萌獸園',decor:'裝飾店'})[k.bld]}</td>
@@ -179,6 +182,8 @@ async function pageCf(){
   document.querySelectorAll('[data-sk]').forEach(b=>b.onclick=async()=>{ try{ await rpc('adm_setting_set',{p_key:b.dataset.sk,p_value:+$('s_'+b.dataset.sk).value}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-cid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.cid, v=f=>+$(`c_${id}_${f}`).value;
     try{ await rpc('adm_crop_save',{p_id:id,p_seed:v('seed'),p_grow_sec:v('grow_sec'),p_yield:v('yield'),p_price:v('price'),p_exp:v('exp'),p_lv:v('lv')}); toast('已儲存'); }catch(e){ toast(e.message); } });
+  document.querySelectorAll('[data-aid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.aid, v=f=>+$(`a_${id}_${f}`).value;
+    try{ await rpc('adm_animal_save',{p_id:id,p_lv:v('lv'),p_price:v('price'),p_feed:v('feed'),p_prod_sec:v('prod_sec'),p_yield:v('yield'),p_good_price:v('good_price'),p_exp:v('exp')}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-kid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.kid, v=f=>$(`k_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
     try{ await rpc('adm_skin_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems')}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-gid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.gid, v=f=>$(`g_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
