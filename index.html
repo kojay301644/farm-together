@@ -771,6 +771,11 @@ function buildWorld(){
   const FC=HG(645,352); objs.push({depth:FC[0]+FC[1], svg:skinSprite('fountain', FC[0], FC[1], 150, 0.8)});
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
+  // 島下方空地的裝飾
+  deco('dc_sakura', ...HG(840,612), 120); deco('dc_picnic', ...HG(740,600), 84); deco('dc_pond', ...HG(610,610), 110);
+  deco('dc_bench', ...HG(700,545), 60); deco('dc_flower', ...HG(800,560), 56); deco('dc_flower', ...HG(560,560), 50);
+  deco('dc_lantree', ...HG(900,560), 80); deco('dc_swing', ...HG(530,620), 80);
+  [[650,640,'#FF9AA2'],[770,650,'#FFFFFF'],[880,640,null],[590,530,'#FFE066'],[860,520,'#B9A6FF']].forEach(([x,y,f])=>{ const g=HG(x,y); objs.push(bush(g[0],g[1],f)); });
 
   // 田地（可點）
   PLOTS.forEach((_,i)=>{ objs.push({depth:PLOTS[i][0]+PLOTS[i][1]+PS, svg:`<g class="tap plot" data-p="${i}"><g class="pg"></g><g class="ps"></g></g>`}); });
