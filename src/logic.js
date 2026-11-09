@@ -492,7 +492,7 @@ function renderPlots(){
       } else { txt = `${c.name} ${fmtS(leftSec(p))}`; pct = p.g/c.time; if(p.dry) bg='#DDF0FF'; }
     }
     if(t.textContent !== txt){ t.textContent = txt; const w=[...txt].reduce((a,ch)=>a+(ch.charCodeAt(0)>255?15:8.5),0)+20; r.setAttribute('width', w.toFixed(0)); r.setAttribute('x', (-w/2).toFixed(0)); }
-    r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('y', pct>=0?2:5);
+    r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('stroke', fg==='#fff' ? '#3A3226' : '#fff'); t.setAttribute('y', pct>=0?2:5);
     bb.style.display = bf.style.display = pct>=0 ? '' : 'none';
     if(pct>=0) bf.setAttribute('width', (60*pct).toFixed(1));
   });

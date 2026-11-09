@@ -328,7 +328,7 @@ function buildWorld(){
   W.querySelectorAll('[data-p]').forEach(g=>{ const i=+g.dataset.p; plotEls[i]=g; plotSig[i]=''; g.addEventListener('click',()=>act(i)); });
   PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i);
     const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-48})`);
-    g.innerHTML=`<rect x="-46" y="-15" width="92" height="30" rx="14" fill="#fff" stroke="${INK}" stroke-width="2"/><text x="0" y="3" text-anchor="middle" font-size="15" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-30" y="7" width="60" height="4" rx="2" fill="#EEE6D6"/><rect class="bf" x="-30" y="7" width="0" height="4" rx="2" fill="#7ED957"/>`;
+    g.innerHTML=`<rect x="-46" y="-15" width="92" height="30" rx="14" fill="#fff" fill-opacity=".45" stroke="${INK}" stroke-opacity=".35" stroke-width="1.5"/><text x="0" y="3" text-anchor="middle" font-size="15" font-weight="900" fill="#3A3226" stroke="#fff" stroke-width="3.5" stroke-linejoin="round" paint-order="stroke" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-30" y="7" width="60" height="4" rx="2" fill="#EEE6D6"/><rect class="bf" x="-30" y="7" width="0" height="4" rx="2" fill="#7ED957"/>`;
     pl.appendChild(g); plotLabs[i]=g; });
   W.querySelectorAll('[data-b]').forEach(g=>g.addEventListener('click',()=>tapBuilding(g)));
 
