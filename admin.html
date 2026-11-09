@@ -185,7 +185,7 @@ async function pageCf(){
     ${C.land.map(l=>`<tr><td>第 ${l.idx+1} 塊</td><td><input class="num" id="l_${l.idx}_lv" type="number" value="${l.lv}"></td><td><input class="num" id="l_${l.idx}_cost" type="number" value="${l.cost}"></td><td><button class="btn" data-li="${l.idx}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>寵物裝備</h2><div class="muted" style="margin-bottom:8px">數值：自動澆水／播種／剷除＝第 1～N 塊地；看門狗／除蟲／除草／稻草人＝機率（0.5＝50%）；自動收成＝成熟後幾分鐘。金幣價留空＝不能用金幣買；鑽石價留空＝不能用鑽石買。</div>
     <table><tr><th>裝備</th><th>功能</th><th>名稱</th><th>數值</th><th>金幣價</th><th>鑽石價</th><th>金幣購買等級</th><th></th></tr>
-    ${(C.gear||[]).map(g=>`<tr><td><img src="assets/${g.icon}.webp" style="width:34px;height:34px;object-fit:contain;vertical-align:middle"> ${['','I','II','III','IV'][g.tier]}</td><td>${({plant:'自動播種',water:'自動澆水',dog:'看門狗',bug:'自動除蟲',weed:'自動除草',clear:'自動剷除',harvest:'自動收成',scare:'稻草人'})[g.func]}</td>
+    ${(C.gear||[]).map(g=>`<tr><td><img src="assets/${g.icon}.webp" style="width:34px;height:34px;object-fit:contain;vertical-align:middle"> ${['','I','II','III','IV'][g.tier]}</td><td>${({plant:'自動播種',water:'自動澆水',dog:'看門狗',bug:'自動除蟲',weed:'自動除草',clear:'自動餵食',feed:'自動餵食',swat:'自動拍蚊子',harvest:'自動收成',scare:'稻草人'})[g.func]}</td>
       <td><input id="g_${g.id}_name" value="${esc(g.name)}" style="width:7em"></td><td><input class="num" id="g_${g.id}_val" type="number" step="any" value="${g.val}"></td>
       <td><input class="num" id="g_${g.id}_gold" type="number" value="${g.gold??''}"></td><td><input class="num" id="g_${g.id}_gems" type="number" value="${g.gems??''}"></td>
       <td><input class="num" id="g_${g.id}_lv" type="number" value="${g.lv}"></td><td><button class="btn" data-gid="${g.id}">儲存</button></td></tr>`).join('')}</table></div>

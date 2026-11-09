@@ -199,7 +199,7 @@ function farmerDo(i, kind){
 }
 
 /* 寵物身上的裝備自動做事時，帶那件裝備的寵物會跑過去做動作 */
-const PET_JOB = {plant:['work','🌱'], water:['water','💧'], harvest:['work','🧺'], weed:['work','🌿'], bug:['work','🐛'], feed:['work','🥕']};
+const PET_JOB = {plant:['work','🌱'], water:['water','💧'], harvest:['work','🧺'], weed:['work','🌿'], bug:['work','🐛'], feed:['work','🥕'], swat:['work','🦟']};
 function petDo(func, target){
   if(typeof mode!=='undefined' && mode!=='home') return;
   const pt=(typeof partyOf==='function' && S && S.me) ? partyOf(S.me) : [];

@@ -2,13 +2,13 @@
 /* ================= 寵物進化與裝備 ================= */
 let GEAR = {}, GEAR_LIST = [], EVO = [10,20];
 const GEAR_FUNC = {plant:['自動播種','🌱'], water:['自動澆水','💧'], dog:['看門狗','🐶'], bug:['自動除蟲','🐛'],
-  weed:['自動除草','🌿'], feed:['自動餵食','🥕'], clear:['自動餵食','🥕'], harvest:['自動收成','🧺'], scare:['稻草人','🎃']};
+  weed:['自動除草','🌿'], feed:['自動餵食','🥕'], clear:['自動餵食','🥕'], harvest:['自動收成','🧺'], swat:['自動拍蚊子','🦟'], scare:['稻草人','🎃']};
 const ROMAN = ['','I','II','III','IV'];
 function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
   return ({plant:`空地自動種下你指定的種子（第 1～${v} 塊地）`, water:`土乾了自動澆水（第 1～${v} 塊地）`,
     dog:`小偷來偷菜時 ${pc}% 被趕走`, bug:`蟲一出現 ${pc}% 自動除掉`, weed:`雜草一長出 ${pc}% 自動拔掉`,
     feed:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, clear:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, harvest:`作物和牧場產品好了 ${v} 分鐘後自動收，小偷來不及偷`,
-    scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
+    swat:`牧場的蚊子每 10 分鐘有 ${pc}% 被拍掉一隻`, scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
 function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
   if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
 const chrStage = lv => 1;  // 不進化：一律第一階
@@ -19,11 +19,11 @@ const gearImg = (g, sz=40) => g ? `<img src="${A(g.icon)}" style="width:${sz}px;
 const gearTitle = g => `${g.name} ${ROMAN[g.tier]}`;
 
 /* 我的寵物面板（我的家裡） */
-const AUTO_FUNCS=['plant','water','harvest','feed','weed','bug','dog','scare'];
+const AUTO_FUNCS=['plant','water','harvest','feed','weed','bug','swat','dog','scare'];
 function autoProgress(me){ const pt=partyOf(me), on=new Set(pt.map(p=>GEAR[p.g]&&GEAR[p.g].func).filter(Boolean).map(f=>f==='clear'?'feed':f));
   return {pets:pt.length, funcs:AUTO_FUNCS.filter(f=>on.has(f)).length, missing:AUTO_FUNCS.filter(f=>!on.has(f))}; }
-function autoProgressHTML(me){ const a=autoProgress(me); if(a.pets>=8 && a.funcs>=8) return `<div class="autobar done">🎉 <b>全自動農場</b>完成！休息的時候農場也在幫你賺錢</div>`;
-  return `<div class="autobar"><b>🤖 全自動農場進度</b>：寵物 ${a.pets}/8・裝備 ${a.funcs}/8 種<br><small>開滿 8 隻寵物、插上 8 種不同功能的裝備（${a.missing.map(f=>GEAR_FUNC[f]?GEAR_FUNC[f][1]+GEAR_FUNC[f][0]:f).join('、')||'—'}），休息時間也在賺錢！</small></div>`; }
+function autoProgressHTML(me){ const a=autoProgress(me); if(a.pets>=9 && a.funcs>=9) return `<div class="autobar done">🎉 <b>全自動農場</b>完成！休息的時候農場也在幫你賺錢</div>`;
+  return `<div class="autobar"><b>🤖 全自動農場進度</b>：寵物 ${a.pets}/9・裝備 ${a.funcs}/9 種<br><small>開滿 9 隻寵物、插上 9 種不同功能的裝備（${a.missing.map(f=>GEAR_FUNC[f]?GEAR_FUNC[f][1]+GEAR_FUNC[f][0]:f).join('、')||'—'}），休息時間也在賺錢！</small></div>`; }
 function beastPanelHTML(){
   const me=S.me, pt=partyOf(me);
   return autoProgressHTML(me) + partyRowHTML(me, true) + `<div class="rhint" style="text-align:center">夥伴 ${pt.length}/${me.party_cap||1} 隻・👑 第一隻是隊長・點寵物下方的格子可以插裝備</div>

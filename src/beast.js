@@ -64,7 +64,7 @@ function syncParkMovers(){
   });
 }
 
-/* ================= 夥伴隊伍（最多 8 隻，依等級開放） ================= */
+/* ================= 夥伴隊伍（最多 9 隻，依等級開放） ================= */
 const partyOf = who => (who && who.party && who.party.length) ? who.party : [{s:chrSpecies(who && who.chara), g:who && who.equip}];
 function syncParty(){
   const who = mode==='visit' && V ? V.owner : S && S.me; if(!who || !farmerMover) return;
@@ -80,13 +80,13 @@ function syncParty(){
   }
   extra.forEach((p,i)=>setMoverChar(partyMovers[i], p.s+'1', p.g));
 }
-function partyLvs(){ const st=(typeof CFG_SET!=='undefined'&&CFG_SET)||{}; return [1, +(st.party_lv2??5), +(st.party_lv3??10), +(st.party_lv4??15), +(st.party_lv5??20), +(st.party_lv6??25), +(st.party_lv7??7), +(st.party_lv8??8)]; }
+function partyLvs(){ const st=(typeof CFG_SET!=='undefined'&&CFG_SET)||{}; return [1, +(st.party_lv2??5), +(st.party_lv3??10), +(st.party_lv4??15), +(st.party_lv5??20), +(st.party_lv6??25), +(st.party_lv7??7), +(st.party_lv8??8), +(st.party_lv9??9)]; }
 async function saveParty(pt, msg){
   try{ applyState(await rpc('farm_set_party',{p_party:pt})); refresh(); sfx('coin'); if(msg) toast(msg); }catch(e){ toast(e.message); }
 }
 function partyRowHTML(who, editable){
   const pt=partyOf(who), cap=editable ? (who.party_cap||1) : pt.length, lvs=partyLvs();
-  return `<div class="prow">${[0,1,2,3,4,5,6,7].map(i=>{ const p=pt[i];
+  return `<div class="prow">${[0,1,2,3,4,5,6,7,8].map(i=>{ const p=pt[i];
     if(p){ const g=GEAR[p.g]; return `<div class="pslot${i===0?' lead':''}">${i===0?'<span class="crown">👑</span>':''}<img class="pb" src="${chrSrc(p.s+'1')}" alt="">${editable?`<button class="pg${g?' on':''}" data-pg="${i}">${g?`<img src="${A(g.icon)}" alt="">`:'<i>＋</i>'}<span>${g?'✓':'裝備'}</span></button>`:(g?`<span class="pg on"><img src="${A(g.icon)}" alt=""><span>裝備</span></span>`:'')}</div>`; }
     if(i<cap) return `<div class="pslot empty">空位</div>`;
     return `<div class="pslot lock">🔒<br>Lv${lvs[i]}</div>`; }).join('')}</div>`;

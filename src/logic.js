@@ -77,7 +77,8 @@ function autoJobs(a, b){
   const R={}; (a.ranch||[]).forEach(r=>R[r.slot]=r);
   (b.ranch||[]).forEach(r=>{ const o=R[r.slot]; if(!o) return;
     if(!o.ra && r.ra) petDo('feed', 'ranch');
-    else if(o.ra && !r.ra) petDo('harvest', 'ranch'); });
+    else if(o.ra && !r.ra) petDo('harvest', 'ranch');
+    if((r.f||0) < (o.f||0)) petDo('swat', 'ranch'); });
 }
 function applyVisit(v){ if(v) V = {owner:v.owner, plots:v.plots, ranch:v.ranch||[], bin:v.bin||{}, off:v.now - Date.now(), friend:!!v.friend, protected:!!v.protected}; }
 
@@ -521,7 +522,7 @@ function renderHUD(){
   else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';
   else if(PL.some(p=>p.s==='empty')) h = n?'點<b>空地</b>選種子種下去吧':'沒有種子了，到<b>穀倉的種子商店</b>買一些吧';
   else { const a=autoProgress(me);
-    h = (a.pets<8||a.funcs<8) ? `🤖 寵物 ${a.pets}/8・裝備 ${a.funcs}/8 種：開滿 8 隻寵物、插上 8 種裝備，打造<b>全自動農場</b>，休息時間也在賺錢！` : '作物正在長大中…去<b>好友廣場</b>看看誰的菜可以偷'; }
+    h = (a.pets<9||a.funcs<9) ? `🤖 寵物 ${a.pets}/9・裝備 ${a.funcs}/9 種：開滿 9 隻寵物、插上 9 種裝備，打造<b>全自動農場</b>，休息時間也在賺錢！` : '作物正在長大中…去<b>好友廣場</b>看看誰的菜可以偷'; }
   setHint(`<span>🌱</span><span>${h}</span>`);
 }
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
