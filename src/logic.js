@@ -492,10 +492,13 @@ function renderHUD(){
     const can = PL.filter(p=>p.s==='grow' && p.g>=CROP[p.c].time && !p.mine && p.st<p.cap).length;
     h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
     if(V.protected) h += '對方在<b>新手保護</b>中，不能偷菜和惡作劇';
-    else h += (can ? `有 <b>${can}</b> 塊地可以偷！` : `惡作劇還剩 ${me.prank_left} 次`) + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次）`);
+    else { const vb=V.bin||{}, binOk=binCount(vb.items)>0 && !vb.mine && vb.left>0;
+      h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇還剩 ${me.prank_left} 次`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次）`); }
     setHint(`<span>🧺</span><span>${h}</span>`); return;
   }
-  if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
+  const bn=binCount(me.bin);
+  if(bn>0) h=`🧺 <b>收集倉</b>有 ${bn} 個東西，記得點收集倉<b>收進穀倉</b>，避免被偷！`;
+  else if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
   else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，不處理會減少收成';
   else if(PL.some(isDry)) h='有田地<b>缺水</b>了，澆水才能長得快';
   else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';

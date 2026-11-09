@@ -413,13 +413,13 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794243666" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794243918" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794243666" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794243666" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794243666" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794243918" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794243918" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794243918" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
@@ -436,11 +436,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794243666" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794243918" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794243666";
+const BUILD="1794243918";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2479,10 +2479,13 @@ function renderHUD(){
     const can = PL.filter(p=>p.s==='grow' && p.g>=CROP[p.c].time && !p.mine && p.st<p.cap).length;
     h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
     if(V.protected) h += '對方在<b>新手保護</b>中，不能偷菜和惡作劇';
-    else h += (can ? `有 <b>${can}</b> 塊地可以偷！` : `惡作劇還剩 ${me.prank_left} 次`) + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次）`);
+    else { const vb=V.bin||{}, binOk=binCount(vb.items)>0 && !vb.mine && vb.left>0;
+      h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇還剩 ${me.prank_left} 次`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次）`); }
     setHint(`<span>🧺</span><span>${h}</span>`); return;
   }
-  if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
+  const bn=binCount(me.bin);
+  if(bn>0) h=`🧺 <b>收集倉</b>有 ${bn} 個東西，記得點收集倉<b>收進穀倉</b>，避免被偷！`;
+  else if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
   else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，不處理會減少收成';
   else if(PL.some(isDry)) h='有田地<b>缺水</b>了，澆水才能長得快';
   else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';
