@@ -320,7 +320,22 @@ function walkable(gx,gy){ const [x,y]=iso(gx,gy);
   if(RANCH && gx>RANCH[0]-0.15 && gx<RANCH[0]+RANCH[2]+0.15 && gy>RANCH[1]-0.15 && gy<RANCH[1]+RANCH[3]+0.15) return false;
   return true; }
 function clearLine(a,b){ const n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/0.25); for(let k=1;k<=n;k++){ if(!walkable(a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n)) return false; } return true; }
+function inRanch(gx,gy){ return RANCH && gx>RANCH[0]-0.2 && gx<RANCH[0]+RANCH[2]+0.2 && gy>RANCH[1]-0.2 && gy<RANCH[1]+RANCH[3]+0.2; }
+function ranchClear(a,b){ const n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/0.2); for(let k=1;k<=n;k++){ if(inRanch(a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n)) return false; } return true; }
+/* 繞過牧場的路線（回傳途經點，不含終點） */
+function viaAround(from, to){
+  if(!RANCH || ranchClear(from,to)) return [];
+  const [X,Y,W,D]=RANCH, m=0.6, C=[[X-m,Y-m],[X+W+m,Y-m],[X-m,Y+D+m],[X+W+m,Y+D+m]], L=(a,b)=>Math.hypot(b[0]-a[0],b[1]-a[1]);
+  let best=null, bl=1e9;
+  for(const c of C) if(ranchClear(from,c) && ranchClear(c,to)){ const l=L(from,c)+L(c,to); if(l<bl){ bl=l; best=[c]; } }
+  if(best) return best;
+  for(const c1 of C) for(const c2 of C) if(c1!==c2 && ranchClear(from,c1) && ranchClear(c1,c2) && ranchClear(c2,to)){ const l=L(from,c1)+L(c1,c2)+L(c2,to); if(l<bl){ bl=l; best=[c1,c2]; } }
+  return best||[];
+}
 function pickRoam(m){
+  if(!walkable(m.x,m.y)){ // 卡在不能走的地方（例如牧場裡），先走到最近的空地
+    for(let r=0.4;r<8;r+=0.4) for(let a=0;a<16;a++){ const g=[m.x+Math.cos(a/16*Math.PI*2)*r, m.y+Math.sin(a/16*Math.PI*2)*r]; if(walkable(g[0],g[1]) && !inRanch(g[0],g[1])){ m.route=viaAround([m.x,m.y],g).slice(1); return g; } }
+  }
   for(let k=0;k<40;k++){ const a=Math.random()*Math.PI*2, r=1.5+Math.random()*5, g=[m.x+Math.cos(a)*r, m.y+Math.sin(a)*r];
     if(walkable(g[0],g[1]) && clearLine([m.x,m.y],g)) return g; }
   return [m.x,m.y]; }
@@ -330,9 +345,11 @@ function farmerStep(m, dt){
   if(m.wait>0){ m.wait-=dt; if(m.wait<=0){ setAct(m,null); if(m.task && m.task.started) m.task=null; } }
   else {
     if(!m.task && !m.goal) m.goal = (m.route && m.route.length) ? m.route.shift() : pickRoam(m);
-    const goal = m.task ? m.task.pos : m.goal;
+    if(m.task && !m.task.via){ m.task.via = viaAround([m.x,m.y], m.task.pos); }
+    const goal = m.task ? (m.task.via.length ? m.task.via[0] : m.task.pos) : m.goal;
     const dx=goal[0]-m.x, dy=goal[1]-m.y, dist=Math.hypot(dx,dy), step=(m.task?2.4:m.speed*(m.c?Math.max(.6,Math.min(1.3,m.c.spd)):1))*dt;
-    if(dist<=step){ m.x=goal[0]; m.y=goal[1];
+    if(dist<=step && m.task && m.task.via.length){ m.x=goal[0]; m.y=goal[1]; m.task.via.shift(); moving=true; }
+    else if(dist<=step){ m.x=goal[0]; m.y=goal[1];
       if(m.task){ m.task.started=true; if(m.task.look){ const sd=(m.task.look[0]-m.x)-(m.task.look[1]-m.y); if(Math.abs(sd)>0.05) m.face=sd>0?1:-1; }
         setAct(m,m.task.act); m.wait=m.task.dur; emote(m,m.task.emo); }
       else { m.goal=null; if(m.route && m.route.length){ m.wait=0.2+Math.random()*0.6; } else { m.wait=1+Math.random()*3;

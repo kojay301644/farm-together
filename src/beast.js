@@ -74,7 +74,8 @@ function syncParty(){
   while(partyMovers.length > extra.length){ const m=partyMovers.pop(); m.el.remove(); const i=movers.indexOf(m); if(i>=0) movers.splice(i,1); }
   while(partyMovers.length < extra.length){
     const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML='<g class="mvin"></g>'; mv.appendChild(g);
-    const a=Math.random()*Math.PI*2, m={el:g, wait:Math.random()*2, face:1, x:farmerMover.x+Math.cos(a)*1.2, y:farmerMover.y+Math.sin(a)*1.2, path:[], tgt:0, speed:0.5, s:1.1, farmer:true, member:true};
+    let px=farmerMover.x, py=farmerMover.y; for(let t=0;t<30;t++){ const a=Math.random()*Math.PI*2, r=1+Math.random()*3, x=farmerMover.x+Math.cos(a)*r, y=farmerMover.y+Math.sin(a)*r; if(walkable(x,y)){ px=x; py=y; break; } }
+    const m={el:g, wait:Math.random()*2, face:1, x:px, y:py, path:[], tgt:0, speed:0.5, s:1.1, farmer:true, member:true};
     movers.push(m); partyMovers.push(m);
   }
   extra.forEach((p,i)=>setMoverChar(partyMovers[i], p.s+'1', p.g));
