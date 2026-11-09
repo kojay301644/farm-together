@@ -66,34 +66,35 @@ function openGearBag(slot){
   bindAutoSel();
 }
 
-/* 裝備商店：金幣（I、II 級）／鑽石（III、IV 級） */
-let gearShopTab='gold';
-function openGearShop(t){
+/* 裝備商店（升級制）：每種功能先買 I 階，再一階一階升級；I、II 階用金幣，III、IV 階用鑽石 */
+const gearOwned = (me, f) => GEAR_LIST.filter(g=>g.func===f && ((me.gear||{})[g.id]||0)>0).sort((a,b)=>b.tier-a.tier)[0] || null;
+function openGearShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
-  if(t) gearShopTab=t;
-  const me=S.me, list=GEAR_LIST.filter(g=>gearShopTab==='gold' ? g.gold!=null : g.gems!=null);
-  const tabs=`<div class="tabs"><button data-gs="gold" class="${gearShopTab==='gold'?'on':''}">金幣裝備</button><button data-gs="gem" class="${gearShopTab==='gem'?'on':''}">💎 高級裝備</button></div>`;
-  const byF={}; list.forEach(g=>(byF[g.func]=byF[g.func]||[]).push(g));
-  let body=tabs;
-  Object.keys(GEAR_FUNC).forEach(f=>{ if(!byF[f]) return;
-    body+=`<div class="sec">${GEAR_FUNC[f][1]} ${GEAR_FUNC[f][0]}</div>`;
-    body+=byF[f].map(g=>{ const lock=g.gold!=null && me.lv<g.lv, cost=g.gold!=null?`${g.gold.toLocaleString()} 金`:`💎${g.gems}`;
-      const poor=g.gold!=null ? me.gold<g.gold : (me.gems||0)<g.gems, n=(me.gear||{})[g.id]||0;
-      return `<div class="row" style="${lock?'opacity:.55':''}"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b>${n?` <span class="tag">已有 ${n}</span>`:''}<div>${gearDesc(g)}</div></div>
-        ${lock?`<span class="lock">Lv${g.lv} 解鎖</span>`:`<button class="mini ${g.gems!=null?'gem':''}" data-bg="${g.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('');
+  const me=S.me, funcs=[...new Set(GEAR_LIST.map(g=>g.func==='clear'?'feed':g.func))];
+  let body=`<div class="rhint" style="margin-bottom:6px">每種裝備只能有 1 件。先買 I 階，之後升級會直接變成下一階（插在寵物身上的也會自動換新）。</div>`;
+  funcs.forEach(f=>{ const tiers=GEAR_LIST.filter(g=>(g.func==='clear'?'feed':g.func)===f).sort((a,b)=>a.tier-b.tier); if(!tiers.length) return;
+    const cur=gearOwned(me, tiers[0].func), next=cur ? tiers.find(g=>g.tier===cur.tier+1) : tiers[0], show=cur||tiers[0];
+    const pips=tiers.map(g=>`<span class="tp${cur&&g.tier<=cur.tier?' on':''}">${ROMAN[g.tier]}</span>`).join('');
+    const prices=tiers.map(g=>`<span class="tpr${cur&&g.tier<=cur.tier?' on':''}">${ROMAN[g.tier]} ${g.gold!=null?`${g.gold.toLocaleString()}金`:`💎${g.gems}`}</span>`).join('');
+    let btn;
+    if(!next) btn=`<span class="tag" style="background:#E8F8EE;color:#2E9660">已滿階</span>`;
+    else { const lock=next.gold!=null && me.lv<next.lv, poor=next.gold!=null ? me.gold<next.gold : (me.gems||0)<next.gems, cost=next.gold!=null?`${next.gold.toLocaleString()} 金`:`💎${next.gems}`;
+      btn = lock ? `<span class="lock">Lv${next.lv} 解鎖</span>` : `<button class="mini ${next.gems!=null?'gem':''}" data-bg="${next.id}" ${poor?'disabled':''}>${cur?'升到 '+ROMAN[next.tier]+' 階':'購買'}<br>${cost}</button>`; }
+    body+=`<div class="row gshop"><div class="ic">${gearImg(show,44)}</div><div class="tx"><b>${GEAR_FUNC[f][1]} ${GEAR_FUNC[f][0]}</b> <span class="tps">${pips}</span>
+      <div>${cur?`目前 ${esc(gearTitle(cur))}：${gearDesc(cur)}`:'還沒有'}</div>${next?`<div class="gnext">下一階 ${esc(gearTitle(next))}：${gearDesc(next)}</div>`:''}<div class="tprs">${prices}</div></div>${btn}</div>`;
   });
   modal(`裝備商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`, body);
   const md=$('md');
-  md.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>openGearShop(b.dataset.gs));
-  md.querySelectorAll('[data-bg]').forEach(b=>b.onclick=async()=>{ const g=GEAR[b.dataset.bg];
-    try{ applyState(await rpc('farm_buy_gear',{p_id:g.id})); refresh(); sfx('coin');
+  md.querySelectorAll('[data-bg]').forEach(b=>b.onclick=async()=>{ const g=GEAR[b.dataset.bg], upgrade=g.tier>1;
+    try{ applyState(await rpc('farm_buy_gear',{p_id:g.id})); refresh(); sfx(upgrade?'lvup':'coin');
+      if(upgrade){ fxConfetti(); toast(`升級成 ${gearTitle(g)}！`); return openGearShop(); }
       const pt=JSON.parse(JSON.stringify(partyOf(S.me)));
       const pick=pt.map((p,i)=>{ const cg=GEAR[p.g]; return `<button class="eqpick" data-eqto="${i}"><img src="${chrSrc(p.s+'1')}" alt=""><b>${i===0?'👑 ':''}${esc(bName(p.s))}</b><small>${cg?`換下 ${esc(gearTitle(cg))}`:'空的裝備格'}</small></button>`; }).join('');
       modal('買到了！', `<div style="text-align:center;padding:6px 0">${gearImg(g,80)}<div style="font-weight:900;font-size:18px;margin-top:6px">${gearTitle(g)}</div><div style="color:var(--ink2);font-weight:700;margin-top:4px">${gearDesc(g)}</div></div>
         <div class="sec">要插在哪一隻寵物身上？</div><div class="eqgrid">${pick}</div>`,
         [['先放背包','sub',()=>openGearShop()]]);
-      document.querySelectorAll('[data-eqto]').forEach(b=>b.onclick=async()=>{ const i=+b.dataset.eqto, n=(S.me.gear||{})[g.id]||0, used=pt.filter((p,j)=>j!==i&&p.g===g.id).length;
-        if(used>=n){ for(let j=pt.length-1;j>=0;j--){ if(j!==i && pt[j].g===g.id){ pt[j].g=null; break; } } }
+      document.querySelectorAll('[data-eqto]').forEach(b=>b.onclick=async()=>{ const i=+b.dataset.eqto;
+        for(let j=0;j<pt.length;j++) if(j!==i && pt[j].g===g.id) pt[j].g=null;
         pt[i].g=g.id; await saveParty(pt, `${bName(pt[i].s)} 裝備好了！`); closeModal(); });
     }catch(e){ toast(e.message); } });
 }
