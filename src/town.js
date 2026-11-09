@@ -108,7 +108,7 @@ let plotEls=[], plotSig=[], plotLabs=[];
 const movers=[];
 let OBST=[], RANCH=null;  // 不能踩的範圍（畫面座標橢圓）
 const addObst=(gx,gy,rx,ry,dy=0)=>{ const [x,y]=iso(gx,gy); OBST.push([x,y+dy,rx,ry]); };
-let farmerMover=null, farmerAv=null;
+let farmerMover=null, farmerAv=null, partyMovers=[];
 /* 玩家角色＝萌獸（動作仿萌獸星球：腿部切片擺動、搖擺、漂浮、呼吸） */
 const CHR_RATIO={"bunny1":0.782,"bunny2":0.771,"bunny3":0.812,"mouse1":1.341,"mouse2":1.276,"mouse3":1.1,"mole1":0.882,"mole2":0.976,"mole3":0.976,"puffer1":1.0,"puffer2":0.982,"puffer3":0.965,"owl1":0.888,"owl2":0.841,"owl3":0.853,"lizard1":1.453,"lizard2":1.288,"lizard3":1.259,"deer1":0.747,"deer2":0.647,"deer3":0.712,"moth1":0.924,"moth2":0.988,"moth3":0.865,"armad1":1.112,"armad2":1.035,"armad3":0.971,"seal1":1.1,"seal2":1.059,"seal3":0.994,"marten1":1.006,"marten2":1.212,"marten3":1.276,"phoenix1":0.841,"phoenix2":0.947,"phoenix3":0.882,"fox1":1.018,"fox2":0.994,"fox3":1.0,"otter1":0.9,"otter2":0.865,"otter3":0.841,"penguin1":0.871,"penguin2":0.953,"penguin3":0.929,"pango1":1.188,"pango2":1.365,"pango3":1.147,"ferret1":0.971,"ferret2":1.053,"ferret3":1.012,"whale1":1.376,"whale2":1.182,"whale3":1.088,"bear1":0.965,"bear2":0.9,"bear3":0.935,"dragon1":0.941,"dragon2":0.935,"dragon3":0.947};
 const CHR_NAMES={"bunny":["蘑菇兔","孢子兔","森菇賢者"],"mouse":["火花鼠","電光鼠","雷霆鼠"],"mole":["礦石鼴","礦工鼴","晶甲鼴王"],"puffer":["泡泡豚","珊瑚豚","鎧刺豚"],"owl":["雪絨鴞","霜羽鴞","冰冠鴞"],"lizard":["火蜥寶","熔岩蜥","岩漿蜥王"],"deer":["雷光鹿","雷角鹿","霆冠鹿王"],"moth":["花芽蝶","花仙蝶","虹彩花后"],"armad":["小鋼甲","鐵甲犰狳","鋼堡犰狳"],"seal":["雪球海豹","極光海豹","極光女王"],"marten":["影絨貂","影刺貂","雷影忍貂"],"phoenix":["火鳥雛","烈焰鳥","不死鳳凰"],"fox":["小焰狐","焰尾狐","炎陽狐王"],"otter":["泡泡獺","浪花獺","潮汐獺王"],"penguin":["雪糰企鵝","霜羽企鵝","冰冠企鵝帝"],"pango":["小石甲","滾石甲","山岳甲王"],"ferret":["靜電毛球","雷絨貂","雷霆貂"],"whale":["小鯨鈴","鳴鈴鯨","天籟鯨"],"bear":["苔苔熊","藤甲熊","古森熊王"],"dragon":["星晶龍寶","星晶龍","創星龍"]};
@@ -131,7 +131,8 @@ function charSVG(k){
       <g class="cp-a">${img(id+'a')}</g><g class="cp-b">${img(id+'b')}</g><g class="cp-t">${img(id+'t')}</g>`; }
   return `<ellipse class="cp-sh" cx="0" cy="0" rx="${b*.3}" ry="${n*.08}" fill="rgba(0,0,0,.2)"/><g class="cp-root">${body}</g>`;
 }
-function setFarmer(k, gid){ const sig=k+'|'+((typeof GEAR!=='undefined'&&GEAR[gid])?gid:''); if(!farmerMover || farmerAv===sig) return; farmerAv=sig; const m=farmerMover; m.el.firstChild.innerHTML=charSVG(k);
+function setFarmer(k, gid){ setMoverChar(farmerMover, k, gid); }
+function setMoverChar(m, k, gid){ const sig=k+'|'+((typeof GEAR!=='undefined'&&GEAR[gid])?gid:''); if(!m || m.sig===sig) return; m.sig=sig; m.el.firstChild.innerHTML=charSVG(k);
   const g=(typeof GEAR!=='undefined')&&GEAR[gid]; if(g){ const c=chrInfo(k), n=48+c.st*9, sz=Math.round(n*.42), tgt=m.el.querySelector('.cp-t')||m.el.querySelector('.cp-root');
     tgt.insertAdjacentHTML('beforeend',`<g class="gbadge"><circle cx="${n*.18}" cy="${-n*.42}" r="${sz*.55}" fill="#FFF8E6" stroke="#4B3423" stroke-width="1.8"/><image href="${A(g.icon)}" x="${n*.18-sz/2}" y="${-n*.42-sz/2}" width="${sz}" height="${sz}"/></g>`); }
   m.c=chrInfo(k); m.n=48+m.c.st*9; m.ph=0; m.anim=Math.random()*9; m.jump=0;
@@ -301,9 +302,9 @@ function buildWorld(){
   const WP=[[645,425],[560,430],[420,265],[545,285],[600,235],[690,235],[745,285],[890,268],[760,300],[730,430],[650,480],[760,520]].map(H_)
     .concat([out,gin,inside,inside2,inside,gin,out]).concat([[620,520],[690,500]].map(H_));
   addMover('',{x:C0[0],y:C0[1],path:WP,tgt:1,speed:0.55,s:1.25,farmer:true});
-  farmerMover=movers[movers.length-1]; farmerAv=null;
+  farmerMover=movers[movers.length-1]; farmerAv=null; partyMovers=[];
   ranchMovers=[]; ranchSig='';
-  { const pc=BLD.find(b=>b.id==='pen').c; PARK=[pc[0]-0.2, pc[1]-0.6, 1.6]; parkMovers=[]; parkSig=''; }
+  { const pc=BLD.find(b=>b.id==='pen').c; PARK=[pc[0]-0.6, pc[1]-0.9, 2.5]; parkMovers=[]; parkSig=''; }
   ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
 

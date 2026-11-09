@@ -20,10 +20,32 @@ function zhErr(m){
   return m;
 }
 async function rpc(fn, args){
+  if(SESS.kicked) throw new Error('帳號已在其他裝置登入');
   const {data, error} = await sb.rpc(fn, args||{});
-  if(error) throw new Error(zhErr(error.message));
+  if(error){ if(/KICKED/.test(error.message)){ showKicked(); throw new Error('帳號已在其他裝置登入'); } throw new Error(zhErr(error.message)); }
   return data;
 }
+/* ================= 單一裝置登入：新登入的裝置會擠掉舊的 ================= */
+const SESS = {sid:null, kicked:false};
+let CFG_SET = {};
+function devName(){ const u=navigator.userAgent; const os=/iPhone/.test(u)?'iPhone':/iPad/.test(u)?'iPad':/Android/.test(u)?'Android 手機':/Mac/.test(u)?'Mac':/Windows/.test(u)?'Windows 電腦':'其他裝置';
+  const br=/Line\//.test(u)?'LINE':/FBAN|FBAV/.test(u)?'Facebook':/CriOS|Chrome/.test(u)?'Chrome':/Safari/.test(u)?'Safari':/Firefox/.test(u)?'Firefox':'瀏覽器'; return os+'・'+br; }
+function setSidHeader(v){ try{ const h=sb.rest.headers; if(typeof Headers!=='undefined' && h instanceof Headers){ v?h.set('x-farm-sid',v):h.delete('x-farm-sid'); } else if(h){ if(v) h['x-farm-sid']=v; else delete h['x-farm-sid']; } }catch(e){} }
+async function sessionStart(){
+  try{ const {data} = await sb.rpc('farm_session_start', {p_dev:devName()}); if(data && data.sid){ SESS.sid=data.sid; SESS.kicked=false; setSidHeader(data.sid); } }catch(e){}
+}
+async function sessionPing(){
+  if(!SESS.sid || SESS.kicked) return;
+  try{ const {data} = await sb.rpc('farm_session_ping', {p_sid:SESS.sid}); if(data && data.ok===false) showKicked(data.dev); }catch(e){}
+}
+function showKicked(dev){
+  if(SESS.kicked) return; SESS.kicked=true;
+  const d=document.createElement('div'); d.className='kick';
+  d.innerHTML=`<div class="kbox"><div style="font-size:40px">⚠️</div><h3>帳號已在其他裝置登入</h3><p>你的帳號剛剛在${dev?`「${esc(dev)}」`:'另一台裝置'}開啟，這台已經暫停，避免兩邊同時玩造成進度錯亂。</p><p class="mut">如果不是你本人登入，請盡快修改密碼。</p><button class="btn" id="kickGo">在這台繼續玩</button></div>`;
+  document.body.appendChild(d); $('kickGo').onclick=()=>location.reload();
+}
+setInterval(sessionPing, 30000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sessionPing(); });
 
 /* ================= 遊戲狀態 ================= */
 let S = null;          // 自己：{me, plots, off}
@@ -471,7 +493,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); } else if(S){ applySkins(S.me.skin_on); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -557,7 +579,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts);
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts); CFG_SET=c.settings||{};
   }catch(e){}
 }
 async function showNotices(){
@@ -569,6 +591,7 @@ async function showNotices(){
 }
 function startGame(st){
   applyState(st); mode = 'home'; V = null;
+  sessionStart();
   loadConfig().then(()=>{ if(S) refresh(); });
   showScreen('game');
   if(!built){ buildWorld(); requestAnimationFrame(animate); built = true; }
@@ -605,7 +628,7 @@ $('tutSkip').onclick = ()=>tutFinish();
 sb.auth.onAuthStateChange((ev, session)=>{
   if(ev==='PASSWORD_RECOVERY'){ setTimeout(showResetPw, 300); }
   if(session && (ev==='SIGNED_IN' || ev==='INITIAL_SESSION') && !S) setTimeout(enterGame, 0);
-  if(ev==='SIGNED_OUT'){ tut=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; S=null; V=null; mode='home'; showScreen('login'); setAuthMode('login'); }
+  if(ev==='SIGNED_OUT'){ SESS.sid=null; setSidHeader(null); tut=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; S=null; V=null; mode='home'; showScreen('login'); setAuthMode('login'); }
   if(ev==='INITIAL_SESSION' && !session) showScreen('login');
 });
 setAuthMode('login');
