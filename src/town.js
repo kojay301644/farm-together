@@ -37,7 +37,7 @@ function sprite(name, gx, gy, w, opt={}){
   const yy = y - h*(opt.foot ?? 0.82);
   return `<image href="${A(name)}" x="${(x-w/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" ${opt.cls?`class="${opt.cls}"`:''}/>`;
 }
-const RATIO = {b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
+const RATIO = {bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
   dc_flower:1, dc_lamp:1, dc_bench:1, dc_pond:1, dc_hay:1, dc_mail:1, dc_kennel:1, dc_lantree:1, dc_swing:1, dc_sakura:1, dc_picnic:1, dc_balloon:1,
   bunny1:396/310, bear1:1, fox1:1, penguin1:1, otter1:1, mouse1:1};
 
@@ -48,7 +48,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:HG(930,203),  w:240, foot:0.80},
   {id:'decor', name:'裝飾店',   img:'bc_shop',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:HG(694,560), w:104, foot:0.78, locked:'牧場將在第四階段開放'},
-  {id:'pen',   name:'萌獸園', skip:true, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
+  {id:'pen',   name:'萌獸園',   img:'bf_train',   c:HG(398,552), w:390, foot:0.70, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
 
 // 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
@@ -210,15 +210,6 @@ function buildWorld(){
   const RC=HG(694,556), RW=3.0, RD=3.0, RX=RC[0]-RW/2, RY=RC[1]-RD/2;
   pen(RX,RY,RW,RD,'#E8D3A2','#A8D46E');
   { const [tx,ty]=iso(RX+RW-0.7, RY+0.6); objs.push({depth:RX+RW+RY, svg: ol(`<path d="M${tx-22} ${ty-6} l22 -11 l22 11 l-22 11z" fill="#8B5E3C"/><path d="M${tx-18} ${ty-6} l18 -9 l18 9 l-18 9z" fill="#F4D35E"/>`,2)}); }
-  // 萌獸園（原本農田的位置，之後多的萌獸住這裡）
-  const YC=HG(398,540), YW=3.6, YD=3.6, YX=YC[0]-YW/2, YY=YC[1]-YD/2;
-  objs.push({depth:-1, svg:`<g class="tap" data-b="pen"><polygon points="${P(dia(YX,YY,YW,YD))}" fill="rgba(0,0,0,0)"/></g>`});
-  pen(YX,YY,YW,YD,'#F3E3BF','#B6DE7E',true);
-  { const a=iso(YX+YW/2-0.45,YY), b=iso(YX+YW/2+0.45,YY), m=[(a[0]+b[0])/2,(a[1]+b[1])/2-58];
-    ground += ol(`<rect x="${a[0]-4}" y="${a[1]-52}" width="8" height="52" rx="3" fill="#A86F45"/><rect x="${b[0]-4}" y="${b[1]-52}" width="8" height="52" rx="3" fill="#A86F45"/>`,2)
-      + `<path d="M${a[0]} ${a[1]-50} Q${m[0]} ${m[1]-22} ${b[0]} ${b[1]-50}" stroke="${INK}" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M${a[0]} ${a[1]-50} Q${m[0]} ${m[1]-22} ${b[0]} ${b[1]-50}" stroke="#C98B5E" stroke-width="5" fill="none" stroke-linecap="round"/>`
-      + `<g transform="translate(${m[0]} ${m[1]})"><rect x="-30" y="-10" width="60" height="20" rx="6" fill="#FFF1DC" stroke="${INK}" stroke-width="2"/><text y="5" text-anchor="middle" font-size="12" font-weight="900" fill="#6B4A2E" font-family="Noto Sans TC,sans-serif">萌獸園</text></g>`;
-    const [wx,wy]=iso(YX+0.9, YY+YD-0.9); objs.push({depth:YX+YY+YD, svg: ol(`<ellipse cx="${wx}" cy="${wy}" rx="24" ry="11" fill="#9C6B43"/><ellipse cx="${wx}" cy="${wy-2}" rx="18" ry="7" fill="#7FD0F5"/>`,2)}); }
 
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
