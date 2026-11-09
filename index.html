@@ -360,13 +360,13 @@ body.lowfx .bird{display:none}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794231378" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794231514" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794231378" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794231378" alt=""><span id="pgems">0</span></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794231378" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794231514" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794231514" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794231514" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>
@@ -382,11 +382,11 @@ body.lowfx .bird{display:none}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794231378" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794231514" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794231378";
+const BUILD="1794231514";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1336,6 +1336,22 @@ function openSkinShop(t){
   md.querySelectorAll('[data-skuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_skin',{p_bld:skinTab,p_style:b.dataset.skuse})); refresh(); sfx('coin'); openSkinShop(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
 }
+
+/* ================= 自動更新：發現新版就重新載入 ================= */
+async function checkUpdate(){
+  try{
+    const t = await (await fetch('index.html?u='+Date.now(), {cache:'no-store'})).text();
+    const v = (t.match(/const BUILD="(\d+)"/)||[])[1];
+    if(v && v!==BUILD){
+      if(document.querySelector('#ov.show') || (typeof ui!=='undefined' && ui.busy)) return;  // 不打斷正在做的事
+      toast('有新版本，更新中…');
+      setTimeout(()=>{ const u=new URL(location.href); u.searchParams.set('v', v); location.replace(u.toString()); }, 800);
+    }
+  }catch(e){}
+}
+setInterval(checkUpdate, 60000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkUpdate(); });
+setTimeout(checkUpdate, 3000);
 
 /* ================= 連線設定 ================= */
 const SB_URL = 'https://qnxnuyfvkrvhnaewvrik.supabase.co';

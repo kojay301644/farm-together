@@ -128,3 +128,19 @@ function openSkinShop(t){
   md.querySelectorAll('[data-skuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_skin',{p_bld:skinTab,p_style:b.dataset.skuse})); refresh(); sfx('coin'); openSkinShop(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
 }
+
+/* ================= 自動更新：發現新版就重新載入 ================= */
+async function checkUpdate(){
+  try{
+    const t = await (await fetch('index.html?u='+Date.now(), {cache:'no-store'})).text();
+    const v = (t.match(/const BUILD="(\d+)"/)||[])[1];
+    if(v && v!==BUILD){
+      if(document.querySelector('#ov.show') || (typeof ui!=='undefined' && ui.busy)) return;  // 不打斷正在做的事
+      toast('有新版本，更新中…');
+      setTimeout(()=>{ const u=new URL(location.href); u.searchParams.set('v', v); location.replace(u.toString()); }, 800);
+    }
+  }catch(e){}
+}
+setInterval(checkUpdate, 60000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkUpdate(); });
+setTimeout(checkUpdate, 3000);
