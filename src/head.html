@@ -7,8 +7,8 @@
 <meta name="description" content="開心農場風格的小鎮種田遊戲：種菜、收成、加好友、偷菜！">
 <meta name="theme-color" content="#3BB273">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="icon-192.png?v=2">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+<link rel="icon" type="image/png" href="icon-192.png?v=3">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="一起種田吧">
@@ -318,6 +318,18 @@ body.lowfx .bird{display:none}
 .hint.hide{opacity:0;transform:translateY(-8px);pointer-events:none}
 .setbtn{flex:none;width:36px;height:36px;border-radius:12px;border:0;background:#F3EBDD;display:grid;place-items:center;cursor:pointer;padding:0}
 .setbtn img{width:28px;height:28px;object-fit:contain}
+.setbtn.eb{font-size:20px;line-height:1;margin-left:-2px}
+@media (max-width:520px){.top{gap:6px}.cur{flex-direction:column;gap:2px;align-items:flex-end}.setbtn{width:32px;height:32px;border-radius:10px}.setbtn img{width:24px;height:24px}.setbtn.eb{font-size:17px;margin-left:-3px}}
+.sidebtn{position:absolute;left:10px;top:calc(100% + 8px);width:50px;height:54px;border:0;border-radius:14px;background:rgba(255,255,255,.95);box-shadow:0 3px 0 #4B3423;font-size:22px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:0}
+.sidebtn small{font-size:11px;font-weight:900;color:var(--ink)}
+.sidebtn.dot::after{content:'';position:absolute;right:-2px;top:-2px;width:12px;height:12px;border-radius:50%;background:#F2545B;border:2px solid #fff}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.sgd{position:relative;background:#FFF8EC;border:2.5px solid #E6D9C3;border-radius:14px;padding:8px 4px;text-align:center;font-size:13px}
+.sgd.big{grid-column:1/-1;background:#FFF1D6;border-color:#FFB547}
+.sgd .sgr{margin-top:4px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.sgd.now{border-color:#3BB273;box-shadow:0 0 0 3px rgba(59,178,115,.25)}
+.sgd.got{opacity:.6}.sgd.got i{position:absolute;right:6px;top:4px;color:#3BB273;font-style:normal;font-weight:900;font-size:18px}
+.avw{position:relative;flex:none}.aved{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;background:#FF9F43;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 0 #D67D22;pointer-events:none}
 .admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
 .admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}
 .admrow input{font:inherit;font-weight:800;padding:5px 8px;border-radius:10px;border:2px solid #E6D2A8;width:100%;box-sizing:border-box}
@@ -420,16 +432,18 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp" alt="" style="cursor:pointer">
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
     <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
     <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">

@@ -27,9 +27,10 @@ function autoProgressHTML(me){ const a=autoProgress(me); if(a.pets>=9 && a.funcs
 function beastPanelHTML(){
   const me=S.me, pt=partyOf(me);
   return autoProgressHTML(me) + partyRowHTML(me, true) + `<div class="rhint" style="text-align:center">夥伴 ${pt.length}/${me.party_cap||1} 隻・👑 第一隻是隊長・點寵物下方的格子可以插裝備</div>
-    <div class="homebtns"><button class="btn sub" id="hCh">🐾 換夥伴</button><button class="btn o" id="hBag">🎒 背包</button></div>`;
+    <div class="homebtns"><button class="btn sub" id="hCh">🐾 換夥伴</button><button class="btn o" id="hBag">🎒 背包</button></div>
+    <div class="homebtns"><button class="btn" id="hPlace">🖐️ 擺放城鎮</button></div>`;
 }
-function bindBeastPanel(){ document.querySelectorAll('#md [data-pg]').forEach(b=>b.onclick=()=>openGearBag(+b.dataset.pg)); $('hCh').onclick=()=>openBeastPark('mine'); $('hBag').onclick=()=>openPack(); }
+function bindBeastPanel(){ document.querySelectorAll('#md [data-pg]').forEach(b=>b.onclick=()=>openGearBag(+b.dataset.pg)); $('hCh').onclick=()=>openBeastPark('mine'); $('hBag').onclick=()=>openPack(); if($('hPlace')) $('hPlace').onclick=()=>{ closeModal(); enterDecorEdit(); }; }
 
 /* 自動播種要種什麼、自動餵食要拿什麼餵 */
 function autoSeedHTML(){ const me=S.me;

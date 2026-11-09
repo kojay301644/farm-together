@@ -289,19 +289,8 @@ async function openHome(){
   const {data:{user}} = await sb.auth.getUser();
   modal(`🏠 ${esc(S.me.nickname)}的家`, `
     <div class="sec">我的寵物夥伴</div>${beastPanelHTML()}
-    <div class="sec">成就（拿鑽石）</div>${achHTML(S.me)}
-    <div class="sec">玩家</div>
-    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
-    <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
-    <div class="sec">玩法小提醒</div>
-    <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
-      ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友廣場」加好友、拜訪好友農場</div>
-    <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
-    <div class="homebtns"><button class="btn o" id="hGift">📬 禮物信箱</button><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
-    <div class="homebtns"><button class="btn sub" id="hSet">⚙️ 設定・登出</button></div>`);
-  $('hAv').onclick = openAvatarPicker; bindBeastPanel();
-  $('hSet').onclick = openSettings;
-  $('hGift').onclick = ()=>openGifts(false); $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
+    <div class="sec">成就（拿鑽石）</div>${achHTML(S.me)}`);
+  bindBeastPanel();
 }
 /* ================= 設定頁 ================= */
 async function openSettings(){
@@ -310,8 +299,8 @@ async function openSettings(){
     <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(me,'avatar')}<div style="font-weight:800;line-height:1.6">${esc(me.nickname)}・Lv${me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div></div>
     <div class="homebtns"><button class="btn sub" id="sSwitch">🔄 切換帳號</button><button class="btn sub" id="sOut" style="background:#F2545B;color:#fff;box-shadow:0 3px 0 #C23A40">登出</button></div>
     <div class="sec">遊戲設定</div>
-    <div class="seg" style="margin-top:6px"><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
-    <div class="homebtns"><button class="btn o" id="sHelp">📖 遊戲說明</button><button class="btn o" id="sA2hs">📱 加到桌面</button></div>
+    <div class="seg" style="margin-top:6px"><button id="tBgm" class="${BGM_ON?'on':''}">🎵 音樂</button><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
+    <div class="homebtns"><button class="btn o" id="sA2hs">📱 加到桌面</button><button class="btn sub" id="sInv">💌 邀請朋友</button></div>
     <div class="sec">兌換碼</div><div class="redeem"><input id="rCode" placeholder="輸入兌換碼" maxlength="20" autocomplete="off"><button class="btn" id="rGo">兌換</button></div>`;
   if(me.admin) body += `<div class="sec">🛠️ 管理員</div><div class="admbox">
     <div class="admrow"><span>等級</span><input id="aLv" type="number" min="1" max="30" value="${me.lv}"><span>金幣</span><input id="aGold" type="number" min="0" value="${me.gold}"><span>鑽石</span><input id="aGems" type="number" min="0" value="${me.gems||0}"></div>
@@ -320,10 +309,11 @@ async function openSettings(){
     <div class="rhint">只會改到你自己的帳號，每次修改都記錄在後台的操作紀錄</div></div>`;
   body += `<div style="text-align:center;margin-top:12px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`;
   modal('設定', body);
+  $('tBgm').onclick = ()=>{ BGM_ON=!BGM_ON; SETPREF('bgm',BGM_ON); bgmSync(); openSettings(); };
   $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openSettings(); };
   $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openSettings(); };
   $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openSettings(); };
-  $('sHelp').onclick = openHelp; $('sA2hs').onclick = openA2HS;
+  $('sInv').onclick = invite; $('sA2hs').onclick = openA2HS;
   $('rGo').onclick = async()=>{ const c=$('rCode').value.trim(); if(!c) return toast('請輸入兌換碼');
     try{ const r=await rpc('farm_redeem',{p_code:c}); applyState(r.state); refresh(); sfx('lvup'); fxConfetti(); closeModal(); modal('🎁 兌換成功！', `<div class="rwbox">${rewardHTML(r.reward)}</div>`); if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } };
   $('sOut').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
@@ -530,7 +520,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); syncParkMovers(); renderDecor(); signBadge(); $('bSign').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -607,7 +597,7 @@ async function enterGame(){
   try{
     const st = await rpc('farm_me');
     if(!st){ showScreen('nick'); setTimeout(()=>$('nickIn').focus(), 50); return; }
-    startGame(st); setTimeout(()=>dailyToast(st), 3500);
+    startGame(st); setTimeout(()=>dailyToast(st), 3500); setTimeout(signMaybePop, 4500);
   }catch(e){ showScreen('login'); authMsg(e.message); if(/停權/.test(e.message)) sb.auth.signOut(); }
   finally{ entering = false; }
 }
@@ -657,6 +647,9 @@ $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); }
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
 $('bSet').onclick = ()=>{ if(S) openSettings(); };
+$('bHelp').onclick = ()=>{ if(S) openHelp(); };
+$('bSign').onclick = ()=>openSign();
+$('bGift').onclick = ()=>{ if(S) openGifts(false); };
 $('avatar').onclick = ()=>{ if(S && mode==='home') openAvatarPicker(); };
 $('gemBox').onclick = ()=>{ if(S) openTopup(); };
 $('tutNext').onclick = ()=>tutNext();

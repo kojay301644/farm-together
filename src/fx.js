@@ -3,7 +3,16 @@
 const PREF = (k, d) => { try{ const v = localStorage.getItem('ytzt_'+k); return v===null ? d : v==='1'; }catch(e){ return d; } };
 const SETPREF = (k, v) => { try{ localStorage.setItem('ytzt_'+k, v?'1':'0'); }catch(e){} };
 let LOWFX = PREF('low', (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) || (navigator.deviceMemory && navigator.deviceMemory <= 2));
-let SFX_ON = PREF('sfx', true), VIB_ON = PREF('vib', true);
+let SFX_ON = PREF('sfx', true), VIB_ON = PREF('vib', true), BGM_ON = PREF('bgm', true);
+/* 背景音樂：第一次點畫面後開始播（瀏覽器規定），切到背景自動暫停 */
+let BGM = null;
+function bgmSync(){
+  if(!BGM_ON || document.hidden){ if(BGM) BGM.pause(); return; }
+  if(!BGM){ BGM = new Audio('assets/bgm.mp3?v='+(typeof BUILD!=='undefined'?BUILD:'')); BGM.loop = true; BGM.volume = 0.35; }
+  const p = BGM.play(); if(p && p.catch) p.catch(()=>{});
+}
+addEventListener('pointerdown', ()=>{ if(BGM_ON && (!BGM || BGM.paused)) bgmSync(); }, {passive:true});
+document.addEventListener('visibilitychange', bgmSync);
 document.body.classList.toggle('lowfx', LOWFX);
 
 /* ================= 音效（WebAudio 即時合成，不用音檔） ================= */

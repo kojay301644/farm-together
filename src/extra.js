@@ -1,17 +1,58 @@
 
 /* ================= 新手教學 ================= */
 const GAME_URL = 'https://kojay301644.github.io/farm-together/';
+const bEl = id => document.querySelector(`[data-b="${id}"]`);
 const TUT_STEPS = [
-  {text:'歡迎來到小鎮！先點一塊<b>空地</b>，選「白蘿蔔」種下去吧', target:()=>plotEls[S.plots.findIndex(p=>p.s==='empty'||p.s==='grow')], done:()=>S.plots.some(p=>p.s==='grow'||p.s==='dead')},
+  {text:'歡迎來到你的農場！先點一塊<b>空地</b>，選「白蘿蔔」種下去吧 🌱', target:()=>plotEls[S.plots.findIndex(p=>p.s==='empty'||p.s==='grow')], done:()=>S.plots.some(p=>p.s==='grow')},
   {text:'下面是<b>工具列</b>：田裡缺水、長草或有蟲時，選對應的工具點田地。放著不管，收成會變少喔', target:()=>$('tools'), next:true},
-  {text:'白蘿蔔大約 <b>2 分鐘</b>成熟。成熟後選「收成」點它，就能收進倉庫', target:()=>plotEls[S.plots.findIndex(p=>p.s==='grow'||p.s==='dead')], done:()=>Object.keys(S.me.crops).length>0 || S.plots.some(p=>p.s==='dead'), next:true},
-  {text:'點<b>穀倉</b>可以把作物賣掉換金幣，裡面的<b>種子商店</b>可以買更多種子', target:()=>document.querySelector('[data-b="barn"]'), next:true},
-  {text:'最後，點中間的<b>好友廣場</b>（噴水池）用暱稱加好友，就能去朋友的農場偷菜了！', target:()=>document.querySelector('[data-b="board"]'), next:true, last:true},
+  {text:'白蘿蔔大約 <b>2 分鐘</b>成熟。成熟後選「收成」點它，作物就會收進穀倉', target:()=>plotEls[S.plots.findIndex(p=>p.s==='grow')], done:()=>Object.values(S.me.crops||{}).some(n=>n>0), next:true},
+  {text:'點<b>穀倉</b>可以把作物賣掉換金幣；穀倉裡的<b>種子商店</b>可以買更多、更高級的種子', target:()=>bEl('barn'), next:true},
+  {text:'這是<b>你的家</b>：可以看寵物夥伴、幫寵物插裝備、打開背包、<b>擺放城鎮</b>裝飾，還有<b>成就</b>可以拿鑽石 💎', target:()=>bEl('home'), next:true},
+  {text:'<b>寵物園</b>可以買新寵物、讓牠們上場當夥伴。夥伴會在農場陪你，插上裝備還會<b>自動幫你做事</b>', target:()=>bEl('pen'), next:true},
+  {text:'<b>裝備商店</b>賣寵物裝備：自動播種、澆水、收成、除草、除蟲…插滿 9 種就是<b>全自動農場</b>，休息時間也在賺錢！', target:()=>bEl('decor'), next:true},
+  {text:'上面的功能條：點<b>頭像</b>換頭像，📬 <b>禮物信箱</b>收獎勵，📖 <b>遊戲說明</b>，⚙️ 設定（可以開關🎵音樂）。左邊 ✍️ <b>每日簽到</b>，連續 7 天有大獎！', target:()=>$('bGift'), next:true},
+  {text:'最後，點中間的<b>好友廣場</b>用暱稱加好友、拜訪鄰居，成熟的菜可以偷喔！祝你玩得開心 🎉', target:()=>bEl('board'), next:true, last:true},
 ];
+/* 新功能開放時的一次性教學 */
+const FEAT_TUTS = [
+  {id:'till', when:()=>S.plots.some(p=>p.s==='wild' && LAND[p.i] && S.me.lv>=LAND[p.i].lv && S.me.gold>=LAND[p.i].cost),
+   text:'🪓 有<b>荒地</b>可以開墾了！點荒地花一點金幣開墾，就能種更多田', target:()=>plotEls[S.plots.findIndex(p=>p.s==='wild' && LAND[p.i] && S.me.lv>=LAND[p.i].lv)]},
+  {id:'party2', when:()=>(S.me.party_cap||1)>=2,
+   text:'🐾 <b>第 2 個夥伴格</b>開放了！到<b>寵物園</b>買新寵物，按「上場當夥伴」讓牠一起幫忙', target:()=>bEl('pen')},
+  {id:'gear', when:()=>S.me.lv>=3 && !Object.values(S.me.gear||{}).some(n=>n>0),
+   text:'🛡️ <b>裝備商店</b>可以買裝備了！買完選一隻寵物插上，牠就會自動幫你做事（例如自動澆水、自動收成）', target:()=>bEl('decor')},
+  {id:'ranch', when:()=>S.me.lv>=RANCH_LV,
+   text:'🐔 <b>牧場</b>開放了！買小雞、用穀倉的作物餵牠，過一段時間就會生產雞蛋，可以拿去賣錢', target:()=>bEl('coop')},
+  {id:'auto', when:()=>partyOf(S.me).some(p=>p.g),
+   text:'🤖 你的寵物開始用裝備工作了！到<b>我的家</b>看「全自動農場進度」：開滿 9 隻寵物、插上 9 種裝備，農場就會全自動', target:()=>bEl('home')},
+  {id:'bin', when:()=>binCount(S.me.bin)>0,
+   text:'🧺 寵物自動收成的東西會先放在<b>收集倉</b>。記得常來點它「收進穀倉」，不然別人可以來偷！', target:()=>bEl('bin')},
+  {id:'steal', when:()=>S.me.lv > (+(CFG_SET.newbie_lv??3)),
+   text:'⚠️ <b>新手保護</b>結束了！現在鄰居可以來偷你的菜，你也可以去偷別人的。插上<b>看門狗</b>裝備可以擋小偷', target:()=>bEl('board')},
+  {id:'shop', when:()=>S.me.lv>=5,
+   text:'🏠 <b>建築商店</b>可以買裝飾擺在農場、換建築外觀和城鎮色調，把農場打扮成你喜歡的樣子', target:()=>bEl('shop')},
+];
+let feat = null;   // 目前顯示中的新功能教學
+const featKey = id => 'ytzt_feat_' + (S && S.me.id) + '_' + id;
+const featSeen = id => { try{ return localStorage.getItem(featKey(id))==='1'; }catch(e){ return true; } };
+function featDone(){ if(feat){ try{ localStorage.setItem(featKey(feat.id),'1'); }catch(e){} } feat=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; }
+function featTick(){
+  if(tut || !S || mode!=='home' || !tutDone()) return;
+  if(document.querySelector('#ov.show')) return;
+  if(!feat){ feat = FEAT_TUTS.find(f=>!featSeen(f.id) && (()=>{ try{ return f.when(); }catch(e){ return false; } })()) || null;
+    if(!feat) return;
+    $('tut').style.display=''; $('tutText').innerHTML=`<span class="tutn">新功能</span>${feat.text}`;
+    $('tutNext').style.display=''; $('tutNext').textContent='知道了'; $('tutSkip').style.display='none'; }
+  const el = feat.target && feat.target(), a=$('tutArrow');
+  if(!el){ a.style.display='none'; return; }
+  const r=el.getBoundingClientRect(); a.style.display=''; a.style.left=(r.left+r.width/2)+'px'; a.style.top=Math.max(110, r.top-6)+'px';
+}
 let tut = null;   // {step}
 const tutKey = () => 'ytzt_tut_' + (S && S.me.id);
 function tutDone(){ try{ return localStorage.getItem(tutKey())==='1'; }catch(e){ return false; } }
-function tutFinish(){ try{ localStorage.setItem(tutKey(),'1'); }catch(e){} tut=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; }
+function tutFinish(){ try{ localStorage.setItem(tutKey(),'1'); }catch(e){} tut=null; $('tut').style.display='none'; $('tutArrow').style.display='none';
+  // 已經開放的功能，不要一次跳一堆教學：老玩家直接標記為看過
+  if(S && S.me.lv > 3) FEAT_TUTS.forEach(f=>{ try{ if(f.when()) localStorage.setItem(featKey(f.id),'1'); }catch(e){} }); }
 function tutMaybeStart(){
   if(!S || tutDone()) return;
   if(S.me.lv > 2) return tutFinish();   // 老玩家不顯示
@@ -20,14 +61,15 @@ function tutMaybeStart(){
 function tutRender(){
   if(!tut) return;
   const st = TUT_STEPS[tut.step];
-  $('tut').style.display = '';
+  $('tut').style.display = ''; $('tutSkip').style.display = '';
   $('tutText').innerHTML = `<span class="tutn">${tut.step+1}/${TUT_STEPS.length}</span>${st.text}`;
   $('tutNext').style.display = st.next ? '' : 'none';
   $('tutNext').textContent = st.last ? '開始玩！' : '下一步';
   tutTick();
 }
 function tutTick(){
-  if(!tut || mode!=='home'){ if($('tutArrow')) $('tutArrow').style.display='none'; return; }
+  if(!tut){ featTick(); return; }
+  if(mode!=='home'){ if($('tutArrow')) $('tutArrow').style.display='none'; return; }
   const st = TUT_STEPS[tut.step];
   if(st.done && st.done() && !st.last){ tut.step++; return tutRender(); }
   const el = st.target && st.target();
@@ -38,7 +80,7 @@ function tutTick(){
   a.style.left = (r.left + r.width/2) + 'px';
   a.style.top = Math.max(110, r.top - 6) + 'px';
 }
-function tutNext(){ if(!tut) return; if(TUT_STEPS[tut.step].last) return tutFinish(); tut.step++; tutRender(); }
+function tutNext(){ if(feat) return featDone(); if(!tut) return; if(TUT_STEPS[tut.step].last) return tutFinish(); tut.step++; tutRender(); }
 setInterval(tutTick, 500);
 addEventListener('scroll', tutTick, true);
 
@@ -64,7 +106,7 @@ function openHelp(){
     <p>寵物身上有 <b>1 格裝備欄</b>，插上裝備就會幫你自動做事：自動澆水、自動播種、自動除蟲、自動除草、自動餵食、自動收成、自動拍蚊子、看門狗（趕走小偷）、稻草人（擋下惡作劇）。每種裝備只能有 1 件，在裝備商店先買 I 階，再一階一階升級（I、II 階用金幣，III、IV 階用鑽石）；收成時也可能撿到寶箱，或升到 Lv5／10／15／20 領禮物。</p>
     <h4>🏆 排行榜</h4>
     <p>依等級排名，同等級再比經驗。可以看好友排行和全服前 50 名。</p></div>`,
-    [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); }catch(e){} tut={step:0}; tutRender(); }],['知道了','',closeModal]]);
+    [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); FEAT_TUTS.forEach(f=>localStorage.removeItem(featKey(f.id))); }catch(e){} feat=null; tut={step:0}; tutRender(); }],['知道了','',closeModal]]);
 }
 function openA2HS(){
   modal('加到手機桌面', `<div class="help">
@@ -106,4 +148,26 @@ function openTopup(){
   body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard"><div class="bonus">首儲 ×2</div><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`).join('')}</div>`;
   body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center">每個方案第一次購買，鑽石加倍送</div>`;
   modal(`💎 儲值　<span style="font-size:14px;color:#5B4ED6">目前 💎 ${(S.me.gems||0).toLocaleString()}</span>`, body);
+}
+
+/* ================= 每日簽到（7 天一輪） ================= */
+const signedToday = () => S && S.me.sign_day && S.me.today && String(S.me.sign_day).slice(0,10)===String(S.me.today).slice(0,10);
+function signNext(){ // 今天簽的話會是第幾天
+  const me=S.me; if(signedToday()) return me.sign_n;
+  const y=new Date(String(me.today).slice(0,10)+'T00:00:00Z'); y.setUTCDate(y.getUTCDate()-1);
+  return (me.sign_day && String(me.sign_day).slice(0,10)===y.toISOString().slice(0,10) && me.sign_n<7) ? me.sign_n+1 : 1; }
+function signBadge(){ const b=$('bSign'); if(b) b.classList.toggle('dot', !!S && !signedToday()); }
+function openSign(){
+  if(!S) return; const me=S.me, rws=me.sign_rw||[], done=signedToday(), cur=signNext();
+  const cells = rws.slice(0,7).map((rw,i)=>{ const d=i+1, got = done ? d<=cur : d<cur, now=!done && d===cur;
+    return `<div class="sgd ${got?'got':''} ${now?'now':''} ${d===7?'big':''}"><b>第 ${d} 天</b><div class="sgr">${rewardHTML(rw)}</div>${got?'<i>✓</i>':''}</div>`; }).join('');
+  modal('✍️ 每日簽到', `<div class="rhint" style="text-align:center">連續簽到 7 天，第 7 天大獎！中斷一天會從第 1 天重新開始</div><div class="sgrid">${cells}</div>`,
+    [[done?'今天簽到過了，明天再來':'✍️ 簽到領獎', done?'sub':'', async()=>{ if(signedToday()) return closeModal();
+      try{ const r=await rpc('farm_sign'); applyState(r.state); refresh(); sfx('lvup'); fxConfetti(); signBadge(); openSign(); toast(`第 ${r.day} 天簽到成功！`); if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } }]]);
+}
+let signAuto = false;
+function signMaybePop(){ // 每天第一次進遊戲自動跳出（教學進行中不跳）
+  signBadge(); if(signAuto || !S || signedToday() || tut || mode!=='home') return; signAuto = true;
+  if(document.querySelector('#ov.show')) return;
+  openSign();
 }
