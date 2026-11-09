@@ -465,7 +465,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } checkEvolve(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;

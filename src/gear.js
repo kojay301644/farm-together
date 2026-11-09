@@ -11,7 +11,7 @@ function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
     scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
 function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
   if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
-const chrStage = lv => lv>=EVO[1] ? 3 : lv>=EVO[0] ? 2 : 1;
+const chrStage = lv => 1;  // 不進化：一律第一階
 const chrSpecies = k => (/^([a-z]+)/.exec(k||'bunny')||[0,'bunny'])[1];
 const chrKey = (k, lv) => chrSpecies(k) + chrStage(lv||1);
 const chrName = key => { const c=chrInfo(key); return (CHR_NAMES[c.sp]||[])[c.st-1] || c.name; };
@@ -21,9 +21,9 @@ const gearTitle = g => `${g.name} ${ROMAN[g.tier]}`;
 /* 我的萌獸面板（我的家裡） */
 function beastPanelHTML(){
   const me=S.me, key=chrKey(me.chara, me.lv), st=chrStage(me.lv), g=GEAR[me.equip];
-  const next = st===1 ? `Lv${EVO[0]} 會進化成「${chrName(chrSpecies(key)+2)}」` : st===2 ? `Lv${EVO[1]} 會進化成「${chrName(chrSpecies(key)+3)}」` : '已經是最終型態了！';
+  const next = '你的農場夥伴';
   return `<div class="beast">
-    <div class="bimg"><img src="${chrSrc(key)}" alt=""><span class="bst">${ROMAN[st]} 階</span></div>
+    <div class="bimg"><img src="${chrSrc(key)}" alt=""></div>
     <div class="binfo"><b>${chrName(key)}</b><div class="bnext">${next}</div>
       <button class="gslot" id="hGear">${g?gearImg(g,34):'<span class="plus">＋</span>'}<span><b>${g?gearTitle(g):'裝備欄（空）'}</b><small>${g?`${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}`:'點這裡插上裝備，萌獸會幫你自動做事'}</small></span></button>
     </div></div>
