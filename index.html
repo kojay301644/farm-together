@@ -580,7 +580,7 @@ const BLD = [
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:HG(930,203),  w:240, foot:0.80},
   {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
-  {id:'coop',  name:'牧場',     img:'dc_hay',     c:HG(694,560), w:104, foot:0.78, locked:'牧場將在第四階段開放'},
+  {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.6+3.4, 12.05+1.7], w:120, foot:0.78, locked:'牧場將在第四階段開放'},
   {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(448,572), w:430, foot:0.74, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
 
@@ -733,8 +733,6 @@ function buildWorld(){
   const fence=(x0,y0,x1,y1,col='#E8D3A2')=>{ let s=''; const n=Math.ceil(Math.hypot(x1-x0,y1-y0)/0.55);
     const a=iso(x0,y0), b=iso(x1,y1); s+=`<path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="${col}" stroke-width="2.6" stroke-linecap="round"/>`;
     for(let k=0;k<=n;k++){ const p=iso(x0+(x1-x0)*k/n, y0+(y1-y0)*k/n); s+=`<rect x="${p[0]-2.5}" y="${p[1]-21}" width="5" height="21" rx="2" fill="#F3E3BF" stroke="${INK}" stroke-width="1.5"/>`; } return s; };
-  ground += fence(4.1,6.5,14.25,6.5,'#D9B98A') + fence(4.1,6.5,4.1,11.85,'#D9B98A');
-  objs.push({depth:4.1+11.85+14.25+0.2, svg: fence(4.1,11.85,14.25,11.85,'#D9B98A') + fence(14.25,6.5,14.25,11.85,'#D9B98A')});
 
   // 圍欄草地（後兩邊畫在地面層，前兩邊依深度排序）
   const pen=(x,y,w,d,col,base,gate)=>{ ground += poly(dia(x,y,w,d),base,`stroke="${INK}" stroke-width="2" stroke-linejoin="round"`);
@@ -742,7 +740,7 @@ function buildWorld(){
     ground += fence(x,y,x,y+d,col);
     objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col)}); };
   // 牧場（農田左邊、島的下方中間）
-  const RC=HG(694,556), RW=3.0, RD=3.0, RX=RC[0]-RW/2, RY=RC[1]-RD/2;
+  const RX=4.6, RY=12.05, RW=6.4, RD=3.3;  // 緊貼農田前方
   pen(RX,RY,RW,RD,'#E8D3A2','url(#pGrass)');
   { const [tx,ty]=iso(RX+RW-0.7, RY+0.6); objs.push({depth:RX+RW+RY, svg: ol(`<path d="M${tx-22} ${ty-6} l22 -11 l22 11 l-22 11z" fill="#8B5E3C"/><path d="M${tx-18} ${ty-6} l18 -9 l18 9 l-18 9z" fill="#F4D35E"/>`,2)}); }
 
