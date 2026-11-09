@@ -89,14 +89,20 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .home button{pointer-events:auto;background:#fff;border-radius:16px;padding:7px 12px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px}
 
 /* 視窗 */
-.ov{position:fixed;inset:0;background:rgba(40,30,20,.45);z-index:50;display:none;align-items:flex-end;justify-content:center;padding:12px}
+.ov{position:fixed;inset:0;background:rgba(40,30,20,.45);z-index:50;display:none;align-items:flex-end;justify-content:center;padding:8px}
 .ov.show{display:flex}
 @media(min-width:560px){.ov{align-items:center}}
-.md{background:var(--card);width:100%;max-width:520px;max-height:84vh;border-radius:24px;display:flex;flex-direction:column;overflow:hidden;animation:pop .18s ease-out}
+.md{position:relative;background:var(--card);width:100%;max-width:560px;max-height:90vh;max-height:90dvh;border-radius:24px;display:flex;flex-direction:column;overflow:hidden;animation:pop .18s ease-out}
 @keyframes pop{from{transform:translateY(20px);opacity:0}}
 .md h3{margin:0;padding:16px 18px 10px;font-size:19px;font-weight:900;display:flex;align-items:center;justify-content:space-between}
 .md .x{background:#F3EEE5;width:32px;height:32px;border-radius:50%;font-size:18px;font-weight:900}
-.md .bd{padding:0 18px 12px;overflow:auto}
+.md .bd{padding:0 18px 12px;overflow:auto;zoom:1.1}
+.md h3{font-size:21px}
+.mmore{position:absolute;left:50%;bottom:14px;transform:translate(-50%,10px);z-index:3;border:0;border-radius:999px;background:#3BB273;color:#fff;font-weight:900;font-size:14px;padding:7px 16px;box-shadow:0 4px 0 #2A8E57,0 6px 14px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:.25s;animation:mmb 1.4s ease-in-out infinite}
+.mmore.on{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.md:has(.ft) .mmore{bottom:78px}
+.md.hasmore .bd{-webkit-mask-image:linear-gradient(#000 calc(100% - 46px),transparent);mask-image:linear-gradient(#000 calc(100% - 46px),transparent)}
+@keyframes mmb{0%,100%{margin-bottom:0}50%{margin-bottom:5px}}
 .md .ft{padding:10px 18px 16px;display:flex;gap:8px}
 .btn{flex:1;background:var(--green);color:#fff;font-weight:900;font-size:15px;padding:11px;border-radius:14px;box-shadow:0 3px 0 var(--green-d)}
 .btn.sub{background:#EFE9DF;color:var(--ink);box-shadow:0 3px 0 #DDD3C3}
@@ -457,18 +463,18 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794250277" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794250591" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794250277" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794250277" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794250591" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794250591" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794250277" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794250591" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794250277" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794250591" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -484,11 +490,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794250277" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794250591" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794250277";
+const BUILD="1794250591";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -621,7 +627,12 @@ function modal(title, body, btns){
     const ft=$('mft');
     btns.forEach(([t,cls,fn])=>{ const b=document.createElement('button'); b.className='btn '+(cls||''); b.textContent=t; b.onclick=fn; ft.appendChild(b); });
   }
-  $('ov').classList.add('show');
+  $('md').insertAdjacentHTML('beforeend','<button class="mmore" id="mMore">往下滑還有 ⌄</button>');
+  const bd=$('md').querySelector('.bd'), mm=$('mMore');
+  const upd=()=>{ const more = bd.scrollHeight - bd.scrollTop - bd.clientHeight > 24; mm.classList.toggle('on', more); $('md').classList.toggle('hasmore', more); };
+  bd.addEventListener('scroll', upd, {passive:true}); mm.onclick=()=>bd.scrollBy({top:bd.clientHeight*0.7, behavior:'smooth'});
+  bd.querySelectorAll('img').forEach(im=>{ if(!im.complete) im.addEventListener('load', upd, {once:true}); });
+  $('ov').classList.add('show'); upd(); setTimeout(upd, 120); setTimeout(upd, 600);
 }
 function closeModal(){ $('ov').classList.remove('show'); }
 $('ov').addEventListener('click', e=>{ if(e.target.id==='ov') closeModal(); });

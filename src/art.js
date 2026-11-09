@@ -130,7 +130,12 @@ function modal(title, body, btns){
     const ft=$('mft');
     btns.forEach(([t,cls,fn])=>{ const b=document.createElement('button'); b.className='btn '+(cls||''); b.textContent=t; b.onclick=fn; ft.appendChild(b); });
   }
-  $('ov').classList.add('show');
+  $('md').insertAdjacentHTML('beforeend','<button class="mmore" id="mMore">往下滑還有 ⌄</button>');
+  const bd=$('md').querySelector('.bd'), mm=$('mMore');
+  const upd=()=>{ const more = bd.scrollHeight - bd.scrollTop - bd.clientHeight > 24; mm.classList.toggle('on', more); $('md').classList.toggle('hasmore', more); };
+  bd.addEventListener('scroll', upd, {passive:true}); mm.onclick=()=>bd.scrollBy({top:bd.clientHeight*0.7, behavior:'smooth'});
+  bd.querySelectorAll('img').forEach(im=>{ if(!im.complete) im.addEventListener('load', upd, {once:true}); });
+  $('ov').classList.add('show'); upd(); setTimeout(upd, 120); setTimeout(upd, 600);
 }
 function closeModal(){ $('ov').classList.remove('show'); }
 $('ov').addEventListener('click', e=>{ if(e.target.id==='ov') closeModal(); });
