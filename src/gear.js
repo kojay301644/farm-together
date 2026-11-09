@@ -44,6 +44,10 @@ function bindAutoSel(){
   if($('aFeed')) $('aFeed').onchange=async e=>{ try{ applyState(await rpc('farm_set_auto_feed',{p_crop:e.target.value||null})); refresh(); toast(e.target.value?`會用${CROP[e.target.value].name}餵動物`:'自動挑最便宜的作物來餵'); }catch(err){ toast(err.message); } };
 }
 
+/* 這件裝備現在是誰在穿 */
+function gearWearTag(id, except){ const me=S.me, pt=partyOf(me), who=pt.map((p,i)=>({p,i})).filter(x=>x.p.g===id && x.i!==except);
+  if(!who.length) return except==null ? '<span class="tag wear none">沒有寵物穿</span>' : '';
+  return who.map(x=>`<span class="tag wear"><img src="${petSrc(x.p.s, me)}" alt="">${x.i===0?'👑':''}${esc(bName(x.p.s))} 穿著</span>`).join(' '); }
 /* 裝備背包 */
 function openGearBag(slot){
   slot=slot||0; const me=S.me, pt=JSON.parse(JSON.stringify(partyOf(me))), mem=pt[slot]||pt[0], own=Object.entries(me.gear||{}).filter(([id,n])=>n>0 && GEAR[id]).map(([id,n])=>[GEAR[id],n]).sort((a,b)=>GEAR_LIST.indexOf(a[0])-GEAR_LIST.indexOf(b[0]));
@@ -54,7 +58,7 @@ function openGearBag(slot){
   if(cur && cur.func==='plant') body += autoSeedHTML();
   if(cur && (cur.func==='feed'||cur.func==='clear')) body += autoFeedHTML();
   body += `<div class="sec">背包裡的裝備</div>`;
-  body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span><div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
+  body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span> ${gearWearTag(g.id, slot)}<div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
       ${mem.g===g.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">裝備中</span>':`<button class="mini" data-eq="${g.id}">${(used[g.id]||0)>=n?'換過來':'插上'}</button>`}</div>`).join('')
     : `<div class="empty">還沒有裝備<br><small>可以在寵物商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
   modal('寵物裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
@@ -83,7 +87,7 @@ function openGearShop(){
     else { const lock=next.gold!=null && me.lv<next.lv, poor=next.gold!=null ? me.gold<next.gold : (me.gems||0)<next.gems, cost=next.gold!=null?`${next.gold.toLocaleString()} 金`:`💎${next.gems}`;
       btn = lock ? `<span class="lock">Lv${next.lv} 解鎖</span>` : `<button class="mini ${next.gems!=null?'gem':''}" data-bg="${next.id}" ${poor?'disabled':''}>${cur?'升到 '+ROMAN[next.tier]+' 階':'購買'}<br>${cost}</button>`; }
     body+=`<div class="row gshop"><div class="ic">${gearImg(show,44)}</div><div class="tx"><b>${GEAR_FUNC[f][1]} ${GEAR_FUNC[f][0]}</b> <span class="tps">${pips}</span>
-      <div>${cur?`目前 ${esc(gearTitle(cur))}：${gearDesc(cur)}`:'還沒有'}</div>${next?`<div class="gnext">下一階 ${esc(gearTitle(next))}：${gearDesc(next)}</div>`:''}<div class="tprs">${prices}</div></div>${btn}</div>`;
+      <div>${cur?`目前 ${esc(gearTitle(cur))}：${gearDesc(cur)}`:'還沒有'}</div>${cur?`<div style="margin-top:3px">${gearWearTag(cur.id)}</div>`:''}${next?`<div class="gnext">下一階 ${esc(gearTitle(next))}：${gearDesc(next)}</div>`:''}<div class="tprs">${prices}</div></div>${btn}</div>`;
   });
   modal(`寵物商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`, body);
   const md=$('md'); bindPetShopTabs();
