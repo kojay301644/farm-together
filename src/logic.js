@@ -231,7 +231,10 @@ async function openHome(){
     <div class="sec">玩法小提醒</div>
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
       ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友布告欄」加好友、拜訪好友農場</div>
-    <div style="display:flex;gap:8px;margin-top:16px"><button class="btn sub" id="logout">登出</button></div>`);
+    <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
+    <div class="homebtns"><button class="btn sub" id="hInv">💌 邀請朋友</button><button class="btn sub" id="logout">登出</button></div>
+    <div style="text-align:center;margin-top:10px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`);
+  $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
   $('logout').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
 }
 const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -261,9 +264,9 @@ async function openBoard(tab){
         <div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>
           <div>${f.ripe?`<span style="color:var(--orange-d)">🧺 有 ${f.ripe} 塊地可以偷</span>`:'目前沒有可偷的菜'}${f.issues?`・🐛 需要幫忙 ${f.issues}`:''}</div></div>
         <button class="mini ${f.ripe?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('')
-      : `<div class="empty">還沒有好友，<br>到「加好友」輸入朋友的暱稱吧！</div>`;
+      : `<div class="empty">還沒有好友，<br>到「加好友」輸入朋友的暱稱吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
   } else if(boardTab==='add'){
-    body = `<div class="sec">用暱稱加好友</div>
+    body = `<button class="btn o" id="invBtn" style="width:100%;margin:4px 0 6px">💌 邀請朋友來玩</button><div class="sec">用暱稱加好友</div>
       <div style="display:flex;gap:8px;margin-top:6px"><input id="fnick" class="inp" maxlength="10" placeholder="輸入朋友的暱稱"><button class="mini" id="fsend" style="padding:0 16px">送出</button></div>
       <div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:6px">你的暱稱是「${esc(S.me.nickname)}」，把它告訴朋友吧</div>`;
     body += `<div class="sec">等你確認的邀請</div>` + (F.incoming.length ? F.incoming.map(f=>`<div class="row">
@@ -290,6 +293,7 @@ async function openBoard(tab){
   md.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>visit(b.dataset.visit));
   md.querySelectorAll('[data-acc]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.acc,p_accept:true})); openBoard(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-rej]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.rej,p_accept:false})); openBoard(); }catch(e){ toast(e.message); } });
+  if($('invBtn')) $('invBtn').onclick = invite;
   const fs = $('fsend');
   if(fs){ const send = async()=>{ const v=$('fnick').value.trim(); if(!v) return toast('請輸入暱稱');
       try{ toast(await rpc('farm_friend_request',{p_nick:v})); openBoard(); }catch(e){ toast(e.message); } };
@@ -487,6 +491,7 @@ function startGame(st){
   $('bHome').textContent = '🌾 回到農田';
   requestAnimationFrame(()=>centerOn(...FARM_C));
   toast(`歡迎回到小鎮，${S.me.nickname}！`);
+  setTimeout(tutMaybeStart, 900);
 }
 
 $('authBtn').onclick = doAuth;
@@ -504,11 +509,13 @@ $('nickBtn').onclick = createNick;
 $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); });
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
+$('tutNext').onclick = ()=>tutNext();
+$('tutSkip').onclick = ()=>tutFinish();
 
 sb.auth.onAuthStateChange((ev, session)=>{
   if(ev==='PASSWORD_RECOVERY'){ setTimeout(showResetPw, 300); }
   if(session && (ev==='SIGNED_IN' || ev==='INITIAL_SESSION') && !S) setTimeout(enterGame, 0);
-  if(ev==='SIGNED_OUT'){ S=null; V=null; mode='home'; showScreen('login'); setAuthMode('login'); }
+  if(ev==='SIGNED_OUT'){ tut=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; S=null; V=null; mode='home'; showScreen('login'); setAuthMode('login'); }
   if(ev==='INITIAL_SESSION' && !session) showScreen('login');
 });
 setAuthMode('login');

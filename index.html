@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>一起種田吧</title>
+<meta name="description" content="開心農場風格的小鎮種田遊戲：種菜、收成、加好友、偷菜！">
+<meta name="theme-color" content="#3BB273">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="一起種田吧">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta property="og:title" content="一起種田吧">
+<meta property="og:description" content="開心農場風格的小鎮種田遊戲：種菜、收成、加好友、偷菜！">
+<meta property="og:image" content="https://kojay301644.github.io/farm-together/icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -135,6 +147,19 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .rk.mine{background:#F4FBEF;border-radius:12px;padding-left:6px;padding-right:6px}
 .myrank{margin-top:10px;background:#FFF6DB;border-radius:12px;padding:10px;text-align:center;font-weight:700;font-size:13px}
 .myrank b{color:var(--orange-d);font-size:16px}
+.homebtns{display:flex;gap:8px;margin-top:10px}
+.plink{color:var(--ink2);font-size:12px;font-weight:700}
+.help h4{margin:14px 0 4px;font-size:15px}
+.help p,.help li{font-size:13px;font-weight:500;line-height:1.75;color:var(--ink);margin:2px 0}
+.help ul{margin:2px 0;padding-left:20px}
+.urlbox{margin-top:12px;background:#F3EEE5;border-radius:10px;padding:8px;font-size:12px;font-weight:700;text-align:center;word-break:break-all;user-select:text;-webkit-user-select:text}
+.tut{position:fixed;left:0;right:0;bottom:calc(150px + env(safe-area-inset-bottom));z-index:30;padding:0 12px;pointer-events:none}
+.tutin{max-width:520px;margin:0 auto;background:#3A3226;color:#fff;border-radius:18px;padding:12px 14px;font-size:14px;font-weight:700;line-height:1.6;box-shadow:0 6px 18px rgba(0,0,0,.25);pointer-events:auto}
+.tutin b{color:#FFE066}
+.tutn{display:inline-block;background:var(--orange);border-radius:8px;padding:0 7px;font-size:11px;margin-right:6px;vertical-align:1px}
+.tutbtns{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+.tutarrow{position:fixed;z-index:31;font-size:34px;transform:translate(-50%,-100%);pointer-events:none;animation:tbounce .8s ease-in-out infinite;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+@keyframes tbounce{50%{transform:translate(-50%,calc(-100% - 10px))}}
 .dot{font-style:normal;background:var(--red);color:#fff;border-radius:8px;padding:0 6px;font-size:11px}
 .avatar.sm{width:40px;height:40px;font-size:16px;flex:none}
 .mini.sub{background:#EFE9DF;color:var(--ink);box-shadow:0 2px 0 #DDD3C3}
@@ -163,7 +188,8 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
     <div id="authMsg" class="amsg"></div>
     <button class="link" id="forgot">忘記密碼？</button>
     <div class="or"><span>或</span></div>
-    <button class="gbtn" id="gBtn"><svg viewBox="0 0 48 48" width="20" height="20"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>用 Google 帳號登入</button>
+    <button class="gbtn" id="gBtn" data-x="1"><svg viewBox="0 0 48 48" width="20" height="20"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>用 Google 帳號登入</button>
+    <div style="margin-top:12px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>
   </div>
   <div class="card" id="nickCard" style="display:none">
     <div class="logo" style="font-size:26px">幫自己取個名字</div>
@@ -193,6 +219,8 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
   <div class="dock-in"><div class="tools" id="tools"></div></div>
 </div>
 
+<div class="tut" id="tut" style="display:none"><div class="tutin"><div id="tutText"></div><div class="tutbtns"><button class="mini sub" id="tutSkip">跳過教學</button><button class="mini o" id="tutNext">下一步</button></div></div></div>
+<div class="tutarrow" id="tutArrow" style="display:none">👇</div>
 <div class="ov" id="ov"><div class="md" id="md"></div></div>
 <div class="toast" id="toast"></div>
 
@@ -601,6 +629,92 @@ map.addEventListener('click',e=>{ if(moved){ e.stopPropagation(); e.preventDefau
 addEventListener('resize',()=>{ if(S){ layout(); centerOn(...FARM_C); } });
 
 
+/* ================= 新手教學 ================= */
+const GAME_URL = 'https://kojay301644.github.io/farm-together/';
+const TUT_STEPS = [
+  {text:'歡迎來到小鎮！先點一塊<b>空地</b>，選「白蘿蔔」種下去吧', target:()=>plotEls[S.plots.findIndex(p=>p.s==='empty'||p.s==='grow')], done:()=>S.plots.some(p=>p.s==='grow'||p.s==='dead')},
+  {text:'下面是<b>工具列</b>：田裡缺水、長草或有蟲時，選對應的工具點田地。放著不管，收成會變少喔', target:()=>$('tools'), next:true},
+  {text:'白蘿蔔大約 <b>2 分鐘</b>成熟。成熟後選「收成」點它，就能收進倉庫', target:()=>plotEls[S.plots.findIndex(p=>p.s==='grow'||p.s==='dead')], done:()=>Object.keys(S.me.crops).length>0 || S.plots.some(p=>p.s==='dead'), next:true},
+  {text:'點<b>穀倉</b>可以把作物賣掉換金幣，再到<b>種子商店</b>買更多種子', target:()=>document.querySelector('[data-b="barn"]'), next:true},
+  {text:'最後，點<b>好友布告欄</b>用暱稱加好友，就能去朋友的農場偷菜了！', target:()=>document.querySelector('[data-b="board"]'), next:true, last:true},
+];
+let tut = null;   // {step}
+const tutKey = () => 'ytzt_tut_' + (S && S.me.id);
+function tutDone(){ try{ return localStorage.getItem(tutKey())==='1'; }catch(e){ return false; } }
+function tutFinish(){ try{ localStorage.setItem(tutKey(),'1'); }catch(e){} tut=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; }
+function tutMaybeStart(){
+  if(!S || tutDone()) return;
+  if(S.me.lv > 2) return tutFinish();   // 老玩家不顯示
+  tut = {step:0}; tutRender();
+}
+function tutRender(){
+  if(!tut) return;
+  const st = TUT_STEPS[tut.step];
+  $('tut').style.display = '';
+  $('tutText').innerHTML = `<span class="tutn">${tut.step+1}/${TUT_STEPS.length}</span>${st.text}`;
+  $('tutNext').style.display = st.next ? '' : 'none';
+  $('tutNext').textContent = st.last ? '開始玩！' : '下一步';
+  tutTick();
+}
+function tutTick(){
+  if(!tut || mode!=='home'){ if($('tutArrow')) $('tutArrow').style.display='none'; return; }
+  const st = TUT_STEPS[tut.step];
+  if(st.done && st.done() && !st.last){ tut.step++; return tutRender(); }
+  const el = st.target && st.target();
+  const a = $('tutArrow');
+  if(!el){ a.style.display='none'; return; }
+  const r = el.getBoundingClientRect();
+  a.style.display = '';
+  a.style.left = (r.left + r.width/2) + 'px';
+  a.style.top = Math.max(110, r.top - 6) + 'px';
+}
+function tutNext(){ if(!tut) return; if(TUT_STEPS[tut.step].last) return tutFinish(); tut.step++; tutRender(); }
+setInterval(tutTick, 500);
+addEventListener('scroll', tutTick, true);
+
+/* ================= 遊戲說明 ================= */
+function openHelp(){
+  modal('遊戲說明', `<div class="help">
+    <h4>🌱 種田</h4>
+    <p>點空地選種子種下，作物會隨著真實時間長大，關掉網頁也會繼續長。成熟後用「收成」點它，作物會進到穀倉。</p>
+    <h4>💧 照顧作物</h4>
+    <p>土壤乾掉時作物會<b>長得比較慢</b>（速度減半），記得澆水。田裡長出的雜草和蟲，每一個都會讓收成少 1 個，用「除草」「除蟲」清掉就沒事。</p>
+    <h4>💰 賺錢與升級</h4>
+    <p>到穀倉把作物賣掉換金幣，再到種子商店買種子。收成、澆水、除草除蟲都會拿到經驗，升級後可以買更高級的作物、開墾更多荒地（最多 18 塊）。</p>
+    <h4>🧺 好友與偷菜</h4>
+    <p>在好友布告欄用暱稱加好友，就能拜訪對方農場：</p>
+    <ul><li><b>偷菜</b>：成熟的作物每塊地每人只能偷一次，每塊地最多被偷走 4 成，主人一定拿得到 6 成</li>
+    <li><b>幫忙</b>：幫好友除草除蟲可以拿經驗</li>
+    <li><b>惡作劇</b>：在好友還沒成熟的作物放草放蟲，每天 10 次</li></ul>
+    <p>作物成熟後要快點收，不然會被好友偷走喔！誰偷了你的菜，都會記在「動態」裡。</p>
+    <h4>🏆 排行榜</h4>
+    <p>依等級排名，同等級再比經驗。可以看好友排行和全服前 50 名。</p></div>`,
+    [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); }catch(e){} tut={step:0}; tutRender(); }],['知道了','',closeModal]]);
+}
+function openA2HS(){
+  modal('加到手機桌面', `<div class="help">
+    <p>加到桌面後，點圖示就能直接全螢幕開遊戲，像 App 一樣方便。</p>
+    <h4>📱 iPhone（Safari）</h4>
+    <ul><li>用 <b>Safari</b> 打開遊戲網址</li><li>點下方的<b>分享</b>按鈕（方框加向上箭頭）</li><li>往下滑，選「<b>加入主畫面</b>」→ 右上角「新增」</li></ul>
+    <h4>🤖 Android（Chrome）</h4>
+    <ul><li>用 <b>Chrome</b> 打開遊戲網址</li><li>點右上角 <b>⋮</b> 選單</li><li>選「<b>加到主畫面</b>」或「安裝應用程式」</li></ul>
+    <div class="urlbox">${GAME_URL}</div></div>`, [['複製遊戲網址','sub',()=>copyText(GAME_URL,'已複製遊戲網址')],['知道了','',closeModal]]);
+}
+async function copyText(t, okMsg){
+  try{ await navigator.clipboard.writeText(t); toast(okMsg||'已複製'); }
+  catch(e){ toast('複製失敗，請手動選取文字'); }
+}
+
+/* ================= 邀請朋友 ================= */
+async function invite(){
+  const text = `我在玩「一起種田吧」🌱 開心農場風格的小鎮種田遊戲！我的暱稱是「${S.me.nickname}」，加我好友來偷菜吧～`;
+  if(navigator.share){
+    try{ await navigator.share({title:'一起種田吧', text, url:GAME_URL}); return; }
+    catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  copyText(text + '\n' + GAME_URL, '邀請訊息已複製，貼給朋友吧！');
+}
+
 /* ================= 連線設定 ================= */
 const SB_URL = 'https://qnxnuyfvkrvhnaewvrik.supabase.co';
 const SB_KEY = 'sb_publishable_nX97hqqEgiGRwKQMOz56ow_uvMEAdht';
@@ -833,7 +947,10 @@ async function openHome(){
     <div class="sec">玩法小提醒</div>
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
       ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友布告欄」加好友、拜訪好友農場</div>
-    <div style="display:flex;gap:8px;margin-top:16px"><button class="btn sub" id="logout">登出</button></div>`);
+    <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
+    <div class="homebtns"><button class="btn sub" id="hInv">💌 邀請朋友</button><button class="btn sub" id="logout">登出</button></div>
+    <div style="text-align:center;margin-top:10px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`);
+  $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
   $('logout').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
 }
 const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -863,9 +980,9 @@ async function openBoard(tab){
         <div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>
           <div>${f.ripe?`<span style="color:var(--orange-d)">🧺 有 ${f.ripe} 塊地可以偷</span>`:'目前沒有可偷的菜'}${f.issues?`・🐛 需要幫忙 ${f.issues}`:''}</div></div>
         <button class="mini ${f.ripe?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('')
-      : `<div class="empty">還沒有好友，<br>到「加好友」輸入朋友的暱稱吧！</div>`;
+      : `<div class="empty">還沒有好友，<br>到「加好友」輸入朋友的暱稱吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
   } else if(boardTab==='add'){
-    body = `<div class="sec">用暱稱加好友</div>
+    body = `<button class="btn o" id="invBtn" style="width:100%;margin:4px 0 6px">💌 邀請朋友來玩</button><div class="sec">用暱稱加好友</div>
       <div style="display:flex;gap:8px;margin-top:6px"><input id="fnick" class="inp" maxlength="10" placeholder="輸入朋友的暱稱"><button class="mini" id="fsend" style="padding:0 16px">送出</button></div>
       <div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:6px">你的暱稱是「${esc(S.me.nickname)}」，把它告訴朋友吧</div>`;
     body += `<div class="sec">等你確認的邀請</div>` + (F.incoming.length ? F.incoming.map(f=>`<div class="row">
@@ -892,6 +1009,7 @@ async function openBoard(tab){
   md.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>visit(b.dataset.visit));
   md.querySelectorAll('[data-acc]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.acc,p_accept:true})); openBoard(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-rej]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.rej,p_accept:false})); openBoard(); }catch(e){ toast(e.message); } });
+  if($('invBtn')) $('invBtn').onclick = invite;
   const fs = $('fsend');
   if(fs){ const send = async()=>{ const v=$('fnick').value.trim(); if(!v) return toast('請輸入暱稱');
       try{ toast(await rpc('farm_friend_request',{p_nick:v})); openBoard(); }catch(e){ toast(e.message); } };
@@ -1089,6 +1207,7 @@ function startGame(st){
   $('bHome').textContent = '🌾 回到農田';
   requestAnimationFrame(()=>centerOn(...FARM_C));
   toast(`歡迎回到小鎮，${S.me.nickname}！`);
+  setTimeout(tutMaybeStart, 900);
 }
 
 $('authBtn').onclick = doAuth;
@@ -1106,11 +1225,13 @@ $('nickBtn').onclick = createNick;
 $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); });
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
+$('tutNext').onclick = ()=>tutNext();
+$('tutSkip').onclick = ()=>tutFinish();
 
 sb.auth.onAuthStateChange((ev, session)=>{
   if(ev==='PASSWORD_RECOVERY'){ setTimeout(showResetPw, 300); }
   if(session && (ev==='SIGNED_IN' || ev==='INITIAL_SESSION') && !S) setTimeout(enterGame, 0);
-  if(ev==='SIGNED_OUT'){ S=null; V=null; mode='home'; showScreen('login'); setAuthMode('login'); }
+  if(ev==='SIGNED_OUT'){ tut=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; S=null; V=null; mode='home'; showScreen('login'); setAuthMode('login'); }
   if(ev==='INITIAL_SESSION' && !session) showScreen('login');
 });
 setAuthMode('login');
