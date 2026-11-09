@@ -10,9 +10,17 @@ const CROPS = [
   {id:'pumpkin',   name:'南瓜',   lv:7, seed:220, time:14400, yield:12, price:28, exp:60,  type:'ground',color:'#FF9F1C'},
   {id:'watermelon',name:'西瓜',   lv:8, seed:300, time:21600, yield:10, price:48, exp:80,  type:'ground',color:'#3E9B4F', stripe:true},
   {id:'grape',     name:'葡萄',   lv:9, seed:400, time:28800, yield:16, price:38, exp:110, type:'bush',  color:'#8E5CC9', fruit:'grape'},
+  {id:'pineapple', name:'鳳梨',   lv:10,seed:480, time:36000, yield:12, price:58, exp:135, type:'pine',  color:'#FFC531'},
+  {id:'peach',     name:'桃子',   lv:11,seed:560, time:43200, yield:18, price:44, exp:160, type:'bush',  color:'#FF9EA0', fruit:'round'},
+  {id:'dragonfruit',name:'火龍果',lv:12,seed:650, time:50400, yield:14, price:65, exp:190, type:'bush',  color:'#E8338A', fruit:'dragon'},
+  {id:'melon',     name:'哈密瓜', lv:13,seed:760, time:57600, yield:10, price:105,exp:220, type:'ground',color:'#D9E8A0', net:true},
+  {id:'mango',     name:'芒果',   lv:14,seed:880, time:64800, yield:16, price:75, exp:255, type:'bush',  color:'#FFB02E', fruit:'long'},
 ];
 const CROP = Object.fromEntries(CROPS.map(c=>[c.id,c]));
-const WILD = [null,null,null,null,{cost:100,lv:1},{cost:300,lv:2}]; // 第5、6塊是荒地
+// 18 塊田的開墾條件（第 0～3 塊一開始就有），要跟伺服器的 land 表一致
+const LAND = [null,null,null,null,{lv:1,cost:100},{lv:2,cost:300},{lv:3,cost:500},{lv:4,cost:800},{lv:5,cost:1200},{lv:6,cost:1600},
+  {lv:7,cost:2000},{lv:8,cost:2500},{lv:9,cost:3000},{lv:10,cost:4000},{lv:11,cost:5000},{lv:12,cost:6500},{lv:13,cost:8000},{lv:14,cost:10000}];
+const WILD = LAND;
 const MAX_LV = 30;
 const needExp = lv => 30*lv*lv;
 const wetDur = c => Math.min(3600, Math.max(45, c.time*0.3));
@@ -44,14 +52,20 @@ function cropArt(c, st){
         if(c.fruit==='round') fr += `<circle cx="${x}" cy="${y}" r="${6*k}" fill="${col}"/><rect x="${x-2}" y="${y-7*k}" width="4" height="3" rx="1" fill="#3E8E3A"/>`;
         else if(c.fruit==='long') fr += `<ellipse cx="${x}" cy="${y+2}" rx="${4*k}" ry="${8*k}" fill="${col}"/><rect x="${x-3}" y="${y-7*k}" width="6" height="3" rx="1.5" fill="#3E8E3A"/>`;
         else if(c.fruit==='berry') fr += `<path d="M${x-5*k} ${y-3*k} Q${x} ${y-7*k} ${x+5*k} ${y-3*k} Q${x+4*k} ${y+5*k} ${x} ${y+7*k} Q${x-4*k} ${y+5*k} ${x-5*k} ${y-3*k}Z" fill="${col}"/>${ripe?`<circle cx="${x-1.5}" cy="${y}" r=".9" fill="#FFE066"/><circle cx="${x+1.8}" cy="${y+2}" r=".9" fill="#FFE066"/>`:''}`;
+        else if(c.fruit==='dragon') fr += `<ellipse cx="${x}" cy="${y}" rx="${5.5*k}" ry="${7*k}" fill="${col}"/>${ripe?`<path d="M${x-5} ${y-3} l-3 -2 M${x+5} ${y-2} l3 -2 M${x} ${y-7} l0 -3" stroke="#7CC85A" stroke-width="2" stroke-linecap="round"/>`:''}`;
         else if(c.fruit==='grape'){ const r=3*k; fr += [[0,0],[-3,-3],[3,-3],[-1.5,3],[1.5,3],[0,6]].map(([a,b])=>`<circle cx="${x+a*k}" cy="${y-2+b*k}" r="${r}" fill="${col}"/>`).join(''); }
       }
       return `<rect x="58" y="62" width="4" height="13" fill="#5A9E3E"/><circle cx="47" cy="60" r="15" fill="#5DB54A"/><circle cx="73" cy="60" r="15" fill="#5DB54A"/><circle cx="60" cy="50" r="17" fill="#6CC655"/><circle cx="54" cy="45" r="6" fill="#86D46A" opacity=".7"/>${fr}`;
     }
+    case 'pine':
+      return `${L(50,46,5,16,-30,'#4E9B3F')}${L(70,46,5,16,30,'#4E9B3F')}${L(44,58,5,14,-55,'#5DB54A')}${L(76,58,5,14,55,'#5DB54A')}
+        <ellipse cx="60" cy="${70-4*(1-k)}" rx="${11*k}" ry="${14*k}" fill="${ripe?c.color:'#C8D97A'}"/>
+        ${ripe?`<path d="M51 62 L69 78 M51 72 L63 82 M57 58 L69 70 M69 62 L51 78 M69 72 L57 82 M63 58 L51 70" stroke="#D99A1E" stroke-width="1.6"/>`:''}
+        ${L(56,50,3,9,-20,'#5DB54A')}${L(64,50,3,9,20,'#5DB54A')}${L(60,47,3,10,0,'#6CC655')}`;
     case 'ground':
       return `<path d="M30 70 Q45 56 60 66 T92 64" stroke="#5A9E3E" stroke-width="3" fill="none"/>${L(36,62,13,7,-20,'#5DB54A')}${L(86,60,13,7,20,'#6CC655')}
         <ellipse cx="60" cy="66" rx="${22*k}" ry="${15*k}" fill="${col}"/>
-        ${c.stripe?`<path d="M${60-12*k} ${54*1+(1-k)*8} Q${60-16*k} 66 ${60-12*k} ${78-(1-k)*8} M60 ${51+(1-k)*4} V${81-(1-k)*4} M${60+12*k} ${54+(1-k)*8} Q${60+16*k} 66 ${60+12*k} ${78-(1-k)*8}" stroke="${ripe?'#2C7A3B':'#8DBF55'}" stroke-width="3" fill="none"/>`
+        ${c.net?`<path d="M${60-14*k} ${60} Q60 ${56} ${60+14*k} ${60} M${60-18*k} 67 Q60 63 ${60+18*k} 67 M${60-14*k} 74 Q60 70 ${60+14*k} 74 M${60-8*k} ${54+(1-k)*6} Q${60-12*k} 66 ${60-8*k} ${79-(1-k)*6} M${60+8*k} ${54+(1-k)*6} Q${60+12*k} 66 ${60+8*k} ${79-(1-k)*6}" stroke="${ripe?'#A9BF6E':'#95C25E'}" stroke-width="1.6" fill="none"/>`:c.stripe?`<path d="M${60-12*k} ${54*1+(1-k)*8} Q${60-16*k} 66 ${60-12*k} ${78-(1-k)*8} M60 ${51+(1-k)*4} V${81-(1-k)*4} M${60+12*k} ${54+(1-k)*8} Q${60+16*k} 66 ${60+12*k} ${78-(1-k)*8}" stroke="${ripe?'#2C7A3B':'#8DBF55'}" stroke-width="3" fill="none"/>`
                   :`<path d="M${60-10*k} ${54+(1-k)*6} Q${60-15*k} 66 ${60-10*k} ${78-(1-k)*6} M${60+10*k} ${54+(1-k)*6} Q${60+15*k} 66 ${60+10*k} ${78-(1-k)*6}" stroke="${ripe?'#E8830C':'#95C25E'}" stroke-width="2.5" fill="none"/>`}
         <rect x="58" y="${50+(1-k)*5}" width="5" height="6" rx="2" fill="#6B8E3A"/>`;
   }
@@ -77,6 +91,7 @@ const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','�
 /* ================= 工具函式 ================= */
 const $ = id=>document.getElementById(id);
 function dur(sec){ sec=Math.round(sec); const h=Math.floor(sec/3600), m=Math.round(sec%3600/60); if(h) return m?`${h}小時${m}分鐘`:`${h}小時`; if(sec>=60) return `${Math.round(sec/60)}分鐘`; return `${sec}秒`; }
+function fmtS(sec){ sec=Math.max(0,Math.ceil(sec)); const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60; const p=n=>String(n).padStart(2,'0'); if(h) return `${h}:${p(m)}:${p(s)}`; if(m) return `${m}:${p(s)}`; return `${s}秒`; }
 function fmt(sec){
   sec = Math.max(0, Math.ceil(sec));
   const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60;

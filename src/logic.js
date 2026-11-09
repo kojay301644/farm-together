@@ -55,7 +55,7 @@ const leftSec = p => { const c=CROP[p.c]; return (c.time - p.g)/(p.dry?0.5:1); }
 function showLevelUp(){
   const lv = S.me.lv;
   const un = CROPS.filter(c=>c.lv===lv).map(c=>c.name);
-  const w = WILD.filter(x=>x && x.lv===lv).length;
+  const w = LAND.filter(x=>x && x.lv===lv).length;
   modal('升級了！', `<div style="text-align:center;padding:10px 0 4px">
     <div style="font-size:46px;font-weight:900;color:var(--green-d)">Lv${lv}</div>
     ${un.length?`<div style="font-weight:700;margin-top:6px">解鎖新作物：<b style="color:var(--orange-d)">${un.join('、')}</b></div>`:''}
@@ -124,7 +124,7 @@ async function plant(i, id){
   if(r) floatAt(plotEls[i], `種下${CROP[id].name}`);
 }
 function askTill(i){
-  const w = WILD[i];
+  const w = LAND[i];
   if(S.me.lv < w.lv) return toast(`需要 Lv${w.lv} 才能開墾這塊荒地`);
   modal('開墾荒地', `<p style="font-weight:700;text-align:center">花 <b style="color:var(--orange-d)">${w.cost}</b> 金幣開墾這塊荒地？</p>`,
     [['取消','sub',closeModal],['開墾','o',async()=>{
@@ -237,7 +237,7 @@ async function openHome(){
 const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
 /* ================= 好友布告欄 ================= */
-let boardTab = 'friends';
+let boardTab = 'friends', rankScope = 'f';
 function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60) return '剛剛'; if(s<3600) return `${Math.floor(s/60)} 分鐘前`; if(s<86400) return `${Math.floor(s/3600)} 小時前`; return `${Math.floor(s/86400)} 天前`; }
 const LOG_TXT = {steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
   prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`};
@@ -245,14 +245,15 @@ const LOG_TXT = {steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`
 async function openBoard(tab){
   if(tab) boardTab = tab;
   modal('好友布告欄', `<div class="empty">讀取中…</div>`);
-  let F, logs;
-  try{ [F, logs] = await Promise.all([rpc('farm_friends'), rpc('farm_logs_get')]); }
+  let F, logs, R;
+  try{ [F, logs, R] = await Promise.all([rpc('farm_friends'), boardTab==='logs'?rpc('farm_logs_get'):[], boardTab==='rank'?rpc('farm_rank'):null]); }
   catch(e){ return modal('好友布告欄', `<div class="empty">${esc(e.message)}</div>`); }
   const nIn = F.incoming.length;
   const tabs = `<div class="tabs">
     <button data-tab="friends" class="${boardTab==='friends'?'on':''}">好友 ${F.friends.length}</button>
     <button data-tab="add" class="${boardTab==='add'?'on':''}">加好友${nIn?` <i class="dot">${nIn}</i>`:''}</button>
-    <button data-tab="logs" class="${boardTab==='logs'?'on':''}">農場動態</button></div>`;
+    <button data-tab="rank" class="${boardTab==='rank'?'on':''}">排行榜</button>
+    <button data-tab="logs" class="${boardTab==='logs'?'on':''}">動態</button></div>`;
   let body = '';
   if(boardTab==='friends'){
     body = F.friends.length ? F.friends.map(f=>`<div class="row">
@@ -269,6 +270,14 @@ async function openBoard(tab){
         <div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span><div>想成為你的好友</div></div>
         <button class="mini" data-acc="${f.id}">接受</button><button class="mini sub" data-rej="${f.id}">拒絕</button></div>`).join('') : `<div class="empty" style="padding:10px 0">沒有新的邀請</div>`);
     if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row"><div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
+  } else if(boardTab==='rank'){
+    const medal = r => r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
+    const row = (rk, x) => `<div class="row rk${x.me?' mine':''}"><div class="rkn">${medal(rk)}</div><div class="avatar sm">${esc(x.nickname.slice(0,1))}</div>
+        <div class="tx"><b>${esc(x.nickname)}</b>${x.me?' <span class="tag">我</span>':''}<div>經驗 ${x.exp}</div></div><span class="tag" style="font-size:13px">Lv${x.lv}</span></div>`;
+    body = `<div class="seg" style="margin:4px 0 6px"><button data-rs="f" class="${rankScope==='f'?'on':''}">好友排行</button><button data-rs="a" class="${rankScope==='a'?'on':''}">全服前 50 名</button></div>`;
+    if(rankScope==='f') body += R.friends.map((x,k)=>row(k+1, x)).join('') + (R.friends.length<2?`<div class="empty" style="padding:10px 0">加更多好友一起比賽吧！</div>`:'');
+    else body += R.top.map(x=>row(x.rk, x)).join('');
+    body += `<div class="myrank">你在全服排第 <b>${R.my_rank}</b> 名（共 ${R.total} 位玩家）</div>`;
   } else {
     body = logs.length ? logs.map(l=>`<div class="row"><div class="avatar sm" style="background:${l.kind.startsWith('prank')?'#F78FB3':l.kind==='steal'?'#FF9F43':'#3BB273'}">${esc((l.who||'?').slice(0,1))}</div>
         <div class="tx"><b>${esc(l.who||'')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}<div>${ago(l.at)}</div></div></div>`).join('')
@@ -277,6 +286,7 @@ async function openBoard(tab){
   modal('好友布告欄', tabs + body);
   const md = $('md');
   md.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>openBoard(b.dataset.tab));
+  md.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>{ rankScope=b.dataset.rs; openBoard('rank'); });
   md.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>visit(b.dataset.visit));
   md.querySelectorAll('[data-acc]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.acc,p_accept:true})); openBoard(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-rej]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.rej,p_accept:false})); openBoard(); }catch(e){ toast(e.message); } });
@@ -340,26 +350,26 @@ function renderPlots(){
   P.forEach(p=>{
     const i = p.i, el = plotEls[i]; if(!el) return;
     const st = p.s==='grow' ? stageOf(p) : -1;
-    const sig = [mode, p.s, p.c, st, p.w, p.b, p.dry].join('|');
+    const sig = [mode, p.s, p.c, st, p.w, p.b, p.dry, p.s==='wild'?S.me.lv:0].join('|');
     if(sig !== plotSig[i]){ el.querySelector('.pg').innerHTML = plotGroundSVG(p,i); el.querySelector('.ps').innerHTML = plotSpriteSVG(p,i); plotSig[i] = sig; }
     el.classList.toggle('ripe', st===4);
     const L = plotLabs[i], t = L.querySelector('text'), r = L.querySelector('rect'), bb = L.querySelector('.bb'), bf = L.querySelector('.bf');
     L.style.display = (p.s==='wild'||p.s==='empty') ? 'none' : '';
     let txt='', pct=-1, bg='#fff', fg='#3A3226';
-    if(p.s==='dead'){ txt = mode==='visit' ? '已收成' : '枯萎・點我剷除'; bg='#E8DCC8'; }
+    if(p.s==='dead'){ txt = mode==='visit' ? '已收成' : '枯萎・剷除'; bg='#E8DCC8'; }
     else if(p.s==='grow'){ const c = CROP[p.c];
       if(st===4){
         if(mode==='visit'){
           if(p.mine){ txt='你偷過了'; bg='#E8DCC8'; }
           else if(p.st >= p.cap){ txt='被偷光了'; bg='#E8DCC8'; }
-          else { txt=`${c.name} 可以偷！`; bg='#F2545B'; fg='#fff'; }
-        } else { txt=`${c.name} 可收成！`; bg='#FF9F43'; fg='#fff'; }
-      } else { txt = `${c.name} ${fmt(leftSec(p))}`; pct = p.g/c.time; if(p.dry) bg='#DDF0FF'; }
+          else { txt=`${c.name}可以偷！`; bg='#F2545B'; fg='#fff'; }
+        } else { txt=`${c.name}可收成！`; bg='#FF9F43'; fg='#fff'; }
+      } else { txt = `${c.name} ${fmtS(leftSec(p))}`; pct = p.g/c.time; if(p.dry) bg='#DDF0FF'; }
     }
     if(t.textContent !== txt) t.textContent = txt;
-    r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('y', pct>=0?3:5);
+    r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('y', pct>=0?2:4);
     bb.style.display = bf.style.display = pct>=0 ? '' : 'none';
-    if(pct>=0) bf.setAttribute('width', (64*pct).toFixed(1));
+    if(pct>=0) bf.setAttribute('width', (56*pct).toFixed(1));
   });
 }
 function renderHUD(){

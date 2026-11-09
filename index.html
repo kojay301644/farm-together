@@ -131,6 +131,10 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .tabs{display:flex;gap:6px;margin-bottom:6px;position:sticky;top:0;background:#fff;padding-bottom:6px;z-index:1}
 .tabs button{flex:1;background:#F3EEE5;border-radius:10px;padding:8px 0;font-weight:900;font-size:13px}
 .tabs button.on{background:var(--green);color:#fff}
+.rk .rkn{width:26px;text-align:center;font-weight:900;font-size:16px;color:var(--ink2);flex:none}
+.rk.mine{background:#F4FBEF;border-radius:12px;padding-left:6px;padding-right:6px}
+.myrank{margin-top:10px;background:#FFF6DB;border-radius:12px;padding:10px;text-align:center;font-weight:700;font-size:13px}
+.myrank b{color:var(--orange-d);font-size:16px}
 .dot{font-style:normal;background:var(--red);color:#fff;border-radius:8px;padding:0 6px;font-size:11px}
 .avatar.sm{width:40px;height:40px;font-size:16px;flex:none}
 .mini.sub{background:#EFE9DF;color:var(--ink);box-shadow:0 2px 0 #DDD3C3}
@@ -206,9 +210,17 @@ const CROPS = [
   {id:'pumpkin',   name:'南瓜',   lv:7, seed:220, time:14400, yield:12, price:28, exp:60,  type:'ground',color:'#FF9F1C'},
   {id:'watermelon',name:'西瓜',   lv:8, seed:300, time:21600, yield:10, price:48, exp:80,  type:'ground',color:'#3E9B4F', stripe:true},
   {id:'grape',     name:'葡萄',   lv:9, seed:400, time:28800, yield:16, price:38, exp:110, type:'bush',  color:'#8E5CC9', fruit:'grape'},
+  {id:'pineapple', name:'鳳梨',   lv:10,seed:480, time:36000, yield:12, price:58, exp:135, type:'pine',  color:'#FFC531'},
+  {id:'peach',     name:'桃子',   lv:11,seed:560, time:43200, yield:18, price:44, exp:160, type:'bush',  color:'#FF9EA0', fruit:'round'},
+  {id:'dragonfruit',name:'火龍果',lv:12,seed:650, time:50400, yield:14, price:65, exp:190, type:'bush',  color:'#E8338A', fruit:'dragon'},
+  {id:'melon',     name:'哈密瓜', lv:13,seed:760, time:57600, yield:10, price:105,exp:220, type:'ground',color:'#D9E8A0', net:true},
+  {id:'mango',     name:'芒果',   lv:14,seed:880, time:64800, yield:16, price:75, exp:255, type:'bush',  color:'#FFB02E', fruit:'long'},
 ];
 const CROP = Object.fromEntries(CROPS.map(c=>[c.id,c]));
-const WILD = [null,null,null,null,{cost:100,lv:1},{cost:300,lv:2}]; // 第5、6塊是荒地
+// 18 塊田的開墾條件（第 0～3 塊一開始就有），要跟伺服器的 land 表一致
+const LAND = [null,null,null,null,{lv:1,cost:100},{lv:2,cost:300},{lv:3,cost:500},{lv:4,cost:800},{lv:5,cost:1200},{lv:6,cost:1600},
+  {lv:7,cost:2000},{lv:8,cost:2500},{lv:9,cost:3000},{lv:10,cost:4000},{lv:11,cost:5000},{lv:12,cost:6500},{lv:13,cost:8000},{lv:14,cost:10000}];
+const WILD = LAND;
 const MAX_LV = 30;
 const needExp = lv => 30*lv*lv;
 const wetDur = c => Math.min(3600, Math.max(45, c.time*0.3));
@@ -240,14 +252,20 @@ function cropArt(c, st){
         if(c.fruit==='round') fr += `<circle cx="${x}" cy="${y}" r="${6*k}" fill="${col}"/><rect x="${x-2}" y="${y-7*k}" width="4" height="3" rx="1" fill="#3E8E3A"/>`;
         else if(c.fruit==='long') fr += `<ellipse cx="${x}" cy="${y+2}" rx="${4*k}" ry="${8*k}" fill="${col}"/><rect x="${x-3}" y="${y-7*k}" width="6" height="3" rx="1.5" fill="#3E8E3A"/>`;
         else if(c.fruit==='berry') fr += `<path d="M${x-5*k} ${y-3*k} Q${x} ${y-7*k} ${x+5*k} ${y-3*k} Q${x+4*k} ${y+5*k} ${x} ${y+7*k} Q${x-4*k} ${y+5*k} ${x-5*k} ${y-3*k}Z" fill="${col}"/>${ripe?`<circle cx="${x-1.5}" cy="${y}" r=".9" fill="#FFE066"/><circle cx="${x+1.8}" cy="${y+2}" r=".9" fill="#FFE066"/>`:''}`;
+        else if(c.fruit==='dragon') fr += `<ellipse cx="${x}" cy="${y}" rx="${5.5*k}" ry="${7*k}" fill="${col}"/>${ripe?`<path d="M${x-5} ${y-3} l-3 -2 M${x+5} ${y-2} l3 -2 M${x} ${y-7} l0 -3" stroke="#7CC85A" stroke-width="2" stroke-linecap="round"/>`:''}`;
         else if(c.fruit==='grape'){ const r=3*k; fr += [[0,0],[-3,-3],[3,-3],[-1.5,3],[1.5,3],[0,6]].map(([a,b])=>`<circle cx="${x+a*k}" cy="${y-2+b*k}" r="${r}" fill="${col}"/>`).join(''); }
       }
       return `<rect x="58" y="62" width="4" height="13" fill="#5A9E3E"/><circle cx="47" cy="60" r="15" fill="#5DB54A"/><circle cx="73" cy="60" r="15" fill="#5DB54A"/><circle cx="60" cy="50" r="17" fill="#6CC655"/><circle cx="54" cy="45" r="6" fill="#86D46A" opacity=".7"/>${fr}`;
     }
+    case 'pine':
+      return `${L(50,46,5,16,-30,'#4E9B3F')}${L(70,46,5,16,30,'#4E9B3F')}${L(44,58,5,14,-55,'#5DB54A')}${L(76,58,5,14,55,'#5DB54A')}
+        <ellipse cx="60" cy="${70-4*(1-k)}" rx="${11*k}" ry="${14*k}" fill="${ripe?c.color:'#C8D97A'}"/>
+        ${ripe?`<path d="M51 62 L69 78 M51 72 L63 82 M57 58 L69 70 M69 62 L51 78 M69 72 L57 82 M63 58 L51 70" stroke="#D99A1E" stroke-width="1.6"/>`:''}
+        ${L(56,50,3,9,-20,'#5DB54A')}${L(64,50,3,9,20,'#5DB54A')}${L(60,47,3,10,0,'#6CC655')}`;
     case 'ground':
       return `<path d="M30 70 Q45 56 60 66 T92 64" stroke="#5A9E3E" stroke-width="3" fill="none"/>${L(36,62,13,7,-20,'#5DB54A')}${L(86,60,13,7,20,'#6CC655')}
         <ellipse cx="60" cy="66" rx="${22*k}" ry="${15*k}" fill="${col}"/>
-        ${c.stripe?`<path d="M${60-12*k} ${54*1+(1-k)*8} Q${60-16*k} 66 ${60-12*k} ${78-(1-k)*8} M60 ${51+(1-k)*4} V${81-(1-k)*4} M${60+12*k} ${54+(1-k)*8} Q${60+16*k} 66 ${60+12*k} ${78-(1-k)*8}" stroke="${ripe?'#2C7A3B':'#8DBF55'}" stroke-width="3" fill="none"/>`
+        ${c.net?`<path d="M${60-14*k} ${60} Q60 ${56} ${60+14*k} ${60} M${60-18*k} 67 Q60 63 ${60+18*k} 67 M${60-14*k} 74 Q60 70 ${60+14*k} 74 M${60-8*k} ${54+(1-k)*6} Q${60-12*k} 66 ${60-8*k} ${79-(1-k)*6} M${60+8*k} ${54+(1-k)*6} Q${60+12*k} 66 ${60+8*k} ${79-(1-k)*6}" stroke="${ripe?'#A9BF6E':'#95C25E'}" stroke-width="1.6" fill="none"/>`:c.stripe?`<path d="M${60-12*k} ${54*1+(1-k)*8} Q${60-16*k} 66 ${60-12*k} ${78-(1-k)*8} M60 ${51+(1-k)*4} V${81-(1-k)*4} M${60+12*k} ${54+(1-k)*8} Q${60+16*k} 66 ${60+12*k} ${78-(1-k)*8}" stroke="${ripe?'#2C7A3B':'#8DBF55'}" stroke-width="3" fill="none"/>`
                   :`<path d="M${60-10*k} ${54+(1-k)*6} Q${60-15*k} 66 ${60-10*k} ${78-(1-k)*6} M${60+10*k} ${54+(1-k)*6} Q${60+15*k} 66 ${60+10*k} ${78-(1-k)*6}" stroke="${ripe?'#E8830C':'#95C25E'}" stroke-width="2.5" fill="none"/>`}
         <rect x="58" y="${50+(1-k)*5}" width="5" height="6" rx="2" fill="#6B8E3A"/>`;
   }
@@ -273,6 +291,7 @@ const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','�
 /* ================= 工具函式 ================= */
 const $ = id=>document.getElementById(id);
 function dur(sec){ sec=Math.round(sec); const h=Math.floor(sec/3600), m=Math.round(sec%3600/60); if(h) return m?`${h}小時${m}分鐘`:`${h}小時`; if(sec>=60) return `${Math.round(sec/60)}分鐘`; return `${sec}秒`; }
+function fmtS(sec){ sec=Math.max(0,Math.ceil(sec)); const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60; const p=n=>String(n).padStart(2,'0'); if(h) return `${h}:${p(m)}:${p(s)}`; if(m) return `${m}:${p(s)}`; return `${s}秒`; }
 function fmt(sec){
   sec = Math.max(0, Math.ceil(sec));
   const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60;
@@ -315,10 +334,10 @@ function fq(P0,P1,u0,u1,v0,v1,f,extra=''){ return poly([fpt(P0,P1,u0,v0),fpt(P0,
 let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
 
 /* 田地位置（格座標，3×2） */
-const PS=1.8;
-const PLOTS=[0,1,2,3,4,5].map(i=>[5.6+(i%3)*2.1, 7+Math.floor(i/3)*2.1]);
+const PS=1.45, PG=1.65;
+const PLOTS=Array.from({length:18},(_,i)=>[4.35+(i%6)*PG, 6.75+Math.floor(i/6)*PG]);
 const plotCenter=i=>iso(PLOTS[i][0]+PS/2, PLOTS[i][1]+PS/2);
-const FARM_C=[8.7,8.9];
+const FARM_C=[9.2,9.2];
 
 /* ================= 美術元件 ================= */
 function labelPill(x,y,text,opt={}){
@@ -367,7 +386,7 @@ const BLD = [
       <circle class="smoke" cx="${p[0]+1}" cy="${p[1]-24}" r="5" fill="#fff" opacity=".7"/><circle class="smoke" style="animation-delay:1.5s" cx="${p[0]+4}" cy="${p[1]-26}" r="4" fill="#fff" opacity=".7"/>`; }},
   {id:'decor', name:'裝飾店', x:0.4,y:10.1,w:2.4,d:2.2,h:36,rh:22, wallL:'#FFFFFF', wallR:'#ECE4EE', roofF:'#F78FB3', roofB:'#D86F94', locked:'裝飾店將在第四階段開放',
     deco:(D,C,B,h)=> fq(D,C,.4,.62,0,22,'#F78FB3')+fq(D,C,.08,.32,10,24,'#FFD6E5')+fq(D,C,.72,.94,10,24,'#FFD6E5')+fq(C,B,.3,.7,14,26,'#FFD6E5')},
-  {id:'coop', name:'牧場', x:14,y:9.9,w:1.5,d:1.3,h:24,rh:14, wallL:'#FFE0A3', wallR:'#EFC982', roofF:'#E2574C', roofB:'#B5413A', locked:'牧場將在第四階段開放',
+  {id:'coop', name:'牧場', x:13.9,y:12.3,w:1.4,d:1.2,h:24,rh:14, wallL:'#FFE0A3', wallR:'#EFC982', roofF:'#E2574C', roofB:'#B5413A', locked:'牧場將在第四階段開放',
     deco:(D,C,B,h)=> fq(D,C,.35,.65,0,14,'#8B5E3C')},
 ];
 
@@ -441,9 +460,9 @@ function buildWorld(){
   ground += `<path d="M${P([up(iso(2.75,13.9),8),up(iso(2.75,15.7),8)])} M${P([up(iso(4.25,13.9),8),up(iso(4.25,15.7),8)])}" stroke="#8B5E3C" stroke-width="3"/>`;
 
   // 田區底
-  ground += poly(dia(5.25,6.65,6.95,4.6),'#9ACF6A','stroke="#7DB14C" stroke-width="3"');
+  ground += poly(dia(4.1,6.5,10.15,5.35),'#9ACF6A','stroke="#7DB14C" stroke-width="3"');
   // 牧場底與圍欄
-  const RX=11.9,RY=9.5,RW=3.9,RD=4;
+  const RX=9.4,RY=12.1,RW=6.2,RD=1.9;
   ground += poly(dia(RX,RY,RW,RD),'#A7D46F');
   const fence=(x0,y0,x1,y1)=>{ let s=''; const n=Math.ceil(Math.hypot(x1-x0,y1-y0)/0.55);
     const a=iso(x0,y0), b=iso(x1,y1); s+=`<path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="#E8D3A2" stroke-width="3"/>`;
@@ -451,7 +470,7 @@ function buildWorld(){
   ground += fence(RX,RY,RX+RW,RY) + fence(RX,RY,RX,RY+RD);
   objs.push({depth:RX+RW+RY+RD+0.5, svg: fence(RX,RY+RD,RX+RW,RY+RD) + fence(RX+RW,RY,RX+RW,RY+RD)});
   // 飼料槽
-  objs.push({depth:RX+1+RY+2.6, svg:(()=>{ const [x,y]=iso(RX+1,RY+2.6); return `<rect x="${x-14}" y="${y-8}" width="28" height="8" rx="3" fill="#A86F45"/><rect x="${x-12}" y="${y-8}" width="24" height="3" fill="#F2D57E"/>`; })()});
+  objs.push({depth:RX+1.2+RY+1, svg:(()=>{ const [x,y]=iso(RX+1.2,RY+1); return `<rect x="${x-14}" y="${y-8}" width="28" height="8" rx="3" fill="#A86F45"/><rect x="${x-12}" y="${y-8}" width="24" height="3" fill="#F2D57E"/>`; })()});
 
   // 建築
   BLD.forEach(o=>{ const b=building(o);
@@ -460,20 +479,20 @@ function buildWorld(){
   });
   const bd=board(1.6,7.4); objs.push({depth:bd.depth, svg:`<g class="tap" data-b="board">${bd.svg}</g>`});
   lab += labelPill(iso(1.6,7.4)[0], iso(1.6,7.4)[1]-68, '好友布告欄', {bg:'#E3F6EA',fg:'#2E9660'});
-  const wm=windmill(13.7,7.4); objs.push(wm);
+  const wm=windmill(16.2,7.6); objs.push(wm);
   // 信箱
   objs.push((()=>{ const [x,y]=iso(13.9,4.5); return {depth:18.4, svg:`<g transform="translate(${x} ${y})"><rect x="-1.5" y="-22" width="3" height="22" fill="#9C6B43"/><rect x="-8" y="-32" width="16" height="11" rx="5" fill="#3DA5F4"/><rect x="5" y="-36" width="2" height="8" fill="#F2545B"/></g>`}; })());
 
   // 樹木與花叢
-  [[-0.4,3.4],[-0.5,7.6],[-0.3,13.2],[5,13.1],[8,13.4],[10.8,13.2],[16,7],[16,15.6],[13,16.2],[1.5,16.3],[7.5,16.4],[16.2,2.2],[15.6,-0.4],[4.9,-0.3],[9.4,-0.4],[-0.6,0.3],[16.3,13.6],[5.2,15.9]].forEach(([x,y],k)=>objs.push(tree(x,y,0.85+((k*37)%30)/100)));
-  [[9.7,4.5,'#FF9AA2'],[14.4,4.6,'#FFE066'],[4.9,4.5,null],[12.4,6.6,'#FFFFFF'],[2.3,8.8,'#FFE066'],[4.6,11.6,null]].forEach(([x,y,f])=>objs.push(bush(x,y,f)));
+  [[-0.4,3.4],[-0.5,7.6],[-0.3,13.2],[5,13.1],[7.6,13.3],[16,15.6],[13,16.2],[1.5,16.3],[7.5,16.4],[16.2,2.2],[15.6,-0.4],[4.9,-0.3],[9.4,-0.4],[-0.6,0.3],[16.6,11.2],[5.2,15.9]].forEach(([x,y],k)=>objs.push(tree(x,y,0.85+((k*37)%30)/100)));
+  [[9.7,4.5,'#FF9AA2'],[14.4,4.6,'#FFE066'],[4.9,4.5,null],[15.6,10.6,'#FFFFFF'],[2.3,8.8,'#FFE066'],[2.4,12.9,null]].forEach(([x,y,f])=>objs.push(bush(x,y,f)));
 
   // 田地（可點）
   PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i); objs.push({depth:PLOTS[i][0]+PLOTS[i][1]+PS, svg:`<g class="tap plot" data-p="${i}"><g class="pg"></g><g class="ps"></g></g>`}); });
 
   // 固定人物
   const stand=(gx,gy,o,flip)=>{ const [x,y]=iso(gx,gy); objs.push({depth:gx+gy, svg:`<g transform="translate(${x} ${y}) scale(${flip?-1.15:1.15} 1.15)">${personSVG(o)}</g>`}); };
-  stand(4.85,8.3,{shirt:'#FFFFFF',overall:'#3DA5F4',hair:'#5A3A22',hat:true,tool:'hoe'},false);
+  stand(3.6,8.9,{shirt:'#FFFFFF',overall:'#3DA5F4',hair:'#5A3A22',hat:true,tool:'hoe'},false);
   stand(7.45,4.6,{shirt:'#3BB273',apron:'#FFF3E0',hair:'#3A3226'},true);
 
   objs.sort((a,b)=>a.depth-b.depth);
@@ -489,8 +508,8 @@ function buildWorld(){
   const pl=$('plabs');
   W.querySelectorAll('[data-p]').forEach(g=>{ const i=+g.dataset.p; plotEls[i]=g; plotSig[i]=''; g.addEventListener('click',()=>act(i)); });
   PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i);
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-62})`);
-    g.innerHTML=`<rect x="-44" y="-12" width="88" height="25" rx="11" fill="#fff" stroke="rgba(0,0,0,.08)" stroke-width="2"/><text x="0" y="3" text-anchor="middle" font-size="12" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-32" y="6" width="64" height="4" rx="2" fill="#EEE6D6"/><rect class="bf" x="-32" y="6" width="0" height="4" rx="2" fill="#7ED957"/>`;
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-44})`);
+    g.innerHTML=`<rect x="-38" y="-11" width="76" height="22" rx="10" fill="#fff" stroke="rgba(0,0,0,.08)" stroke-width="2"/><text x="0" y="2" text-anchor="middle" font-size="11" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-28" y="5" width="56" height="3" rx="1.5" fill="#EEE6D6"/><rect class="bf" x="-28" y="5" width="0" height="3" rx="1.5" fill="#7ED957"/>`;
     pl.appendChild(g); plotLabs[i]=g; });
   W.querySelectorAll('[data-b]').forEach(g=>g.addEventListener('click',()=>tapBuilding(g)));
 
@@ -530,22 +549,23 @@ function animate(now){
 }
 
 /* ================= 田地繪製 ================= */
-const SPR=0.85;
+const SPR=0.7;
 function plotGroundSVG(p,i){
   const [x,y]=PLOTS[i], pts=dia(x,y,PS,PS), B=pts[1], C=pts[2], D=pts[3];
   let top='#A06F49', sl='#7E5638', sr='#6B4830';
   if(p.s==='wild'){ top='#7DB14C'; sl='#8B5E3C'; sr='#76502F'; }
   else if(p.s==='grow'){ if(isDry(p)){ top='#C08A5C'; } else { top='#7A4E33'; } }
   let s = poly([D,C,[C[0],C[1]+7],[D[0],D[1]+7]],sl) + poly([C,B,[B[0],B[1]+7],[C[0],C[1]+7]],sr) + poly(pts,top);
-  if(p.s!=='wild') for(const k of [0.45,0.9,1.35]) s+=`<path d="M${P([iso(x+0.15,y+k),iso(x+PS-0.15,y+k)])}" stroke="rgba(0,0,0,.12)" stroke-width="3" stroke-linecap="round"/>`;
+  if(p.s!=='wild') for(const k of [PS*0.25,PS*0.5,PS*0.75]) s+=`<path d="M${P([iso(x+0.15,y+k),iso(x+PS-0.15,y+k)])}" stroke="rgba(0,0,0,.12)" stroke-width="3" stroke-linecap="round"/>`;
   if(p.s==='grow' && isDry(p)) s+=`<path d="M${P([iso(x+0.4,y+0.3),iso(x+0.6,y+0.5),iso(x+0.5,y+0.7)])} M${P([iso(x+1.3,y+1.2),iso(x+1.5,y+1.3)])}" stroke="#8C6040" stroke-width="1.6" fill="none"/>`;
   return s;
 }
+function wildSign(i){ const l=LAND[i]; if(!l || mode==='visit' || !S) return '荒地'; return S.me.lv>=l.lv ? '可開墾' : `Lv${l.lv}`; }
 function plotSpriteSVG(p,i){
   let body='';
   if(p.s==='wild'){
     body = `${weedArt(30,80)}${weedArt(90,70)}${weedArt(56,64)}<ellipse cx="76" cy="84" rx="8" ry="5" fill="#B5AFA3"/><ellipse cx="74" cy="82" rx="4" ry="2" fill="#CFCAC0"/>
-      <g transform="translate(36 24)"><rect x="22" y="14" width="4" height="26" fill="#B07A4F"/><rect x="0" y="0" width="48" height="20" rx="5" fill="#F3D9A8"/><text x="24" y="14.5" font-size="11" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">荒地</text></g>`;
+      <g transform="translate(36 24)"><rect x="22" y="14" width="4" height="26" fill="#B07A4F"/><rect x="0" y="0" width="48" height="20" rx="5" fill="#F3D9A8"/><text x="24" y="14.5" font-size="11" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">${wildSign(i)}</text></g>`;
   } else if(p.s==='grow'){
     const st=stageOf(p);
     body += `<g class="crop">${cropArt(CROP[p.c],st)}</g>`;
@@ -563,7 +583,7 @@ const map=$('map'), world=$('world');
 let scale=1;
 function layout(){
   const vw=innerWidth, vh=innerHeight;
-  scale=Math.max(0.6, Math.min(vw/470, vh/560, 1.6));
+  scale=Math.max(0.55, Math.min(vw/560, vh/600, 1.6));
   world.setAttribute('width',(WW*scale).toFixed(0)); world.setAttribute('height',(WH*scale).toFixed(0));
   world.style.margin=`${PAD.t}px ${PAD.r}px ${PAD.b}px ${PAD.l}px`;
 }
@@ -637,7 +657,7 @@ const leftSec = p => { const c=CROP[p.c]; return (c.time - p.g)/(p.dry?0.5:1); }
 function showLevelUp(){
   const lv = S.me.lv;
   const un = CROPS.filter(c=>c.lv===lv).map(c=>c.name);
-  const w = WILD.filter(x=>x && x.lv===lv).length;
+  const w = LAND.filter(x=>x && x.lv===lv).length;
   modal('升級了！', `<div style="text-align:center;padding:10px 0 4px">
     <div style="font-size:46px;font-weight:900;color:var(--green-d)">Lv${lv}</div>
     ${un.length?`<div style="font-weight:700;margin-top:6px">解鎖新作物：<b style="color:var(--orange-d)">${un.join('、')}</b></div>`:''}
@@ -706,7 +726,7 @@ async function plant(i, id){
   if(r) floatAt(plotEls[i], `種下${CROP[id].name}`);
 }
 function askTill(i){
-  const w = WILD[i];
+  const w = LAND[i];
   if(S.me.lv < w.lv) return toast(`需要 Lv${w.lv} 才能開墾這塊荒地`);
   modal('開墾荒地', `<p style="font-weight:700;text-align:center">花 <b style="color:var(--orange-d)">${w.cost}</b> 金幣開墾這塊荒地？</p>`,
     [['取消','sub',closeModal],['開墾','o',async()=>{
@@ -819,7 +839,7 @@ async function openHome(){
 const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
 /* ================= 好友布告欄 ================= */
-let boardTab = 'friends';
+let boardTab = 'friends', rankScope = 'f';
 function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60) return '剛剛'; if(s<3600) return `${Math.floor(s/60)} 分鐘前`; if(s<86400) return `${Math.floor(s/3600)} 小時前`; return `${Math.floor(s/86400)} 天前`; }
 const LOG_TXT = {steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
   prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`};
@@ -827,14 +847,15 @@ const LOG_TXT = {steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`
 async function openBoard(tab){
   if(tab) boardTab = tab;
   modal('好友布告欄', `<div class="empty">讀取中…</div>`);
-  let F, logs;
-  try{ [F, logs] = await Promise.all([rpc('farm_friends'), rpc('farm_logs_get')]); }
+  let F, logs, R;
+  try{ [F, logs, R] = await Promise.all([rpc('farm_friends'), boardTab==='logs'?rpc('farm_logs_get'):[], boardTab==='rank'?rpc('farm_rank'):null]); }
   catch(e){ return modal('好友布告欄', `<div class="empty">${esc(e.message)}</div>`); }
   const nIn = F.incoming.length;
   const tabs = `<div class="tabs">
     <button data-tab="friends" class="${boardTab==='friends'?'on':''}">好友 ${F.friends.length}</button>
     <button data-tab="add" class="${boardTab==='add'?'on':''}">加好友${nIn?` <i class="dot">${nIn}</i>`:''}</button>
-    <button data-tab="logs" class="${boardTab==='logs'?'on':''}">農場動態</button></div>`;
+    <button data-tab="rank" class="${boardTab==='rank'?'on':''}">排行榜</button>
+    <button data-tab="logs" class="${boardTab==='logs'?'on':''}">動態</button></div>`;
   let body = '';
   if(boardTab==='friends'){
     body = F.friends.length ? F.friends.map(f=>`<div class="row">
@@ -851,6 +872,14 @@ async function openBoard(tab){
         <div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span><div>想成為你的好友</div></div>
         <button class="mini" data-acc="${f.id}">接受</button><button class="mini sub" data-rej="${f.id}">拒絕</button></div>`).join('') : `<div class="empty" style="padding:10px 0">沒有新的邀請</div>`);
     if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row"><div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
+  } else if(boardTab==='rank'){
+    const medal = r => r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
+    const row = (rk, x) => `<div class="row rk${x.me?' mine':''}"><div class="rkn">${medal(rk)}</div><div class="avatar sm">${esc(x.nickname.slice(0,1))}</div>
+        <div class="tx"><b>${esc(x.nickname)}</b>${x.me?' <span class="tag">我</span>':''}<div>經驗 ${x.exp}</div></div><span class="tag" style="font-size:13px">Lv${x.lv}</span></div>`;
+    body = `<div class="seg" style="margin:4px 0 6px"><button data-rs="f" class="${rankScope==='f'?'on':''}">好友排行</button><button data-rs="a" class="${rankScope==='a'?'on':''}">全服前 50 名</button></div>`;
+    if(rankScope==='f') body += R.friends.map((x,k)=>row(k+1, x)).join('') + (R.friends.length<2?`<div class="empty" style="padding:10px 0">加更多好友一起比賽吧！</div>`:'');
+    else body += R.top.map(x=>row(x.rk, x)).join('');
+    body += `<div class="myrank">你在全服排第 <b>${R.my_rank}</b> 名（共 ${R.total} 位玩家）</div>`;
   } else {
     body = logs.length ? logs.map(l=>`<div class="row"><div class="avatar sm" style="background:${l.kind.startsWith('prank')?'#F78FB3':l.kind==='steal'?'#FF9F43':'#3BB273'}">${esc((l.who||'?').slice(0,1))}</div>
         <div class="tx"><b>${esc(l.who||'')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}<div>${ago(l.at)}</div></div></div>`).join('')
@@ -859,6 +888,7 @@ async function openBoard(tab){
   modal('好友布告欄', tabs + body);
   const md = $('md');
   md.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>openBoard(b.dataset.tab));
+  md.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>{ rankScope=b.dataset.rs; openBoard('rank'); });
   md.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>visit(b.dataset.visit));
   md.querySelectorAll('[data-acc]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.acc,p_accept:true})); openBoard(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-rej]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.rej,p_accept:false})); openBoard(); }catch(e){ toast(e.message); } });
@@ -922,26 +952,26 @@ function renderPlots(){
   P.forEach(p=>{
     const i = p.i, el = plotEls[i]; if(!el) return;
     const st = p.s==='grow' ? stageOf(p) : -1;
-    const sig = [mode, p.s, p.c, st, p.w, p.b, p.dry].join('|');
+    const sig = [mode, p.s, p.c, st, p.w, p.b, p.dry, p.s==='wild'?S.me.lv:0].join('|');
     if(sig !== plotSig[i]){ el.querySelector('.pg').innerHTML = plotGroundSVG(p,i); el.querySelector('.ps').innerHTML = plotSpriteSVG(p,i); plotSig[i] = sig; }
     el.classList.toggle('ripe', st===4);
     const L = plotLabs[i], t = L.querySelector('text'), r = L.querySelector('rect'), bb = L.querySelector('.bb'), bf = L.querySelector('.bf');
     L.style.display = (p.s==='wild'||p.s==='empty') ? 'none' : '';
     let txt='', pct=-1, bg='#fff', fg='#3A3226';
-    if(p.s==='dead'){ txt = mode==='visit' ? '已收成' : '枯萎・點我剷除'; bg='#E8DCC8'; }
+    if(p.s==='dead'){ txt = mode==='visit' ? '已收成' : '枯萎・剷除'; bg='#E8DCC8'; }
     else if(p.s==='grow'){ const c = CROP[p.c];
       if(st===4){
         if(mode==='visit'){
           if(p.mine){ txt='你偷過了'; bg='#E8DCC8'; }
           else if(p.st >= p.cap){ txt='被偷光了'; bg='#E8DCC8'; }
-          else { txt=`${c.name} 可以偷！`; bg='#F2545B'; fg='#fff'; }
-        } else { txt=`${c.name} 可收成！`; bg='#FF9F43'; fg='#fff'; }
-      } else { txt = `${c.name} ${fmt(leftSec(p))}`; pct = p.g/c.time; if(p.dry) bg='#DDF0FF'; }
+          else { txt=`${c.name}可以偷！`; bg='#F2545B'; fg='#fff'; }
+        } else { txt=`${c.name}可收成！`; bg='#FF9F43'; fg='#fff'; }
+      } else { txt = `${c.name} ${fmtS(leftSec(p))}`; pct = p.g/c.time; if(p.dry) bg='#DDF0FF'; }
     }
     if(t.textContent !== txt) t.textContent = txt;
-    r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('y', pct>=0?3:5);
+    r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('y', pct>=0?2:4);
     bb.style.display = bf.style.display = pct>=0 ? '' : 'none';
-    if(pct>=0) bf.setAttribute('width', (64*pct).toFixed(1));
+    if(pct>=0) bf.setAttribute('width', (56*pct).toFixed(1));
   });
 }
 function renderHUD(){

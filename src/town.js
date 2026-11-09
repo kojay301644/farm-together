@@ -12,10 +12,10 @@ function fq(P0,P1,u0,u1,v0,v1,f,extra=''){ return poly([fpt(P0,P1,u0,v0),fpt(P0,
 let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
 
 /* 田地位置（格座標，3×2） */
-const PS=1.8;
-const PLOTS=[0,1,2,3,4,5].map(i=>[5.6+(i%3)*2.1, 7+Math.floor(i/3)*2.1]);
+const PS=1.45, PG=1.65;
+const PLOTS=Array.from({length:18},(_,i)=>[4.35+(i%6)*PG, 6.75+Math.floor(i/6)*PG]);
 const plotCenter=i=>iso(PLOTS[i][0]+PS/2, PLOTS[i][1]+PS/2);
-const FARM_C=[8.7,8.9];
+const FARM_C=[9.2,9.2];
 
 /* ================= 美術元件 ================= */
 function labelPill(x,y,text,opt={}){
@@ -64,7 +64,7 @@ const BLD = [
       <circle class="smoke" cx="${p[0]+1}" cy="${p[1]-24}" r="5" fill="#fff" opacity=".7"/><circle class="smoke" style="animation-delay:1.5s" cx="${p[0]+4}" cy="${p[1]-26}" r="4" fill="#fff" opacity=".7"/>`; }},
   {id:'decor', name:'裝飾店', x:0.4,y:10.1,w:2.4,d:2.2,h:36,rh:22, wallL:'#FFFFFF', wallR:'#ECE4EE', roofF:'#F78FB3', roofB:'#D86F94', locked:'裝飾店將在第四階段開放',
     deco:(D,C,B,h)=> fq(D,C,.4,.62,0,22,'#F78FB3')+fq(D,C,.08,.32,10,24,'#FFD6E5')+fq(D,C,.72,.94,10,24,'#FFD6E5')+fq(C,B,.3,.7,14,26,'#FFD6E5')},
-  {id:'coop', name:'牧場', x:14,y:9.9,w:1.5,d:1.3,h:24,rh:14, wallL:'#FFE0A3', wallR:'#EFC982', roofF:'#E2574C', roofB:'#B5413A', locked:'牧場將在第四階段開放',
+  {id:'coop', name:'牧場', x:13.9,y:12.3,w:1.4,d:1.2,h:24,rh:14, wallL:'#FFE0A3', wallR:'#EFC982', roofF:'#E2574C', roofB:'#B5413A', locked:'牧場將在第四階段開放',
     deco:(D,C,B,h)=> fq(D,C,.35,.65,0,14,'#8B5E3C')},
 ];
 
@@ -138,9 +138,9 @@ function buildWorld(){
   ground += `<path d="M${P([up(iso(2.75,13.9),8),up(iso(2.75,15.7),8)])} M${P([up(iso(4.25,13.9),8),up(iso(4.25,15.7),8)])}" stroke="#8B5E3C" stroke-width="3"/>`;
 
   // 田區底
-  ground += poly(dia(5.25,6.65,6.95,4.6),'#9ACF6A','stroke="#7DB14C" stroke-width="3"');
+  ground += poly(dia(4.1,6.5,10.15,5.35),'#9ACF6A','stroke="#7DB14C" stroke-width="3"');
   // 牧場底與圍欄
-  const RX=11.9,RY=9.5,RW=3.9,RD=4;
+  const RX=9.4,RY=12.1,RW=6.2,RD=1.9;
   ground += poly(dia(RX,RY,RW,RD),'#A7D46F');
   const fence=(x0,y0,x1,y1)=>{ let s=''; const n=Math.ceil(Math.hypot(x1-x0,y1-y0)/0.55);
     const a=iso(x0,y0), b=iso(x1,y1); s+=`<path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="#E8D3A2" stroke-width="3"/>`;
@@ -148,7 +148,7 @@ function buildWorld(){
   ground += fence(RX,RY,RX+RW,RY) + fence(RX,RY,RX,RY+RD);
   objs.push({depth:RX+RW+RY+RD+0.5, svg: fence(RX,RY+RD,RX+RW,RY+RD) + fence(RX+RW,RY,RX+RW,RY+RD)});
   // 飼料槽
-  objs.push({depth:RX+1+RY+2.6, svg:(()=>{ const [x,y]=iso(RX+1,RY+2.6); return `<rect x="${x-14}" y="${y-8}" width="28" height="8" rx="3" fill="#A86F45"/><rect x="${x-12}" y="${y-8}" width="24" height="3" fill="#F2D57E"/>`; })()});
+  objs.push({depth:RX+1.2+RY+1, svg:(()=>{ const [x,y]=iso(RX+1.2,RY+1); return `<rect x="${x-14}" y="${y-8}" width="28" height="8" rx="3" fill="#A86F45"/><rect x="${x-12}" y="${y-8}" width="24" height="3" fill="#F2D57E"/>`; })()});
 
   // 建築
   BLD.forEach(o=>{ const b=building(o);
@@ -157,20 +157,20 @@ function buildWorld(){
   });
   const bd=board(1.6,7.4); objs.push({depth:bd.depth, svg:`<g class="tap" data-b="board">${bd.svg}</g>`});
   lab += labelPill(iso(1.6,7.4)[0], iso(1.6,7.4)[1]-68, '好友布告欄', {bg:'#E3F6EA',fg:'#2E9660'});
-  const wm=windmill(13.7,7.4); objs.push(wm);
+  const wm=windmill(16.2,7.6); objs.push(wm);
   // 信箱
   objs.push((()=>{ const [x,y]=iso(13.9,4.5); return {depth:18.4, svg:`<g transform="translate(${x} ${y})"><rect x="-1.5" y="-22" width="3" height="22" fill="#9C6B43"/><rect x="-8" y="-32" width="16" height="11" rx="5" fill="#3DA5F4"/><rect x="5" y="-36" width="2" height="8" fill="#F2545B"/></g>`}; })());
 
   // 樹木與花叢
-  [[-0.4,3.4],[-0.5,7.6],[-0.3,13.2],[5,13.1],[8,13.4],[10.8,13.2],[16,7],[16,15.6],[13,16.2],[1.5,16.3],[7.5,16.4],[16.2,2.2],[15.6,-0.4],[4.9,-0.3],[9.4,-0.4],[-0.6,0.3],[16.3,13.6],[5.2,15.9]].forEach(([x,y],k)=>objs.push(tree(x,y,0.85+((k*37)%30)/100)));
-  [[9.7,4.5,'#FF9AA2'],[14.4,4.6,'#FFE066'],[4.9,4.5,null],[12.4,6.6,'#FFFFFF'],[2.3,8.8,'#FFE066'],[4.6,11.6,null]].forEach(([x,y,f])=>objs.push(bush(x,y,f)));
+  [[-0.4,3.4],[-0.5,7.6],[-0.3,13.2],[5,13.1],[7.6,13.3],[16,15.6],[13,16.2],[1.5,16.3],[7.5,16.4],[16.2,2.2],[15.6,-0.4],[4.9,-0.3],[9.4,-0.4],[-0.6,0.3],[16.6,11.2],[5.2,15.9]].forEach(([x,y],k)=>objs.push(tree(x,y,0.85+((k*37)%30)/100)));
+  [[9.7,4.5,'#FF9AA2'],[14.4,4.6,'#FFE066'],[4.9,4.5,null],[15.6,10.6,'#FFFFFF'],[2.3,8.8,'#FFE066'],[2.4,12.9,null]].forEach(([x,y,f])=>objs.push(bush(x,y,f)));
 
   // 田地（可點）
   PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i); objs.push({depth:PLOTS[i][0]+PLOTS[i][1]+PS, svg:`<g class="tap plot" data-p="${i}"><g class="pg"></g><g class="ps"></g></g>`}); });
 
   // 固定人物
   const stand=(gx,gy,o,flip)=>{ const [x,y]=iso(gx,gy); objs.push({depth:gx+gy, svg:`<g transform="translate(${x} ${y}) scale(${flip?-1.15:1.15} 1.15)">${personSVG(o)}</g>`}); };
-  stand(4.85,8.3,{shirt:'#FFFFFF',overall:'#3DA5F4',hair:'#5A3A22',hat:true,tool:'hoe'},false);
+  stand(3.6,8.9,{shirt:'#FFFFFF',overall:'#3DA5F4',hair:'#5A3A22',hat:true,tool:'hoe'},false);
   stand(7.45,4.6,{shirt:'#3BB273',apron:'#FFF3E0',hair:'#3A3226'},true);
 
   objs.sort((a,b)=>a.depth-b.depth);
@@ -186,8 +186,8 @@ function buildWorld(){
   const pl=$('plabs');
   W.querySelectorAll('[data-p]').forEach(g=>{ const i=+g.dataset.p; plotEls[i]=g; plotSig[i]=''; g.addEventListener('click',()=>act(i)); });
   PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i);
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-62})`);
-    g.innerHTML=`<rect x="-44" y="-12" width="88" height="25" rx="11" fill="#fff" stroke="rgba(0,0,0,.08)" stroke-width="2"/><text x="0" y="3" text-anchor="middle" font-size="12" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-32" y="6" width="64" height="4" rx="2" fill="#EEE6D6"/><rect class="bf" x="-32" y="6" width="0" height="4" rx="2" fill="#7ED957"/>`;
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-44})`);
+    g.innerHTML=`<rect x="-38" y="-11" width="76" height="22" rx="10" fill="#fff" stroke="rgba(0,0,0,.08)" stroke-width="2"/><text x="0" y="2" text-anchor="middle" font-size="11" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-28" y="5" width="56" height="3" rx="1.5" fill="#EEE6D6"/><rect class="bf" x="-28" y="5" width="0" height="3" rx="1.5" fill="#7ED957"/>`;
     pl.appendChild(g); plotLabs[i]=g; });
   W.querySelectorAll('[data-b]').forEach(g=>g.addEventListener('click',()=>tapBuilding(g)));
 
@@ -227,22 +227,23 @@ function animate(now){
 }
 
 /* ================= 田地繪製 ================= */
-const SPR=0.85;
+const SPR=0.7;
 function plotGroundSVG(p,i){
   const [x,y]=PLOTS[i], pts=dia(x,y,PS,PS), B=pts[1], C=pts[2], D=pts[3];
   let top='#A06F49', sl='#7E5638', sr='#6B4830';
   if(p.s==='wild'){ top='#7DB14C'; sl='#8B5E3C'; sr='#76502F'; }
   else if(p.s==='grow'){ if(isDry(p)){ top='#C08A5C'; } else { top='#7A4E33'; } }
   let s = poly([D,C,[C[0],C[1]+7],[D[0],D[1]+7]],sl) + poly([C,B,[B[0],B[1]+7],[C[0],C[1]+7]],sr) + poly(pts,top);
-  if(p.s!=='wild') for(const k of [0.45,0.9,1.35]) s+=`<path d="M${P([iso(x+0.15,y+k),iso(x+PS-0.15,y+k)])}" stroke="rgba(0,0,0,.12)" stroke-width="3" stroke-linecap="round"/>`;
+  if(p.s!=='wild') for(const k of [PS*0.25,PS*0.5,PS*0.75]) s+=`<path d="M${P([iso(x+0.15,y+k),iso(x+PS-0.15,y+k)])}" stroke="rgba(0,0,0,.12)" stroke-width="3" stroke-linecap="round"/>`;
   if(p.s==='grow' && isDry(p)) s+=`<path d="M${P([iso(x+0.4,y+0.3),iso(x+0.6,y+0.5),iso(x+0.5,y+0.7)])} M${P([iso(x+1.3,y+1.2),iso(x+1.5,y+1.3)])}" stroke="#8C6040" stroke-width="1.6" fill="none"/>`;
   return s;
 }
+function wildSign(i){ const l=LAND[i]; if(!l || mode==='visit' || !S) return '荒地'; return S.me.lv>=l.lv ? '可開墾' : `Lv${l.lv}`; }
 function plotSpriteSVG(p,i){
   let body='';
   if(p.s==='wild'){
     body = `${weedArt(30,80)}${weedArt(90,70)}${weedArt(56,64)}<ellipse cx="76" cy="84" rx="8" ry="5" fill="#B5AFA3"/><ellipse cx="74" cy="82" rx="4" ry="2" fill="#CFCAC0"/>
-      <g transform="translate(36 24)"><rect x="22" y="14" width="4" height="26" fill="#B07A4F"/><rect x="0" y="0" width="48" height="20" rx="5" fill="#F3D9A8"/><text x="24" y="14.5" font-size="11" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">荒地</text></g>`;
+      <g transform="translate(36 24)"><rect x="22" y="14" width="4" height="26" fill="#B07A4F"/><rect x="0" y="0" width="48" height="20" rx="5" fill="#F3D9A8"/><text x="24" y="14.5" font-size="11" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">${wildSign(i)}</text></g>`;
   } else if(p.s==='grow'){
     const st=stageOf(p);
     body += `<g class="crop">${cropArt(CROP[p.c],st)}</g>`;
@@ -260,7 +261,7 @@ const map=$('map'), world=$('world');
 let scale=1;
 function layout(){
   const vw=innerWidth, vh=innerHeight;
-  scale=Math.max(0.6, Math.min(vw/470, vh/560, 1.6));
+  scale=Math.max(0.55, Math.min(vw/560, vh/600, 1.6));
   world.setAttribute('width',(WW*scale).toFixed(0)); world.setAttribute('height',(WH*scale).toFixed(0));
   world.style.margin=`${PAD.t}px ${PAD.r}px ${PAD.b}px ${PAD.l}px`;
 }
