@@ -27,7 +27,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden}
-body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#8FD3F4;user-select:none;-webkit-user-select:none}
+body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#8CCB5B;user-select:none;-webkit-user-select:none}
 button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 
 /* 地圖 */
@@ -46,7 +46,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .blades{transform-box:fill-box;transform-origin:center;animation:spin 7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .cloud{animation:drift linear infinite}
-@keyframes drift{from{transform:translateX(-300px)}to{transform:translateX(1700px)}}
+@keyframes drift{from{transform:translateX(-400px)}to{transform:translateX(1700px)}}
 .flow{stroke-dasharray:14 22;animation:flow 2.4s linear infinite}
 @keyframes flow{to{stroke-dashoffset:-36}}
 .wave{animation:wave 3s ease-in-out infinite}
@@ -196,7 +196,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .floaty{animation:floaty 3.5s ease-in-out infinite}
 @keyframes floaty{50%{transform:translateY(-8px)}}
 .bird{animation:bird 38s linear infinite}
-@keyframes bird{from{transform:translateX(-120px)}to{transform:translateX(1500px)}}
+@keyframes bird{from{transform:translateX(-200px)}to{transform:translateX(1600px)}}
 .lampglow{opacity:0;transition:opacity 1.5s;pointer-events:none}
 body.night .lampglow{opacity:1;animation:glow 2.4s ease-in-out infinite}
 @keyframes glow{50%{opacity:.75}}
