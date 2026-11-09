@@ -413,13 +413,13 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794243631" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794243666" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794243631" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794243631" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794243631" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794243666" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794243666" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794243666" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
@@ -436,11 +436,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794243631" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794243666" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794243631";
+const BUILD="1794243666";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -655,7 +655,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'裝備商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
-  {id:'bin',   name:'收集倉',   img:'dc_hay',   c:[8.1,4.0], w:104, foot:0.80},
+  {id:'bin',   name:'收集倉',   img:'dc_hay',   c:[3.0,11.3], w:104, foot:0.80},
   {id:'pen',   name:'寵物園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
 

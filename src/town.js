@@ -75,7 +75,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'裝備商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
-  {id:'bin',   name:'收集倉',   img:'dc_hay',   c:[8.1,4.0], w:104, foot:0.80},
+  {id:'bin',   name:'收集倉',   img:'dc_hay',   c:[3.0,11.3], w:104, foot:0.80},
   {id:'pen',   name:'寵物園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
 
