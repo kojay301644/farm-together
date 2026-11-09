@@ -59,7 +59,7 @@ const RATIO = {bc_forge:1.0928, b_play:0.6936, bf_train:564/504, b_shop:690/627,
 const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
-  {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.3,4.7],  w:300, foot:0.80},
+  {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78, locked:'牧場將在第四階段開放'},
   {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
