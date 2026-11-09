@@ -48,27 +48,27 @@ function spawn(html, x, y, cls, life=1200, style=''){
   const d=document.createElement('div'); d.className='fxp '+(cls||''); d.innerHTML=html; d.style.cssText=`left:${x}px;top:${y}px;${style}`;
   FX.appendChild(d); setTimeout(()=>d.remove(), life); return d;
 }
-function fxWater(i){
+function fxWater(i){ try{farmerDo(i,'water');}catch(e){}
   sfx('water'); const [x,y]=plotXY(i);
   spawn(`<svg viewBox="0 0 32 32" width="46" height="46">${ICONS.water.replace(/^<svg[^>]*>|<\/svg>$/g,'')}</svg>`, x+26, y-58, 'can', 1100);
   if(LOWFX) return;
   for(let k=0;k<12;k++) spawn('', x-22+Math.random()*30, y-44+Math.random()*10, 'drop', 900, `animation-delay:${(k*0.05).toFixed(2)}s`);
   for(let k=0;k<2;k++) spawn('', x-8+k*14, y+2, 'ripple', 1000, `animation-delay:${0.35+k*0.15}s`);
 }
-function fxSeed(i){
+function fxSeed(i){ try{farmerDo(i,'seed');}catch(e){}
   sfx('seed'); const [x,y]=plotXY(i);
   if(!LOWFX) for(let k=0;k<7;k++){ const dx=(Math.random()-0.5)*40; spawn('', x-50, y-70, 'seed', 800, `--dx:${50+dx}px;--dy:${70+(Math.random()-0.5)*10}px;animation-delay:${k*0.04}s`); }
   setTimeout(()=>fxDirt(i, true), LOWFX?0:450);
 }
-function fxDirt(i, quiet){
+function fxDirt(i, quiet){ try{farmerDo(i,quiet?'':'dig');}catch(e){}
   if(!quiet) sfx('dig'); const [x,y]=plotXY(i);
   for(let k=0;k<(LOWFX?3:8);k++){ const a=Math.random()*Math.PI*2, r=18+Math.random()*16; spawn('', x, y, 'dirt', 700, `--dx:${Math.cos(a)*r}px;--dy:${Math.sin(a)*r*0.5-12}px`); }
 }
-function fxPoof(i, color){
+function fxPoof(i, color){ try{farmerDo(i,color==='bug'?'bug':'weed');}catch(e){}
   sfx('poof'); const [x,y]=plotXY(i);
   for(let k=0;k<(LOWFX?3:8);k++){ const a=Math.random()*Math.PI*2, r=20+Math.random()*18; spawn('🍃', x, y-12, 'leaf', 800, `--dx:${Math.cos(a)*r}px;--dy:${Math.sin(a)*r-20}px;filter:${color==='bug'?'hue-rotate(60deg)':'none'}`); }
 }
-function fxHarvest(i, c, amt){
+function fxHarvest(i, c, amt){ try{farmerDo(i,'harvest');}catch(e){}
   sfx('harvest'); vib(25); const [x,y]=plotXY(i);
   const ic = spawn(iconSVG(c), x-27, y-46, 'fly', 1100);
   const tgt = document.querySelector('[data-b="barn"]'); let tx=innerWidth-60, ty=60;
@@ -76,12 +76,12 @@ function fxHarvest(i, c, amt){
   ic.style.setProperty('--tx', (tx-x)+'px'); ic.style.setProperty('--ty', (ty-y+40)+'px');
   if(!LOWFX) for(let k=0;k<8;k++){ const a=k/8*Math.PI*2; spawn('✦', x, y-30, 'star', 700, `--dx:${Math.cos(a)*34}px;--dy:${Math.sin(a)*24}px`); }
 }
-function fxSteal(i, c){
+function fxSteal(i, c){ try{farmerDo(i,'steal');}catch(e){}
   sfx('steal'); vib(15); const [x,y]=plotXY(i);
   spawn('<span style="font-size:38px">🫳</span>', x-19, y-80, 'grab', 900);
   const ic = spawn(iconSVG(c), x-27, y-46, 'fly', 1100, 'animation-delay:.35s'); ic.style.setProperty('--tx', (innerWidth-60-x)+'px'); ic.style.setProperty('--ty', (40-y)+'px');
 }
-function fxSmoke(i){
+function fxSmoke(i){ try{farmerDo(i,'prank');}catch(e){}
   sfx('prank'); const [x,y]=plotXY(i);
   for(let k=0;k<(LOWFX?3:7);k++) spawn('', x-14+Math.random()*28, y-20+Math.random()*10, 'smoke2', 1000, `animation-delay:${k*0.06}s`);
   spawn('<span style="font-size:26px">😈</span>', x-13, y-60, 'pop', 1000);

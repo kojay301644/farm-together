@@ -91,18 +91,38 @@ let farmerMover=null, farmerAv=null;
 const AV_SHIRT=['#7F9625','#A39697','#7D4017','#BC6B3A','#F2C380','#E39C6C','#5C344A','#3D251B','#C08B69','#5C4320','#CF8F5E','#362727','#C14943','#77571B','#CD4365','#D2DAF2','#A82C15','#53455F','#352828','#A5815D','#E9A83C','#724154','#CC814D','#F4B07A','#E9B644','#A7B5C9','#A85E2F','#D6A039','#B8B6AE','#B3556C'];
 /* 大頭Q版人物：頭＝頭像圖 */
 function charSVG(av){
-  av = Math.min(30, Math.max(1, +av||11)); const sh = AV_SHIRT[av-1], id='avclip'+av;
-  return `<ellipse cx="0" cy="1" rx="14" ry="4.5" fill="rgba(0,0,0,.18)"/><g class="hop">
-    ${ol(`<rect x="-7.5" y="-15" width="6" height="15" rx="3" fill="#5A3E28"/><rect x="1.5" y="-15" width="6" height="15" rx="3" fill="#5A3E28"/>
-      <ellipse cx="-4.5" cy="-1" rx="5" ry="3" fill="#3B2A1E"/><ellipse cx="4.5" cy="-1" rx="5" ry="3" fill="#3B2A1E"/>
-      <path d="M-12 -12 Q-13 -34 0 -35 Q13 -34 12 -12 Q0 -8 -12 -12Z" fill="${sh}"/>
-      <ellipse cx="-13" cy="-22" rx="4" ry="7" fill="${sh}" transform="rotate(14 -13 -22)"/><ellipse cx="13" cy="-22" rx="4" ry="7" fill="${sh}" transform="rotate(-14 13 -22)"/>
-      <circle cx="-14.5" cy="-15" r="3.4" fill="#FBD7B5"/><circle cx="14.5" cy="-15" r="3.4" fill="#FBD7B5"/>`,2.2)}
-    <path d="M-6 -33 L0 -27 L6 -33" stroke="#fff" stroke-width="2.4" fill="none" opacity=".75"/>
-    <clipPath id="${id}"><circle cx="0" cy="-55" r="21"/></clipPath>
-    <circle cx="0" cy="-55" r="22.5" fill="#fff" stroke="${INK}" stroke-width="2.6"/>
-    <image href="${avSrc(av)}" x="-27" y="-84" width="54" height="54" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice"/>
-    <ellipse cx="-8" cy="-68" rx="6" ry="3" fill="#fff" opacity=".35" transform="rotate(-25 -8 -68)"/></g>`;
+  av = Math.min(30, Math.max(1, +av||11)); const sh = AV_SHIRT[av-1], id='avclip'+av, SK='#FBD7B5';
+  const leg=x=>ol(`<rect x="${x-3}" y="-15" width="6" height="14" rx="3" fill="#5A3E28"/><ellipse cx="${x}" cy="-1.5" rx="5" ry="3" fill="#3B2A1E"/>`,2.2);
+  const arm=x=>ol(`<ellipse cx="${x}" cy="-24.5" rx="4" ry="7.5" fill="${sh}"/><circle cx="${x}" cy="-16.5" r="3.4" fill="${SK}"/>`,2.2);
+  return `<ellipse cx="0" cy="1" rx="14" ry="4.5" fill="rgba(0,0,0,.18)"/><g class="hop"><g class="ch">
+    <g class="ch-lgL">${leg(-4.5)}</g><g class="ch-lgR">${leg(4.5)}</g>
+    <g class="ch-up">
+            ${ol(`<path d="M-11.5 -12 Q-13 -34 0 -35 Q13 -34 11.5 -12 Q0 -8 -11.5 -12Z" fill="${sh}"/>`,2.2)}
+      <path d="M-6 -33 L0 -27 L6 -33" stroke="#fff" stroke-width="2.4" fill="none" opacity=".75"/>
+      <g class="ch-hd">
+        <clipPath id="${id}"><circle cx="0" cy="-55" r="21"/></clipPath>
+        <circle cx="0" cy="-55" r="22.5" fill="#fff" stroke="${INK}" stroke-width="2.6"/>
+        <image href="${avSrc(av)}" x="-27" y="-84" width="54" height="54" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice"/>
+        <ellipse cx="-8" cy="-68" rx="6" ry="3" fill="#fff" opacity=".35" transform="rotate(-25 -8 -68)"/>
+      </g>
+      <g class="ch-arL">${arm(-13)}</g><g class="ch-arR">${arm(13)}</g>
+    </g></g></g>`;
+}
+/* 角色動作 */
+function setAct(m, a){ if(m.act===a) return; if(m.act) m.el.classList.remove('a-'+m.act); m.act=a; if(a) m.el.classList.add('a-'+a); }
+function emote(m, e){ if(!e || typeof spawn!=='function') return; const r=m.el.getBoundingClientRect(); if(!r.width) return;
+  spawn(`<span>${e}</span>`, r.left+r.width/2-14, r.top-18, 'emo', 1500); }
+const FARMER_ACT = {harvest:['work','✨'], water:['water','💧'], seed:['work','🌱'], dig:['work','💪'], weed:['work','👍'], bug:['work','👍'],
+  steal:['angry','💢'], prank:['angry','😤'], help:['cheer','❤️']};
+function farmerDo(i, kind){
+  const m=farmerMover; if(!m || !kind) return;
+  let [act,emo] = FARMER_ACT[kind] || ['work','✨'];
+  if(typeof mode!=='undefined' && mode==='visit'){ // 好友的角色在原地反應
+    if(kind!=='steal' && kind!=='prank') [act,emo]=FARMER_ACT.help;
+    setAct(m,null); m.task={pos:[m.x,m.y], act, emo, dur:1.6, started:false}; return; }
+  const P=PLOTS[i]; if(!P) return;
+  m.task={pos:[P[0]+PS*0.5, P[1]+PS+0.12], act, emo, dur:1.5, started:false, look:[P[0]+PS/2,P[1]+PS/2]};
+  setAct(m,null); m.wait=0; m.goal=null;
 }
 function setFarmer(av){ if(!farmerMover || farmerAv===av) return; farmerAv=av; farmerMover.el.firstChild.innerHTML = charSVG(av); }
 
@@ -238,12 +258,31 @@ function buildWorld(){
   ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
 
+/* 農場主人的移動與動作 */
+function farmerStep(m, dt){
+  let moving=false;
+  if(m.wait>0){ m.wait-=dt; if(m.wait<=0){ setAct(m,null); if(m.task && m.task.started) m.task=null; } }
+  else {
+    const goal = m.task ? m.task.pos : m.path[m.tgt];
+    const dx=goal[0]-m.x, dy=goal[1]-m.y, dist=Math.hypot(dx,dy), step=(m.task?2.4:m.speed)*dt;
+    if(dist<=step){ m.x=goal[0]; m.y=goal[1];
+      if(m.task){ m.task.started=true; if(m.task.look){ const sd=(m.task.look[0]-m.x)-(m.task.look[1]-m.y); if(Math.abs(sd)>0.05) m.face=sd>0?1:-1; }
+        setAct(m,m.task.act); m.wait=m.task.dur; emote(m,m.task.emo); }
+      else { m.tgt=(m.tgt+1)%m.path.length; m.wait=1+Math.random()*3;
+        const r=Math.random(); if(r<0.5) setAct(m, ['wave','stretch','look','wave'][Math.floor(Math.random()*4)]); }
+    } else { m.x+=dx/dist*step; m.y+=dy/dist*step; moving=true; const sdx=dx-dy; if(Math.abs(sdx)>0.01) m.face=sdx>0?1:-1; }
+  }
+  const [sx,sy]=iso(m.x,m.y);
+  m.el.setAttribute('transform',`translate(${sx.toFixed(1)} ${sy.toFixed(1)}) scale(${m.face*m.s} ${m.s})`);
+  if(m.moving!==moving){ m.moving=moving; m.el.classList.toggle('walk',moving); m.el.classList.toggle('run',moving && !!m.task); }
+}
 /* 移動動畫 */
 let lastF=performance.now();
 function animate(now){
   const dt=Math.min(0.1,(now-lastF)/1000); lastF=now;
   for(const m of movers){
     if(m.fly && LOWFX){ m.el.style.display='none'; continue; }
+    if(m.farmer){ farmerStep(m, dt); continue; }
     let moving=false;
     if(m.wait>0){ m.wait-=dt; }
     else {

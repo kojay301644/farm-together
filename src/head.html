@@ -255,6 +255,43 @@ body.lowfx .bird{display:none}
 .login .card{position:relative;box-shadow:0 6px 0 #4B3423}
 
 .note{font-size:11px;color:#A89C88;margin-top:12px;font-weight:700}
+
+/* 頭像人物動作 */
+.ch-lgL,.ch-lgR{transform-box:fill-box;transform-origin:50% 0}
+.ch-arL,.ch-arR{transform-box:fill-box;transform-origin:50% 8%}
+.ch-hd{transform-box:fill-box;transform-origin:50% 100%;animation:chHead 4.2s ease-in-out infinite}
+.ch-up{transform-box:fill-box;transform-origin:50% 100%;animation:chBreath 2.6s ease-in-out infinite}
+@keyframes chHead{0%,100%{transform:rotate(0)}30%{transform:rotate(-4deg)}65%{transform:rotate(3deg)}}
+@keyframes chBreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,.975)}}
+.walk .ch-lgL{animation:chLeg .45s ease-in-out infinite}.walk .ch-lgR{animation:chLeg .45s ease-in-out infinite reverse}
+.walk .ch-arL{animation:chArm .45s ease-in-out infinite reverse}.walk .ch-arR{animation:chArm .45s ease-in-out infinite}
+.walk .ch-hd{animation:chBob .45s ease-in-out infinite}
+.run .ch-lgL,.run .ch-lgR,.run .ch-arL,.run .ch-arR,.run .ch-hd{animation-duration:.26s}
+.run .ch-up{animation:none;transform:rotate(8deg)}
+@keyframes chLeg{0%,100%{transform:rotate(28deg)}50%{transform:rotate(-28deg)}}
+@keyframes chArm{0%,100%{transform:rotate(32deg)}50%{transform:rotate(-32deg)}}
+@keyframes chBob{0%,100%{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(3deg) translateY(-1.5px)}}
+.a-wave .ch-arR{animation:chWave .5s ease-in-out infinite}
+@keyframes chWave{0%,100%{transform:rotate(-135deg)}50%{transform:rotate(-105deg)}}
+.a-wave .ch-hd{animation:chHead 1s ease-in-out infinite}
+.a-stretch .ch-arL{animation:chStrL 2s ease-in-out}.a-stretch .ch-arR{animation:chStrR 2s ease-in-out}.a-stretch .ch-up{animation:chStrB 2s ease-in-out}
+@keyframes chStrL{20%,70%{transform:rotate(140deg)}}@keyframes chStrR{20%,70%{transform:rotate(-140deg)}}@keyframes chStrB{20%,70%{transform:scale(.97,1.07)}}
+.a-look .ch-hd{animation:chLook 2.2s ease-in-out}
+@keyframes chLook{20%,40%{transform:rotate(-10deg)}60%,80%{transform:rotate(10deg)}}
+.a-work .ch-up{animation:chDig .38s ease-in-out infinite}.a-work .ch-arL,.a-work .ch-arR{animation:chDigA .38s ease-in-out infinite}
+@keyframes chDig{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
+@keyframes chDigA{0%,100%{transform:rotate(-40deg)}50%{transform:rotate(-95deg)}}
+.a-water .ch-arR{transform:rotate(-80deg)}.a-water .ch-up{animation:none;transform:rotate(10deg)}
+.a-water .ch-arL{animation:chArm 1.2s ease-in-out infinite}
+.a-cheer .ch{animation:chJump .5s ease-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.a-cheer .ch-arL{transform:rotate(135deg)}.a-cheer .ch-arR{transform:rotate(-135deg)}
+@keyframes chJump{0%,100%{transform:translateY(0) scale(1.05,.95)}45%{transform:translateY(-12px) scale(.96,1.05)}}
+.a-angry .ch{animation:chShake .14s linear infinite;transform-box:fill-box}
+.a-angry .ch-arL{transform:rotate(-60deg)}.a-angry .ch-arR{transform:rotate(60deg)}
+@keyframes chShake{0%,100%{transform:translateX(-1.5px)}50%{transform:translateX(1.5px)}}
+.fxp.emo{font-size:24px;line-height:1;animation:emo 1.5s ease-out forwards;filter:drop-shadow(0 2px 0 rgba(75,52,35,.35))}
+@keyframes emo{0%{transform:translateY(8px) scale(.3);opacity:0}18%{transform:translateY(-6px) scale(1.2);opacity:1}30%{transform:translateY(-4px) scale(1)}80%{opacity:1}100%{transform:translateY(-26px);opacity:0}}
+body.lowfx .ch-hd,body.lowfx .ch-up{animation:none!important}
 </style>
 </head>
 <body>
