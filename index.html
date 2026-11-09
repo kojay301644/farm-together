@@ -360,13 +360,13 @@ body.lowfx .bird{display:none}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794232440" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794232516" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794232440" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794232440" alt=""><span id="pgems">0</span></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794232440" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794232516" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794232516" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794232516" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>
@@ -382,11 +382,11 @@ body.lowfx .bird{display:none}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794232440" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794232516" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794232440";
+const BUILD="1794232516";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -638,10 +638,10 @@ let farmerMover=null, farmerAv=null;
 /* 玩家角色＝萌獸（動作仿萌獸星球：腿部切片擺動、搖擺、漂浮、呼吸） */
 const CHR_RATIO={"bunny1":0.782,"bunny2":0.771,"bunny3":0.812,"mouse1":1.341,"mouse2":1.276,"mouse3":1.1,"mole1":0.882,"mole2":0.976,"mole3":0.976,"puffer1":1.0,"puffer2":0.982,"puffer3":0.965,"owl1":0.888,"owl2":0.841,"owl3":0.853,"lizard1":1.453,"lizard2":1.288,"lizard3":1.259,"deer1":0.747,"deer2":0.647,"deer3":0.712,"moth1":0.924,"moth2":0.988,"moth3":0.865,"armad1":1.112,"armad2":1.035,"armad3":0.971,"seal1":1.1,"seal2":1.059,"seal3":0.994,"marten1":1.006,"marten2":1.212,"marten3":1.276,"phoenix1":0.841,"phoenix2":0.947,"phoenix3":0.882,"fox1":1.018,"fox2":0.994,"fox3":1.0,"otter1":0.9,"otter2":0.865,"otter3":0.841,"penguin1":0.871,"penguin2":0.953,"penguin3":0.929,"pango1":1.188,"pango2":1.365,"pango3":1.147,"ferret1":0.971,"ferret2":1.053,"ferret3":1.012,"whale1":1.376,"whale2":1.182,"whale3":1.088,"bear1":0.965,"bear2":0.9,"bear3":0.935,"dragon1":0.941,"dragon2":0.935,"dragon3":0.947};
 const CHR_NAMES={"bunny":["蘑菇兔","孢子兔","森菇賢者"],"mouse":["火花鼠","電光鼠","雷霆鼠"],"mole":["礦石鼴","礦工鼴","晶甲鼴王"],"puffer":["泡泡豚","珊瑚豚","鎧刺豚"],"owl":["雪絨鴞","霜羽鴞","冰冠鴞"],"lizard":["火蜥寶","熔岩蜥","岩漿蜥王"],"deer":["雷光鹿","雷角鹿","霆冠鹿王"],"moth":["花芽蝶","花仙蝶","虹彩花后"],"armad":["小鋼甲","鐵甲犰狳","鋼堡犰狳"],"seal":["雪球海豹","極光海豹","極光女王"],"marten":["影絨貂","影刺貂","雷影忍貂"],"phoenix":["火鳥雛","烈焰鳥","不死鳳凰"],"fox":["小焰狐","焰尾狐","炎陽狐王"],"otter":["泡泡獺","浪花獺","潮汐獺王"],"penguin":["雪糰企鵝","霜羽企鵝","冰冠企鵝帝"],"pango":["小石甲","滾石甲","山岳甲王"],"ferret":["靜電毛球","雷絨貂","雷霆貂"],"whale":["小鯨鈴","鳴鈴鯨","天籟鯨"],"bear":["苔苔熊","藤甲熊","古森熊王"],"dragon":["星晶龍寶","星晶龍","創星龍"]};
-const CHR_SP={bunny:['蘑菇兔',.9,'quad',.74,.5],mouse:['小鼠',1.3,'quad',.72,.5],mole:['鼴鼠',.6,'biped',.8,.48],puffer:['河豚',.6,'float'],
+const CHR_SP={bunny:['蘑菇兔',.9,'quad',.74,.5],mouse:['小鼠',1.3,'quad',.72,.5],mole:['鼴鼠',.6,'biped',.8,.48],
   owl:['貓頭鷹',.6,'waddle'],lizard:['蜥蜴',1,'quad',.72,.5],deer:['小鹿',1.1,'quad',.62,.5],moth:['飛蛾',.8,'float'],armad:['犰狳',.55,'quad',.74,.5],
   seal:['海豹',.5,'waddle'],marten:['貂',1.35,'quad',.7,.5],phoenix:['鳳凰',.9,'float'],fox:['狐狸',1.2,'quad',.7,.5],otter:['水獺',.8,'biped',.8,.48],
-  penguin:['企鵝',.65,'waddle'],pango:['穿山甲',.55,'quad',.7,.5],ferret:['雪貂',1.35,'quad',.68,.5],whale:['鯨魚',.75,'float'],bear:['熊',.6,'biped',.8,.48],dragon:['龍',.85,'quad',.74,.5]};
+  penguin:['企鵝',.65,'waddle'],pango:['穿山甲',.55,'quad',.7,.5],ferret:['雪貂',1.35,'quad',.68,.5],bear:['熊',.6,'biped',.8,.48],dragon:['龍',.85,'quad',.74,.5]};
 const chrInfo=k=>{ const m=/^([a-z]+)([1-3])$/.exec(k||'')||[0,'bunny','1']; const sp=CHR_SP[m[1]]?m[1]:'bunny', d=CHR_SP[sp];
   return {k:sp+m[2], sp, st:+m[2], name:d[0], spd:d[1], type:d[2], legY:d[3]||.8, mid:d[4]||.5}; };
 const chrSrc=k=>A('c_'+k);
