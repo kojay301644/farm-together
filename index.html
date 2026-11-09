@@ -326,6 +326,19 @@ body.lowfx .bird{display:none}
 .atag text{font-family:'Apple Color Emoji','Segoe UI Emoji',sans-serif}
 .abub{animation:floaty 2s ease-in-out infinite}
 .rhint{font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:6px;line-height:1.5}
+/* 擺放模式 */
+body.editing #dock,body.editing #hint,body.editing #bHome{display:none!important}
+body.editing #objs,body.editing #plabs{pointer-events:none}
+body.editing .dec{cursor:grab;touch-action:none}
+body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
+.dec.bad image{filter:drop-shadow(0 0 4px #F2545B) saturate(.6)!important}
+#editBar{position:fixed;left:0;right:0;bottom:0;z-index:25;padding:0 8px calc(8px + env(safe-area-inset-bottom))}
+.ebin{max-width:720px;margin:0 auto;background:rgba(255,255,255,.97);border:2.5px solid #4B3423;border-radius:20px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.ebrow{display:flex;gap:8px;justify-content:center;align-items:center;min-height:30px}.ebrow .btn{flex:1}
+.ebtip{font-size:12px;font-weight:700;color:var(--ink2)}
+.ebinv{display:flex;gap:6px;overflow-x:auto;padding:2px}
+.ebitem{position:relative;flex:none;width:54px;height:54px;border-radius:12px;border:2px solid #E6D9C3;background:#FFF8EC;padding:3px;cursor:pointer}
+.ebitem img{width:100%;height:100%;object-fit:contain}.ebitem span{position:absolute;right:-4px;top:-6px;background:#FF9F43;color:#fff;font-size:11px;font-weight:900;border-radius:9px;padding:0 5px;border:1.5px solid #4B3423}
 </style>
 </head>
 <body>
@@ -364,13 +377,13 @@ body.lowfx .bird{display:none}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794232998" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794233484" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794232998" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794232998" alt=""><span id="pgems">0</span></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794232998" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794233484" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794233484" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794233484" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>
@@ -386,11 +399,11 @@ body.lowfx .bird{display:none}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794232998" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794233484" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794232998";
+const BUILD="1794233484";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -583,7 +596,7 @@ function applySkins(on){ on=on||{}; const sig=JSON.stringify(on); if(sig===skinS
   document.querySelectorAll('#world image.skin').forEach(el=>{ const k=el.dataset.sk, img=skinImg(k, on[k]), w=+el.dataset.w, h=w*(SKIN_R[img]||1);
     el.setAttribute('href', A(img)); el.setAttribute('height', h.toFixed(1)); el.setAttribute('y', (+el.dataset.fy - h*(+el.dataset.foot)).toFixed(1)); }); }
 const RATIO = {bc_forge:1.0928, b_play:0.6936, bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
-  dc_flower:1, dc_lamp:1, dc_bench:1, dc_pond:1, dc_hay:1, dc_mail:1, dc_kennel:1, dc_lantree:1, dc_swing:1, dc_sakura:1, dc_picnic:1, dc_balloon:1,
+  dc_flower:0.796, dc_lamp:1.969, dc_bench:0.83, dc_pond:0.819, dc_hay:0.898, dc_mail:1.291, dc_kennel:0.966, dc_lantree:1.1, dc_swing:1.113, dc_sakura:1.109, dc_picnic:0.713, dc_balloon:1.249,
   bunny1:396/310, bear1:1, fox1:1, penguin1:1, otter1:1, mouse1:1};
 
 // 建築（萌獸星球素材），footprint 用來算前後順序與點擊
@@ -591,7 +604,7 @@ const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
-  {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
+  {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
   {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
@@ -787,9 +800,6 @@ function buildWorld(){
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
   // 島下方空地的裝飾
-  deco('dc_sakura', ...HG(840,612), 120); deco('dc_picnic', ...HG(740,600), 84); deco('dc_pond', ...HG(610,610), 110);
-  deco('dc_bench', ...HG(700,545), 60); deco('dc_flower', ...HG(800,560), 56); deco('dc_flower', ...HG(560,560), 50);
-  deco('dc_lantree', ...HG(900,560), 80); deco('dc_swing', ...HG(530,620), 80);
   [[650,640,'#FF9AA2'],[770,650,'#FFFFFF'],[880,640,null],[590,530,'#FFE066'],[860,520,'#B9A6FF']].forEach(([x,y,f])=>{ const g=HG(x,y); objs.push(bush(g[0],g[1],f)); });
 
   // 田地（可點）
@@ -806,8 +816,9 @@ function buildWorld(){
   // 飛鳥
   for(let k=0;k<2;k++) cloud += `<g class="bird" style="animation-delay:${-k*17}s"><g transform="translate(0 ${120+k*90})"><path d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path transform="translate(26 14) scale(.8)" d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/></g></g>`;
 
-  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="movers" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
+  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="decorL"></g><g id="movers" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
 
+  OBST_FIXED=OBST.slice(); decorSig=''; bindDecorLayer();
   // 田地元素與標籤
   plotEls=[]; plotSig=[]; plotLabs=[];
   const pl=$('plabs');
@@ -835,7 +846,7 @@ function buildWorld(){
 }
 
 /* 自由走動：整座島都能走，不踩建築與裝飾；偶爾從牧場門進出 */
-const ISL=[672*IS,335*IS,520*IS,240*IS];
+const ISL=[672*IS,360*IS,545*IS,292*IS];
 function walkable(gx,gy){ const [x,y]=iso(gx,gy);
   if(((x-ISL[0])/ISL[2])**2+((y-ISL[1])/ISL[3])**2>1) return false;
   for(const [ox,oy,rx,ry] of OBST) if(((x-ox)/rx)**2+((y-oy)/ry)**2<1) return false;
@@ -1486,6 +1497,139 @@ function goodsHTML(me){
     + `<button class="btn o" id="sellGoods" style="width:100%;margin-top:6px">賣出全部牧場產品（${total} 金）</button>`;
 }
 
+/* ================= 裝飾店與自由擺放 ================= */
+let DECOR = [], DEC = {}, DECOR_MAX = 40, OBST_FIXED = [], decorSig = '', EDIT = null;
+const DEC_R = {"balloon":1.249,"bench":0.83,"carousel":1.346,"crystal":0.978,"dragon":1.071,"flag":1.602,"flower":0.796,"gifts":0.924,"hay":0.898,"kennel":0.966,"lamp":1.969,"lantree":1.1,"mail":1.291,"mush":1.058,"picnic":0.713,"pond":0.819,"pumpkin":0.924,"rainbow":0.793,"sakura":1.109,"snowman":1.151,"statue":1.313,"swing":1.113,"torii":1.266,"xmas":1.131};
+function setDecorConfig(list, st){ if(list){ DECOR=list; DEC={}; list.forEach(d=>DEC[d.id]=d); } if(st && st.decor_max!=null) DECOR_MAX=+st.decor_max; }
+const decW = id => (DEC[id] && DEC[id].w) || 70;
+const bonusTxt = d => !d || !d.bonus ? '' : d.bonus==='prank' ? `擺出來：每天惡作劇 +${d.bonus_val}` : `擺出來：每天偷陌生人 +${d.bonus_val}`;
+
+/* 位置能不能擺：在島上、不壓到建築、田、牧場 */
+function decorOK(gx, gy){
+  const [x,y]=iso(gx,gy);
+  if(((x-ISL[0])/(ISL[2]*0.97))**2+((y-ISL[1])/(ISL[3]*0.95))**2>1) return false;
+  for(const [ox,oy,rx,ry] of OBST_FIXED) if(((x-ox)/rx)**2+((y-oy)/ry)**2<1) return false;
+  if(RANCH && gx>RANCH[0]-0.3 && gx<RANCH[0]+RANCH[2]+0.3 && gy>RANCH[1]-0.3 && gy<RANCH[1]+RANCH[3]+0.3) return false;
+  for(const [px,py] of PLOTS) if(gx>px-0.25 && gx<px+PS+0.25 && gy>py-0.25 && gy<py+PS+0.25) return false;
+  return true;
+}
+function curDecor(){ if(EDIT) return EDIT.list; if(mode==='visit' && V) return V.owner.decor_place||[]; return (S && S.me.decor_place)||[]; }
+
+function renderDecor(force){
+  const L = $('decorL'); if(!L) return;
+  const list = curDecor();
+  const sig = JSON.stringify(list) + (EDIT?('e'+EDIT.sel):'');
+  if(!force && sig===decorSig) return; decorSig = sig;
+  const idx = list.map((d,i)=>i).sort((a,b)=>(list[a].x+list[a].y)-(list[b].x+list[b].y));
+  L.innerHTML = idx.map(i=>{ const d=list[i], w=decW(d.i), h=w*(DEC_R[d.i]||1), [x,y]=iso(d.x,d.y);
+    const bad = EDIT && !decorOK(d.x,d.y), sel = EDIT && EDIT.sel===i;
+    const img = `<image href="${A('dc_'+d.i)}" x="${(x-w/2).toFixed(1)}" y="${(y-h*0.85).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"${d.f?` transform="translate(${2*x} 0) scale(-1 1)"`:''}/>`;
+    return `<g data-di="${i}" class="dec${sel?' sel':''}${bad?' bad':''}">${sel?`<ellipse cx="${x}" cy="${y}" rx="${w*0.5}" ry="${w*0.22}" fill="${bad?'rgba(242,84,91,.35)':'rgba(255,255,255,.45)'}" stroke="${bad?'#F2545B':'#3BB273'}" stroke-width="3" stroke-dasharray="8 5"/>`:''}${img}</g>`; }).join('');
+  // 萌獸繞開裝飾
+  OBST = OBST_FIXED.concat(list.map(d=>{ const w=decW(d.i), [x,y]=iso(d.x,d.y); return [x, y-w*0.06, w*0.4, w*0.2]; }));
+}
+
+/* ---------- 商店 ---------- */
+let decorTab = 'shop';
+function openDecorShop(t){
+  if(mode==='visit') return toast('回到自己的農場才能逛裝飾店');
+  if(t) decorTab=t;
+  const me=S.me, inv=me.decor_inv||{}, placed={}; (me.decor_place||[]).forEach(d=>placed[d.i]=(placed[d.i]||0)+1);
+  const tabs=`<div class="tabs"><button data-dt="shop" class="${decorTab==='shop'?'on':''}">裝飾商店</button><button data-dt="mine" class="${decorTab==='mine'?'on':''}">我的裝飾</button></div>`;
+  let body = tabs;
+  if(decorTab==='shop'){
+    body += DECOR.map(d=>{ const lock=me.lv<d.lv, n=inv[d.id]||0, cost=d.gold!=null?`${d.gold.toLocaleString()} 金`:`💎${d.gems}`;
+      const poor = d.gold!=null ? me.gold<d.gold : (me.gems||0)<d.gems;
+      return `<div class="row" style="${lock?'opacity:.55':''}"><div class="ic"><img src="${A('dc_'+d.id)}" style="width:44px;height:44px;object-fit:contain" alt=""></div>
+        <div class="tx"><b>${esc(d.name)}</b>${n?` <span class="tag">已有 ${n}</span>`:''}${d.bonus?`<div style="color:#7B6CF6">${bonusTxt(d)}</div>`:'<div>&nbsp;</div>'}</div>
+        ${lock?`<span class="lock">Lv${d.lv} 解鎖</span>`:`<button class="mini ${d.gems!=null?'gem':''}" data-bd="${d.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('');
+  } else {
+    const own = DECOR.filter(d=>(inv[d.id]||0)>0);
+    body += own.length ? own.map(d=>`<div class="row"><div class="ic"><img src="${A('dc_'+d.id)}" style="width:44px;height:44px;object-fit:contain" alt=""></div>
+        <div class="tx"><b>${esc(d.name)}</b> <span class="tag">擺了 ${placed[d.id]||0}/${inv[d.id]}</span>${d.bonus?`<div style="color:#7B6CF6">${bonusTxt(d)}</div>`:''}</div>
+        <button class="mini" data-pd="${d.id}" ${(placed[d.id]||0)>=inv[d.id]?'disabled':''}>擺放</button></div>`).join('')
+      : `<div class="empty">還沒有裝飾，去商店買一些吧！</div>`;
+  }
+  body += `<div class="rhint" style="text-align:center;margin-top:8px">同一種加成裝飾只算一次・最多擺 ${DECOR_MAX} 個・好友來拜訪看得到</div>`;
+  modal(`裝飾店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`, body, [['🖐️ 擺放模式','o',()=>enterDecorEdit()]]);
+  const md=$('md');
+  md.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>openDecorShop(b.dataset.dt));
+  md.querySelectorAll('[data-bd]').forEach(b=>b.onclick=async()=>{ const d=DEC[b.dataset.bd];
+    try{ applyState(await rpc('farm_buy_decor',{p_id:d.id,p_n:1})); refresh(); sfx('coin');
+      modal('買到了！', `<div style="text-align:center;padding:6px 0"><img src="${A('dc_'+d.id)}" style="width:110px;height:110px;object-fit:contain"><div style="font-weight:900;font-size:18px;margin-top:6px">${esc(d.name)}</div>${d.bonus?`<div style="color:#7B6CF6;font-weight:700">${bonusTxt(d)}</div>`:''}</div>`,
+        [['馬上擺放','',()=>enterDecorEdit(d.id)],['繼續逛','sub',()=>openDecorShop('shop')]]);
+    }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>enterDecorEdit(b.dataset.pd));
+}
+
+/* ---------- 擺放模式 ---------- */
+function screenToGrid(cx, cy){ const W=$('world'), pt=W.createSVGPoint(); pt.x=cx; pt.y=cy; const p=pt.matrixTransform(W.getScreenCTM().inverse()); return W2G(p.x, p.y); }
+function enterDecorEdit(addId){
+  if(mode==='visit') return;
+  closeModal();
+  EDIT = {list: JSON.parse(JSON.stringify(S.me.decor_place||[])), sel:-1, orig: JSON.stringify(S.me.decor_place||[])};
+  document.body.classList.add('editing');
+  let bar=$('editBar');
+  if(!bar){ bar=document.createElement('div'); bar.id='editBar'; document.body.appendChild(bar); }
+  bar.style.display='';
+  if(addId) decorAdd(addId); else renderEditBar();
+  renderDecor(true);
+  if(!addId) toast('點裝飾選取、拖曳移動');
+}
+function renderEditBar(){
+  const bar=$('editBar'), s=EDIT.sel>=0, inv=S.me.decor_inv||{}, used={};
+  EDIT.list.forEach(d=>used[d.i]=(used[d.i]||0)+1);
+  const left = DECOR.filter(d=>(inv[d.id]||0)>(used[d.id]||0));
+  bar.innerHTML = `<div class="ebin">
+    <div class="ebrow">${s?`<button class="mini sub" id="eFlip">↔️ 翻轉</button><button class="mini sub" id="eBack">📦 收回</button>`:`<span class="ebtip">點裝飾選取，按住拖曳移動（${EDIT.list.length}/${DECOR_MAX}）</span>`}</div>
+    <div class="ebinv">${left.length?left.map(d=>`<button class="ebitem" data-ea="${d.id}"><img src="${A('dc_'+d.id)}" alt=""><span>${(inv[d.id]||0)-(used[d.id]||0)}</span></button>`).join(''):'<span class="ebtip">背包裡的裝飾都擺出來了</span>'}</div>
+    <div class="ebrow"><button class="btn sub" id="eCancel">取消</button><button class="btn" id="eDone">✔ 完成</button></div></div>`;
+  if(s){ $('eFlip').onclick=()=>{ const d=EDIT.list[EDIT.sel]; d.f=!d.f; renderDecor(true); };
+         $('eBack').onclick=()=>{ EDIT.list.splice(EDIT.sel,1); EDIT.sel=-1; renderDecor(true); renderEditBar(); }; }
+  bar.querySelectorAll('[data-ea]').forEach(b=>b.onclick=()=>decorAdd(b.dataset.ea));
+  $('eCancel').onclick=()=>exitDecorEdit(false);
+  $('eDone').onclick=()=>exitDecorEdit(true);
+}
+function decorAdd(id){
+  if(EDIT.list.length>=DECOR_MAX) return toast(`最多只能擺 ${DECOR_MAX} 個`);
+  let [gx,gy]=screenToGrid(innerWidth/2, innerHeight*0.45);
+  // 中間不能擺就找附近的空位
+  if(!decorOK(gx,gy)){ for(let r=0.5;r<8;r+=0.5){ let found=false; for(let a=0;a<12;a++){ const x=gx+Math.cos(a/12*Math.PI*2)*r, y=gy+Math.sin(a/12*Math.PI*2)*r; if(decorOK(x,y)){ gx=x; gy=y; found=true; break; } } if(found) break; } }
+  EDIT.list.push({i:id, x:+gx.toFixed(2), y:+gy.toFixed(2), f:false}); EDIT.sel=EDIT.list.length-1;
+  sfx('tap'); renderDecor(true); renderEditBar();
+}
+async function exitDecorEdit(save){
+  if(save){
+    if(EDIT.list.some(d=>!decorOK(d.x,d.y))) return toast('有裝飾擺在不能放的地方（紅色），移開再按完成');
+    if(JSON.stringify(EDIT.list)!==EDIT.orig){
+      try{ applyState(await rpc('farm_save_decor',{p_list:EDIT.list})); sfx('coin'); toast('擺放好了！'); }
+      catch(e){ return toast(e.message); }
+    }
+  }
+  EDIT=null; document.body.classList.remove('editing'); const bar=$('editBar'); if(bar) bar.style.display='none';
+  refresh(); renderDecor(true);
+}
+/* 拖曳 */
+let decDrag=null;
+function bindDecorLayer(){
+  const L=$('decorL'); if(!L || L._bound) return; L._bound=true;
+  L.addEventListener('pointerdown', e=>{
+    if(!EDIT) return; const g=e.target.closest('[data-di]'); if(!g) return;
+    e.stopPropagation(); e.preventDefault();
+    const i=+g.dataset.di, d=EDIT.list[i], [gx,gy]=screenToGrid(e.clientX,e.clientY);
+    EDIT.sel=i; decDrag={i, dx:d.x-gx, dy:d.y-gy, id:e.pointerId};
+    try{ L.setPointerCapture(e.pointerId); }catch(_){}
+    renderDecor(true); renderEditBar();
+  });
+  L.addEventListener('pointermove', e=>{ if(!decDrag || e.pointerId!==decDrag.id) return; e.preventDefault();
+    const [gx,gy]=screenToGrid(e.clientX,e.clientY), d=EDIT.list[decDrag.i]; d.x=+(gx+decDrag.dx).toFixed(2); d.y=+(gy+decDrag.dy).toFixed(2); renderDecor(true); });
+  const end=e=>{ if(decDrag){ decDrag=null; } };
+  L.addEventListener('pointerup', end); L.addEventListener('pointercancel', end);
+  L.addEventListener('touchstart', e=>{ if(EDIT && e.target.closest('[data-di]')) e.preventDefault(); }, {passive:false});
+  // 點空白處取消選取
+  $('map').addEventListener('click', e=>{ if(EDIT && !e.target.closest('[data-di]') && EDIT.sel>=0){ EDIT.sel=-1; renderDecor(true); renderEditBar(); } });
+}
+
 /* ================= 連線設定 ================= */
 const SB_URL = 'https://qnxnuyfvkrvhnaewvrik.supabase.co';
 const SB_KEY = 'sb_publishable_nX97hqqEgiGRwKQMOz56ow_uvMEAdht';
@@ -1875,6 +2019,7 @@ function tapBuilding(g){
   if(id==='barn') return openBag();
   if(id==='home') return openHome();
   if(id==='coop') return openRanch();
+  if(id==='decor') return openDecorShop();
   const o = BLD.find(b=>b.id===id); if(o && o.locked) toast(o.locked);
 }
 
@@ -1956,7 +2101,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } syncRanchMovers(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } syncRanchMovers(); renderDecor(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -2042,7 +2187,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings);
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings);
   }catch(e){}
 }
 async function showNotices(){

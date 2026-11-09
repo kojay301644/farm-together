@@ -388,6 +388,7 @@ function tapBuilding(g){
   if(id==='barn') return openBag();
   if(id==='home') return openHome();
   if(id==='coop') return openRanch();
+  if(id==='decor') return openDecorShop();
   const o = BLD.find(b=>b.id===id); if(o && o.locked) toast(o.locked);
 }
 
@@ -469,7 +470,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } syncRanchMovers(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } syncRanchMovers(); renderDecor(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -555,7 +556,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings);
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings);
   }catch(e){}
 }
 async function showNotices(){

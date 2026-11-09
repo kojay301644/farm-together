@@ -53,7 +53,7 @@ function applySkins(on){ on=on||{}; const sig=JSON.stringify(on); if(sig===skinS
   document.querySelectorAll('#world image.skin').forEach(el=>{ const k=el.dataset.sk, img=skinImg(k, on[k]), w=+el.dataset.w, h=w*(SKIN_R[img]||1);
     el.setAttribute('href', A(img)); el.setAttribute('height', h.toFixed(1)); el.setAttribute('y', (+el.dataset.fy - h*(+el.dataset.foot)).toFixed(1)); }); }
 const RATIO = {bc_forge:1.0928, b_play:0.6936, bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
-  dc_flower:1, dc_lamp:1, dc_bench:1, dc_pond:1, dc_hay:1, dc_mail:1, dc_kennel:1, dc_lantree:1, dc_swing:1, dc_sakura:1, dc_picnic:1, dc_balloon:1,
+  dc_flower:0.796, dc_lamp:1.969, dc_bench:0.83, dc_pond:0.819, dc_hay:0.898, dc_mail:1.291, dc_kennel:0.966, dc_lantree:1.1, dc_swing:1.113, dc_sakura:1.109, dc_picnic:0.713, dc_balloon:1.249,
   bunny1:396/310, bear1:1, fox1:1, penguin1:1, otter1:1, mouse1:1};
 
 // 建築（萌獸星球素材），footprint 用來算前後順序與點擊
@@ -61,7 +61,7 @@ const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
-  {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
+  {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
   {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
@@ -257,9 +257,6 @@ function buildWorld(){
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
   // 島下方空地的裝飾
-  deco('dc_sakura', ...HG(840,612), 120); deco('dc_picnic', ...HG(740,600), 84); deco('dc_pond', ...HG(610,610), 110);
-  deco('dc_bench', ...HG(700,545), 60); deco('dc_flower', ...HG(800,560), 56); deco('dc_flower', ...HG(560,560), 50);
-  deco('dc_lantree', ...HG(900,560), 80); deco('dc_swing', ...HG(530,620), 80);
   [[650,640,'#FF9AA2'],[770,650,'#FFFFFF'],[880,640,null],[590,530,'#FFE066'],[860,520,'#B9A6FF']].forEach(([x,y,f])=>{ const g=HG(x,y); objs.push(bush(g[0],g[1],f)); });
 
   // 田地（可點）
@@ -276,8 +273,9 @@ function buildWorld(){
   // 飛鳥
   for(let k=0;k<2;k++) cloud += `<g class="bird" style="animation-delay:${-k*17}s"><g transform="translate(0 ${120+k*90})"><path d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path transform="translate(26 14) scale(.8)" d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/></g></g>`;
 
-  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="movers" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
+  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="decorL"></g><g id="movers" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
 
+  OBST_FIXED=OBST.slice(); decorSig=''; bindDecorLayer();
   // 田地元素與標籤
   plotEls=[]; plotSig=[]; plotLabs=[];
   const pl=$('plabs');
@@ -305,7 +303,7 @@ function buildWorld(){
 }
 
 /* 自由走動：整座島都能走，不踩建築與裝飾；偶爾從牧場門進出 */
-const ISL=[672*IS,335*IS,520*IS,240*IS];
+const ISL=[672*IS,360*IS,545*IS,292*IS];
 function walkable(gx,gy){ const [x,y]=iso(gx,gy);
   if(((x-ISL[0])/ISL[2])**2+((y-ISL[1])/ISL[3])**2>1) return false;
   for(const [ox,oy,rx,ry] of OBST) if(((x-ox)/rx)**2+((y-oy)/ry)**2<1) return false;
