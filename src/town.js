@@ -23,7 +23,11 @@ const FARM_C=[9.2,9.2];
 
 /* ================= 美術元件 ================= */
 const INK='#4B3423';
-let HOME_LBL=null, homeLblCur='';
+let HOME_LBL=null, homeLblCur='', BIN_LBL=null, binLblCur='';
+const binItems = () => (mode==='visit' && typeof V!=='undefined' && V) ? ((V.bin||{}).items||{}) : ((typeof S!=='undefined' && S && S.me && S.me.bin)||{});
+const binCount = b => ['c','g'].reduce((a,t)=>a+Object.values((b||{})[t]||{}).reduce((x,y)=>x+(+y||0),0),0);
+const binLblText = () => { const n=binCount(binItems()); return n ? `🧺 收集倉 ${n}` : '🧺 收集倉'; };
+function setBinLabel(){ const el=$('binLbl'), t=binLblText(); if(!el||!BIN_LBL||t===binLblCur) return; binLblCur=t; el.innerHTML=labelPill(BIN_LBL[0], BIN_LBL[1], t, {bg:'#FFF1DC'}); }
 const homeLblName = () => (mode==='visit' && typeof V!=='undefined' && V) ? V.owner.nickname : (typeof S!=='undefined' && S && S.me ? S.me.nickname : '我的家');
 function setHomeLabel(){ const el=$('homeLbl'), n=homeLblName(); if(!el||!HOME_LBL||n===homeLblCur) return; homeLblCur=n; el.innerHTML=labelPill(HOME_LBL[0], HOME_LBL[1], '🏠 '+esc(n)+'的家', {big:1}); }
 function labelPill(x,y,text,opt={}){
@@ -71,6 +75,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'裝備商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
+  {id:'bin',   name:'收集倉',   img:'dc_hay',   c:[6.75,4.95], w:118, foot:0.80},
   {id:'pen',   name:'寵物園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
 
@@ -268,6 +273,7 @@ function buildWorld(){
     } else objs.push({depth:gx+gy, svg:`<g class="tap" data-b="${o.id}">${s}</g>`});
     const [lx,ly]=iso(gx,gy);
     if(o.id==='home'){ HOME_LBL=[lx, ly - h*0.12]; homeLblCur=homeLblName(); lab += `<g id="homeLbl">${labelPill(lx, ly - h*0.12, '🏠 '+esc(homeLblCur)+'的家', {big:1})}</g>`; }  // 放在大門前面，不會被上方玩家欄擋住
+    else if(o.id==='bin'){ BIN_LBL=[lx, ly-h*o.foot-18]; lab += `<g id="binLbl">${labelPill(lx, ly-h*o.foot-18, binLblText(), {bg:'#FFF1DC'})}</g>`; }
     else lab += labelPill(lx, ly - (o.id==='coop'?20:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
   });
 

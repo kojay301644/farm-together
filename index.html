@@ -413,13 +413,13 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794241752" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794243205" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794241752" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794241752" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794241752" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794243205" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794243205" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794243205" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
@@ -436,11 +436,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794241752" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794243205" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794241752";
+const BUILD="1794243205";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -603,7 +603,11 @@ const FARM_C=[9.2,9.2];
 
 /* ================= 美術元件 ================= */
 const INK='#4B3423';
-let HOME_LBL=null, homeLblCur='';
+let HOME_LBL=null, homeLblCur='', BIN_LBL=null, binLblCur='';
+const binItems = () => (mode==='visit' && typeof V!=='undefined' && V) ? ((V.bin||{}).items||{}) : ((typeof S!=='undefined' && S && S.me && S.me.bin)||{});
+const binCount = b => ['c','g'].reduce((a,t)=>a+Object.values((b||{})[t]||{}).reduce((x,y)=>x+(+y||0),0),0);
+const binLblText = () => { const n=binCount(binItems()); return n ? `🧺 收集倉 ${n}` : '🧺 收集倉'; };
+function setBinLabel(){ const el=$('binLbl'), t=binLblText(); if(!el||!BIN_LBL||t===binLblCur) return; binLblCur=t; el.innerHTML=labelPill(BIN_LBL[0], BIN_LBL[1], t, {bg:'#FFF1DC'}); }
 const homeLblName = () => (mode==='visit' && typeof V!=='undefined' && V) ? V.owner.nickname : (typeof S!=='undefined' && S && S.me ? S.me.nickname : '我的家');
 function setHomeLabel(){ const el=$('homeLbl'), n=homeLblName(); if(!el||!HOME_LBL||n===homeLblCur) return; homeLblCur=n; el.innerHTML=labelPill(HOME_LBL[0], HOME_LBL[1], '🏠 '+esc(n)+'的家', {big:1}); }
 function labelPill(x,y,text,opt={}){
@@ -651,6 +655,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'裝備商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
+  {id:'bin',   name:'收集倉',   img:'dc_hay',   c:[6.75,4.95], w:118, foot:0.80},
   {id:'pen',   name:'寵物園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
 
@@ -848,6 +853,7 @@ function buildWorld(){
     } else objs.push({depth:gx+gy, svg:`<g class="tap" data-b="${o.id}">${s}</g>`});
     const [lx,ly]=iso(gx,gy);
     if(o.id==='home'){ HOME_LBL=[lx, ly - h*0.12]; homeLblCur=homeLblName(); lab += `<g id="homeLbl">${labelPill(lx, ly - h*0.12, '🏠 '+esc(homeLblCur)+'的家', {big:1})}</g>`; }  // 放在大門前面，不會被上方玩家欄擋住
+    else if(o.id==='bin'){ BIN_LBL=[lx, ly-h*o.foot-18]; lab += `<g id="binLbl">${labelPill(lx, ly-h*o.foot-18, binLblText(), {bg:'#FFF1DC'})}</g>`; }
     else lab += labelPill(lx, ly - (o.id==='coop'?20:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
   });
 
@@ -2043,7 +2049,7 @@ let mode = 'home';
 const ui = {tool:'hand', seed:'radish', busy:false};
 
 function applyState(st){ if(st) S = {me:st.me, plots:st.plots, ranch:st.ranch||[], off:st.now - Date.now()}; }
-function applyVisit(v){ if(v) V = {owner:v.owner, plots:v.plots, ranch:v.ranch||[], off:v.now - Date.now(), friend:!!v.friend, protected:!!v.protected}; }
+function applyVisit(v){ if(v) V = {owner:v.owner, plots:v.plots, ranch:v.ranch||[], bin:v.bin||{}, off:v.now - Date.now(), friend:!!v.friend, protected:!!v.protected}; }
 
 // 依伺服器時間預測目前生長進度（實際以伺服器為準）
 function pred(p, off){
@@ -2398,6 +2404,7 @@ function tapBuilding(g){
   g.classList.remove('hit'); void g.getBBox(); g.classList.add('hit');
   const id = g.dataset.b;
   if(id==='board') return openBoard();
+  if(id==='bin') return openBin();
   if(mode==='visit' && ['shop','barn','home','decor'].includes(id)) return toast('回到自己的農場才能使用');
   if(id==='shop') return openShopTab('decor');
   if(id==='barn') return openBag();
@@ -2486,7 +2493,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -2675,6 +2682,25 @@ function eventInfo(){ const c=CFG_SET||{}, now=Date.now()/1000, st=+c.ev_start||
   const m=[]; if(+c.ev_exp>1) m.push(`經驗 ×${+c.ev_exp}`); if(+c.ev_yield>1) m.push(`收成 ×${+c.ev_yield}`); if(+c.ev_gold>1) m.push(`賣價 ×${+c.ev_gold}`);
   const d=new Date(en*1000), t=`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
   return `🎉 <b>${esc(c.ev_name||'限時活動')}</b>${m.length?`：${m.join('、')}`:''}（到 ${t}）`; }
+
+/* ================= 食物收集倉：寵物自動收成的東西先放這裡，要手動收進穀倉；別人可以來偷 ================= */
+function binListHTML(b){ const rows=[];
+  Object.entries((b||{}).c||{}).forEach(([k,n])=>{ if(n>0) rows.push(`<div class="row"><div class="ic">${CROP[k]?iconSVG(CROP[k]):''}</div><div class="tx"><b>${CROP[k]?.name||k}</b> <span class="tag">×${n}</span></div></div>`); });
+  Object.entries((b||{}).g||{}).forEach(([k,n])=>{ if(n>0){ const a=ANIMALS.find(x=>x.good===k)||{}; rows.push(`<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${GOOD_ICON[k]||'🥚'}</div><div class="tx"><b>${a.good_name||k}</b> <span class="tag">×${n}</span></div></div>`); } });
+  return rows.join('') || `<div class="empty">收集倉是空的</div>`; }
+function openBin(){
+  if(mode==='visit' && V){
+    const b=V.bin||{}, n=binCount(b.items);
+    const why = !n ? '收集倉是空的' : b.mine ? '這一批你已經偷過了' : !(b.left>0) ? '已經被偷光了，留點給主人吧' : V.protected ? '對方還在新手保護中' : '';
+    modal(`🧺 ${esc(V.owner.nickname)} 的收集倉`, `<div class="rhint" style="margin-bottom:6px">寵物自動收成的東西會先放在這裡，主人還沒收走前可以偷一點（每次最多 ${+(CFG_SET.bin_steal_max??2)} 個）</div>${binListHTML(b.items)}`,
+      why ? [[why,'sub',closeModal]] : [['🧺 偷一點','r',async()=>{ try{ const r=await rpc('farm_bin_steal',{p_owner:V.owner.id}); applyState(r.state); applyVisit(r.visit); refresh(); closeModal();
+        if(r.ab==='dog'){ sfx('err'); toast('被看門狗咬了！什麼都沒偷到 🐶'); } else { sfx('steal'); toast(`偷到 ${r.qty} 個！`); } if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } }]]);
+    return;
+  }
+  const b=S.me.bin||{}, n=binCount(b), cap=+(S.me.bin_cap||200);
+  modal('🧺 食物收集倉', `<div class="rhint" style="margin-bottom:6px">寵物自動收成的作物和牧場產品會先放在這裡（${n}/${cap}），要按「收進穀倉」才能賣。放在這裡的東西好友和鄰居可以來偷，記得常來收！滿了寵物就會先停止收成。</div>${binListHTML(b)}`,
+    n ? [[`收進穀倉（${n} 個）`,'',async()=>{ try{ const r=await rpc('farm_bin_collect'); applyState(r.state); refresh(); sfx('coin'); toast(`收進穀倉 ${r.n} 個`); closeModal(); }catch(e){ toast(e.message); } }]] : null);
+}
 
 </script>
 </body>
