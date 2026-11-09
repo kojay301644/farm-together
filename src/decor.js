@@ -27,7 +27,7 @@ function renderDecor(force){
     const bad = EDIT && !decorOK(d.x,d.y), sel = EDIT && EDIT.sel===i;
     const img = `<image href="${A('dc_'+d.i)}" x="${(x-w/2).toFixed(1)}" y="${(y-h*0.85).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"${d.f?` transform="translate(${2*x} 0) scale(-1 1)"`:''}/>`;
     return `<g data-di="${i}" class="dec${sel?' sel':''}${bad?' bad':''}">${sel?`<ellipse cx="${x}" cy="${y}" rx="${w*0.5}" ry="${w*0.22}" fill="${bad?'rgba(242,84,91,.35)':'rgba(255,255,255,.45)'}" stroke="${bad?'#F2545B':'#3BB273'}" stroke-width="3" stroke-dasharray="8 5"/>`:''}${img}</g>`; }).join('');
-  // 萌獸繞開裝飾
+  // 寵物繞開裝飾
   OBST = OBST_FIXED.concat(list.map(d=>{ const w=decW(d.i), [x,y]=iso(d.x,d.y); return [x, y-w*0.06, w*0.4, w*0.2]; }));
 }
 

@@ -1,13 +1,13 @@
 
-/* ================= 萌獸進化與裝備 ================= */
+/* ================= 寵物進化與裝備 ================= */
 let GEAR = {}, GEAR_LIST = [], EVO = [10,20];
 const GEAR_FUNC = {plant:['自動播種','🌱'], water:['自動澆水','💧'], dog:['看門狗','🐶'], bug:['自動除蟲','🐛'],
-  weed:['自動除草','🌿'], clear:['自動剷除','🔥'], harvest:['自動收成','🧺'], scare:['稻草人','🎃']};
+  weed:['自動除草','🌿'], feed:['自動餵食','🥕'], clear:['自動餵食','🥕'], harvest:['自動收成','🧺'], scare:['稻草人','🎃']};
 const ROMAN = ['','I','II','III','IV'];
 function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
   return ({plant:`空地自動種下你指定的種子（第 1～${v} 塊地）`, water:`土乾了自動澆水（第 1～${v} 塊地）`,
     dog:`小偷來偷菜時 ${pc}% 被趕走`, bug:`蟲一出現 ${pc}% 自動除掉`, weed:`雜草一長出 ${pc}% 自動拔掉`,
-    clear:`收成後自動整地（第 1～${v} 塊地）`, harvest:`作物成熟 ${v} 分鐘後自動收成，小偷來不及偷`,
+    feed:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, clear:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, harvest:`作物和牧場產品好了 ${v} 分鐘後自動收，小偷來不及偷`,
     scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
 function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
   if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
@@ -18,19 +18,18 @@ const chrName = key => { const c=chrInfo(key); return (CHR_NAMES[c.sp]||[])[c.st
 const gearImg = (g, sz=40) => g ? `<img src="${A(g.icon)}" style="width:${sz}px;height:${sz}px;object-fit:contain" alt="">` : '';
 const gearTitle = g => `${g.name} ${ROMAN[g.tier]}`;
 
-/* 我的萌獸面板（我的家裡） */
+/* 我的寵物面板（我的家裡） */
 function beastPanelHTML(){
   const me=S.me, key=chrKey(me.chara, me.lv), st=chrStage(me.lv), g=GEAR[partyOf(me)[0].g];
   const next = `👑 隊長・夥伴 ${partyOf(me).length}/${me.party_cap||1} 隻`;
   return `<div class="beast">
     <div class="bimg"><img src="${chrSrc(key)}" alt=""></div>
     <div class="binfo"><b>${chrName(key)}</b><div class="bnext">${next}</div>
-      <button class="gslot" id="hGear">${g?gearImg(g,34):'<span class="plus">＋</span>'}<span><b>${g?gearTitle(g):'裝備欄（空）'}</b><small>${g?`${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}`:'點這裡插上裝備，萌獸會幫你自動做事'}</small></span></button>
+      <button class="gslot" id="hGear">${g?gearImg(g,34):'<span class="plus">＋</span>'}<span><b>${g?gearTitle(g):'裝備欄（空）'}</b><small>${g?`${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}`:'點這裡插上裝備，寵物會幫你自動做事'}</small></span></button>
     </div></div>
-    <div class="homebtns"><button class="btn sub" id="hCh">🐾 夥伴隊伍</button><button class="btn o" id="hGshop">🛒 買裝備</button></div>
-    <div class="homebtns"><button class="btn" id="hSkin" style="background:#FF8FB1;box-shadow:0 3px 0 #D9628A">🏠 建築外觀</button></div>`;
+    <div class="homebtns"><button class="btn sub" id="hCh">🐾 夥伴隊伍</button><button class="btn o" id="hBag">🎒 背包</button></div>`;
 }
-function bindBeastPanel(){ $('hSkin').onclick=()=>openSkinShop(); $('hGear').onclick=()=>openGearBag(0); $('hCh').onclick=()=>openBeastPark('mine'); $('hGshop').onclick=()=>openGearShop(); }
+function bindBeastPanel(){ $('hGear').onclick=()=>openGearBag(0); $('hCh').onclick=()=>openBeastPark('mine'); $('hBag').onclick=()=>openPack(); }
 
 /* 裝備背包 */
 function openGearBag(slot){
@@ -47,7 +46,7 @@ function openGearBag(slot){
   body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span><div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
       ${mem.g===g.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">裝備中</span>':`<button class="mini" data-eq="${g.id}">${(used[g.id]||0)>=n?'換過來':'插上'}</button>`}</div>`).join('')
     : `<div class="empty">還沒有裝備<br><small>可以在商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
-  modal('萌獸裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
+  modal('寵物裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
   const md=$('md');
   md.querySelectorAll('[data-eq]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.eq, n=(me.gear||{})[id]||0;
     // 數量不夠就從別隻夥伴身上拿過來
@@ -113,7 +112,7 @@ function checkEvolve(){
 
 /* ================= 建築外觀商店 ================= */
 let SKINS = [], skinTab = 'home';
-const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'萌獸園', decor:'裝飾店'};
+const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'寵物園', decor:'裝飾店'};
 function openSkinShop(t){
   if(mode==='visit') return toast('回到自己的農場才能換外觀');
   if(t) skinTab=t;

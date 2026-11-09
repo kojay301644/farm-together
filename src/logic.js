@@ -119,7 +119,7 @@ async function act(i){
     return toast(`${c.name}：約 ${fmt(leftSec(p))} 後成熟${issues?'｜'+issues:''}`);
   }
   if(tool==='seed'){
-    if(p.s!=='empty') return toast(p.s==='dead'?'先用鏟子剷除枯萎的作物':'這塊地已經種了東西');
+    if(p.s!=='empty') return toast('這塊地已經種了東西');
     if(!(S.me.seeds[ui.seed]>0)) return openSeedPicker(i);
     return plant(i, ui.seed);
   }
@@ -225,7 +225,7 @@ function openShop(){
       <div>成熟 ${dur(c.time)}・收成 ${c.yield}×${c.price} 金 = ${c.yield*c.price} 金</div></div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">${btn}</div></div>`;
   }).join('');
-  modal(`種子商店　<span style="font-size:14px;color:var(--ink2)">金幣 ${me.gold}</span>`, body, [['🐾 萌獸裝備','o',()=>openGearShop('gold')]]);
+  modal(`種子商店　<span style="font-size:14px;color:var(--ink2)">金幣 ${me.gold}</span>`, body, [['🐾 寵物裝備','o',()=>openGearShop('gold')]]);
   $('md').querySelectorAll('[data-buy]').forEach(b=>b.onclick=async()=>{
     const c = CROP[b.dataset.buy], n = +b.dataset.n;
     const r = await doAct('buy', null, c.id, n);
@@ -260,7 +260,7 @@ async function openHome(){
   if(mode==='visit') return toast('這是好友的家喔');
   const {data:{user}} = await sb.auth.getUser();
   modal('我的家', `
-    <div class="sec">我的萌獸</div>${beastPanelHTML()}
+    <div class="sec">我的寵物</div>${beastPanelHTML()}
     <div class="sec">玩家</div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>

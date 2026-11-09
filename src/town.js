@@ -17,13 +17,18 @@ const A = n => `assets/${n}.webp?v=${typeof BUILD!=='undefined'?BUILD:''}`;
 /* 田地位置（格座標，3 排 × 6 塊） */
 const PS=1.45, PG=1.65;
 // 第 1～4 塊在穀倉右邊、農田上方 2×2（一開始就有）；其餘 18 塊是原本 3 排 × 6
-const PLOTS=[[0,2],[1,2],[0,1],[1,1]].map(([c,r])=>[4.35+c*PG, 6.75-r*PG]).concat(Array.from({length:18},(_,i)=>[4.35+(i%6)*PG, 6.75+Math.floor(i/6)*PG]));
+const PLOTS=[[0,2],[0,1]].map(([c,r])=>[4.35+c*PG, 6.75-r*PG]).concat(Array.from({length:18},(_,i)=>[4.35+(i%6)*PG, 6.75+Math.floor(i/6)*PG]));
 const plotCenter=i=>iso(PLOTS[i][0]+PS/2, PLOTS[i][1]+PS/2);
 const FARM_C=[9.2,9.2];
 
 /* ================= 美術元件 ================= */
 const INK='#4B3423';
 function labelPill(x,y,text,opt={}){
+  if(opt.big){ const w=text.length*18+30, bg='#FF8A3D';
+    return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" style="pointer-events:none"><g class="bob">
+    <rect x="${-w/2}" y="-18" width="${w}" height="36" rx="18" fill="${bg}" stroke="${INK}" stroke-width="2.5"/>
+    <path d="M-7 17 L0 25 L7 17" fill="${bg}" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><rect x="-8" y="14" width="16" height="4" fill="${bg}"/>
+    <text x="0" y="7" text-anchor="middle" font-size="18" font-weight="900" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke" font-family="Noto Sans TC,sans-serif">${text}</text></g></g>`; }
   const w = text.length*13+26;
   const bg = opt.locked?'#E2DACB':(opt.bg||'#FFFFFF');
   const fg = opt.locked?'#7A6E5D':(opt.fg||'#3A3226');
@@ -38,7 +43,7 @@ function sprite(name, gx, gy, w, opt={}){
   const yy = y - h*(opt.foot ?? 0.82);
   return `<image href="${A(name)}" x="${(x-w/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" ${opt.cls?`class="${opt.cls}"`:''}/>`;
 }
-/* 建築外觀（萌獸 7 種樣式） */
+/* 建築外觀（寵物 7 種樣式） */
 const SKIN_R = {"b_forge": 1.0885, "bb_forge": 1.0687, "bc_forge": 1.0928, "bf_forge": 1.061, "bi_forge": 1.0782, "bj_forge": 1.0668, "bl_forge": 1.0649, "b_play": 0.6936, "bb_play": 0.6959, "bc_play": 0.7324, "bf_play": 0.6988, "bi_play": 0.6965, "bj_play": 0.698, "bl_play": 0.709, "b_academy": 1.0, "bb_academy": 1.0423, "bc_academy": 1.1761, "bf_academy": 1.0387, "bi_academy": 1.1156, "bj_academy": 1.0387, "bl_academy": 1.0479, "b_farm": 0.9729, "bb_farm": 0.9677, "bc_farm": 1.0159, "bf_farm": 0.9899, "bi_farm": 1.0665, "bj_farm": 0.998, "bl_farm": 0.984, "b_shop": 1.0395, "bb_shop": 1.0573, "bc_shop": 1.0827, "bf_shop": 1.0479, "bi_shop": 1.0567, "bj_shop": 1.0498, "bl_shop": 1.0629, "b_fountain": 1.1107, "bb_fountain": 1.0804, "bc_fountain": 1.0537, "bf_fountain": 1.0765, "bi_fountain": 1.084, "bj_fountain": 1.0745, "bl_fountain": 1.0884, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
 const SKIN_PART = {home:'academy', barn:'farm', shop:'shop', fountain:'fountain', pen:'play', decor:'forge'};
 const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'b', decor:'b'};
@@ -63,7 +68,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
-  {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
+  {id:'pen',   name:'寵物園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
 
 // 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
@@ -109,7 +114,7 @@ const movers=[];
 let OBST=[], RANCH=null;  // 不能踩的範圍（畫面座標橢圓）
 const addObst=(gx,gy,rx,ry,dy=0)=>{ const [x,y]=iso(gx,gy); OBST.push([x,y+dy,rx,ry]); };
 let farmerMover=null, farmerAv=null, partyMovers=[];
-/* 玩家角色＝萌獸（動作仿萌獸星球：腿部切片擺動、搖擺、漂浮、呼吸） */
+/* 玩家角色＝寵物（動作仿萌獸星球：腿部切片擺動、搖擺、漂浮、呼吸） */
 const CHR_RATIO={"bunny1":0.782,"bunny2":0.771,"bunny3":0.812,"mouse1":1.341,"mouse2":1.276,"mouse3":1.1,"mole1":0.882,"mole2":0.976,"mole3":0.976,"puffer1":1.0,"puffer2":0.982,"puffer3":0.965,"owl1":0.888,"owl2":0.841,"owl3":0.853,"lizard1":1.453,"lizard2":1.288,"lizard3":1.259,"deer1":0.747,"deer2":0.647,"deer3":0.712,"moth1":0.924,"moth2":0.988,"moth3":0.865,"armad1":1.112,"armad2":1.035,"armad3":0.971,"seal1":1.1,"seal2":1.059,"seal3":0.994,"marten1":1.006,"marten2":1.212,"marten3":1.276,"phoenix1":0.841,"phoenix2":0.947,"phoenix3":0.882,"fox1":1.018,"fox2":0.994,"fox3":1.0,"otter1":0.9,"otter2":0.865,"otter3":0.841,"penguin1":0.871,"penguin2":0.953,"penguin3":0.929,"pango1":1.188,"pango2":1.365,"pango3":1.147,"ferret1":0.971,"ferret2":1.053,"ferret3":1.012,"whale1":1.376,"whale2":1.182,"whale3":1.088,"bear1":0.965,"bear2":0.9,"bear3":0.935,"dragon1":0.941,"dragon2":0.935,"dragon3":0.947};
 const CHR_NAMES={"bunny":["蘑菇兔","孢子兔","森菇賢者"],"mouse":["火花鼠","電光鼠","雷霆鼠"],"mole":["礦石鼴","礦工鼴","晶甲鼴王"],"puffer":["泡泡豚","珊瑚豚","鎧刺豚"],"owl":["雪絨鴞","霜羽鴞","冰冠鴞"],"lizard":["火蜥寶","熔岩蜥","岩漿蜥王"],"deer":["雷光鹿","雷角鹿","霆冠鹿王"],"moth":["花芽蝶","花仙蝶","虹彩花后"],"armad":["小鋼甲","鐵甲犰狳","鋼堡犰狳"],"seal":["雪球海豹","極光海豹","極光女王"],"marten":["影絨貂","影刺貂","雷影忍貂"],"phoenix":["火鳥雛","烈焰鳥","不死鳳凰"],"fox":["小焰狐","焰尾狐","炎陽狐王"],"otter":["泡泡獺","浪花獺","潮汐獺王"],"penguin":["雪糰企鵝","霜羽企鵝","冰冠企鵝帝"],"pango":["小石甲","滾石甲","山岳甲王"],"ferret":["靜電毛球","雷絨貂","雷霆貂"],"whale":["小鯨鈴","鳴鈴鯨","天籟鯨"],"bear":["苔苔熊","藤甲熊","古森熊王"],"dragon":["星晶龍寶","星晶龍","創星龍"]};
 const CHR_SP={bunny:['蘑菇兔',.9,'quad',.74,.5],mouse:['小鼠',1.3,'quad',.72,.5],mole:['鼴鼠',.6,'biped',.8,.48],
@@ -137,7 +142,7 @@ function setMoverChar(m, k, gid){ const sig=k+'|'+((typeof GEAR!=='undefined'&&G
     tgt.insertAdjacentHTML('beforeend',`<g class="gbadge"><circle cx="${n*.18}" cy="${-n*.42}" r="${sz*.55}" fill="#FFF8E6" stroke="#4B3423" stroke-width="1.8"/><image href="${A(g.icon)}" x="${n*.18-sz/2}" y="${-n*.42-sz/2}" width="${sz}" height="${sz}"/></g>`); }
   m.c=chrInfo(k); m.n=48+m.c.st*9; m.ph=0; m.anim=Math.random()*9; m.jump=0;
   m.parts={root:m.el.querySelector('.cp-root'), a:m.el.querySelector('.cp-a'), b:m.el.querySelector('.cp-b'), t:m.el.querySelector('.cp-t'), sh:m.el.querySelector('.cp-sh')}; }
-/* 每幀姿勢（照萌獸的算法） */
+/* 每幀姿勢（照寵物的算法） */
 function farmerPose(m, dt, moving){
   const P=m.parts; if(!P||!P.root) return; const c=m.c, n=m.n, act=m.act;
   m.anim+=dt; if(moving) m.ph+=dt*c.spd*(m.task?14:9);
@@ -162,10 +167,10 @@ function farmerPose(m, dt, moving){
 function openCharPicker(){
   const cur=(S.me.chara)||'bunny1';
   const evo=(typeof EVO!=='undefined')?EVO:[10,20];
-  modal('選擇萌獸', `<p class="mut" style="margin:0 0 8px">選一隻萌獸當你的農場夥伴，牠會在農場裡走來走去幫你做事。</p><div class="chgrid">${Object.keys(CHR_SP).map(sp=>{ const k=sp+'1';
+  modal('選擇寵物', `<p class="mut" style="margin:0 0 8px">選一隻寵物當你的農場夥伴，牠會在農場裡走來走去幫你做事。</p><div class="chgrid">${Object.keys(CHR_SP).map(sp=>{ const k=sp+'1';
     return `<button class="chpick${sp===chrSpecies(cur)?' on':''}" data-ch="${k}"><img src="${chrSrc(sp+'1')}" alt=""><span>${(CHR_NAMES[sp]||[])[0]||CHR_SP[sp][0]}</span></button>`; }).join('')}</div>`);
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=async()=>{
-    try{ applyState(await rpc('farm_set_chara', {p_c:b.dataset.ch})); refresh(); sfx('coin'); toast('萌獸已更換'); closeModal(); }catch(e){ toast(e.message); }
+    try{ applyState(await rpc('farm_set_chara', {p_c:b.dataset.ch})); refresh(); sfx('coin'); toast('寵物已更換'); closeModal(); }catch(e){ toast(e.message); }
   });
 }
 /* 角色動作 */
@@ -237,12 +242,12 @@ function buildWorld(){
   // 牧場（農田左邊、島的下方中間）
   const RX=4.1, RY=11.85, RW=10.15, RD=3.0;  // 農田左下邊，長度跟農田切齊
   pen(RX,RY,RW,RD,'#E8D3A2','url(#pGrass)','front');
-  const GATE=[RX+RW*0.32, RY+RD]; RANCH=[RX,RY,RW,RD];  // 牧場門（萌獸從這裡進出）
+  const GATE=[RX+RW*0.32, RY+RD]; RANCH=[RX,RY,RW,RD];  // 牧場門（寵物從這裡進出）
   { const [tx,ty]=iso(RX+RW-0.7, RY+0.6); objs.push({depth:RX+RW+RY, svg: ol(`<path d="M${tx-22} ${ty-6} l22 -11 l22 11 l-22 11z" fill="#8B5E3C"/><path d="M${tx-18} ${ty-6} l18 -9 l18 9 l-18 9z" fill="#F4D35E"/>`,2)}); }
 
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
-    if(o.id!=='pen' && o.id!=='coop'){ // 擋住整個建築圖的範圍（含後面），萌獸才不會走到屋頂上
+    if(o.id!=='pen' && o.id!=='coop'){ // 擋住整個建築圖的範圍（含後面），寵物才不會走到屋頂上
       const hh=o.w*(SKIN_PART[o.id] ? (SKIN_R[skinImg(o.id)]||1.1) : (RATIO[o.img]||1))*o.foot;
       addObst(o.c[0],o.c[1],o.w*0.52,hh/2+16,-hh/2+8); }
     const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
@@ -254,9 +259,13 @@ function buildWorld(){
     if(o.id==='home'){ const [x,y]=iso(gx,gy), top=y-h*o.foot; s += `<circle class="smoke" cx="${x+o.w*0.24}" cy="${top+h*0.02}" r="6" fill="#fff" opacity=".75"/><circle class="smoke" style="animation-delay:1.5s" cx="${x+o.w*0.26}" cy="${top}" r="5" fill="#fff" opacity=".75"/>`; }
     if(o.id==='coop'){ // 牧場：乾草車不接受點擊（避免擋到農田），改成點牧場草地
       ground += `<g class="tap" data-b="coop"><polygon points="${P(dia(RX,RY,RW,RD))}" fill="rgba(0,0,0,0)"/></g>`;
+    } else if(o.id==='pen'){ // 寵物園圖很大：只有地面那一圈可以點，才不會蓋到上面的商店
+      const [x,y]=iso(gx,gy);
+      objs.push({depth:gx+gy, svg:`<g class="tap" data-b="pen"><g style="pointer-events:none">${s}</g><ellipse cx="${x.toFixed(1)}" cy="${(y-h*0.1).toFixed(1)}" rx="${(o.w*0.44).toFixed(1)}" ry="${(o.w*0.2).toFixed(1)}" fill="rgba(0,0,0,0)"/></g>`});
     } else objs.push({depth:gx+gy, svg:`<g class="tap" data-b="${o.id}">${s}</g>`});
     const [lx,ly]=iso(gx,gy);
-    lab += labelPill(lx, ly - (o.id==='coop'?20:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
+    if(o.id==='home') lab += labelPill(lx, ly - h*0.12, '🏠 我的家', {big:1});  // 放在大門前面，不會被上方玩家欄擋住
+    else lab += labelPill(lx, ly - (o.id==='coop'?20:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
   });
 
   // 裝飾（萌獸星球素材）

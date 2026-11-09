@@ -166,7 +166,7 @@ async function pageCf(){
     ${C.crops.map(c=>`<tr><td><b>${esc(c.name)}</b></td>${['lv','seed','grow_sec','yield','price','exp'].map(f=>`<td><input class="num" id="c_${c.id}_${f}" type="number" value="${c[f]}"></td>`).join('')}<td><button class="btn" data-cid="${c.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>開墾條件</h2><table><tr><th>第幾塊</th><th>需要等級</th><th>費用</th><th></th></tr>
     ${C.land.map(l=>`<tr><td>第 ${l.idx+1} 塊</td><td><input class="num" id="l_${l.idx}_lv" type="number" value="${l.lv}"></td><td><input class="num" id="l_${l.idx}_cost" type="number" value="${l.cost}"></td><td><button class="btn" data-li="${l.idx}">儲存</button></td></tr>`).join('')}</table></div>
-    <div class="card"><h2>萌獸裝備</h2><div class="muted" style="margin-bottom:8px">數值：自動澆水／播種／剷除＝第 1～N 塊地；看門狗／除蟲／除草／稻草人＝機率（0.5＝50%）；自動收成＝成熟後幾分鐘。金幣價留空＝不能用金幣買；鑽石價留空＝不能用鑽石買。</div>
+    <div class="card"><h2>寵物裝備</h2><div class="muted" style="margin-bottom:8px">數值：自動澆水／播種／剷除＝第 1～N 塊地；看門狗／除蟲／除草／稻草人＝機率（0.5＝50%）；自動收成＝成熟後幾分鐘。金幣價留空＝不能用金幣買；鑽石價留空＝不能用鑽石買。</div>
     <table><tr><th>裝備</th><th>功能</th><th>名稱</th><th>數值</th><th>金幣價</th><th>鑽石價</th><th>金幣購買等級</th><th></th></tr>
     ${(C.gear||[]).map(g=>`<tr><td><img src="assets/${g.icon}.webp" style="width:34px;height:34px;object-fit:contain;vertical-align:middle"> ${['','I','II','III','IV'][g.tier]}</td><td>${({plant:'自動播種',water:'自動澆水',dog:'看門狗',bug:'自動除蟲',weed:'自動除草',clear:'自動剷除',harvest:'自動收成',scare:'稻草人'})[g.func]}</td>
       <td><input id="g_${g.id}_name" value="${esc(g.name)}" style="width:7em"></td><td><input class="num" id="g_${g.id}_val" type="number" step="any" value="${g.val}"></td>
@@ -175,14 +175,14 @@ async function pageCf(){
     <div class="card"><h2>牧場動物</h2><div class="muted" style="margin-bottom:8px">生產秒數：餵飽後多久產出；飼料＝要幾個作物。牧場開放等級和格數在上方「玩法設定」。</div>
     <table><tr><th>動物</th><th>解鎖等級</th><th>價格</th><th>飼料</th><th>生產秒數</th><th>產量</th><th>產品單價</th><th>經驗</th><th></th></tr>
     ${(C.animals||[]).map(a=>`<tr><td><b>${esc(a.name)}</b><div class="muted">${esc(a.good_name)}</div></td>${['lv','price','feed','prod_sec','yield','good_price','exp'].map(f=>`<td><input class="num" id="a_${a.id}_${f}" type="number" value="${a[f]}"></td>`).join('')}<td><button class="btn" data-aid="${a.id}">儲存</button></td></tr>`).join('')}</table></div>
-    <div class="card"><h2>萌獸價格</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填。</div>
-    <table><tr><th>萌獸</th><th>解鎖等級</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
+    <div class="card"><h2>寵物價格</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填。</div>
+    <table><tr><th>寵物</th><th>解鎖等級</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.beasts||[]).map(b=>`<tr><td><b>${esc(b.name)}</b></td><td><input class="num" id="b_${b.id}_lv" type="number" value="${b.lv}"></td><td><input class="num" id="b_${b.id}_gold" type="number" value="${b.gold??''}"></td><td><input class="num" id="b_${b.id}_gems" type="number" value="${b.gems??''}"></td><td><button class="btn" data-bid="${b.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>城鎮色調</h2><table><tr><th>色調</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.tones||[]).filter(t=>t.id!=='spring').map(t=>`<tr><td><b>${esc(t.name)}</b></td><td><input class="num" id="t_${t.id}_gold" type="number" value="${t.gold??''}"></td><td><input class="num" id="t_${t.id}_gems" type="number" value="${t.gems??''}"></td><td><button class="btn" data-tid="${t.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>建築外觀</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；兩個都留空＝不能購買。</div>
     <table><tr><th>外觀</th><th>建築</th><th>名稱</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
-    ${(C.skins||[]).map(k=>`<tr><td><img src="assets/th_${k.style}_${({home:'academy',barn:'farm',shop:'shop',fountain:'fountain',pen:'play',decor:'forge'})[k.bld]}.webp" style="width:40px;height:40px;object-fit:contain"></td><td>${({home:'我的家',barn:'穀倉',shop:'種子商店',fountain:'噴水池',pen:'萌獸園',decor:'裝飾店'})[k.bld]}</td>
+    ${(C.skins||[]).map(k=>`<tr><td><img src="assets/th_${k.style}_${({home:'academy',barn:'farm',shop:'shop',fountain:'fountain',pen:'play',decor:'forge'})[k.bld]}.webp" style="width:40px;height:40px;object-fit:contain"></td><td>${({home:'我的家',barn:'穀倉',shop:'種子商店',fountain:'噴水池',pen:'寵物園',decor:'裝飾店'})[k.bld]}</td>
       <td><input id="k_${k.id}_name" value="${esc(k.name)}" style="width:6em"></td><td><input class="num" id="k_${k.id}_gold" type="number" value="${k.gold??''}"></td><td><input class="num" id="k_${k.id}_gems" type="number" value="${k.gems??''}"></td><td><button class="btn" data-kid="${k.id}">儲存</button></td></tr>`).join('')}</table></div>`);
   document.querySelectorAll('[data-sk]').forEach(b=>b.onclick=async()=>{ try{ await rpc('adm_setting_set',{p_key:b.dataset.sk,p_value:+$('s_'+b.dataset.sk).value}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-cid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.cid, v=f=>+$(`c_${id}_${f}`).value;

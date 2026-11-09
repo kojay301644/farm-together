@@ -264,7 +264,7 @@ body.lowfx .bird{display:none}
 .fxp.emo{font-size:24px;line-height:1;animation:emo 1.5s ease-out forwards;filter:drop-shadow(0 2px 0 rgba(75,52,35,.35))}
 @keyframes emo{0%{transform:translateY(8px) scale(.3);opacity:0}18%{transform:translateY(-6px) scale(1.2);opacity:1}30%{transform:translateY(-4px) scale(1)}80%{opacity:1}100%{transform:translateY(-26px);opacity:0}}
 
-/* 我的萌獸、裝備 */
+/* 我的寵物、裝備 */
 .beast{display:flex;gap:12px;align-items:center;margin:6px 0 4px}
 .bimg{position:relative;width:96px;height:96px;flex:none;border-radius:20px;background:radial-gradient(circle at 50% 60%,#FFF6D8,#F3E5C4);border:2.5px solid #E6D2A8;display:grid;place-items:center}
 .bimg img{width:86px;height:86px;object-fit:contain;animation:floaty 3s ease-in-out infinite}
@@ -362,6 +362,7 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 @keyframes tfall{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(30px,55vh) rotate(180deg)}100%{transform:translate(-20px,110vh) rotate(360deg)}}
 
 .twk{animation:twk 3s ease-in-out infinite}@keyframes twk{50%{opacity:.25}}
+.bob{animation:bob 2.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-4px)}}body.lowfx .bob{animation:none}
 </style>
 </head>
 <body>
@@ -400,13 +401,13 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794236428" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794237808" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794236428" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794236428" alt=""><span id="pgems">0</span></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794236428" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794237808" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794237808" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794237808" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>
@@ -422,11 +423,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794236428" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794237808" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794236428";
+const BUILD="1794237808";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -583,13 +584,18 @@ const A = n => `assets/${n}.webp?v=${typeof BUILD!=='undefined'?BUILD:''}`;
 /* 田地位置（格座標，3 排 × 6 塊） */
 const PS=1.45, PG=1.65;
 // 第 1～4 塊在穀倉右邊、農田上方 2×2（一開始就有）；其餘 18 塊是原本 3 排 × 6
-const PLOTS=[[0,2],[1,2],[0,1],[1,1]].map(([c,r])=>[4.35+c*PG, 6.75-r*PG]).concat(Array.from({length:18},(_,i)=>[4.35+(i%6)*PG, 6.75+Math.floor(i/6)*PG]));
+const PLOTS=[[0,2],[0,1]].map(([c,r])=>[4.35+c*PG, 6.75-r*PG]).concat(Array.from({length:18},(_,i)=>[4.35+(i%6)*PG, 6.75+Math.floor(i/6)*PG]));
 const plotCenter=i=>iso(PLOTS[i][0]+PS/2, PLOTS[i][1]+PS/2);
 const FARM_C=[9.2,9.2];
 
 /* ================= 美術元件 ================= */
 const INK='#4B3423';
 function labelPill(x,y,text,opt={}){
+  if(opt.big){ const w=text.length*18+30, bg='#FF8A3D';
+    return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" style="pointer-events:none"><g class="bob">
+    <rect x="${-w/2}" y="-18" width="${w}" height="36" rx="18" fill="${bg}" stroke="${INK}" stroke-width="2.5"/>
+    <path d="M-7 17 L0 25 L7 17" fill="${bg}" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><rect x="-8" y="14" width="16" height="4" fill="${bg}"/>
+    <text x="0" y="7" text-anchor="middle" font-size="18" font-weight="900" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke" font-family="Noto Sans TC,sans-serif">${text}</text></g></g>`; }
   const w = text.length*13+26;
   const bg = opt.locked?'#E2DACB':(opt.bg||'#FFFFFF');
   const fg = opt.locked?'#7A6E5D':(opt.fg||'#3A3226');
@@ -604,7 +610,7 @@ function sprite(name, gx, gy, w, opt={}){
   const yy = y - h*(opt.foot ?? 0.82);
   return `<image href="${A(name)}" x="${(x-w/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" ${opt.cls?`class="${opt.cls}"`:''}/>`;
 }
-/* 建築外觀（萌獸 7 種樣式） */
+/* 建築外觀（寵物 7 種樣式） */
 const SKIN_R = {"b_forge": 1.0885, "bb_forge": 1.0687, "bc_forge": 1.0928, "bf_forge": 1.061, "bi_forge": 1.0782, "bj_forge": 1.0668, "bl_forge": 1.0649, "b_play": 0.6936, "bb_play": 0.6959, "bc_play": 0.7324, "bf_play": 0.6988, "bi_play": 0.6965, "bj_play": 0.698, "bl_play": 0.709, "b_academy": 1.0, "bb_academy": 1.0423, "bc_academy": 1.1761, "bf_academy": 1.0387, "bi_academy": 1.1156, "bj_academy": 1.0387, "bl_academy": 1.0479, "b_farm": 0.9729, "bb_farm": 0.9677, "bc_farm": 1.0159, "bf_farm": 0.9899, "bi_farm": 1.0665, "bj_farm": 0.998, "bl_farm": 0.984, "b_shop": 1.0395, "bb_shop": 1.0573, "bc_shop": 1.0827, "bf_shop": 1.0479, "bi_shop": 1.0567, "bj_shop": 1.0498, "bl_shop": 1.0629, "b_fountain": 1.1107, "bb_fountain": 1.0804, "bc_fountain": 1.0537, "bf_fountain": 1.0765, "bi_fountain": 1.084, "bj_fountain": 1.0745, "bl_fountain": 1.0884, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
 const SKIN_PART = {home:'academy', barn:'farm', shop:'shop', fountain:'fountain', pen:'play', decor:'forge'};
 const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'b', decor:'b'};
@@ -629,7 +635,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
-  {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
+  {id:'pen',   name:'寵物園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
 
 // 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
@@ -675,7 +681,7 @@ const movers=[];
 let OBST=[], RANCH=null;  // 不能踩的範圍（畫面座標橢圓）
 const addObst=(gx,gy,rx,ry,dy=0)=>{ const [x,y]=iso(gx,gy); OBST.push([x,y+dy,rx,ry]); };
 let farmerMover=null, farmerAv=null, partyMovers=[];
-/* 玩家角色＝萌獸（動作仿萌獸星球：腿部切片擺動、搖擺、漂浮、呼吸） */
+/* 玩家角色＝寵物（動作仿萌獸星球：腿部切片擺動、搖擺、漂浮、呼吸） */
 const CHR_RATIO={"bunny1":0.782,"bunny2":0.771,"bunny3":0.812,"mouse1":1.341,"mouse2":1.276,"mouse3":1.1,"mole1":0.882,"mole2":0.976,"mole3":0.976,"puffer1":1.0,"puffer2":0.982,"puffer3":0.965,"owl1":0.888,"owl2":0.841,"owl3":0.853,"lizard1":1.453,"lizard2":1.288,"lizard3":1.259,"deer1":0.747,"deer2":0.647,"deer3":0.712,"moth1":0.924,"moth2":0.988,"moth3":0.865,"armad1":1.112,"armad2":1.035,"armad3":0.971,"seal1":1.1,"seal2":1.059,"seal3":0.994,"marten1":1.006,"marten2":1.212,"marten3":1.276,"phoenix1":0.841,"phoenix2":0.947,"phoenix3":0.882,"fox1":1.018,"fox2":0.994,"fox3":1.0,"otter1":0.9,"otter2":0.865,"otter3":0.841,"penguin1":0.871,"penguin2":0.953,"penguin3":0.929,"pango1":1.188,"pango2":1.365,"pango3":1.147,"ferret1":0.971,"ferret2":1.053,"ferret3":1.012,"whale1":1.376,"whale2":1.182,"whale3":1.088,"bear1":0.965,"bear2":0.9,"bear3":0.935,"dragon1":0.941,"dragon2":0.935,"dragon3":0.947};
 const CHR_NAMES={"bunny":["蘑菇兔","孢子兔","森菇賢者"],"mouse":["火花鼠","電光鼠","雷霆鼠"],"mole":["礦石鼴","礦工鼴","晶甲鼴王"],"puffer":["泡泡豚","珊瑚豚","鎧刺豚"],"owl":["雪絨鴞","霜羽鴞","冰冠鴞"],"lizard":["火蜥寶","熔岩蜥","岩漿蜥王"],"deer":["雷光鹿","雷角鹿","霆冠鹿王"],"moth":["花芽蝶","花仙蝶","虹彩花后"],"armad":["小鋼甲","鐵甲犰狳","鋼堡犰狳"],"seal":["雪球海豹","極光海豹","極光女王"],"marten":["影絨貂","影刺貂","雷影忍貂"],"phoenix":["火鳥雛","烈焰鳥","不死鳳凰"],"fox":["小焰狐","焰尾狐","炎陽狐王"],"otter":["泡泡獺","浪花獺","潮汐獺王"],"penguin":["雪糰企鵝","霜羽企鵝","冰冠企鵝帝"],"pango":["小石甲","滾石甲","山岳甲王"],"ferret":["靜電毛球","雷絨貂","雷霆貂"],"whale":["小鯨鈴","鳴鈴鯨","天籟鯨"],"bear":["苔苔熊","藤甲熊","古森熊王"],"dragon":["星晶龍寶","星晶龍","創星龍"]};
 const CHR_SP={bunny:['蘑菇兔',.9,'quad',.74,.5],mouse:['小鼠',1.3,'quad',.72,.5],mole:['鼴鼠',.6,'biped',.8,.48],
@@ -703,7 +709,7 @@ function setMoverChar(m, k, gid){ const sig=k+'|'+((typeof GEAR!=='undefined'&&G
     tgt.insertAdjacentHTML('beforeend',`<g class="gbadge"><circle cx="${n*.18}" cy="${-n*.42}" r="${sz*.55}" fill="#FFF8E6" stroke="#4B3423" stroke-width="1.8"/><image href="${A(g.icon)}" x="${n*.18-sz/2}" y="${-n*.42-sz/2}" width="${sz}" height="${sz}"/></g>`); }
   m.c=chrInfo(k); m.n=48+m.c.st*9; m.ph=0; m.anim=Math.random()*9; m.jump=0;
   m.parts={root:m.el.querySelector('.cp-root'), a:m.el.querySelector('.cp-a'), b:m.el.querySelector('.cp-b'), t:m.el.querySelector('.cp-t'), sh:m.el.querySelector('.cp-sh')}; }
-/* 每幀姿勢（照萌獸的算法） */
+/* 每幀姿勢（照寵物的算法） */
 function farmerPose(m, dt, moving){
   const P=m.parts; if(!P||!P.root) return; const c=m.c, n=m.n, act=m.act;
   m.anim+=dt; if(moving) m.ph+=dt*c.spd*(m.task?14:9);
@@ -728,10 +734,10 @@ function farmerPose(m, dt, moving){
 function openCharPicker(){
   const cur=(S.me.chara)||'bunny1';
   const evo=(typeof EVO!=='undefined')?EVO:[10,20];
-  modal('選擇萌獸', `<p class="mut" style="margin:0 0 8px">選一隻萌獸當你的農場夥伴，牠會在農場裡走來走去幫你做事。</p><div class="chgrid">${Object.keys(CHR_SP).map(sp=>{ const k=sp+'1';
+  modal('選擇寵物', `<p class="mut" style="margin:0 0 8px">選一隻寵物當你的農場夥伴，牠會在農場裡走來走去幫你做事。</p><div class="chgrid">${Object.keys(CHR_SP).map(sp=>{ const k=sp+'1';
     return `<button class="chpick${sp===chrSpecies(cur)?' on':''}" data-ch="${k}"><img src="${chrSrc(sp+'1')}" alt=""><span>${(CHR_NAMES[sp]||[])[0]||CHR_SP[sp][0]}</span></button>`; }).join('')}</div>`);
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=async()=>{
-    try{ applyState(await rpc('farm_set_chara', {p_c:b.dataset.ch})); refresh(); sfx('coin'); toast('萌獸已更換'); closeModal(); }catch(e){ toast(e.message); }
+    try{ applyState(await rpc('farm_set_chara', {p_c:b.dataset.ch})); refresh(); sfx('coin'); toast('寵物已更換'); closeModal(); }catch(e){ toast(e.message); }
   });
 }
 /* 角色動作 */
@@ -803,12 +809,12 @@ function buildWorld(){
   // 牧場（農田左邊、島的下方中間）
   const RX=4.1, RY=11.85, RW=10.15, RD=3.0;  // 農田左下邊，長度跟農田切齊
   pen(RX,RY,RW,RD,'#E8D3A2','url(#pGrass)','front');
-  const GATE=[RX+RW*0.32, RY+RD]; RANCH=[RX,RY,RW,RD];  // 牧場門（萌獸從這裡進出）
+  const GATE=[RX+RW*0.32, RY+RD]; RANCH=[RX,RY,RW,RD];  // 牧場門（寵物從這裡進出）
   { const [tx,ty]=iso(RX+RW-0.7, RY+0.6); objs.push({depth:RX+RW+RY, svg: ol(`<path d="M${tx-22} ${ty-6} l22 -11 l22 11 l-22 11z" fill="#8B5E3C"/><path d="M${tx-18} ${ty-6} l18 -9 l18 9 l-18 9z" fill="#F4D35E"/>`,2)}); }
 
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
-    if(o.id!=='pen' && o.id!=='coop'){ // 擋住整個建築圖的範圍（含後面），萌獸才不會走到屋頂上
+    if(o.id!=='pen' && o.id!=='coop'){ // 擋住整個建築圖的範圍（含後面），寵物才不會走到屋頂上
       const hh=o.w*(SKIN_PART[o.id] ? (SKIN_R[skinImg(o.id)]||1.1) : (RATIO[o.img]||1))*o.foot;
       addObst(o.c[0],o.c[1],o.w*0.52,hh/2+16,-hh/2+8); }
     const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
@@ -820,9 +826,13 @@ function buildWorld(){
     if(o.id==='home'){ const [x,y]=iso(gx,gy), top=y-h*o.foot; s += `<circle class="smoke" cx="${x+o.w*0.24}" cy="${top+h*0.02}" r="6" fill="#fff" opacity=".75"/><circle class="smoke" style="animation-delay:1.5s" cx="${x+o.w*0.26}" cy="${top}" r="5" fill="#fff" opacity=".75"/>`; }
     if(o.id==='coop'){ // 牧場：乾草車不接受點擊（避免擋到農田），改成點牧場草地
       ground += `<g class="tap" data-b="coop"><polygon points="${P(dia(RX,RY,RW,RD))}" fill="rgba(0,0,0,0)"/></g>`;
+    } else if(o.id==='pen'){ // 寵物園圖很大：只有地面那一圈可以點，才不會蓋到上面的商店
+      const [x,y]=iso(gx,gy);
+      objs.push({depth:gx+gy, svg:`<g class="tap" data-b="pen"><g style="pointer-events:none">${s}</g><ellipse cx="${x.toFixed(1)}" cy="${(y-h*0.1).toFixed(1)}" rx="${(o.w*0.44).toFixed(1)}" ry="${(o.w*0.2).toFixed(1)}" fill="rgba(0,0,0,0)"/></g>`});
     } else objs.push({depth:gx+gy, svg:`<g class="tap" data-b="${o.id}">${s}</g>`});
     const [lx,ly]=iso(gx,gy);
-    lab += labelPill(lx, ly - (o.id==='coop'?20:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
+    if(o.id==='home') lab += labelPill(lx, ly - h*0.12, '🏠 我的家', {big:1});  // 放在大門前面，不會被上方玩家欄擋住
+    else lab += labelPill(lx, ly - (o.id==='coop'?20:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
   });
 
   // 裝飾（萌獸星球素材）
@@ -1206,9 +1216,9 @@ function openHelp(){
     <p>作物成熟後要快點收，不然會被好友偷走喔！誰偷了你的菜，都會記在「動態」裡。</p>
     <h4>🐔 牧場</h4>
     <p>Lv3 開放。在牧場買小雞、小鴨、綿羊、乳牛、小豬，用倉庫裡的作物餵牠們，過一段時間就會產出雞蛋、牛奶、羊毛等，收成後到穀倉賣錢。好友可以來偷、幫忙餵食和拍蚊子，惡作劇的人會放蚊子讓產量變少。</p>
-    <h4>🐾 萌獸夥伴</h4>
-    <p>在「我的家」選一隻萌獸當夥伴，牠會在農場走來走去，你收成澆水時牠會跑過去幫忙。</p>
-    <p>萌獸身上有 <b>1 格裝備欄</b>，插上裝備就會幫你自動做事：自動澆水、自動播種、自動除蟲、自動除草、自動剷除、自動收成、看門狗（趕走小偷）、稻草人（擋下惡作劇）。裝備可以在商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物。</p>
+    <h4>🐾 寵物夥伴</h4>
+    <p>在「我的家」選一隻寵物當夥伴，牠會在農場走來走去，你收成澆水時牠會跑過去幫忙。</p>
+    <p>寵物身上有 <b>1 格裝備欄</b>，插上裝備就會幫你自動做事：自動澆水、自動播種、自動除蟲、自動除草、自動剷除、自動收成、看門狗（趕走小偷）、稻草人（擋下惡作劇）。裝備可以在商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物。</p>
     <h4>🏆 排行榜</h4>
     <p>依等級排名，同等級再比經驗。可以看好友排行和全服前 50 名。</p></div>`,
     [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); }catch(e){} tut={step:0}; tutRender(); }],['知道了','',closeModal]]);
@@ -1264,7 +1274,7 @@ function openGemShop(t){
     body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard"><div class="bonus">首儲 ×2</div><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">${p.name}${p.extra?`・${p.extra}`:''}</div><div class="price">NT$${p.price}</div></div>`).join('')}</div>`;
     body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center">每個方案第一次購買，鑽石加倍送</div>`;
   } else {
-    body += `<button class="btn" id="gGear" style="width:100%;margin:2px 0 10px;background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">🐾 萌獸高級裝備（可以用鑽石買）</button>`;
+    body += `<button class="btn" id="gGear" style="width:100%;margin:2px 0 10px;background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">🐾 寵物高級裝備（可以用鑽石買）</button>`;
     body += GEM_ITEMS.map(x=>`<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${x.icon}</div><div class="tx"><b>${x.name}</b><div>${x.desc}</div></div><span class="lock">💎${x.gems}</span></div>`).join('');
   }
   modal(`鑽石商店　<span style="font-size:14px;color:#5B4ED6">💎 ${(S.me.gems||0).toLocaleString()}</span>`, tabs + body);
@@ -1272,15 +1282,15 @@ function openGemShop(t){
   if($('gGear')) $('gGear').onclick=()=>openGearShop('gem');
 }
 
-/* ================= 萌獸進化與裝備 ================= */
+/* ================= 寵物進化與裝備 ================= */
 let GEAR = {}, GEAR_LIST = [], EVO = [10,20];
 const GEAR_FUNC = {plant:['自動播種','🌱'], water:['自動澆水','💧'], dog:['看門狗','🐶'], bug:['自動除蟲','🐛'],
-  weed:['自動除草','🌿'], clear:['自動剷除','🔥'], harvest:['自動收成','🧺'], scare:['稻草人','🎃']};
+  weed:['自動除草','🌿'], feed:['自動餵食','🥕'], clear:['自動餵食','🥕'], harvest:['自動收成','🧺'], scare:['稻草人','🎃']};
 const ROMAN = ['','I','II','III','IV'];
 function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
   return ({plant:`空地自動種下你指定的種子（第 1～${v} 塊地）`, water:`土乾了自動澆水（第 1～${v} 塊地）`,
     dog:`小偷來偷菜時 ${pc}% 被趕走`, bug:`蟲一出現 ${pc}% 自動除掉`, weed:`雜草一長出 ${pc}% 自動拔掉`,
-    clear:`收成後自動整地（第 1～${v} 塊地）`, harvest:`作物成熟 ${v} 分鐘後自動收成，小偷來不及偷`,
+    feed:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, clear:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, harvest:`作物和牧場產品好了 ${v} 分鐘後自動收，小偷來不及偷`,
     scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
 function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
   if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
@@ -1291,19 +1301,18 @@ const chrName = key => { const c=chrInfo(key); return (CHR_NAMES[c.sp]||[])[c.st
 const gearImg = (g, sz=40) => g ? `<img src="${A(g.icon)}" style="width:${sz}px;height:${sz}px;object-fit:contain" alt="">` : '';
 const gearTitle = g => `${g.name} ${ROMAN[g.tier]}`;
 
-/* 我的萌獸面板（我的家裡） */
+/* 我的寵物面板（我的家裡） */
 function beastPanelHTML(){
   const me=S.me, key=chrKey(me.chara, me.lv), st=chrStage(me.lv), g=GEAR[partyOf(me)[0].g];
   const next = `👑 隊長・夥伴 ${partyOf(me).length}/${me.party_cap||1} 隻`;
   return `<div class="beast">
     <div class="bimg"><img src="${chrSrc(key)}" alt=""></div>
     <div class="binfo"><b>${chrName(key)}</b><div class="bnext">${next}</div>
-      <button class="gslot" id="hGear">${g?gearImg(g,34):'<span class="plus">＋</span>'}<span><b>${g?gearTitle(g):'裝備欄（空）'}</b><small>${g?`${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}`:'點這裡插上裝備，萌獸會幫你自動做事'}</small></span></button>
+      <button class="gslot" id="hGear">${g?gearImg(g,34):'<span class="plus">＋</span>'}<span><b>${g?gearTitle(g):'裝備欄（空）'}</b><small>${g?`${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}`:'點這裡插上裝備，寵物會幫你自動做事'}</small></span></button>
     </div></div>
-    <div class="homebtns"><button class="btn sub" id="hCh">🐾 夥伴隊伍</button><button class="btn o" id="hGshop">🛒 買裝備</button></div>
-    <div class="homebtns"><button class="btn" id="hSkin" style="background:#FF8FB1;box-shadow:0 3px 0 #D9628A">🏠 建築外觀</button></div>`;
+    <div class="homebtns"><button class="btn sub" id="hCh">🐾 夥伴隊伍</button><button class="btn o" id="hBag">🎒 背包</button></div>`;
 }
-function bindBeastPanel(){ $('hSkin').onclick=()=>openSkinShop(); $('hGear').onclick=()=>openGearBag(0); $('hCh').onclick=()=>openBeastPark('mine'); $('hGshop').onclick=()=>openGearShop(); }
+function bindBeastPanel(){ $('hGear').onclick=()=>openGearBag(0); $('hCh').onclick=()=>openBeastPark('mine'); $('hBag').onclick=()=>openPack(); }
 
 /* 裝備背包 */
 function openGearBag(slot){
@@ -1320,7 +1329,7 @@ function openGearBag(slot){
   body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span><div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
       ${mem.g===g.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">裝備中</span>':`<button class="mini" data-eq="${g.id}">${(used[g.id]||0)>=n?'換過來':'插上'}</button>`}</div>`).join('')
     : `<div class="empty">還沒有裝備<br><small>可以在商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
-  modal('萌獸裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
+  modal('寵物裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
   const md=$('md');
   md.querySelectorAll('[data-eq]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.eq, n=(me.gear||{})[id]||0;
     // 數量不夠就從別隻夥伴身上拿過來
@@ -1386,7 +1395,7 @@ function checkEvolve(){
 
 /* ================= 建築外觀商店 ================= */
 let SKINS = [], skinTab = 'home';
-const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'萌獸園', decor:'裝飾店'};
+const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'寵物園', decor:'裝飾店'};
 function openSkinShop(t){
   if(mode==='visit') return toast('回到自己的農場才能換外觀');
   if(t) skinTab=t;
@@ -1576,7 +1585,7 @@ function renderDecor(force){
     const bad = EDIT && !decorOK(d.x,d.y), sel = EDIT && EDIT.sel===i;
     const img = `<image href="${A('dc_'+d.i)}" x="${(x-w/2).toFixed(1)}" y="${(y-h*0.85).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"${d.f?` transform="translate(${2*x} 0) scale(-1 1)"`:''}/>`;
     return `<g data-di="${i}" class="dec${sel?' sel':''}${bad?' bad':''}">${sel?`<ellipse cx="${x}" cy="${y}" rx="${w*0.5}" ry="${w*0.22}" fill="${bad?'rgba(242,84,91,.35)':'rgba(255,255,255,.45)'}" stroke="${bad?'#F2545B':'#3BB273'}" stroke-width="3" stroke-dasharray="8 5"/>`:''}${img}</g>`; }).join('');
-  // 萌獸繞開裝飾
+  // 寵物繞開裝飾
   OBST = OBST_FIXED.concat(list.map(d=>{ const w=decW(d.i), [x,y]=iso(d.x,d.y); return [x, y-w*0.06, w*0.4, w*0.2]; }));
 }
 
@@ -1679,7 +1688,7 @@ function bindDecorLayer(){
   $('map').addEventListener('click', e=>{ if(EDIT && !e.target.closest('[data-di]') && EDIT.sel>=0){ EDIT.sel=-1; renderDecor(true); renderEditBar(); } });
 }
 
-/* ================= 萌獸園：我的萌獸＋圖鑑 ================= */
+/* ================= 寵物園：我的寵物＋圖鑑 ================= */
 let BEASTS = [], BST = {}, parkTab = 'mine';
 function setBeastConfig(list){ if(list){ BEASTS=list; BST={}; list.forEach(b=>BST[b.id]=b); } }
 const ownedBeasts = o => Object.keys((o && o.beasts) || {});
@@ -1689,16 +1698,16 @@ const fmtDate = ms => { if(!ms) return '一開始就在'; const d=new Date(+ms);
 function openBeastPark(t){
   if(t) parkTab=t;
   const visit = mode==='visit' && V, who = visit ? V.owner : S.me, own = who.beasts || {};
-  const tabs = `<div class="tabs"><button data-pt="mine" class="${parkTab==='mine'?'on':''}">${visit?'牠的萌獸':'我的萌獸'}（${ownedBeasts(who).length}）</button><button data-pt="dex" class="${parkTab==='dex'?'on':''}">圖鑑 ${ownedBeasts(who).length}/${BEASTS.length}</button></div>`;
+  const tabs = `<div class="tabs"><button data-pt="mine" class="${parkTab==='mine'?'on':''}">${visit?'牠的寵物':'我的寵物'}（${ownedBeasts(who).length}）</button><button data-pt="dex" class="${parkTab==='dex'?'on':''}">圖鑑 ${ownedBeasts(who).length}/${BEASTS.length}</button></div>`;
   let body = tabs;
   if(parkTab==='mine'){
     const pt=partyOf(who), inP=sp=>pt.findIndex(p=>p.s===sp), cap=visit?6:(who.party_cap||1);
     body += `<div class="sec">${visit?'牠的夥伴':`我的夥伴（${pt.length}/${cap}）`}</div>` + partyRowHTML(who, !visit);
     if(!visit) body += `<div class="rhint">👑 隊長會跑去幫你收成、澆水。每隻夥伴都能插一件裝備（點橘色「＋裝備」），同種功能取最強的那件。</div>`;
     const list = BEASTS.filter(b=>own[b.id]!=null);
-    body += `<div class="sec">全部萌獸</div><div class="bgrid">${list.map(b=>{ const k=inP(b.id);
+    body += `<div class="sec">全部寵物</div><div class="bgrid">${list.map(b=>{ const k=inP(b.id);
       let btn='';
-      if(visit) btn = k>=0 ? '<span class="tag" style="background:#E8F8EE;color:#2E9660">夥伴</span>' : '<span class="tag">在萌獸園玩</span>';
+      if(visit) btn = k>=0 ? '<span class="tag" style="background:#E8F8EE;color:#2E9660">夥伴</span>' : '<span class="tag">在寵物園玩</span>';
       else if(k===0) btn='<span class="tag" style="background:#FFF1DC;color:#C77A1E">👑 隊長</span>';
       else if(k>0) btn=`<div style="display:flex;gap:4px"><button class="mini o" data-lead="${b.id}">隊長</button><button class="mini sub" data-off="${b.id}">下場</button></div>`;
       else btn=`<button class="mini" data-on="${b.id}" ${pt.length>=cap?'disabled':''}>上場</button>`;
@@ -1707,25 +1716,25 @@ function openBeastPark(t){
     body += `<div class="bgrid">${BEASTS.map(b=>{ const has=own[b.id]!=null, lock=!visit && S.me.lv<b.lv;
       const cost = b.gold!=null ? `${b.gold.toLocaleString()} 金` : `💎${b.gems}`;
       const poor = !visit && (b.gold!=null ? S.me.gold<b.gold : (S.me.gems||0)<b.gems);
-      return `<div class="bcard${has?'':' dark'}"><img src="${chrSrc(b.id+'1')}" alt=""><b>${bName(b.id)}</b><small>${has?fmtDate(own[b.id]):(b.gems!=null?'✨ 稀有萌獸':'還沒擁有')}</small>
+      return `<div class="bcard${has?'':' dark'}"><img src="${chrSrc(b.id+'1')}" alt=""><b>${bName(b.id)}</b><small>${has?fmtDate(own[b.id]):(b.gems!=null?'✨ 稀有寵物':'還沒擁有')}</small>
         ${has?'<span class="tag" style="background:#E8F8EE;color:#2E9660">已擁有</span>':visit?'':lock?`<span class="lock">Lv${b.lv} 解鎖</span>`:`<button class="mini ${b.gems!=null?'gem':''}" data-bb="${b.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('')}</div>`;
   }
-  modal(visit ? `${esc(V.owner.nickname)} 的萌獸園` : '萌獸園', body);
+  modal(visit ? `${esc(V.owner.nickname)} 的寵物園` : '寵物園', body);
   const md=$('md');
   md.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>openBeastPark(b.dataset.pt));
   const pt0 = () => JSON.parse(JSON.stringify(partyOf(S.me)));
   md.querySelectorAll('[data-on]').forEach(b=>b.onclick=async()=>{ const pt=pt0(); pt.push({s:b.dataset.on,g:null}); await saveParty(pt, `${bName(b.dataset.on)} 上場了！`); openBeastPark('mine'); });
-  md.querySelectorAll('[data-off]').forEach(b=>b.onclick=async()=>{ const pt=pt0().filter(p=>p.s!==b.dataset.off); await saveParty(pt, `${bName(b.dataset.off)} 回萌獸園玩了`); openBeastPark('mine'); });
+  md.querySelectorAll('[data-off]').forEach(b=>b.onclick=async()=>{ const pt=pt0().filter(p=>p.s!==b.dataset.off); await saveParty(pt, `${bName(b.dataset.off)} 回寵物園玩了`); openBeastPark('mine'); });
   md.querySelectorAll('[data-lead]').forEach(b=>b.onclick=async()=>{ const pt=pt0(), i=pt.findIndex(p=>p.s===b.dataset.lead); const [m]=pt.splice(i,1); pt.unshift(m); await saveParty(pt, `${bName(m.s)} 當上隊長！`); openBeastPark('mine'); });
   md.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>openGearBag(+b.dataset.pg));
   md.querySelectorAll('[data-bb]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.bb;
     try{ applyState(await rpc('farm_buy_beast',{p_id:id})); refresh(); fxConfetti(); sfx('lvup');
-      modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">已經住進萌獸園了</div></div>`,
+      modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">已經住進寵物園了</div></div>`,
         [['上場當夥伴','',async()=>{ const pt=JSON.parse(JSON.stringify(partyOf(S.me))); if(pt.length>=(S.me.party_cap||1)) return toast('夥伴格子滿了，先讓一隻下場'); pt.push({s:id,g:null}); await saveParty(pt, `${bName(id)} 上場了！`); closeModal(); }],['繼續看圖鑑','sub',()=>openBeastPark('dex')]]);
     }catch(e){ toast(e.message); } });
 }
 
-/* 萌獸園裡玩的萌獸（不是夥伴的那些） */
+/* 寵物園裡玩的寵物（不是夥伴的那些） */
 let parkMovers = [], parkSig = '', PARK = null;
 function syncParkMovers(){
   if(!PARK) return;
@@ -1880,7 +1889,7 @@ function toneFxLoop(now){
 }
 
 /* ================= 商店（裝飾、外觀、色調、裝備都在這裡） ================= */
-const SHOP_TABS = [['decor','🎨 裝飾'],['mine','📦 我的裝飾'],['skin','🏠 建築外觀'],['tone','🌈 城鎮色調'],['gear','🐾 萌獸裝備']];
+const SHOP_TABS = [['decor','🎨 裝飾'],['skin','🏠 建築外觀'],['tone','🌈 城鎮色調'],['gear','🐾 寵物裝備']];
 const shopTitle = () => `商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`;
 const shopNav = cur => `<div class="snav">${SHOP_TABS.map(([k,n])=>`<button data-snav="${k}" class="${k===cur?'on':''}">${n}</button>`).join('')}</div>`;
 function bindShopNav(){ document.querySelectorAll('[data-snav]').forEach(b=>b.onclick=()=>openShopTab(b.dataset.snav)); }
@@ -1907,6 +1916,53 @@ function openToneShop(){
     if(f.post) d.insertAdjacentHTML('beforeend',`<i style="position:absolute;inset:0;background:${f.post[1]};opacity:${f.post[2]};mix-blend-mode:${f.post[0]}"></i>`); });
   md.querySelectorAll('[data-tuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_tone',{p_id:b.dataset.tuse})); refresh(); sfx('coin'); openToneShop(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-tbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_tone',{p_id:b.dataset.tbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('色調已套用！'); openToneShop(); }catch(e){ toast(e.message); } });
+}
+/* ================= 背包：商店買到的東西都分類放在這裡 ================= */
+const BAG_TABS = [['gear','🐾 寵物裝備'],['decor','🎨 裝飾'],['skin','🏠 建築外觀'],['tone','🌈 城鎮色調']];
+let bagTab = 'gear';
+function openPack(t){
+  if(mode==='visit') return toast('回到自己的農場才能打開背包');
+  if(t) bagTab=t;
+  const me=S.me;
+  let body = `<div class="snav">${BAG_TABS.map(([k,n])=>`<button data-bag="${k}" class="${k===bagTab?'on':''}">${n}</button>`).join('')}</div>`;
+  if(bagTab==='gear'){
+    const pt=partyOf(me), used={}; pt.forEach((p,i)=>{ if(p.g) (used[p.g]=used[p.g]||[]).push(i); });
+    const own=Object.entries(me.gear||{}).filter(([id,n])=>n>0&&GEAR[id]).map(([id,n])=>[GEAR[id],n]).sort((a,b)=>GEAR_LIST.indexOf(a[0])-GEAR_LIST.indexOf(b[0]));
+    body += own.length ? own.map(([g,n])=>{ const on=(used[g.id]||[]).map(i=>bName(pt[i].s)).join('、');
+      return `<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span>${on?` <span class="tag" style="background:#E8F8EE;color:#2E9660">${esc(on)} 裝備中</span>`:''}<div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div></div>`; }).join('')
+      : `<div class="empty">還沒有裝備<br><small>可以在商店買、收成時撿到寶箱，或升級領禮物</small></div>`;
+    body += `<div class="rhint" style="text-align:center;margin-top:8px">到「夥伴隊伍」點寵物下面的裝備格就能插上</div>`;
+  } else if(bagTab==='decor'){
+    const inv=me.decor_inv||{}, placed={}; (me.decor_place||[]).forEach(d=>placed[d.i]=(placed[d.i]||0)+1);
+    const own=DECOR.filter(d=>(inv[d.id]||0)>0);
+    body += own.length ? own.map(d=>`<div class="row"><div class="ic"><img src="${A('dc_'+d.id)}" style="width:44px;height:44px;object-fit:contain" alt=""></div>
+        <div class="tx"><b>${esc(d.name)}</b> <span class="tag">擺了 ${placed[d.id]||0}/${inv[d.id]}</span>${d.bonus?`<div style="color:#7B6CF6">${bonusTxt(d)}</div>`:''}</div>
+        <button class="mini" data-pd="${d.id}" ${(placed[d.id]||0)>=inv[d.id]?'disabled':''}>擺放</button></div>`).join('')
+      : `<div class="empty">還沒有裝飾，去商店買一些吧！</div>`;
+  } else if(bagTab==='skin'){
+    const owned=me.skins||{}, on=me.skin_on||{};
+    body += Object.keys(SKIN_BLD).map(b=>{ const cur=on[b]||SKIN_DEF[b];
+      const styles=[SKIN_DEF[b], ...SKINS.filter(x=>x.bld===b && owned[b+'_'+x.style]).map(x=>x.style)];
+      return `<div class="sec">${SKIN_BLD[b]}</div><div class="skgrid">${styles.map(st=>{ const def=st===SKIN_DEF[b], k=SKINS.find(x=>x.bld===b&&x.style===st);
+        return `<div class="skcard${st===cur?' on':''}"><img src="${A('th_'+st+'_'+SKIN_PART[b])}" alt=""><b>${def?'預設':(k?k.name:SKIN_NAME[st])}</b>
+          ${st===cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':`<button class="mini" data-sk="${b}|${def?'def':st}">套用</button>`}</div>`; }).join('')}</div>`; }).join('');
+  } else {
+    const own=me.tones||{}, cur=me.tone||'spring';
+    const list=TONES.filter(t=>t.id==='spring'||own[t.id]);
+    body += `<div class="skgrid">${list.map(t=>{ const fx=TONE_FX[t.id]||TONE_FX.spring;
+      return `<div class="skcard${t.id===cur?' on':''}"><div class="tsw" data-tpv="${t.id}" style="background:linear-gradient(${fx.sky[0]},${fx.sky[1]} 60%,${fx.sky[2]})"><img alt="" src="${A('home_island')}"><span>${TONE_ICON[fx.fx]||'🌼'}</span></div><b>${esc(t.name)}</b>
+        ${t.id===cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':`<button class="mini" data-tu="${t.id}">套用</button>`}</div>`; }).join('')}</div>`;
+  }
+  modal('🎒 背包', body, [['🛒 去商店','o',()=>openShopTab(bagTab==='gear'?'gear':bagTab)]]);
+  const md=$('md');
+  md.querySelectorAll('[data-bag]').forEach(b=>b.onclick=()=>openPack(b.dataset.bag));
+  md.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>enterDecorEdit(b.dataset.pd));
+  md.querySelectorAll('[data-sk]').forEach(b=>b.onclick=async()=>{ const [bld,st]=b.dataset.sk.split('|');
+    try{ applyState(await rpc('farm_set_skin',{p_bld:bld,p_style:st})); refresh(); sfx('coin'); openPack(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-tu]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_tone',{p_id:b.dataset.tu})); refresh(); sfx('coin'); openPack(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-tpv]').forEach(d=>{ const im=d.querySelector('img'), f=TONE_FX[d.dataset.tpv]||{};
+    tonedURL(A('home_island'),d.dataset.tpv).then(u=>{ im.src=u; });
+    if(f.post) d.insertAdjacentHTML('beforeend',`<i style="position:absolute;inset:0;background:${f.post[1]};opacity:${f.post[2]};mix-blend-mode:${f.post[0]}"></i>`); });
 }
 
 /* ================= 連線設定 ================= */
@@ -2029,7 +2085,7 @@ async function act(i){
     return toast(`${c.name}：約 ${fmt(leftSec(p))} 後成熟${issues?'｜'+issues:''}`);
   }
   if(tool==='seed'){
-    if(p.s!=='empty') return toast(p.s==='dead'?'先用鏟子剷除枯萎的作物':'這塊地已經種了東西');
+    if(p.s!=='empty') return toast('這塊地已經種了東西');
     if(!(S.me.seeds[ui.seed]>0)) return openSeedPicker(i);
     return plant(i, ui.seed);
   }
@@ -2135,7 +2191,7 @@ function openShop(){
       <div>成熟 ${dur(c.time)}・收成 ${c.yield}×${c.price} 金 = ${c.yield*c.price} 金</div></div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">${btn}</div></div>`;
   }).join('');
-  modal(`種子商店　<span style="font-size:14px;color:var(--ink2)">金幣 ${me.gold}</span>`, body, [['🐾 萌獸裝備','o',()=>openGearShop('gold')]]);
+  modal(`種子商店　<span style="font-size:14px;color:var(--ink2)">金幣 ${me.gold}</span>`, body, [['🐾 寵物裝備','o',()=>openGearShop('gold')]]);
   $('md').querySelectorAll('[data-buy]').forEach(b=>b.onclick=async()=>{
     const c = CROP[b.dataset.buy], n = +b.dataset.n;
     const r = await doAct('buy', null, c.id, n);
@@ -2170,7 +2226,7 @@ async function openHome(){
   if(mode==='visit') return toast('這是好友的家喔');
   const {data:{user}} = await sb.auth.getUser();
   modal('我的家', `
-    <div class="sec">我的萌獸</div>${beastPanelHTML()}
+    <div class="sec">我的寵物</div>${beastPanelHTML()}
     <div class="sec">玩家</div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
