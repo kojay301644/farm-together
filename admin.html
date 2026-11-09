@@ -45,6 +45,10 @@ textarea{width:100%;min-height:90px}
 .plot{background:var(--bg);border-radius:8px;padding:6px;font-size:12px;text-align:center}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#3A3226;color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;opacity:0;transition:.2s;pointer-events:none;z-index:20}
 .toast.show{opacity:1}
+.savebar{position:sticky;top:52px;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#FFFDF6;border:2px solid #E6D9C3;border-radius:12px;padding:8px 12px;margin-bottom:12px;font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.06)}
+#saveAll.hot{background:#F2994A;box-shadow:0 0 0 3px rgba(242,153,74,.3)}
+tr[data-dirty] td{background:#FFF4CC}.card[data-dirty]{outline:3px solid #FFD66B}
+button.ok{background:#3BB273!important;color:#fff!important}button.bad{background:#E5484D!important;color:#fff!important}
 .center{min-height:80vh;display:flex;align-items:center;justify-content:center}
 .login{background:#fff;padding:26px;border-radius:16px;width:340px;text-align:center}
 .login input{width:100%;margin-bottom:10px}
@@ -174,10 +178,33 @@ async function pageNt(){
   document.querySelectorAll('[data-tg]').forEach(b=>b.onclick=async()=>{ const n=L.find(x=>x.id==b.dataset.tg); try{ await rpc('adm_notice_save',{p_id:n.id,p_title:n.title,p_body:n.body,p_active:b.dataset.a==='1'}); pageNt(); }catch(e){ toast(e.message); } });
 }
 
+
+/* 儲存按鈕：按了一定有回饋（儲存中 → ✓ 已儲存／✗ 失敗），改過沒存的那列會變黃 */
+function rowOf(b){ return b.closest('tr') && !b.dataset.sign ? b.closest('tr') : b.closest('.card'); }
+function updDirty(){ const n=document.querySelectorAll('#main [data-dirty]').length, el=$('dirtyN'); if(el) el.textContent = n ? `有 ${n} 項修改還沒儲存` : '沒有未儲存的修改'; const sa=$('saveAll'); if(sa) sa.classList.toggle('hot', n>0); }
+async function runSave(b, quiet){
+  const old=b.dataset.lbl||(b.dataset.lbl=b.textContent); b.disabled=true; b.textContent='儲存中…'; b.classList.remove('ok','bad');
+  try{ await b._save(); b.textContent='✓ 已儲存'; b.classList.add('ok'); const r=rowOf(b); if(r){ r.removeAttribute('data-dirty'); r.querySelectorAll('[data-dirty]').forEach(x=>x.removeAttribute('data-dirty')); } if(!quiet) toast('已儲存'); return true; }
+  catch(e){ b.textContent='✗ 失敗'; b.classList.add('bad'); toast('儲存失敗：'+e.message); return false; }
+  finally{ b.disabled=false; updDirty(); setTimeout(()=>{ if(!b.disabled){ b.textContent=b.dataset.lbl; b.classList.remove('ok','bad'); } }, 2000); }
+}
+function wireSaves(){
+  const btns=[...document.querySelectorAll('#main button')].filter(b=>b._save);
+  btns.forEach(b=>b.onclick=()=>runSave(b));
+  document.querySelectorAll('#main input, #main select, #main textarea').forEach(inp=>inp.addEventListener('input',()=>{ const r=inp.closest('[data-signrow]') ? inp.closest('.card') : (inp.closest('tr')||inp.closest('.card')); if(r) r.setAttribute('data-dirty','1'); updDirty(); }));
+  if($('saveAll')) $('saveAll').onclick=async()=>{
+    const todo=btns.filter(b=>{ const r=rowOf(b); return r && r.hasAttribute('data-dirty'); });
+    if(!todo.length) return toast('沒有要儲存的修改');
+    $('saveAll').disabled=true; let ok=0, bad=0;
+    for(const b of todo){ (await runSave(b, true)) ? ok++ : bad++; }
+    $('saveAll').disabled=false; toast(bad ? `儲存完成 ${ok} 項，失敗 ${bad} 項（紅色那幾列）` : `全部儲存好了（${ok} 項）`); };
+  updDirty();
+}
+
 /* 遊戲數值 */
 async function pageCf(){
-  const C = await rpc('adm_config');
-  M(`<div class="card"><h2>玩法設定</h2><table>${C.settings.filter(s=>!/^(ev_|maint_|bot_last_run|evo_)/.test(s.key)).map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
+  const C = await rpc('adm_config'), SIGN=((C.settings||[]).find(x=>x.key==='sign_rw')||{}).value||[];
+  M(`<div class="savebar"><span id="dirtyN">沒有未儲存的修改</span><button class="btn" id="saveAll">💾 全部儲存</button></div><div class="card"><h2>玩法設定</h2><table>${C.settings.filter(s=>typeof s.value==='number' && !/^(ev_|maint_|bot_last_run|evo_)/.test(s.key)).map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>作物數值</h2><div class="muted" style="margin-bottom:8px">成熟時間單位是「秒」。改完按該列的儲存，玩家重新整理後就會套用。</div>
     <table><tr><th>作物</th><th>解鎖等級</th><th>種子價</th><th>成熟秒數</th><th>收成數</th><th>單價</th><th>經驗</th><th></th></tr>
     ${C.crops.map(c=>`<tr><td><b>${esc(c.name)}</b></td>${['lv','seed','grow_sec','yield','price','exp'].map(f=>`<td><input class="num" id="c_${c.id}_${f}" type="number" value="${c[f]}"></td>`).join('')}<td><button class="btn" data-cid="${c.id}">儲存</button></td></tr>`).join('')}</table></div>
@@ -205,24 +232,35 @@ async function pageCf(){
     <div class="card"><h2>建築外觀</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；兩個都留空＝不能購買。</div>
     <table><tr><th>外觀</th><th>建築</th><th>名稱</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.skins||[]).map(k=>`<tr><td><img src="assets/th_${k.style}_${({home:'academy',barn:'farm',shop:'shop',fountain:'fountain',pen:'play',decor:'forge'})[k.bld]}.webp" style="width:40px;height:40px;object-fit:contain"></td><td>${({home:'我的家',barn:'穀倉',shop:'種子商店',fountain:'噴水池',pen:'寵物園',decor:'裝飾店'})[k.bld]}</td>
-      <td><input id="k_${k.id}_name" value="${esc(k.name)}" style="width:6em"></td><td><input class="num" id="k_${k.id}_gold" type="number" value="${k.gold??''}"></td><td><input class="num" id="k_${k.id}_gems" type="number" value="${k.gems??''}"></td><td><button class="btn" data-kid="${k.id}">儲存</button></td></tr>`).join('')}</table></div>`);
-  document.querySelectorAll('[data-sk]').forEach(b=>b.onclick=async()=>{ try{ await rpc('adm_setting_set',{p_key:b.dataset.sk,p_value:+$('s_'+b.dataset.sk).value}); toast('已儲存'); }catch(e){ toast(e.message); } });
-  document.querySelectorAll('[data-cid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.cid, v=f=>+$(`c_${id}_${f}`).value;
-    try{ await rpc('adm_crop_save',{p_id:id,p_seed:v('seed'),p_grow_sec:v('grow_sec'),p_yield:v('yield'),p_price:v('price'),p_exp:v('exp'),p_lv:v('lv')}); toast('已儲存'); }catch(e){ toast(e.message); } });
-  document.querySelectorAll('[data-aid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.aid, v=f=>+$(`a_${id}_${f}`).value;
-    try{ await rpc('adm_animal_save',{p_id:id,p_lv:v('lv'),p_price:v('price'),p_feed:v('feed'),p_prod_sec:v('prod_sec'),p_yield:v('yield'),p_good_price:v('good_price'),p_exp:v('exp')}); toast('已儲存'); }catch(e){ toast(e.message); } });
-  document.querySelectorAll('[data-bid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.bid, v=f=>$(`b_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
-    try{ await rpc('adm_beast_save',{p_id:id,p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv')}); toast('已儲存'); }catch(e){ toast(e.message); } });
-  document.querySelectorAll('[data-tid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.tid, v=f=>$(`t_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
-    try{ await rpc('adm_tone_save',{p_id:id,p_gold:n('gold'),p_gems:n('gems')}); toast('已儲存'); }catch(e){ toast(e.message); } });
-  document.querySelectorAll('[data-did]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.did, v=f=>$(`d_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
-    try{ await rpc('adm_decor_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv'),p_bonus_val:+v('bv')||0}); toast('已儲存'); }catch(e){ toast(e.message); } });
-  document.querySelectorAll('[data-kid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.kid, v=f=>$(`k_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
-    try{ await rpc('adm_skin_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems')}); toast('已儲存'); }catch(e){ toast(e.message); } });
-  document.querySelectorAll('[data-gid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.gid, v=f=>$(`g_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
-    try{ await rpc('adm_gear_save',{p_id:id,p_name:v('name'),p_val:+v('val'),p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv')}); toast('已儲存'); }catch(e){ toast(e.message); } });
-  document.querySelectorAll('[data-li]').forEach(b=>b.onclick=async()=>{ const i=b.dataset.li;
-    try{ await rpc('adm_land_save',{p_idx:+i,p_lv:+$(`l_${i}_lv`).value,p_cost:+$(`l_${i}_cost`).value}); toast('已儲存'); }catch(e){ toast(e.message); } });
+      <td><input id="k_${k.id}_name" value="${esc(k.name)}" style="width:6em"></td><td><input class="num" id="k_${k.id}_gold" type="number" value="${k.gold??''}"></td><td><input class="num" id="k_${k.id}_gems" type="number" value="${k.gems??''}"></td><td><button class="btn" data-kid="${k.id}">儲存</button></td></tr>`).join('')}</table></div>
+    <div class="card"><h2>每日簽到獎勵</h2><div class="muted" style="margin-bottom:8px">連續簽到第 1～7 天各送什麼，不送就留空或填 0。</div>
+    <table><tr><th>天數</th><th>金幣</th><th>鑽石</th></tr>${[0,1,2,3,4,5,6].map(i=>{ const r=(SIGN[i]||{}); return `<tr data-signrow><td><b>第 ${i+1} 天</b></td><td><input class="num" id="sg_${i}_gold" type="number" value="${r.gold??''}"></td><td><input class="num" id="sg_${i}_gems" type="number" value="${r.gems??''}"></td></tr>`; }).join('')}
+    <tr><td></td><td colspan="2"><button class="btn" data-sign="1">儲存簽到獎勵</button></td></tr></table></div>
+    <div class="card"><h2>寵物造型</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；兩個都留空＝不能購買。</div>
+    <table><tr><th>造型</th><th>名稱</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
+    ${(C.pet_skins||[]).map(k=>`<tr><td><img src="assets/ps_${k.beast}_${k.kind}.webp" style="width:40px;height:40px;object-fit:contain"></td><td><input id="ps_${k.id.replace('@','_')}_name" value="${esc(k.name)}" style="width:8em"></td><td><input class="num" id="ps_${k.id.replace('@','_')}_gold" type="number" value="${k.gold??''}"></td><td><input class="num" id="ps_${k.id.replace('@','_')}_gems" type="number" value="${k.gems??''}"></td><td><button class="btn" data-psid="${k.id}">儲存</button></td></tr>`).join('')}</table></div>`);
+  document.querySelectorAll('[data-sk]').forEach(b=>b._save=async()=>{ await rpc('adm_setting_set',{p_key:b.dataset.sk,p_value:+$('s_'+b.dataset.sk).value}); });
+  document.querySelectorAll('[data-cid]').forEach(b=>b._save=async()=>{ const id=b.dataset.cid, v=f=>+$(`c_${id}_${f}`).value;
+    await rpc('adm_crop_save',{p_id:id,p_seed:v('seed'),p_grow_sec:v('grow_sec'),p_yield:v('yield'),p_price:v('price'),p_exp:v('exp'),p_lv:v('lv')}); });
+  document.querySelectorAll('[data-aid]').forEach(b=>b._save=async()=>{ const id=b.dataset.aid, v=f=>+$(`a_${id}_${f}`).value;
+    await rpc('adm_animal_save',{p_id:id,p_lv:v('lv'),p_price:v('price'),p_feed:v('feed'),p_prod_sec:v('prod_sec'),p_yield:v('yield'),p_good_price:v('good_price'),p_exp:v('exp')}); });
+  document.querySelectorAll('[data-bid]').forEach(b=>b._save=async()=>{ const id=b.dataset.bid, v=f=>$(`b_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
+    await rpc('adm_beast_save',{p_id:id,p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv')}); });
+  document.querySelectorAll('[data-tid]').forEach(b=>b._save=async()=>{ const id=b.dataset.tid, v=f=>$(`t_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
+    await rpc('adm_tone_save',{p_id:id,p_gold:n('gold'),p_gems:n('gems')}); });
+  document.querySelectorAll('[data-did]').forEach(b=>b._save=async()=>{ const id=b.dataset.did, v=f=>$(`d_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
+    await rpc('adm_decor_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv'),p_bonus_val:+v('bv')||0}); });
+  document.querySelectorAll('[data-kid]').forEach(b=>b._save=async()=>{ const id=b.dataset.kid, v=f=>$(`k_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
+    await rpc('adm_skin_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems')}); });
+  document.querySelectorAll('[data-gid]').forEach(b=>b._save=async()=>{ const id=b.dataset.gid, v=f=>$(`g_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
+    await rpc('adm_gear_save',{p_id:id,p_name:v('name'),p_val:+v('val'),p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv')}); });
+  document.querySelectorAll('[data-li]').forEach(b=>b._save=async()=>{ const i=b.dataset.li;
+    await rpc('adm_land_save',{p_idx:+i,p_lv:+$(`l_${i}_lv`).value,p_cost:+$(`l_${i}_cost`).value}); });
+  document.querySelectorAll('[data-psid]').forEach(b=>b._save=async()=>{ const id=b.dataset.psid, k=id.replace('@','_'), v=f=>$(`ps_${k}_${f}`).value, n=f=>v(f)===''?null:+v(f);
+    await rpc('adm_pskin_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems')}); });
+  document.querySelectorAll('[data-sign]').forEach(b=>b._save=async()=>{ const rw=[0,1,2,3,4,5,6].map(i=>{ const o={}, g=+$(`sg_${i}_gold`).value||0, m=+$(`sg_${i}_gems`).value||0; if(g>0) o.gold=g; if(m>0) o.gems=m; return o; });
+    await rpc('adm_setting_put',{p_key:'sign_rw',p_value:rw}); });
+  wireSaves();
 }
 
 /* 更新紀錄 */
