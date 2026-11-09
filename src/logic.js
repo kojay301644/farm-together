@@ -261,7 +261,7 @@ function openBag(){
 async function openHome(){
   if(mode==='visit') return toast('這是好友的家喔');
   const {data:{user}} = await sb.auth.getUser();
-  modal('我的家', `
+  modal(`🏠 ${esc(S.me.nickname)}`, `
     <div class="sec">我的寵物夥伴</div>${beastPanelHTML()}
     <div class="sec">玩家</div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
@@ -270,9 +270,8 @@ async function openHome(){
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
       ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友廣場」加好友、拜訪好友農場</div>
     <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
-    <div class="homebtns"><button class="btn o" id="hGem" style="background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">💎 鑽石商店</button><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
+    <div class="homebtns"><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
     <div class="homebtns"><button class="btn sub" id="hSet">⚙️ 設定・登出</button></div>`);
-  $('hGem').onclick = ()=>openGemShop();
   $('hAv').onclick = openAvatarPicker; bindBeastPanel();
   $('hSet').onclick = openSettings;
   $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
@@ -495,7 +494,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -593,7 +592,7 @@ async function showNotices(){
 }
 function startGame(st){
   applyState(st); mode = 'home'; V = null;
-  sessionStart();
+  sessionStart(); setTimeout(loadTicker, 1500);
   loadConfig().then(()=>{ if(S) refresh(); });
   showScreen('game');
   if(!built){ buildWorld(); requestAnimationFrame(animate); built = true; }
@@ -634,3 +633,25 @@ sb.auth.onAuthStateChange((ev, session)=>{
   if(ev==='INITIAL_SESSION' && !session) showScreen('login');
 });
 setAuthMode('login');
+
+/* ================= 跑馬燈：誰的菜被誰偷了、誰被狗咬了 ================= */
+let tkItems=[], tkX=0, tkW=0, tkLast=0;
+function tkText(e){ const a=`<b>${esc(e.a)}</b>`, o=`<b>${esc(e.o)}</b>`;
+  if(e.k==='steal') return `🧺 ${a} 偷走了 ${o} 的 ${e.q} 個${CROP[e.c]?.name||'作物'}`;
+  if(e.k==='r_steal') return `🥚 ${a} 偷走了 ${o} 牧場的 ${e.q} 個${(ANIMALS.find(x=>x.good===e.c)||{}).good_name||'產品'}`;
+  if(e.k==='dog') return `🐶 ${a} 想偷 ${o} 的菜，被看門狗咬了！`;
+  return ''; }
+async function loadTicker(){
+  try{ const L=await rpc('farm_ticker'); const sig=L.map(e=>e.t+e.a).join();
+    if(sig===tkLast) return; tkLast=sig; tkItems=L;
+    const el=$('tk'); if(!el) return;
+    el.innerHTML = L.length ? L.map(tkText).filter(Boolean).join('<span class="sep">｜</span>') : '';
+    $('ticker').classList.toggle('off', !L.length);
+    tkW=el.scrollWidth; tkX=$('ticker').clientWidth;
+  }catch(e){}
+}
+function tkLoop(){ requestAnimationFrame(tkLoop); const el=$('tk'); if(!el||!tkW) return;
+  tkX -= (typeof LOWFX!=='undefined'&&LOWFX) ? 0.6 : 0.9; if(tkX < -tkW) tkX = $('ticker').clientWidth;
+  el.style.transform=`translateX(${tkX.toFixed(1)}px)`; }
+requestAnimationFrame(tkLoop);
+setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 45000);

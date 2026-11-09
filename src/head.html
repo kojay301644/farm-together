@@ -363,6 +363,12 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 .twk{animation:twk 3s ease-in-out infinite}@keyframes twk{50%{opacity:.25}}
 .bob{animation:bob 2.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-4px)}}body.lowfx .bob{animation:none}
+.ticker{margin:6px auto 0;max-width:560px;height:24px;overflow:hidden;position:relative;pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.ticker:empty,.ticker.off{display:none}
+.tk{position:absolute;white-space:nowrap;top:2px;left:0;font-size:13px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 6px rgba(0,0,0,.35);will-change:transform}
+.tk b{color:#FFE27A}.tk .sep{opacity:.6;margin:0 14px}
+
 </style>
 </head>
 <body>
@@ -410,6 +416,7 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
     <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
+  <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
 </div>
 
 <div class="dock" id="dock" style="display:none">
