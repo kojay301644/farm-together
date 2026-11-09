@@ -36,13 +36,13 @@ function labelPill(x,y,text,opt={}){
     <rect x="${-w/2}" y="-18" width="${w}" height="36" rx="18" fill="${bg}" stroke="${INK}" stroke-width="2.5"/>
     <path d="M-7 17 L0 25 L7 17" fill="${bg}" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><rect x="-8" y="14" width="16" height="4" fill="${bg}"/>
     <text x="0" y="7" text-anchor="middle" font-size="18" font-weight="900" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke" font-family="Noto Sans TC,sans-serif">${text}</text></g></g>`; }
-  const w = text.length*13+26;
+  const w = [...text.replace(/&[a-z]+;/g,'x')].reduce((a,ch)=>a+(ch.charCodeAt(0)>255?19:11),0)+(opt.locked?24:0)+30;
   const bg = opt.locked?'#E2DACB':(opt.bg||'#FFFFFF');
   const fg = opt.locked?'#7A6E5D':(opt.fg||'#3A3226');
   return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" style="pointer-events:none">
-    <rect x="${-w/2}" y="-13" width="${w}" height="26" rx="13" fill="${bg}" stroke="${INK}" stroke-width="2"/>
-    <path d="M-5 12.5 L0 18 L5 12.5" fill="${bg}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><rect x="-6" y="10" width="12" height="3" fill="${bg}"/>
-    <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="900" fill="${fg}" font-family="Noto Sans TC,sans-serif">${opt.locked?'🔒 ':''}${text}</text></g>`;
+    <rect x="${-w/2}" y="-18" width="${w}" height="34" rx="17" fill="${bg}" stroke="${INK}" stroke-width="2.5"/>
+    <path d="M-7 15.5 L0 23 L7 15.5" fill="${bg}" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><rect x="-8" y="12" width="16" height="4" fill="${bg}"/>
+    <text x="0" y="6" text-anchor="middle" font-size="19" font-weight="900" fill="${fg}" font-family="Noto Sans TC,sans-serif">${opt.locked?'🔒 ':''}${text}</text></g>`;
 }
 // 圖片精靈：以格座標為底部中心
 function sprite(name, gx, gy, w, opt={}){
