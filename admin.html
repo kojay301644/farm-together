@@ -56,7 +56,7 @@ textarea{width:100%;min-height:90px}
 <header><h1>🌱 一起種田吧｜營運後台</h1><span class="who" id="who"></span><a href="./" target="_blank">開啟遊戲</a></header>
 <nav id="nav" style="display:none">
   <button data-t="ov" class="on">總覽</button><button data-t="pl">玩家管理</button><button data-t="nt">公告</button>
-  <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="bt">電腦玩家</button><button data-t="lg">操作紀錄</button>
+  <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="gf">發獎／兌換碼</button><button data-t="ev">活動／維護</button><button data-t="bt">電腦玩家</button><button data-t="lg">操作紀錄</button>
 </nav>
 <main id="main"><div class="center"><div class="muted">讀取中…</div></div></main>
 <div class="toast" id="toast"></div>
@@ -72,7 +72,7 @@ const dt = ms => ms ? new Date(ms).toLocaleString('zh-TW',{hour12:false}) : '—
 const ago = ms => { if(!ms) return '從未'; const s=(Date.now()-ms)/1000; if(s<120) return '剛剛'; if(s<3600) return Math.floor(s/60)+' 分鐘前'; if(s<86400) return Math.floor(s/3600)+' 小時前'; return Math.floor(s/86400)+' 天前'; };
 const KIND = {steal:'偷菜',help_weed:'幫除草',help_bug:'幫除蟲',help_water:'幫澆水',prank_weed:'放草',prank_bug:'放蟲'};
 const ACT = {give:'補發',ban:'停權',unban:'解除停權',notice:'公告',setting:'改設定',crop:'改作物',land:'改開墾'};
-let CROPN = {};
+let CROPN = {}, CFG = {};
 let tab = 'ov';
 
 async function boot(){
@@ -83,7 +83,7 @@ async function boot(){
   $('who').innerHTML = `${esc(session.user.email)}　<a href="#" id="lo">登出</a>`; $('lo').onclick=async e=>{e.preventDefault(); await sb.auth.signOut(); location.reload();};
   $('nav').style.display='flex';
   document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
-  try{ const c = await rpc('farm_config'); c.crops.forEach(x=>CROPN[x.id]=x.name); }catch(e){}
+  try{ const c = await rpc('farm_config'); CFG=c; c.crops.forEach(x=>CROPN[x.id]=x.name); }catch(e){}
   go('ov');
 }
 function showLogin(){
@@ -95,7 +95,7 @@ function showLogin(){
   $('li').onclick = async()=>{ const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('pw').value}); if(error) return toast('登入失敗：'+error.message); location.reload(); };
   $('gl').onclick = ()=>sb.auth.signInWithOAuth({provider:'google', options:{redirectTo: location.origin+location.pathname}});
 }
-function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,bt:pageBt,lg:pageLg})[t](); }
+function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
 const M = h => $('main').innerHTML = h;
 
 /* 總覽 */
@@ -132,6 +132,17 @@ async function showPlayer(id, data){
       <div class="row">金幣 <input class="num" id="gGold" type="number" value="0"> 經驗 <input class="num" id="gExp" type="number" value="0" min="0"> 鑽石 <input class="num" id="gGems" type="number" value="0"></div>
       <div class="row">種子 <select id="gCrop"><option value="">（不發種子）</option>${Object.entries(CROPN).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select> 數量 <input class="num" id="gSeeds" type="number" value="0"></div>
       <div class="row"><input id="gWhy" placeholder="原因（會記在操作紀錄）" style="flex:1"><button class="btn o" id="gGo">送出</button></div></div>
+    <div class="card"><h2>直接設定數值</h2>
+      <div class="row">暱稱 <input id="psNick" value="${esc(p.nickname)}" style="width:9em"> 等級 <input class="num" id="psLv" type="number" min="1" max="30" value="${p.lv}"> 經驗 <input class="num" id="psExp" type="number" min="0" value="${p.exp}">
+        金幣 <input class="num" id="psGold" type="number" min="0" value="${p.gold}"> 鑽石 <input class="num" id="psGems" type="number" min="0" value="${p.gems}"> <button class="btn" id="psGo">儲存</button></div></div>
+    <div class="card"><h2>擁有的東西</h2>
+      <p>寵物：${Object.keys(p.beasts||{}).map(k=>esc(BN(k))).join('、')||'無'}<br>夥伴：${(p.party||[]).map(x=>esc(BN(x.s))+(x.g?`（${esc(GN(x.g))}）`:'')).join('、')||'無'}<br>
+      裝備背包：${Object.entries(p.gear||{}).filter(([,n])=>n>0).map(([k,n])=>`${esc(GN(k))}×${n}`).join('、')||'無'}<br>
+      裝飾：${Object.entries(p.decor_inv||{}).filter(([,n])=>n>0).map(([k,n])=>`${esc(DN(k))}×${n}`).join('、')||'無'}<br>
+      建築外觀：${Object.keys(p.skins||{}).map(k=>esc(SN(k))).join('、')||'無'}｜色調：${Object.keys(p.tones||{}).map(k=>esc(TN(k))).join('、')||'無'}（使用中：${esc(TN(p.tone||'spring'))}）<br>
+      牧場：${(p.ranch||[]).map(r=>esc(AN(r.k))).join('、')||'無'}｜牧場產品：${Object.entries(p.goods||{}).map(([k,n])=>`${esc(k)}×${n}`).join('、')||'無'}</p></div>
+    <div class="card"><h2>發東西給這位玩家</h2>${rwBuilder('pg')}<div class="row" style="margin-top:8px"><input id="pgWhy" placeholder="原因（會記在操作紀錄）" style="flex:1"><button class="btn o" id="pgGo">發送</button></div></div>
+    <div class="card"><h2>讓這位玩家重玩</h2><div class="row"><span class="muted">等級、金幣、鑽石、田、牧場、寵物、裝備、裝飾、外觀全部回到新手狀態（保留帳號、暱稱、頭像、好友）。</span><button class="btn" style="background:#F2545B" id="prGo">重玩</button></div></div>
     <div class="card"><h2>停權</h2><div class="row">${p.banned?`<button class="btn" id="unban">解除停權</button>`:`<input id="bWhy" placeholder="停權原因（玩家會看到）" style="flex:1"><button class="btn r" id="ban">停權</button>`}</div></div>
     <div class="card"><h2>最近被互動紀錄</h2>${p.logs.length?`<table>${p.logs.map(l=>`<tr><td>${dt(l.at)}</td><td>${esc(l.who)}</td><td>${KIND[l.kind]||l.kind}</td><td>${esc(CROPN[l.crop]||l.crop||'')} ${l.qty?'×'+l.qty:''}</td></tr>`).join('')}</table>`:'<span class="muted">沒有紀錄</span>'}</div>`;
   $('pdet').scrollIntoView({behavior:'smooth'});
@@ -141,6 +152,12 @@ async function showPlayer(id, data){
     if(!confirm(`確定對 ${p.nickname} 補發／扣回？`)) return;
     try{ showPlayer(p.id, await rpc('adm_give', a)); toast('已送出'); }catch(e){ toast(e.message); }
   };
+  rwBind('pg');
+  $('psGo').onclick = async()=>{ try{ showPlayer(p.id, await rpc('adm_player_set',{p_id:p.id,p_nick:$('psNick').value,p_lv:+$('psLv').value,p_exp:+$('psExp').value,p_gold:+$('psGold').value,p_gems:+$('psGems').value})); toast('已儲存'); }catch(e){ toast(e.message); } };
+  $('pgGo').onclick = async()=>{ const rw=rwRead('pg'); if(!Object.keys(rw).length) return toast('沒有設定要發的東西'); if(!confirm(`確定發給 ${p.nickname}？\n${rwText(rw)}`)) return;
+    try{ showPlayer(p.id, await rpc('adm_player_grant',{p_id:p.id,p_reward:rw,p_reason:$('pgWhy').value||null})); toast('已發送'); }catch(e){ toast(e.message); } };
+  $('prGo').onclick = async()=>{ if(prompt(`讓 ${p.nickname} 重玩？做了就不能復原。請輸入「重玩」確認`)!=='重玩') return;
+    try{ showPlayer(p.id, await rpc('adm_player_reset',{p_id:p.id})); toast('已重玩'); }catch(e){ toast(e.message); } };
   if($('ban')) $('ban').onclick = async()=>{ if(!confirm(`確定停權 ${p.nickname}？`)) return; try{ showPlayer(p.id, await rpc('adm_ban',{p_id:p.id,p_ban:true,p_reason:$('bWhy').value||null})); toast('已停權'); }catch(e){ toast(e.message); } };
   if($('unban')) $('unban').onclick = async()=>{ try{ showPlayer(p.id, await rpc('adm_ban',{p_id:p.id,p_ban:false,p_reason:null})); toast('已解除停權'); }catch(e){ toast(e.message); } };
 }
@@ -160,7 +177,7 @@ async function pageNt(){
 /* 遊戲數值 */
 async function pageCf(){
   const C = await rpc('adm_config');
-  M(`<div class="card"><h2>玩法設定</h2><table>${C.settings.map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
+  M(`<div class="card"><h2>玩法設定</h2><table>${C.settings.filter(s=>!/^(ev_|maint_|bot_last_run|evo_)/.test(s.key)).map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>作物數值</h2><div class="muted" style="margin-bottom:8px">成熟時間單位是「秒」。改完按該列的儲存，玩家重新整理後就會套用。</div>
     <table><tr><th>作物</th><th>解鎖等級</th><th>種子價</th><th>成熟秒數</th><th>收成數</th><th>單價</th><th>經驗</th><th></th></tr>
     ${C.crops.map(c=>`<tr><td><b>${esc(c.name)}</b></td>${['lv','seed','grow_sec','yield','price','exp'].map(f=>`<td><input class="num" id="c_${c.id}_${f}" type="number" value="${c[f]}"></td>`).join('')}<td><button class="btn" data-cid="${c.id}">儲存</button></td></tr>`).join('')}</table></div>
@@ -180,6 +197,11 @@ async function pageCf(){
     ${(C.beasts||[]).map(b=>`<tr><td><b>${esc(b.name)}</b></td><td><input class="num" id="b_${b.id}_lv" type="number" value="${b.lv}"></td><td><input class="num" id="b_${b.id}_gold" type="number" value="${b.gold??''}"></td><td><input class="num" id="b_${b.id}_gems" type="number" value="${b.gems??''}"></td><td><button class="btn" data-bid="${b.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>城鎮色調</h2><table><tr><th>色調</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.tones||[]).filter(t=>t.id!=='spring').map(t=>`<tr><td><b>${esc(t.name)}</b></td><td><input class="num" id="t_${t.id}_gold" type="number" value="${t.gold??''}"></td><td><input class="num" id="t_${t.id}_gems" type="number" value="${t.gems??''}"></td><td><button class="btn" data-tid="${t.id}">儲存</button></td></tr>`).join('')}</table></div>
+    <div class="card"><h2>裝飾商品</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；加成數值依裝飾種類（例如偷菜次數 +N）。</div>
+    <table><tr><th>裝飾</th><th>名稱</th><th>解鎖等級</th><th>金幣價</th><th>鑽石價</th><th>加成數值</th><th></th></tr>
+    ${(C.decor||[]).map(d=>`<tr><td><img src="assets/dc_${d.id}.webp" style="width:36px;height:36px;object-fit:contain"></td><td><input id="d_${d.id}_name" value="${esc(d.name)}" style="width:6em"></td>
+      <td><input class="num" id="d_${d.id}_lv" type="number" value="${d.lv}"></td><td><input class="num" id="d_${d.id}_gold" type="number" value="${d.gold??''}"></td><td><input class="num" id="d_${d.id}_gems" type="number" value="${d.gems??''}"></td>
+      <td>${d.bonus?`<input class="num" id="d_${d.id}_bv" type="number" value="${d.bonus_val??0}"> <span class="muted">${esc(d.bonus)}</span>`:`<input type="hidden" id="d_${d.id}_bv" value="0">—`}</td><td><button class="btn" data-did="${d.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>建築外觀</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；兩個都留空＝不能購買。</div>
     <table><tr><th>外觀</th><th>建築</th><th>名稱</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.skins||[]).map(k=>`<tr><td><img src="assets/th_${k.style}_${({home:'academy',barn:'farm',shop:'shop',fountain:'fountain',pen:'play',decor:'forge'})[k.bld]}.webp" style="width:40px;height:40px;object-fit:contain"></td><td>${({home:'我的家',barn:'穀倉',shop:'種子商店',fountain:'噴水池',pen:'寵物園',decor:'裝飾店'})[k.bld]}</td>
@@ -193,6 +215,8 @@ async function pageCf(){
     try{ await rpc('adm_beast_save',{p_id:id,p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv')}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-tid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.tid, v=f=>$(`t_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
     try{ await rpc('adm_tone_save',{p_id:id,p_gold:n('gold'),p_gems:n('gems')}); toast('已儲存'); }catch(e){ toast(e.message); } });
+  document.querySelectorAll('[data-did]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.did, v=f=>$(`d_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
+    try{ await rpc('adm_decor_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv'),p_bonus_val:+v('bv')||0}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-kid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.kid, v=f=>$(`k_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
     try{ await rpc('adm_skin_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems')}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-gid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.gid, v=f=>$(`g_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
@@ -202,9 +226,16 @@ async function pageCf(){
 }
 
 /* 更新紀錄 */
-async function pageCl(){
-  const L = await rpc('adm_changelog');
-  M(`<div class="card"><h2>更新紀錄</h2>${L.map(c=>`<div class="cl" style="border-bottom:1px solid var(--line);padding:10px 0"><h3>${esc(c.title)}</h3><div class="muted">${dt(c.at)}</div><p>${esc(c.body)}</p></div>`).join('')||'<span class="muted">沒有紀錄</span>'}</div>`);
+async function pageCl(data){
+  const L = data || await rpc('adm_changelog');
+  M(`<div class="card"><h2>新增更新紀錄</h2><div class="row"><input id="clT" placeholder="標題" style="flex:1"></div><textarea id="clB" placeholder="內容（玩家看得到）" style="width:100%;min-height:80px;margin-top:8px"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn" id="clAdd">新增</button></div></div>
+    <div class="card"><h2>更新紀錄</h2>${L.map(c=>`<div style="border-bottom:1px solid var(--line);padding:10px 0"><div class="muted">${dt(c.at)}</div>
+      <input data-clt="${c.id}" value="${esc(c.title)}" style="width:100%;font-weight:800"><textarea data-clb="${c.id}" style="width:100%;min-height:70px;margin-top:6px">${esc(c.body||'')}</textarea>
+      <div class="row"><button class="btn" data-cls="${c.id}">儲存</button><button class="btn" style="background:#F2545B" data-cld="${c.id}">刪除</button></div></div>`).join('')||'<span class="muted">還沒有</span>'}</div>`);
+  $('clAdd').onclick=async()=>{ try{ pageCl(await rpc('adm_changelog_save',{p_id:null,p_title:$('clT').value,p_body:$('clB').value})); toast('已新增'); }catch(e){ toast(e.message); } };
+  document.querySelectorAll('[data-cls]').forEach(b=>b.onclick=async()=>{ const id=+b.dataset.cls; try{ pageCl(await rpc('adm_changelog_save',{p_id:id,p_title:document.querySelector(`[data-clt="${id}"]`).value,p_body:document.querySelector(`[data-clb="${id}"]`).value})); toast('已儲存'); }catch(e){ toast(e.message); } });
+  document.querySelectorAll('[data-cld]').forEach(b=>b.onclick=async()=>{ if(!confirm('確定刪除這筆更新紀錄？')) return; try{ pageCl(await rpc('adm_changelog_del',{p_id:+b.dataset.cld})); toast('已刪除'); }catch(e){ toast(e.message); } });
 }
 
 /* 操作紀錄 */
@@ -236,6 +267,79 @@ async function pageBt(data){
   $('rsAll').onclick=async()=>{ if($('rsTxt').value.trim()!=='全部重玩') return toast('請先輸入「全部重玩」');
     if(!confirm('最後確認：所有玩家的進度都會清空，不能復原。確定嗎？')) return;
     try{ const r=await rpc('adm_reset_all',{p_confirm:'全部重玩'}); toast(`已重玩，共 ${r.players} 位玩家`); pageBt(); }catch(e){ toast(e.message); } };
+}
+
+/* ================= 獎勵設定元件（發獎、兌換碼、玩家補發共用） ================= */
+const BN=k=>((CFG.beasts||[]).find(x=>x.id===k)||{}).name||k, GN=k=>{ const g=(CFG.gear||[]).find(x=>x.id===k); return g?`${g.name} ${['','I','II','III','IV'][g.tier]}`:k; },
+  DN=k=>((CFG.decor||[]).find(x=>x.id===k)||{}).name||k, SN=k=>((CFG.skins||[]).find(x=>x.id===k)||{}).name||k, TN=k=>((CFG.tones||[]).find(x=>x.id===k)||{}).name||k,
+  AN=k=>((CFG.animals||[]).find(x=>x.id===k)||{}).name||k;
+const RW_TYPES={seeds:['種子',()=>(CFG.crops||[]).map(c=>[c.id,c.name])],crops:['作物',()=>(CFG.crops||[]).map(c=>[c.id,c.name])],gear:['寵物裝備',()=>(CFG.gear||[]).map(g=>[g.id,GN(g.id)])],
+  decor:['裝飾',()=>(CFG.decor||[]).map(d=>[d.id,d.name])],beasts:['寵物',()=>(CFG.beasts||[]).map(b=>[b.id,b.name])],tones:['城鎮色調',()=>(CFG.tones||[]).filter(t=>t.id!=='spring').map(t=>[t.id,t.name])],
+  skins:['建築外觀',()=>(CFG.skins||[]).map(k=>[k.id,`${({home:'家',barn:'穀倉',shop:'建築商店',fountain:'噴水池',pen:'寵物園',decor:'裝備商店'})[k.bld]||k.bld}・${k.name}`])]};
+function rwBuilder(px){ return `<div class="row">金幣 <input class="num" id="${px}_gold" type="number" min="0" value="0"> 鑽石 <input class="num" id="${px}_gems" type="number" min="0" value="0"> 經驗 <input class="num" id="${px}_exp" type="number" min="0" value="0"></div>
+  <div id="${px}_items"></div><div class="row"><select id="${px}_t">${Object.entries(RW_TYPES).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('')}</select><select id="${px}_i"></select>
+  <input class="num" id="${px}_n" type="number" min="1" value="1"><button class="btn" id="${px}_add" type="button">＋ 加入</button></div>`; }
+const RWX={};
+function rwBind(px){ RWX[px]=[];
+  const fill=()=>{ $(px+'_i').innerHTML=RW_TYPES[$(px+'_t').value][1]().map(([v,n])=>`<option value="${v}">${esc(n)}</option>`).join(''); $(px+'_n').style.display=['beasts','tones','skins'].includes($(px+'_t').value)?'none':''; };
+  const draw=()=>{ $(px+'_items').innerHTML=RWX[px].map((x,i)=>`<span class="tag" style="margin:2px">${RW_TYPES[x.t][0]}：${esc(x.label)}${x.n>1?` ×${x.n}`:''} <a href="#" data-rx="${i}">✕</a></span>`).join('');
+    document.querySelectorAll(`#${px}_items [data-rx]`).forEach(a=>a.onclick=e=>{ e.preventDefault(); RWX[px].splice(+a.dataset.rx,1); draw(); }); };
+  $(px+'_t').onchange=fill; fill();
+  $(px+'_add').onclick=()=>{ const t=$(px+'_t').value, sel=$(px+'_i'); if(!sel.value) return; RWX[px].push({t, id:sel.value, label:sel.options[sel.selectedIndex].text, n:Math.max(1,+$(px+'_n').value||1)}); draw(); };
+}
+function rwRead(px){ const rw={}; ['gold','gems','exp'].forEach(k=>{ const v=+$(px+'_'+k).value||0; if(v>0) rw[k]=v; });
+  (RWX[px]||[]).forEach(x=>{ if(['beasts','tones','skins'].includes(x.t)){ (rw[x.t]=rw[x.t]||[]).includes(x.id)||rw[x.t].push(x.id); } else { rw[x.t]=rw[x.t]||{}; rw[x.t][x.id]=(rw[x.t][x.id]||0)+x.n; } });
+  return rw; }
+function rwText(rw){ const o=[]; if(rw.gold) o.push(`金幣 ${rw.gold}`); if(rw.gems) o.push(`鑽石 ${rw.gems}`); if(rw.exp) o.push(`經驗 ${rw.exp}`);
+  const nm={seeds:k=>CROPN[k]+'種子',crops:k=>CROPN[k],gear:GN,decor:DN,beasts:BN,tones:TN,skins:SN};
+  ['seeds','crops','gear','decor'].forEach(t=>Object.entries(rw[t]||{}).forEach(([k,n])=>o.push(`${nm[t](k)}×${n}`)));
+  ['beasts','tones','skins'].forEach(t=>(rw[t]||[]).forEach(k=>o.push(nm[t](k))));
+  return o.join('、')||'（沒有）'; }
+
+/* ================= 發獎、兌換碼 ================= */
+async function pageGf(){
+  let G=[], K=[]; try{ [G,K]=await Promise.all([rpc('adm_gifts'),rpc('adm_codes')]); }catch(e){ return M(`<div class="card"><h2>發獎／兌換碼</h2><p class="muted">伺服器還沒更新（請先執行 SQL 014）：${esc(e.message)}</p></div>`); }
+  M(`<div class="card"><h2>🎁 全服發獎（禮物信箱）</h2><p class="muted">送出後，所有玩家（含之後新加入的）登入時信箱會跳出來，按領取就拿到。</p>
+    <div class="row"><input id="gfT" placeholder="標題（例如：開服慶祝禮）" style="flex:1"> 有效天數 <input class="num" id="gfD" type="number" min="0" value="7"> <span class="muted">0＝不過期</span></div>
+    <textarea id="gfB" placeholder="說明（可留空）" style="width:100%;min-height:50px;margin-top:6px"></textarea>${rwBuilder('gf')}
+    <div class="row" style="margin-top:8px"><button class="btn o" id="gfGo">發送給全服</button></div></div>
+    <div class="card"><h2>發過的禮物</h2>${G.length?`<table><tr><th>時間</th><th>標題</th><th>獎勵</th><th>對象</th><th>已領</th><th>到期</th><th></th></tr>${G.map(g=>`<tr><td style="white-space:nowrap">${dt(g.at)}</td><td>${esc(g.title)}</td><td>${esc(rwText(g.reward))}</td><td>${g.target?esc(g.target):'全服'}</td><td>${g.claimed}</td><td style="white-space:nowrap">${g.exp?dt(g.exp):'不過期'}</td><td>${!g.exp||g.exp>Date.now()?`<button class="btn" style="background:#F2545B" data-gs="${g.id}">停止</button>`:''}</td></tr>`).join('')}</table>`:'<span class="muted">還沒有</span>'}</div>
+    <div class="card"><h2>🔑 建立兌換碼</h2><p class="muted">玩家在「設定 → 兌換碼」輸入就能領，每個帳號每個碼只能領一次。</p>
+    <div class="row">兌換碼 <input id="cdC" placeholder="例如 FARM2026" style="width:10em;text-transform:uppercase"> 可用次數 <input class="num" id="cdM" type="number" min="0" value="0"> <span class="muted">0＝不限</span> 有效天數 <input class="num" id="cdD" type="number" min="0" value="30"> <input id="cdN" placeholder="備註" style="flex:1"></div>
+    ${rwBuilder('cd')}<div class="row" style="margin-top:8px"><button class="btn o" id="cdGo">建立</button></div></div>
+    <div class="card"><h2>兌換碼列表</h2>${K.length?`<table><tr><th>兌換碼</th><th>獎勵</th><th>已用／上限</th><th>到期</th><th>備註</th><th>啟用</th></tr>${K.map(k=>`<tr><td><b>${esc(k.code)}</b></td><td>${esc(rwText(k.reward))}</td><td>${k.used}／${k.max||'不限'}</td><td style="white-space:nowrap">${k.exp?dt(k.exp):'不過期'}</td><td>${esc(k.note||'')}</td><td><input type="checkbox" data-ca="${esc(k.code)}" ${k.active?'checked':''}></td></tr>`).join('')}</table>`:'<span class="muted">還沒有</span>'}</div>`);
+  rwBind('gf'); rwBind('cd');
+  $('gfGo').onclick=async()=>{ const rw=rwRead('gf'); if(!$('gfT').value.trim()) return toast('請填標題'); if(!Object.keys(rw).length) return toast('請設定獎勵');
+    if(!confirm(`發送給全服？\n${rwText(rw)}`)) return; try{ await rpc('adm_gift_send',{p_title:$('gfT').value,p_body:$('gfB').value||null,p_reward:rw,p_target:null,p_days:+$('gfD').value||0}); toast('已發送'); pageGf(); }catch(e){ toast(e.message); } };
+  document.querySelectorAll('[data-gs]').forEach(b=>b.onclick=async()=>{ if(!confirm('停止這個禮物？還沒領的玩家就領不到了')) return; try{ await rpc('adm_gift_stop',{p_id:+b.dataset.gs}); toast('已停止'); pageGf(); }catch(e){ toast(e.message); } });
+  $('cdGo').onclick=async()=>{ const rw=rwRead('cd'); if(!Object.keys(rw).length) return toast('請設定獎勵');
+    try{ await rpc('adm_code_save',{p_code:$('cdC').value,p_reward:rw,p_max:+$('cdM').value||0,p_days:+$('cdD').value||0,p_active:true,p_note:$('cdN').value||null}); toast('已建立'); pageGf(); }catch(e){ toast(e.message); } };
+  document.querySelectorAll('[data-ca]').forEach(c=>c.onchange=async()=>{ try{ await rpc('adm_code_save',{p_code:c.dataset.ca,p_reward:null,p_max:null,p_days:null,p_active:c.checked,p_note:null}); toast(c.checked?'已啟用':'已停用'); }catch(e){ toast(e.message); } });
+}
+
+/* ================= 活動加倍、維護模式、跑馬燈 ================= */
+async function pageEv(){
+  const C = await rpc('adm_config'), S={}; C.settings.forEach(x=>S[x.key]=x.value);
+  const loc=sec=>{ if(!+sec) return ''; const d=new Date(sec*1000); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,16); };
+  const now=Date.now()/1000, act=now>=+S.ev_start && now<=+S.ev_end;
+  M(`<div class="card"><h2>🎉 活動加倍</h2><p class="muted">在設定的時間內，經驗、收成數量、賣東西拿到的金幣會乘上倍數（1＝不加倍）。玩家畫面上方跑馬燈會顯示活動名稱。${act?'<b style="color:#2E9660">目前活動進行中</b>':''}</p>
+    <div class="row">活動名稱 <input id="evN" value="${esc(S.ev_name||'')}" placeholder="例如：週末豐收祭" style="flex:1"></div>
+    <div class="row">開始 <input id="evS" type="datetime-local" value="${loc(S.ev_start)}"> 結束 <input id="evE" type="datetime-local" value="${loc(S.ev_end)}"></div>
+    <div class="row">經驗 × <input class="num" id="evX" type="number" step="0.1" min="0" value="${S.ev_exp??1}"> 收成 × <input class="num" id="evY" type="number" step="0.1" min="0" value="${S.ev_yield??1}"> 賣價 × <input class="num" id="evG" type="number" step="0.1" min="0" value="${S.ev_gold??1}"></div>
+    <div class="row"><button class="btn o" id="evGo">儲存活動</button><button class="btn" id="evStop" style="background:#F2545B">馬上結束活動</button></div></div>
+    <div class="card"><h2>🛠️ 維護模式</h2><p class="muted">開啟後，管理員以外的玩家都會看到維護畫面、不能操作（電腦玩家也會暫停）。</p>
+    <div class="row">狀態：<b style="color:${+S.maint_on?'#F2545B':'#2E9660'}">${+S.maint_on?'維護中':'正常'}</b></div>
+    <div class="row"><input id="mtM" value="${esc(S.maint_msg||'')}" placeholder="維護公告（例如：預計 22:00 恢復）" style="flex:1"><button class="btn" id="mtGo" style="background:${+S.maint_on?'#3BB273':'#F2545B'}">${+S.maint_on?'結束維護':'開始維護'}</button></div></div>
+    <div class="card"><h2>📢 跑馬燈</h2><div class="row">偷菜、被狗咬的跑馬燈：<b>${+(S.ticker_on??1)?'顯示中':'已關閉'}</b><button class="btn" id="tkGo">${+(S.ticker_on??1)?'關閉':'打開'}</button></div></div>`);
+  const sec=id=>{ const v=$(id).value; return v?Math.floor(new Date(v).getTime()/1000):0; };
+  $('evGo').onclick=async()=>{ const st=sec('evS'), en=sec('evE'); if(!st||!en||en<=st) return toast('請設定正確的開始和結束時間');
+    try{ await rpc('adm_setting_put',{p_key:'ev_name',p_value:$('evN').value});
+      for(const [k,v] of [['ev_start',st],['ev_end',en],['ev_exp',+$('evX').value||1],['ev_yield',+$('evY').value||1],['ev_gold',+$('evG').value||1]]) await rpc('adm_setting_set',{p_key:k,p_value:v});
+      toast('活動已儲存'); pageEv(); }catch(e){ toast(e.message); } };
+  $('evStop').onclick=async()=>{ if(!confirm('馬上結束活動？')) return; try{ await rpc('adm_setting_set',{p_key:'ev_end',p_value:Math.floor(Date.now()/1000)-1}); toast('活動已結束'); pageEv(); }catch(e){ toast(e.message); } };
+  $('mtGo').onclick=async()=>{ const on=+S.maint_on?0:1; if(on && !confirm('開始維護？玩家會馬上不能操作')) return;
+    try{ await rpc('adm_setting_put',{p_key:'maint_msg',p_value:$('mtM').value}); await rpc('adm_setting_set',{p_key:'maint_on',p_value:on}); toast(on?'已開始維護':'已結束維護'); pageEv(); }catch(e){ toast(e.message); } };
+  $('tkGo').onclick=async()=>{ try{ await rpc('adm_setting_set',{p_key:'ticker_on',p_value:+(S.ticker_on??1)?0:1}); toast('已更新'); pageEv(); }catch(e){ toast(e.message); } };
 }
 
 boot();

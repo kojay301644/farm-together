@@ -22,7 +22,9 @@ function zhErr(m){
 async function rpc(fn, args){
   if(SESS.kicked) throw new Error('帳號已在其他裝置登入');
   const {data, error} = await sb.rpc(fn, args||{});
-  if(error){ if(/KICKED/.test(error.message)){ showKicked(); throw new Error('帳號已在其他裝置登入'); } throw new Error(zhErr(error.message)); }
+  if(error){ if(/KICKED/.test(error.message)){ showKicked(); throw new Error('帳號已在其他裝置登入'); }
+    if(/維護中：/.test(error.message)){ showMaint(error.message.replace(/^.*維護中：/,'')); throw new Error('伺服器維護中'); }
+    throw new Error(zhErr(error.message)); }
   return data;
 }
 /* ================= 單一裝置登入：新登入的裝置會擠掉舊的 ================= */
@@ -37,6 +39,12 @@ async function sessionStart(){
 async function sessionPing(){
   if(!SESS.sid || SESS.kicked) return;
   try{ const {data} = await sb.rpc('farm_session_ping', {p_sid:SESS.sid}); if(data && data.ok===false) showKicked(data.dev); }catch(e){}
+}
+function showMaint(msg){
+  if(document.getElementById('maintOv')) return;
+  const d=document.createElement('div'); d.className='kick'; d.id='maintOv';
+  d.innerHTML=`<div class="kbox"><div style="font-size:40px">🛠️</div><h3>伺服器維護中</h3><p>${esc(msg||'請稍後再來')}</p><button class="btn" id="maintGo">重新整理</button></div>`;
+  document.body.appendChild(d); $('maintGo').onclick=()=>location.reload();
 }
 function showKicked(dev){
   if(SESS.kicked) return; SESS.kicked=true;
@@ -270,11 +278,11 @@ async function openHome(){
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
       ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友廣場」加好友、拜訪好友農場</div>
     <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
-    <div class="homebtns"><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
+    <div class="homebtns"><button class="btn o" id="hGift">📬 禮物信箱</button><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
     <div class="homebtns"><button class="btn sub" id="hSet">⚙️ 設定・登出</button></div>`);
   $('hAv').onclick = openAvatarPicker; bindBeastPanel();
   $('hSet').onclick = openSettings;
-  $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
+  $('hGift').onclick = ()=>openGifts(false); $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
 }
 /* ================= 設定頁 ================= */
 async function openSettings(){
@@ -284,7 +292,8 @@ async function openSettings(){
     <div class="homebtns"><button class="btn sub" id="sSwitch">🔄 切換帳號</button><button class="btn sub" id="sOut" style="background:#F2545B;color:#fff;box-shadow:0 3px 0 #C23A40">登出</button></div>
     <div class="sec">遊戲設定</div>
     <div class="seg" style="margin-top:6px"><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
-    <div class="homebtns"><button class="btn o" id="sHelp">📖 遊戲說明</button><button class="btn o" id="sA2hs">📱 加到桌面</button></div>`;
+    <div class="homebtns"><button class="btn o" id="sHelp">📖 遊戲說明</button><button class="btn o" id="sA2hs">📱 加到桌面</button></div>
+    <div class="sec">兌換碼</div><div class="redeem"><input id="rCode" placeholder="輸入兌換碼" maxlength="20" autocomplete="off"><button class="btn" id="rGo">兌換</button></div>`;
   if(me.admin) body += `<div class="sec">🛠️ 管理員</div><div class="admbox">
     <div class="admrow"><span>等級</span><input id="aLv" type="number" min="1" max="30" value="${me.lv}"><span>金幣</span><input id="aGold" type="number" min="0" value="${me.gold}"><span>鑽石</span><input id="aGems" type="number" min="0" value="${me.gems||0}"></div>
     <div class="admquick"><button class="mini" data-q="lv">等級 30</button><button class="mini" data-q="gold">金幣 +10萬</button><button class="mini" data-q="gems">鑽石 +1000</button><button class="mini o" data-q="seeds">每種種子 +20</button></div>
@@ -296,6 +305,8 @@ async function openSettings(){
   $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openSettings(); };
   $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openSettings(); };
   $('sHelp').onclick = openHelp; $('sA2hs').onclick = openA2HS;
+  $('rGo').onclick = async()=>{ const c=$('rCode').value.trim(); if(!c) return toast('請輸入兌換碼');
+    try{ const r=await rpc('farm_redeem',{p_code:c}); applyState(r.state); refresh(); sfx('lvup'); fxConfetti(); closeModal(); modal('🎁 兌換成功！', `<div class="rwbox">${rewardHTML(r.reward)}</div>`); if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } };
   $('sOut').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
   $('sSwitch').onclick = async()=>{ closeModal(); await sb.auth.signOut(); toast('已登出，請用另一個帳號登入'); };
   if(me.admin){
@@ -593,7 +604,7 @@ async function showNotices(){
 function startGame(st){
   applyState(st); mode = 'home'; V = null;
   sessionStart(); setTimeout(loadTicker, 1500);
-  loadConfig().then(()=>{ if(S) refresh(); });
+  loadConfig().then(()=>{ if(S) refresh(); setTimeout(()=>openGifts(true), 2500); });
   showScreen('game');
   if(!built){ buildWorld(); requestAnimationFrame(animate); built = true; }
   plotSig = plotSig.map(()=> '');
@@ -642,11 +653,12 @@ function tkText(e){ const a=`<b>${esc(e.a)}</b>`, o=`<b>${esc(e.o)}</b>`;
   if(e.k==='dog') return `🐶 ${a} 想偷 ${o} 的菜，被看門狗咬了！`;
   return ''; }
 async function loadTicker(){
-  try{ const L=await rpc('farm_ticker'); const sig=L.map(e=>e.t+e.a).join();
+  try{ const on=+((CFG_SET||{}).ticker_on ?? 1)!==0, L=on?await rpc('farm_ticker'):[], ev=eventInfo(); const sig=(ev||'')+L.map(e=>e.t+e.a).join();
     if(sig===tkLast) return; tkLast=sig; tkItems=L;
     const el=$('tk'); if(!el) return;
-    el.innerHTML = L.length ? L.map(tkText).filter(Boolean).join('<span class="sep">｜</span>') : '';
-    $('ticker').classList.toggle('off', !L.length);
+    const parts=(ev?[ev]:[]).concat(L.map(tkText).filter(Boolean));
+    el.innerHTML = parts.join('<span class="sep">｜</span>');
+    $('ticker').classList.toggle('off', !parts.length);
     tkW=el.scrollWidth; tkX=$('ticker').clientWidth;
   }catch(e){}
 }
@@ -655,3 +667,30 @@ function tkLoop(){ requestAnimationFrame(tkLoop); const el=$('tk'); if(!el||!tkW
   el.style.transform=`translateX(${tkX.toFixed(1)}px)`; }
 requestAnimationFrame(tkLoop);
 setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 45000);
+
+/* ================= 禮物信箱、獎勵顯示、活動 ================= */
+function rewardList(rw){ rw=rw||{}; const out=[];
+  if(rw.gold) out.push(['i_coin', `${(+rw.gold).toLocaleString()} 金幣`]);
+  if(rw.gems) out.push(['i_gem', `💎 ${(+rw.gems).toLocaleString()}`]);
+  if(rw.exp) out.push(['', `⭐ 經驗 ${rw.exp}`]);
+  Object.entries(rw.seeds||{}).forEach(([k,n])=>out.push(['', `🌱 ${CROP[k]?.name||k}種子 ×${n}`]));
+  Object.entries(rw.crops||{}).forEach(([k,n])=>out.push(['', `🧺 ${CROP[k]?.name||k} ×${n}`]));
+  Object.entries(rw.gear||{}).forEach(([k,n])=>out.push([GEAR[k]?.icon||'', `${GEAR[k]?gearTitle(GEAR[k]):k} ×${n}`]));
+  Object.entries(rw.decor||{}).forEach(([k,n])=>out.push(['dc_'+k, `${(typeof DEC!=='undefined'&&DEC[k]?.name)||k} ×${n}`]));
+  (rw.beasts||[]).forEach(k=>out.push(['', `🐾 寵物 ${bName(k)}`]));
+  (rw.tones||[]).forEach(k=>out.push(['', `🌈 色調 ${TONE[k]?.name||k}`]));
+  (rw.skins||[]).forEach(k=>out.push(['', `🏠 外觀 ${(SKINS.find(x=>x.id===k)||{}).name||k}`]));
+  return out; }
+function rewardHTML(rw){ return rewardList(rw).map(([ic,t])=>`<span class="rw">${ic&&!/^[^a-z]/.test(ic)?`<img src="${A(ic)}" alt="">`:''}${esc(t)}</span>`).join(''); }
+async function openGifts(auto){
+  let L=[]; try{ L=await rpc('farm_gifts'); }catch(e){ return; }
+  if(!L.length){ if(!auto) modal('📬 禮物信箱', `<div class="empty">目前沒有禮物</div>`); return; }
+  modal('📬 禮物信箱', L.map(g=>`<div class="gift"><b>${esc(g.title)}</b>${g.body?`<p>${esc(g.body)}</p>`:''}<div class="rwbox">${rewardHTML(g.reward)}</div>
+    <button class="btn" data-gc="${g.id}">領取</button></div>`).join(''), L.length>1?[['全部領取','',async()=>{ for(const g of L){ try{ const r=await rpc('farm_gift_claim',{p_id:g.id}); applyState(r.state); }catch(e){} } refresh(); sfx('lvup'); fxConfetti(); toast('全部領好了！'); closeModal(); }]]:null);
+  document.querySelectorAll('[data-gc]').forEach(b=>b.onclick=async()=>{ try{ const r=await rpc('farm_gift_claim',{p_id:+b.dataset.gc}); applyState(r.state); refresh(); sfx('coin'); toast('領好了！'); if(r.gift) toast(r.gift); openGifts(true); if(L.length===1) closeModal(); }catch(e){ toast(e.message); } });
+}
+function eventInfo(){ const c=CFG_SET||{}, now=Date.now()/1000, st=+c.ev_start||0, en=+c.ev_end||0;
+  if(!(now>=st && now<=en)) return null;
+  const m=[]; if(+c.ev_exp>1) m.push(`經驗 ×${+c.ev_exp}`); if(+c.ev_yield>1) m.push(`收成 ×${+c.ev_yield}`); if(+c.ev_gold>1) m.push(`賣價 ×${+c.ev_gold}`);
+  const d=new Date(en*1000), t=`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  return `🎉 <b>${esc(c.ev_name||'限時活動')}</b>${m.length?`：${m.join('、')}`:''}（到 ${t}）`; }
