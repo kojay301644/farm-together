@@ -1,13 +1,14 @@
 -- 005: 頭像（已於線上套用）
 alter table players add column if not exists avatar int not null default 11;
-create or replace function farm_set_avatar(p_av int) returns json
-language plpgsql security definer set search_path=public as $$
+create or replace function farm_set_avatar(p_n integer) returns jsonb
+language plpgsql security definer set search_path to 'public' as $function$
+declare uid uuid := auth.uid();
 begin
-  if auth.uid() is null then raise exception 'not_logged_in'; end if;
-  if p_av < 1 or p_av > 30 then raise exception 'bad_avatar'; end if;
-  update players set avatar=p_av where id=auth.uid();
-  return json_build_object('avatar',p_av);
-end $$;
-grant execute on function farm_set_avatar(int) to authenticated;
+  if uid is null then raise exception '請先登入'; end if;
+  if p_n < 1 or p_n > 30 then raise exception '沒有這個頭像'; end if;
+  update players set avatar = p_n where id = uid;
+  return _state(uid);
+end $function$;
+grant execute on function farm_set_avatar(integer) to authenticated;
 -- _state / farm_friends / farm_neighbors / farm_visit / farm_rank / adm_players / adm_player
 -- 已透過 pg_get_functiondef 修補加入 avatar 欄位
