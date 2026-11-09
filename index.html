@@ -354,6 +354,9 @@ body.ingame .pan{display:flex}
 .sa-ic{font-size:28px}.sa-tx{flex:1;font-weight:800;font-size:14px;color:#5A2A2A;line-height:1.4}.sa-tx b{color:#D63B42}
 .sa-x{border:0;background:none;font-size:18px;color:#B07070;cursor:pointer;padding:4px}
 @keyframes sashake{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+/* 省電：開視窗時背景動畫暫停；省電模式關掉裝飾性的循環動畫 */
+body.modalopen #map *, body.modalopen #ticker *{animation-play-state:paused!important}
+body.lowfx #map .bob, body.lowfx #map .cloud, body.lowfx #map [class*="spark"], body.lowfx .pan, body.lowfx .tutarrow{animation:none!important}
 .avw{position:relative;flex:none}.aved{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;background:#FF9F43;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 0 #D67D22;pointer-events:none}
 .admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
 .admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}
@@ -463,18 +466,18 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794250591" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794250942" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794250591" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794250591" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794250942" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794250942" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794250591" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794250942" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794250591" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794250942" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -490,11 +493,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794250591" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794250942" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794250591";
+const BUILD="1794250942";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -632,9 +635,9 @@ function modal(title, body, btns){
   const upd=()=>{ const more = bd.scrollHeight - bd.scrollTop - bd.clientHeight > 24; mm.classList.toggle('on', more); $('md').classList.toggle('hasmore', more); };
   bd.addEventListener('scroll', upd, {passive:true}); mm.onclick=()=>bd.scrollBy({top:bd.clientHeight*0.7, behavior:'smooth'});
   bd.querySelectorAll('img').forEach(im=>{ if(!im.complete) im.addEventListener('load', upd, {once:true}); });
-  $('ov').classList.add('show'); upd(); setTimeout(upd, 120); setTimeout(upd, 600);
+  $('ov').classList.add('show'); document.body.classList.add('modalopen'); upd(); setTimeout(upd, 120); setTimeout(upd, 600);
 }
-function closeModal(){ $('ov').classList.remove('show'); }
+function closeModal(){ $('ov').classList.remove('show'); document.body.classList.remove('modalopen'); }
 $('ov').addEventListener('click', e=>{ if(e.target.id==='ov') closeModal(); });
 
 
@@ -1040,7 +1043,11 @@ function farmerStep(m, dt){
 }
 /* 移動動畫 */
 let lastF=performance.now();
+/* 省電：畫面最多 30fps（省電模式 20fps），開著視窗或切到背景時整個停下來 */
+const FPS_CAP = () => (typeof LOWFX!=='undefined' && LOWFX) ? 20 : 30;
+const PAUSED = () => document.hidden || document.body.classList.contains('modalopen');
 function animate(now){
+  if(PAUSED() || now-lastF < 1000/FPS_CAP()-2){ if(PAUSED()) lastF=now; requestAnimationFrame(animate); return; }
   const dt=Math.min(0.1,(now-lastF)/1000); lastF=now;
   for(const m of movers){
     if(m.fly && LOWFX){ m.el.style.display='none'; continue; }
@@ -2131,13 +2138,17 @@ function toneFxStart(t){
   _tfx={t, P:[], last:performance.now()};
   if(!toneFxStart._run){ toneFxStart._run=1; requestAnimationFrame(toneFxLoop); }
 }
+let _tfxLast=0, _tfxBlank=false;
 function toneFxLoop(now){
   requestAnimationFrame(toneFxLoop);
   const cv=$('tfx'); if(!cv||!_tfx) return;
-  const dpr=Math.min(2,devicePixelRatio||1), O=innerWidth, z=innerHeight;
+  if(!_tfx.t.fx && !_tfx.t.stars){ if(!_tfxBlank){ cv.getContext('2d').clearRect(0,0,cv.width,cv.height); _tfxBlank=true; } return; }   // 沒有飄落特效就不畫
+  _tfxBlank=false;
+  if(PAUSED() || now-_tfxLast < 1000/FPS_CAP()-2){ if(PAUSED()) _tfx.last=now; return; } _tfxLast=now;
+  const dpr=1, O=innerWidth, z=innerHeight;
   if(cv.width!==Math.round(O*dpr)||cv.height!==Math.round(z*dpr)){ cv.width=Math.round(O*dpr); cv.height=Math.round(z*dpr); }
   const l=cv.getContext('2d'); l.setTransform(dpr,0,0,dpr,0,0); l.clearRect(0,0,O,z);
-  const e=Math.min(.05,(now-_tfx.last)/1000); _tfx.last=now;
+  const e=Math.min(.1,(now-_tfx.last)/1000); _tfx.last=now;
   const t=_tfx.t, w=Math.random, Ns=_tfx.P;
   if(t.stars){ l.fillStyle='#fff'; for(let s=0;s<70;s++){ const n=s*173.3%O, a=s*97.7%(z*.3), i=.4+.6*Math.abs(Math.sin(now/700+s)); l.globalAlpha=i*.9; l.fillRect(n,a,s%7?1.5:2.5,s%7?1.5:2.5); } l.globalAlpha=1; }
   const fx=t.fx; if(!fx) return;
@@ -2541,6 +2552,7 @@ async function openSettings(){
     <div class="homebtns"><button class="btn sub" id="sSwitch">🔄 切換帳號</button><button class="btn sub" id="sOut" style="background:#F2545B;color:#fff;box-shadow:0 3px 0 #C23A40">登出</button></div>
     <div class="sec">遊戲設定</div>
     <div class="seg" style="margin-top:6px"><button id="tBgm" class="${BGM_ON?'on':''}">🎵 音樂</button><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
+    <div class="rhint">手機容易發燙或耗電快，可以開「🔋 省電模式」：畫面更新變慢、關掉裝飾動畫和大部分特效</div>
     <div class="homebtns"><button class="btn o" id="sA2hs">📱 加到桌面</button><button class="btn sub" id="sInv">💌 邀請朋友</button></div>
     <div class="sec">兌換碼</div><div class="redeem"><input id="rCode" placeholder="輸入兌換碼" maxlength="20" autocomplete="off"><button class="btn" id="rGo">兌換</button></div>`;
   if(me.admin) body += `<div class="sec">🛠️ 管理員</div><div class="admbox">
@@ -2929,8 +2941,11 @@ async function loadTicker(){
     tkW=el.scrollWidth; tkX=$('ticker').clientWidth;
   }catch(e){}
 }
-function tkLoop(){ requestAnimationFrame(tkLoop); const el=$('tk'); if(!el||!tkW) return;
-  tkX -= (typeof LOWFX!=='undefined'&&LOWFX) ? 0.6 : 0.9; if(tkX < -tkW) tkX = $('ticker').clientWidth;
+let tkT=0;
+function tkLoop(now){ requestAnimationFrame(tkLoop); const el=$('tk'); if(!el||!tkW) return;
+  if(PAUSED() || now-tkT < 1000/FPS_CAP()-2){ if(PAUSED()) tkT=now; return; }
+  const k=Math.min(4,(now-(tkT||now))/16.7); tkT=now;
+  tkX -= ((typeof LOWFX!=='undefined'&&LOWFX) ? 0.6 : 0.9) * k; if(tkX < -tkW) tkX = $('ticker').clientWidth;
   el.style.transform=`translateX(${tkX.toFixed(1)}px)`; }
 requestAnimationFrame(tkLoop);
 setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 45000);

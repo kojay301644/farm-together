@@ -354,6 +354,9 @@ body.ingame .pan{display:flex}
 .sa-ic{font-size:28px}.sa-tx{flex:1;font-weight:800;font-size:14px;color:#5A2A2A;line-height:1.4}.sa-tx b{color:#D63B42}
 .sa-x{border:0;background:none;font-size:18px;color:#B07070;cursor:pointer;padding:4px}
 @keyframes sashake{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+/* 省電：開視窗時背景動畫暫停；省電模式關掉裝飾性的循環動畫 */
+body.modalopen #map *, body.modalopen #ticker *{animation-play-state:paused!important}
+body.lowfx #map .bob, body.lowfx #map .cloud, body.lowfx #map [class*="spark"], body.lowfx .pan, body.lowfx .tutarrow{animation:none!important}
 .avw{position:relative;flex:none}.aved{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;background:#FF9F43;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 0 #D67D22;pointer-events:none}
 .admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
 .admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}

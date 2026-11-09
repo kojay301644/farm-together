@@ -84,13 +84,17 @@ function toneFxStart(t){
   _tfx={t, P:[], last:performance.now()};
   if(!toneFxStart._run){ toneFxStart._run=1; requestAnimationFrame(toneFxLoop); }
 }
+let _tfxLast=0, _tfxBlank=false;
 function toneFxLoop(now){
   requestAnimationFrame(toneFxLoop);
   const cv=$('tfx'); if(!cv||!_tfx) return;
-  const dpr=Math.min(2,devicePixelRatio||1), O=innerWidth, z=innerHeight;
+  if(!_tfx.t.fx && !_tfx.t.stars){ if(!_tfxBlank){ cv.getContext('2d').clearRect(0,0,cv.width,cv.height); _tfxBlank=true; } return; }   // 沒有飄落特效就不畫
+  _tfxBlank=false;
+  if(PAUSED() || now-_tfxLast < 1000/FPS_CAP()-2){ if(PAUSED()) _tfx.last=now; return; } _tfxLast=now;
+  const dpr=1, O=innerWidth, z=innerHeight;
   if(cv.width!==Math.round(O*dpr)||cv.height!==Math.round(z*dpr)){ cv.width=Math.round(O*dpr); cv.height=Math.round(z*dpr); }
   const l=cv.getContext('2d'); l.setTransform(dpr,0,0,dpr,0,0); l.clearRect(0,0,O,z);
-  const e=Math.min(.05,(now-_tfx.last)/1000); _tfx.last=now;
+  const e=Math.min(.1,(now-_tfx.last)/1000); _tfx.last=now;
   const t=_tfx.t, w=Math.random, Ns=_tfx.P;
   if(t.stars){ l.fillStyle='#fff'; for(let s=0;s<70;s++){ const n=s*173.3%O, a=s*97.7%(z*.3), i=.4+.6*Math.abs(Math.sin(now/700+s)); l.globalAlpha=i*.9; l.fillRect(n,a,s%7?1.5:2.5,s%7?1.5:2.5); } l.globalAlpha=1; }
   const fx=t.fx; if(!fx) return;

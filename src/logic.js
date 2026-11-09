@@ -305,6 +305,7 @@ async function openSettings(){
     <div class="homebtns"><button class="btn sub" id="sSwitch">🔄 切換帳號</button><button class="btn sub" id="sOut" style="background:#F2545B;color:#fff;box-shadow:0 3px 0 #C23A40">登出</button></div>
     <div class="sec">遊戲設定</div>
     <div class="seg" style="margin-top:6px"><button id="tBgm" class="${BGM_ON?'on':''}">🎵 音樂</button><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
+    <div class="rhint">手機容易發燙或耗電快，可以開「🔋 省電模式」：畫面更新變慢、關掉裝飾動畫和大部分特效</div>
     <div class="homebtns"><button class="btn o" id="sA2hs">📱 加到桌面</button><button class="btn sub" id="sInv">💌 邀請朋友</button></div>
     <div class="sec">兌換碼</div><div class="redeem"><input id="rCode" placeholder="輸入兌換碼" maxlength="20" autocomplete="off"><button class="btn" id="rGo">兌換</button></div>`;
   if(me.admin) body += `<div class="sec">🛠️ 管理員</div><div class="admbox">
@@ -693,8 +694,11 @@ async function loadTicker(){
     tkW=el.scrollWidth; tkX=$('ticker').clientWidth;
   }catch(e){}
 }
-function tkLoop(){ requestAnimationFrame(tkLoop); const el=$('tk'); if(!el||!tkW) return;
-  tkX -= (typeof LOWFX!=='undefined'&&LOWFX) ? 0.6 : 0.9; if(tkX < -tkW) tkX = $('ticker').clientWidth;
+let tkT=0;
+function tkLoop(now){ requestAnimationFrame(tkLoop); const el=$('tk'); if(!el||!tkW) return;
+  if(PAUSED() || now-tkT < 1000/FPS_CAP()-2){ if(PAUSED()) tkT=now; return; }
+  const k=Math.min(4,(now-(tkT||now))/16.7); tkT=now;
+  tkX -= ((typeof LOWFX!=='undefined'&&LOWFX) ? 0.6 : 0.9) * k; if(tkX < -tkW) tkX = $('ticker').clientWidth;
   el.style.transform=`translateX(${tkX.toFixed(1)}px)`; }
 requestAnimationFrame(tkLoop);
 setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 45000);

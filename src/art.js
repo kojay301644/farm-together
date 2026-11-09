@@ -135,8 +135,8 @@ function modal(title, body, btns){
   const upd=()=>{ const more = bd.scrollHeight - bd.scrollTop - bd.clientHeight > 24; mm.classList.toggle('on', more); $('md').classList.toggle('hasmore', more); };
   bd.addEventListener('scroll', upd, {passive:true}); mm.onclick=()=>bd.scrollBy({top:bd.clientHeight*0.7, behavior:'smooth'});
   bd.querySelectorAll('img').forEach(im=>{ if(!im.complete) im.addEventListener('load', upd, {once:true}); });
-  $('ov').classList.add('show'); upd(); setTimeout(upd, 120); setTimeout(upd, 600);
+  $('ov').classList.add('show'); document.body.classList.add('modalopen'); upd(); setTimeout(upd, 120); setTimeout(upd, 600);
 }
-function closeModal(){ $('ov').classList.remove('show'); }
+function closeModal(){ $('ov').classList.remove('show'); document.body.classList.remove('modalopen'); }
 $('ov').addEventListener('click', e=>{ if(e.target.id==='ov') closeModal(); });
 
