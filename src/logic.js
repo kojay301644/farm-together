@@ -348,7 +348,8 @@ async function openBoard(tab){
   modal('好友廣場', `<div class="empty">讀取中…</div>`);
   let F, logs, R, NB;
   try{ [F, logs, R] = await Promise.all([rpc('farm_friends'), boardTab==='logs'?rpc('farm_logs_get'):[], boardTab==='rank'?(rankKind==='lv'?rpc('farm_rank'):rpc('farm_rank_by',{p_kind:rankKind})):null]);
-    if(boardTab==='near') NB = await rpc('farm_neighbors'); }
+    if(boardTab==='near') NB = await rpc('farm_neighbors');
+    if(boardTab==='logs'){ stealSeen(logs); $('stealAlert').classList.remove('show'); } }
   catch(e){ return modal('好友廣場', `<div class="empty">${esc(e.message)}</div>`); }
   const nIn = F.incoming.length;
   const tabs = `<div class="tabs">
@@ -356,7 +357,7 @@ async function openBoard(tab){
     <button data-tab="add" class="${boardTab==='add'?'on':''}">加好友${nIn?` <i class="dot">${nIn}</i>`:''}</button>
     <button data-tab="near" class="${boardTab==='near'?'on':''}">鄰居</button>
     <button data-tab="rank" class="${boardTab==='rank'?'on':''}">排行</button>
-    <button data-tab="logs" class="${boardTab==='logs'?'on':''}">動態</button></div>`;
+    <button data-tab="logs" class="${boardTab==='logs'?'on':''}">動態${stealNew?`<i class="nbadge">${stealNew}</i>`:''}</button></div>`;
   let body = '';
   if(boardTab==='friends'){
     body = F.friends.length ? F.friends.map(f=>`<div class="row">
@@ -392,8 +393,10 @@ async function openBoard(tab){
     else body += R.top.map(x=>row(x.rk, x)).join('');
     body += `<div class="myrank">你在全服排第 <b>${R.my_rank}</b> 名（共 ${R.total} 位玩家）</div>`;
   } else {
-    body = logs.length ? logs.map(l=>`<div class="row"><div class="avatar sm" style="background:${l.kind.startsWith('prank')?'#F78FB3':l.kind==='steal'?'#FF9F43':'#3BB273'}">${esc((l.who||'?').slice(0,1))}</div>
-        <div class="tx"><b>${esc(l.who||'')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}<div>${ago(l.at)}</div></div></div>`).join('')
+    const BAD = {steal:1, r_steal:1, dog:1, prank_weed:1, prank_bug:1, r_prank:1, scare:1};
+    body = logs.length ? logs.map(l=>{ const bad=BAD[l.kind], theft=l.kind==='steal'||l.kind==='r_steal', can=l.aid && l.aid!==S.me.id && bad;
+      return `<div class="row${theft?' lsteal':bad?' lbad':''}"><div class="avatar sm" style="background:${l.kind.startsWith('prank')||l.kind==='r_prank'?'#F78FB3':theft?'#F2545B':l.kind==='dog'?'#FF9F43':'#3BB273'}">${theft?'🦹':esc((l.who||'?').slice(0,1))}</div>
+        <div class="tx"><b>${esc(l.who||'')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}<div>${ago(l.at)}</div></div>${can?`<button class="mini revenge" data-visit="${l.aid}">😤 復仇</button>`:''}</div>`; }).join('')
       : `<div class="empty">還沒有任何動態</div>`;
   }
   modal('好友廣場', tabs + body);
@@ -750,3 +753,26 @@ const ACH_LIST=[['harvest100','收成 100 次',30,m=>[(m.stats||{}).harvest||0,1
 function achHTML(me){ return `<div class="achs">${ACH_LIST.map(([id,n,g,f])=>{ const [v,t]=f(me), done=(me.ach||{})[id];
   return `<div class="ach${done?' done':''}"><b>${done?'🏆':'🎯'} ${n}</b><span>${done?'已完成':`${Math.min(v,t)}/${t}`}・💎${g}</span></div>`; }).join('')}</div>
   <div class="rhint">每升 1 級送 💎${+(CFG_SET.lv_gems??20)}，每天第一次上線送 💎${+(CFG_SET.daily_gems??10)}</div>`; }
+
+/* ================= 被偷提醒：有人偷你的菜，畫面上方跳紅色提醒＋復仇按鈕 ================= */
+let stealNew = 0, stealAlertT = 0;
+const stealKey = () => 'ytzt_stealseen_' + (S && S.me.id);
+function stealSeen(logs){ const t=Math.max(0, ...(logs||[]).map(l=>+l.at||0)); try{ if(t) localStorage.setItem(stealKey(), String(t)); }catch(e){} stealNew=0; setStealBadge(); }
+function setStealBadge(){ const lb=document.querySelector('[data-b="board"]'); if(lb) lb.classList.toggle('stolen', stealNew>0); }
+async function checkSteals(){
+  if(!S || mode!=='home' || document.hidden) return;
+  let logs; try{ logs = await rpc('farm_logs_get'); }catch(e){ return; }
+  let seen=0; try{ seen=+localStorage.getItem(stealKey())||0; }catch(e){}
+  if(!seen){ stealSeen(logs); return; }   // 第一次：不跳舊的
+  const fresh = logs.filter(l=>(l.kind==='steal'||l.kind==='r_steal') && +l.at>seen && l.aid!==S.me.id);
+  stealNew = fresh.length; setStealBadge();
+  if(!fresh.length) return;
+  const l = fresh[0], more = fresh.length>1 ? `（還有 ${fresh.length-1} 筆）` : '';
+  const el = $('stealAlert');
+  el.innerHTML = `<div class="sa-in"><span class="sa-ic">🦹</span><div class="sa-tx"><b>${esc(l.who||'有人')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}！${more}</div><button class="mini revenge" id="saGo">😤 復仇</button><button class="sa-x" id="saX">✕</button></div>`;
+  el.classList.add('show'); sfx && sfx('err'); vib && vib([60,40,60]);
+  $('saGo').onclick = ()=>{ el.classList.remove('show'); try{ localStorage.setItem(stealKey(), String(Math.max(...fresh.map(x=>+x.at)))); }catch(e){} stealNew=0; setStealBadge(); visit(l.aid); };
+  $('saX').onclick = ()=>{ el.classList.remove('show'); };
+  clearTimeout(stealAlertT); stealAlertT = setTimeout(()=>el.classList.remove('show'), 12000);
+}
+setInterval(checkSteals, 30000); setTimeout(checkSteals, 6000);

@@ -337,6 +337,17 @@ body.ingame .pan{display:flex}
 .skeep{display:flex;align-items:center;gap:10px;background:#FFF8EC;border:2.5px dashed #E6D9C3;border-radius:14px;padding:8px 12px;margin-bottom:8px;cursor:pointer;font-size:14px}
 .skeep.on{border-style:solid;border-color:#3BB273;background:#E8F8EE}.skeep input{width:22px;height:22px;accent-color:#3BB273;flex:none}.skeep small{color:var(--ink2);font-weight:700;font-size:12px}
 .row.scur{background:#E8F8EE;border-radius:12px}
+.row.lsteal{background:#FFE9E9;border:2px solid #F2545B;border-radius:12px;padding:8px}.row.lsteal .tx b{color:#D63B42}
+.row.lbad{background:#FFF4E6;border-radius:12px}
+.tap.stolen{filter:drop-shadow(0 0 10px #F2545B) drop-shadow(0 0 4px #F2545B)}
+.mini.revenge{background:#F2545B;color:#fff;box-shadow:0 3px 0 #C23A40;white-space:nowrap}
+.nbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:4px;padding:0 5px;border-radius:9px;background:#F2545B;color:#fff;font-style:normal;font-size:11px;font-weight:900}
+.stealalert{position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top) + 74px);z-index:40;display:flex;justify-content:center;pointer-events:none;opacity:0;transform:translateY(-14px);transition:.3s}
+.stealalert.show{opacity:1;transform:none;pointer-events:auto;animation:sashake .5s .3s}
+.sa-in{display:flex;align-items:center;gap:8px;max-width:520px;width:100%;background:#FFF0F0;border:3px solid #F2545B;border-radius:16px;padding:8px 10px;box-shadow:0 6px 18px rgba(242,84,91,.35)}
+.sa-ic{font-size:28px}.sa-tx{flex:1;font-weight:800;font-size:14px;color:#5A2A2A;line-height:1.4}.sa-tx b{color:#D63B42}
+.sa-x{border:0;background:none;font-size:18px;color:#B07070;cursor:pointer;padding:4px}
+@keyframes sashake{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .avw{position:relative;flex:none}.aved{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;background:#FF9F43;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 0 #D67D22;pointer-events:none}
 .admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
 .admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}
@@ -465,6 +476,7 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
   <div class="dock-in"><div class="tools" id="tools"></div></div>
 </div>
 
+<div class="stealalert" id="stealAlert"></div>
 <div class="tut" id="tut" style="display:none"><div class="tutin"><div id="tutText"></div><div class="tutbtns"><button class="mini sub" id="tutSkip">跳過教學</button><button class="mini o" id="tutNext">下一步</button></div></div></div>
 <div class="tutring" id="tutRing" style="display:none"></div><div class="tutarrow" id="tutArrow" style="display:none">👇</div>
 <button class="pan l" id="panL" aria-label="往左看">‹</button><button class="pan r" id="panR" aria-label="往右看">›</button>
