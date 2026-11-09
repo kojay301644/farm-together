@@ -234,9 +234,11 @@ function buildWorld(){
       s += `<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})"><g class="blades"><image href="${A('b_sail')}" x="-55" y="-55" width="110" height="110"/></g></g>`;
     }
     if(o.id==='home'){ const [x,y]=iso(gx,gy), top=y-h*o.foot; s += `<circle class="smoke" cx="${x+o.w*0.24}" cy="${top+h*0.02}" r="6" fill="#fff" opacity=".75"/><circle class="smoke" style="animation-delay:1.5s" cx="${x+o.w*0.26}" cy="${top}" r="5" fill="#fff" opacity=".75"/>`; }
-    objs.push({depth:gx+gy, svg:`<g class="tap" data-b="${o.id}">${s}</g>`});
+    if(o.id==='coop'){ // 牧場：乾草車不接受點擊（避免擋到農田），改成點牧場草地
+      ground += `<g class="tap" data-b="coop"><polygon points="${P(dia(RX,RY,RW,RD))}" fill="rgba(0,0,0,0)"/></g>`;
+    } else objs.push({depth:gx+gy, svg:`<g class="tap" data-b="${o.id}">${s}</g>`});
     const [lx,ly]=iso(gx,gy);
-    lab += labelPill(lx, ly - h*o.foot + (o.id==='coop'?4:18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
+    lab += labelPill(lx, ly - (o.id==='coop'?20:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
   });
   const BDc=HG(790,305); const bd=board(BDc[0],BDc[1]); objs.push({depth:bd.depth, svg:`<g class="tap" data-b="board"><g transform="translate(${iso(...BDc)[0]} ${iso(...BDc)[1]}) scale(1.5) translate(${-iso(...BDc)[0]} ${-iso(...BDc)[1]})">${bd.svg}</g></g>`});
   lab += labelPill(iso(...BDc)[0], iso(...BDc)[1]-132, '好友布告欄', {bg:'#E3F6EA',fg:'#2E9660'});
@@ -261,7 +263,7 @@ function buildWorld(){
   // 飛鳥
   for(let k=0;k<2;k++) cloud += `<g class="bird" style="animation-delay:${-k*17}s"><g transform="translate(0 ${120+k*90})"><path d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path transform="translate(26 14) scale(.8)" d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/></g></g>`;
 
-  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="movers"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
+  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="movers" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
 
   // 田地元素與標籤
   plotEls=[]; plotSig=[]; plotLabs=[];
