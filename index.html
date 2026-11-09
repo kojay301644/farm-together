@@ -557,7 +557,7 @@ function sprite(name, gx, gy, w, opt={}){
   return `<image href="${A(name)}" x="${(x-w/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" ${opt.cls?`class="${opt.cls}"`:''}/>`;
 }
 /* 建築外觀（萌獸 7 種樣式） */
-const SKIN_R = {"b_forge": 1.1449, "bb_forge": 1.1307, "bc_forge": 1.1532, "bf_forge": 1.1287, "bi_forge": 1.149, "bj_forge": 1.1429, "bl_forge": 1.1327, "b_play": 1.1599, "bb_play": 1.164, "bc_play": 1.203, "bf_play": 1.166, "bi_play": 1.1429, "bj_play": 1.1721, "bl_play": 1.1802, "b_academy": 1.0702, "bb_academy": 1.115, "bc_academy": 1.25, "bf_academy": 1.115, "bi_academy": 1.1918, "bj_academy": 1.113, "bl_academy": 1.115, "b_farm": 1.0357, "bb_farm": 1.0317, "bc_farm": 1.0793, "bf_farm": 1.0556, "bi_farm": 1.1327, "bj_farm": 1.0575, "bl_farm": 1.0575, "b_shop": 1.0997, "bb_shop": 1.1268, "bc_shop": 1.1615, "bf_shop": 1.115, "bi_shop": 1.1388, "bj_shop": 1.1189, "bl_shop": 1.1348, "b_fountain": 1.1679, "bb_fountain": 1.1532, "bc_fountain": 1.1228, "bf_fountain": 1.147, "bi_fountain": 1.1429, "bj_fountain": 1.1449, "bl_fountain": 1.1615, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
+const SKIN_R = {"b_forge": 1.1449, "bb_forge": 1.1307, "bc_forge": 1.1532, "bf_forge": 1.1287, "bi_forge": 1.149, "bj_forge": 1.1429, "bl_forge": 1.1327, "b_play": 0.7463, "bb_play": 0.75, "bc_play": 0.7883, "bf_play": 0.75, "bi_play": 0.7459, "bj_play": 0.752, "bl_play": 0.7602, "b_academy": 1.0702, "bb_academy": 1.115, "bc_academy": 1.25, "bf_academy": 1.115, "bi_academy": 1.1918, "bj_academy": 1.113, "bl_academy": 1.115, "b_farm": 1.0357, "bb_farm": 1.0317, "bc_farm": 1.0793, "bf_farm": 1.0556, "bi_farm": 1.1327, "bj_farm": 1.0575, "bl_farm": 1.0575, "b_shop": 1.0997, "bb_shop": 1.1268, "bc_shop": 1.1615, "bf_shop": 1.115, "bi_shop": 1.1388, "bj_shop": 1.1189, "bl_shop": 1.1348, "b_fountain": 1.1679, "bb_fountain": 1.1532, "bc_fountain": 1.1228, "bf_fountain": 1.147, "bi_fountain": 1.1429, "bj_fountain": 1.1449, "bl_fountain": 1.1615, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
 const SKIN_PART = {home:'academy', barn:'farm', shop:'shop', fountain:'fountain', pen:'play', decor:'forge'};
 const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'b', decor:'b'};
 const SKIN_NAME = {b:'原版', bb:'紅磚', bc:'糖果', bf:'森林', bi:'冰雪', bj:'翡翠', bl:'熔岩'};
@@ -570,7 +570,7 @@ let skinSig='';
 function applySkins(on){ on=on||{}; const sig=JSON.stringify(on); if(sig===skinSig) return; skinSig=sig;
   document.querySelectorAll('#world image.skin').forEach(el=>{ const k=el.dataset.sk, img=skinImg(k, on[k]), w=+el.dataset.w, h=w*(SKIN_R[img]||1);
     el.setAttribute('href', A(img)); el.setAttribute('height', h.toFixed(1)); el.setAttribute('y', (+el.dataset.fy - h*(+el.dataset.foot)).toFixed(1)); }); }
-const RATIO = {bc_forge:1.1532, b_play:1.1599, bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
+const RATIO = {bc_forge:1.1532, b_play:0.7463, bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
   dc_flower:1, dc_lamp:1, dc_bench:1, dc_pond:1, dc_hay:1, dc_mail:1, dc_kennel:1, dc_lantree:1, dc_swing:1, dc_sakura:1, dc_picnic:1, dc_balloon:1,
   bunny1:396/310, bear1:1, fox1:1, penguin1:1, otter1:1, mouse1:1};
 
@@ -581,7 +581,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:HG(930,203),  w:240, foot:0.80},
   {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78, locked:'牧場將在第四階段開放'},
-  {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(448,572), w:430, foot:0.74, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
+  {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
 
 // 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
@@ -763,12 +763,11 @@ function buildWorld(){
     const [lx,ly]=iso(gx,gy);
     lab += labelPill(lx, ly - (o.id==='coop'?20:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
   });
-  const BDc=HG(790,305); const bd=board(BDc[0],BDc[1]); objs.push({depth:bd.depth, svg:`<g class="tap" data-b="board"><g transform="translate(${iso(...BDc)[0]} ${iso(...BDc)[1]}) scale(1.5) translate(${-iso(...BDc)[0]} ${-iso(...BDc)[1]})">${bd.svg}</g></g>`});
-  lab += labelPill(iso(...BDc)[0], iso(...BDc)[1]-132, '好友布告欄', {bg:'#E3F6EA',fg:'#2E9660'});
 
   // 裝飾（萌獸星球素材）
   const deco=(n,gx,gy,w,extra='')=>objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`});
-  const FC=HG(645,352); objs.push({depth:FC[0]+FC[1], svg:skinSprite('fountain', FC[0], FC[1], 150, 0.8)});
+  const FC=HG(645,352); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
+  lab += labelPill(iso(...FC)[0], iso(...FC)[1]-150, '好友廣場', {bg:'#E3F6EA',fg:'#2E9660'});
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
   // 島下方空地的裝飾
@@ -1063,7 +1062,7 @@ const TUT_STEPS = [
   {text:'下面是<b>工具列</b>：田裡缺水、長草或有蟲時，選對應的工具點田地。放著不管，收成會變少喔', target:()=>$('tools'), next:true},
   {text:'白蘿蔔大約 <b>2 分鐘</b>成熟。成熟後選「收成」點它，就能收進倉庫', target:()=>plotEls[S.plots.findIndex(p=>p.s==='grow'||p.s==='dead')], done:()=>Object.keys(S.me.crops).length>0 || S.plots.some(p=>p.s==='dead'), next:true},
   {text:'點<b>穀倉</b>可以把作物賣掉換金幣，再到<b>種子商店</b>買更多種子', target:()=>document.querySelector('[data-b="barn"]'), next:true},
-  {text:'最後，點<b>好友布告欄</b>用暱稱加好友，就能去朋友的農場偷菜了！', target:()=>document.querySelector('[data-b="board"]'), next:true, last:true},
+  {text:'最後，點中間的<b>好友廣場</b>（噴水池）用暱稱加好友，就能去朋友的農場偷菜了！', target:()=>document.querySelector('[data-b="board"]'), next:true, last:true},
 ];
 let tut = null;   // {step}
 const tutKey = () => 'ytzt_tut_' + (S && S.me.id);
@@ -1109,7 +1108,7 @@ function openHelp(){
     <h4>💰 賺錢與升級</h4>
     <p>到穀倉把作物賣掉換金幣，再到種子商店買種子。收成、澆水、除草除蟲都會拿到經驗，升級後可以買更高級的作物、開墾更多荒地（最多 18 塊）。</p>
     <h4>🧺 好友與偷菜</h4>
-    <p>在好友布告欄用暱稱加好友，就能拜訪對方農場：</p>
+    <p>在好友廣場用暱稱加好友，就能拜訪對方農場：</p>
     <ul><li><b>偷菜</b>：成熟的作物每塊地每人只能偷一次，每塊地最多被偷走 4 成，主人一定拿得到 6 成</li>
     <li><b>幫忙</b>：幫好友除草除蟲可以拿經驗</li>
     <li><b>惡作劇</b>：在好友還沒成熟的作物放草放蟲，每天 10 次</li></ul>
@@ -1553,7 +1552,7 @@ async function openHome(){
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
     <div class="sec">玩法小提醒</div>
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
-      ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友布告欄」加好友、拜訪好友農場</div>
+      ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友廣場」加好友、拜訪好友農場</div>
     <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
     <div class="homebtns"><button class="btn o" id="hGem" style="background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">💎 鑽石商店</button><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
     <div class="homebtns">${S.me.admin?'<a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">🛠️ 營運後台</a>':''}<button class="btn sub" id="logout">登出</button></div>
@@ -1570,7 +1569,7 @@ async function openHome(){
 }
 const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
-/* ================= 好友布告欄 ================= */
+/* ================= 好友廣場 ================= */
 let boardTab = 'friends', rankScope = 'f';
 function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60) return '剛剛'; if(s<3600) return `${Math.floor(s/60)} 分鐘前`; if(s<86400) return `${Math.floor(s/3600)} 小時前`; return `${Math.floor(s/86400)} 天前`; }
 const LOG_TXT = {help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了水`, steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
@@ -1579,11 +1578,11 @@ const LOG_TXT = {help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了
 
 async function openBoard(tab){
   if(tab) boardTab = tab;
-  modal('好友布告欄', `<div class="empty">讀取中…</div>`);
+  modal('好友廣場', `<div class="empty">讀取中…</div>`);
   let F, logs, R, NB;
   try{ [F, logs, R] = await Promise.all([rpc('farm_friends'), boardTab==='logs'?rpc('farm_logs_get'):[], boardTab==='rank'?rpc('farm_rank'):null]);
     if(boardTab==='near') NB = await rpc('farm_neighbors'); }
-  catch(e){ return modal('好友布告欄', `<div class="empty">${esc(e.message)}</div>`); }
+  catch(e){ return modal('好友廣場', `<div class="empty">${esc(e.message)}</div>`); }
   const nIn = F.incoming.length;
   const tabs = `<div class="tabs">
     <button data-tab="friends" class="${boardTab==='friends'?'on':''}">好友</button>
@@ -1627,7 +1626,7 @@ async function openBoard(tab){
         <div class="tx"><b>${esc(l.who||'')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}<div>${ago(l.at)}</div></div></div>`).join('')
       : `<div class="empty">還沒有任何動態</div>`;
   }
-  modal('好友布告欄', tabs + body);
+  modal('好友廣場', tabs + body);
   const md = $('md');
   md.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>openBoard(b.dataset.tab));
   md.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>{ rankScope=b.dataset.rs; openBoard('rank'); });
@@ -1744,7 +1743,7 @@ function renderHUD(){
   else if(PL.some(isDry)) h='有田地<b>缺水</b>了，澆水才能長得快';
   else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';
   else if(PL.some(p=>p.s==='empty')) h = n?'點<b>空地</b>選種子種下去吧':'沒有種子了，點<b>種子商店</b>買一些吧';
-  else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
+  else h='作物正在長大中…去<b>好友廣場</b>看看誰的菜可以偷';
   setHint(`<span>🌱</span><span>${h}</span>`);
 }
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */

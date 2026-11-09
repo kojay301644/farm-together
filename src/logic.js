@@ -242,7 +242,7 @@ async function openHome(){
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
     <div class="sec">玩法小提醒</div>
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
-      ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友布告欄」加好友、拜訪好友農場</div>
+      ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友廣場」加好友、拜訪好友農場</div>
     <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
     <div class="homebtns"><button class="btn o" id="hGem" style="background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">💎 鑽石商店</button><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
     <div class="homebtns">${S.me.admin?'<a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">🛠️ 營運後台</a>':''}<button class="btn sub" id="logout">登出</button></div>
@@ -259,7 +259,7 @@ async function openHome(){
 }
 const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
-/* ================= 好友布告欄 ================= */
+/* ================= 好友廣場 ================= */
 let boardTab = 'friends', rankScope = 'f';
 function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60) return '剛剛'; if(s<3600) return `${Math.floor(s/60)} 分鐘前`; if(s<86400) return `${Math.floor(s/3600)} 小時前`; return `${Math.floor(s/86400)} 天前`; }
 const LOG_TXT = {help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了水`, steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
@@ -268,11 +268,11 @@ const LOG_TXT = {help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了
 
 async function openBoard(tab){
   if(tab) boardTab = tab;
-  modal('好友布告欄', `<div class="empty">讀取中…</div>`);
+  modal('好友廣場', `<div class="empty">讀取中…</div>`);
   let F, logs, R, NB;
   try{ [F, logs, R] = await Promise.all([rpc('farm_friends'), boardTab==='logs'?rpc('farm_logs_get'):[], boardTab==='rank'?rpc('farm_rank'):null]);
     if(boardTab==='near') NB = await rpc('farm_neighbors'); }
-  catch(e){ return modal('好友布告欄', `<div class="empty">${esc(e.message)}</div>`); }
+  catch(e){ return modal('好友廣場', `<div class="empty">${esc(e.message)}</div>`); }
   const nIn = F.incoming.length;
   const tabs = `<div class="tabs">
     <button data-tab="friends" class="${boardTab==='friends'?'on':''}">好友</button>
@@ -316,7 +316,7 @@ async function openBoard(tab){
         <div class="tx"><b>${esc(l.who||'')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}<div>${ago(l.at)}</div></div></div>`).join('')
       : `<div class="empty">還沒有任何動態</div>`;
   }
-  modal('好友布告欄', tabs + body);
+  modal('好友廣場', tabs + body);
   const md = $('md');
   md.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>openBoard(b.dataset.tab));
   md.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>{ rankScope=b.dataset.rs; openBoard('rank'); });
@@ -433,7 +433,7 @@ function renderHUD(){
   else if(PL.some(isDry)) h='有田地<b>缺水</b>了，澆水才能長得快';
   else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';
   else if(PL.some(p=>p.s==='empty')) h = n?'點<b>空地</b>選種子種下去吧':'沒有種子了，點<b>種子商店</b>買一些吧';
-  else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
+  else h='作物正在長大中…去<b>好友廣場</b>看看誰的菜可以偷';
   setHint(`<span>🌱</span><span>${h}</span>`);
 }
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
