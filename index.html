@@ -584,7 +584,7 @@ addEventListener('resize',()=>{ if(S){ layout(); centerOn(...FARM_C); } });
 /* ================= 連線設定 ================= */
 const SB_URL = 'https://qnxnuyfvkrvhnaewvrik.supabase.co';
 const SB_KEY = 'sb_publishable_nX97hqqEgiGRwKQMOz56ow_uvMEAdht';
-const GOOGLE_ON = false;   // Google 登入金鑰設定好之後改成 true
+const GOOGLE_ON = true;    // Google 登入已開通
 const SITE_URL = location.origin + location.pathname;
 const sb = window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}});
 
