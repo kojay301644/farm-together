@@ -193,6 +193,7 @@ function buildWorld(){
     <linearGradient id="gCliffL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C08A5A"/><stop offset="1" stop-color="#8E5E38"/></linearGradient>
     <linearGradient id="gCliffR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A2703F"/><stop offset="1" stop-color="#704526"/></linearGradient>
     <linearGradient id="gRiver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6FCBF2"/><stop offset="1" stop-color="#3FA6E0"/></linearGradient>
+    <pattern id="pGrass" patternUnits="userSpaceOnUse" width="176" height="152"><image href="${A('grass_tile')}" width="176" height="152"/></pattern>
     <radialGradient id="gGlow"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient>
     <linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ADBF7"/><stop offset="1" stop-color="#6EC3EE"/></linearGradient>
   </defs>`;
@@ -209,7 +210,7 @@ function buildWorld(){
   island += `<ellipse class="wave" cx="${105*IS}" cy="${600*IS}" rx="28" ry="8" fill="#fff" opacity=".7"/>`;
 
   // 田區底＋木圍欄
-  ground += poly(dia(4.1,6.5,10.15,5.35),'#97C964',`stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"`);
+  ground += poly(dia(4.1,6.5,10.15,5.35),'url(#pGrass)',`stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"`);
   const fence=(x0,y0,x1,y1,col='#E8D3A2')=>{ let s=''; const n=Math.ceil(Math.hypot(x1-x0,y1-y0)/0.55);
     const a=iso(x0,y0), b=iso(x1,y1); s+=`<path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="${col}" stroke-width="2.6" stroke-linecap="round"/>`;
     for(let k=0;k<=n;k++){ const p=iso(x0+(x1-x0)*k/n, y0+(y1-y0)*k/n); s+=`<rect x="${p[0]-2.5}" y="${p[1]-21}" width="5" height="21" rx="2" fill="#F3E3BF" stroke="${INK}" stroke-width="1.5"/>`; } return s; };
@@ -223,7 +224,7 @@ function buildWorld(){
     objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col)}); };
   // 牧場（農田左邊、島的下方中間）
   const RC=HG(694,556), RW=3.0, RD=3.0, RX=RC[0]-RW/2, RY=RC[1]-RD/2;
-  pen(RX,RY,RW,RD,'#E8D3A2','#A8D46E');
+  pen(RX,RY,RW,RD,'#E8D3A2','url(#pGrass)');
   { const [tx,ty]=iso(RX+RW-0.7, RY+0.6); objs.push({depth:RX+RW+RY, svg: ol(`<path d="M${tx-22} ${ty-6} l22 -11 l22 11 l-22 11z" fill="#8B5E3C"/><path d="M${tx-18} ${ty-6} l18 -9 l18 9 l-18 9z" fill="#F4D35E"/>`,2)}); }
 
   // 建築
@@ -338,7 +339,7 @@ const SPR=0.7;
 function plotGroundSVG(p,i){
   const [x,y]=PLOTS[i], pts=dia(x,y,PS,PS), B=pts[1], C=pts[2], D=pts[3];
   let top='#9A6743', rim='#B98258', sl='#7A4E30', sr='#663F25';
-  if(p.s==='wild'){ top='#7DB14C'; rim='#93C763'; sl='#8B5E3C'; sr='#76502F'; }
+  if(p.s==='wild'){ top='url(#pGrass)'; rim='#B4E27F'; sl='#8B5E3C'; sr='#76502F'; }
   else if(p.s==='grow'){ if(isDry(p)){ top='#C79563'; rim='#D8AA78'; } else { top='#6E4329'; rim='#845436'; } }
   const k=7;
   let s = poly([D,C,[C[0],C[1]+k],[D[0],D[1]+k]],sl,`stroke="${INK}" stroke-width="2"`) + poly([C,B,[B[0],B[1]+k],[C[0],C[1]+k]],sr,`stroke="${INK}" stroke-width="2"`)
