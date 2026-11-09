@@ -27,7 +27,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden}
-body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#8CCB5B;user-select:none;-webkit-user-select:none}
+body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#8fcdfb;user-select:none;-webkit-user-select:none}
 button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 
 /* 地圖 */
@@ -194,6 +194,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .bfly{animation:flap .25s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 50%}
 @keyframes flap{50%{transform:scaleX(.35)}}
 .floaty{animation:floaty 3.5s ease-in-out infinite}
+.sunrays{animation:spin 160s linear infinite;transform-box:fill-box;transform-origin:50% 50%}
 @keyframes floaty{50%{transform:translateY(-8px)}}
 .bird{animation:bird 38s linear infinite}
 @keyframes bird{from{transform:translateX(-200px)}to{transform:translateX(1600px)}}
@@ -465,7 +466,10 @@ $('ov').addEventListener('click', e=>{ if(e.target.id==='ov') closeModal(); });
 
 
 /* ================= 小鎮地圖：斜角座標 ================= */
-const TW=72, TH=36, OX=680, OY=96, VX=-120, VY=-110, WW=1600, WH=1040;
+const TW=72, TH=36, OX=640, OY=278.8, VX=-90, VY=-70, WW=1780, WH=1030, IW=1600, IH=895.2;
+const IS=1600/1344; // 萌獸主頁座標(1344寬)→世界座标
+const W2G=(x,y)=>{ const a=(x-OX)/(TW/2), b=(y-OY)/(TH/2); return [(a+b)/2,(b-a)/2]; };
+const HG=(x,y)=>W2G(x*IS,y*IS); // 萌獸主頁座標→格座標
 const PAD={t:0,b:0,l:0,r:0};
 const iso=(x,y)=>[OX+(x-y)*TW/2, OY+(x+y)*TH/2];
 const P=a=>a.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
@@ -505,11 +509,11 @@ const RATIO = {b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/59
 
 // 建築（萌獸星球素材），footprint 用來算前後順序與點擊
 const BLD = [
-  {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.8,2.6],  w:250, foot:0.80},
-  {id:'shop',  name:'種子商店', img:'b_shop',     c:[7.4,2.85], w:225, foot:0.80},
-  {id:'home',  name:'我的家',   img:'b_academy',  c:[11.9,2.6], w:235, foot:0.80},
-  {id:'decor', name:'裝飾店',   img:'bc_shop',    c:[1.6,11.2], w:180, foot:0.80, locked:'裝飾店將在第四階段開放'},
-  {id:'coop',  name:'牧場',     img:'dc_hay',     c:[11.6,13.0],w:84,  foot:0.78, locked:'牧場將在第四階段開放'},
+  {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
+  {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
+  {id:'barn',  name:'穀倉',     img:'b_farm',     c:HG(930,203),  w:240, foot:0.80},
+  {id:'decor', name:'裝飾店',   img:'bc_shop',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
+  {id:'coop',  name:'牧場',     img:'dc_hay',     c:HG(1170,410), w:96,  foot:0.78, locked:'牧場將在第四階段開放'},
 ];
 
 // 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
@@ -624,7 +628,6 @@ function farmerDo(i, kind){
   m.task={pos:[P[0]+PS*0.5, P[1]+PS+0.12], act, emo, dur:1.5, started:false, look:[P[0]+PS/2,P[1]+PS/2]};
   setAct(m,null); m.wait=0; m.goal=null;
 }
-function setFarmer(av){ if(!farmerMover || farmerAv===av) return; farmerAv=av; farmerMover.el.firstChild.innerHTML = charSVG(av); }
 
 function buildWorld(){
   const W=$('world');
@@ -641,30 +644,18 @@ function buildWorld(){
     <linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ADBF7"/><stop offset="1" stop-color="#6EC3EE"/></linearGradient>
   </defs>`;
 
-  // 大草原（填滿畫面）
-  sea += `<rect x="${VX-50}" y="${VY-50}" width="${WW+100}" height="${WH+100}" fill="url(#gGrass)"/>`;
-  for(let k=0;k<70;k++){ const x=VX+rnd()*WW, y=VY+rnd()*WH; sea += `<ellipse cx="${x}" cy="${y}" rx="${40+rnd()*70}" ry="${16+rnd()*24}" fill="${rnd()<0.5?'#8FCD5E':'#B4E27F'}" opacity=".45"/>`; }
-  // 草地色塊
-  for(let k=0;k<20;k++){ const [x,y]=iso(rnd()*17-0.5, rnd()*17-0.5); island += `<ellipse cx="${x}" cy="${y}" rx="${30+rnd()*50}" ry="${12+rnd()*18}" fill="${rnd()<0.5?'#8FCD5E':'#B4E27F'}" opacity=".45"/>`; }
-  // 草叢與小花
-  for(let k=0;k<200;k++){ const gx=rnd()*30-7, gy=rnd()*30-7; const [x,y]=iso(gx,gy); if(x<VX||x>VX+WW||y<VY||y>VY+WH) continue;
-    ground += rnd()<0.65 ? `<path class="tuft" style="animation-delay:-${(rnd()*3).toFixed(2)}s" d="M${x-4} ${y} l2 -7 l2 7 l2 -6 l2 6" stroke="#4E9A3A" stroke-width="1.8" fill="none" stroke-linejoin="round"/>`
-      : `<g><circle cx="${x}" cy="${y-2}" r="2.8" fill="${['#FFE066','#FFFFFF','#FF9AA2','#B9A6FF'][k%4]}" stroke="${INK}" stroke-width="1"/><circle cx="${x}" cy="${y-2}" r="1" fill="#F0A030"/></g>`; }
-
-  // 小路（沙土＋石板）
-  const path=(x,y,w,d)=>poly(dia(x,y,w,d),'#EAD5A3',`stroke="#B9965E" stroke-width="2.5" stroke-linejoin="round"`);
-  ground += path(-16,5,48,1) + path(3,6,1,24) + path(7.2,4.1,0.8,0.9) + path(11.6,4,0.8,1) + path(2.6,4,0.8,1);
-  for(let x=-15.6;x<31.8;x+=0.62){ const [px,py]=iso(x+0.1*rnd(), 5.5+(rnd()-0.5)*0.35); ground+=`<ellipse cx="${px}" cy="${py}" rx="${7+rnd()*3}" ry="${3.5+rnd()*1.5}" fill="#D8C08C" stroke="#A88A57" stroke-width="1.3"/>`; }
-  for(let y=6.3;y<29.8;y+=0.62){ const [px,py]=iso(3.5+(rnd()-0.5)*0.35, y); ground+=`<ellipse cx="${px}" cy="${py}" rx="${7+rnd()*3}" ry="${3.5+rnd()*1.5}" fill="#D8C08C" stroke="#A88A57" stroke-width="1.3"/>`; }
-
-  // 河
-  ground += poly(dia(-16,14.15,48,1.3),'#9ADFF7',`stroke="${INK}" stroke-width="2.5"`) + poly(dia(-16,14.35,48,0.9),'url(#gRiver)');
-  ground += `<path class="flow" d="M${P([iso(-16,14.65),iso(32,14.65)])}" stroke="#E3F6FF" stroke-width="2.5" opacity=".85"/><path class="flow" style="animation-delay:-1s" d="M${P([iso(-16,14.95),iso(32,14.95)])}" stroke="#E3F6FF" stroke-width="2" opacity=".6"/>`;
-  for(let k=0;k<18;k++){ const [x,y]=iso(rnd()*40-14, 14.4+rnd()*0.8); ground+=`<ellipse class="wave" style="animation-delay:-${(rnd()*3).toFixed(1)}s" cx="${x}" cy="${y}" rx="5" ry="1.6" fill="#fff" opacity=".7"/>`; }
-  // 橋
-  ground += poly(dia(2.75,13.9,1.5,1.8),'#C98B5E',`stroke="${INK}" stroke-width="2.5"`);
-  for(let k=1;k<6;k++){ ground+=`<path d="M${P([iso(2.75,13.9+k*0.3),iso(4.25,13.9+k*0.3)])}" stroke="#8B5E3C" stroke-width="2"/>`; }
-  ground += `<path d="M${P([up(iso(2.75,13.9),9),up(iso(2.75,15.7),9)])} M${P([up(iso(4.25,13.9),9),up(iso(4.25,15.7),9)])}" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M${P([up(iso(2.75,13.9),9),up(iso(2.75,15.7),9)])} M${P([up(iso(4.25,13.9),9),up(iso(4.25,15.7),9)])}" stroke="#A86F45" stroke-width="2" stroke-linecap="round"/>`;
+  // 天空（同萌獸主頁：漸層＋陽光＋遠方浮島）
+  defs = defs.replace('</defs>',`<linearGradient id="gSky" gradientUnits="userSpaceOnUse" x1="0" y1="${VY}" x2="0" y2="${VY+WH}"><stop offset="0" stop-color="#3f9be8"/><stop offset=".55" stop-color="#8fcdfb"/><stop offset="1" stop-color="#d6efff"/></linearGradient>
+    <radialGradient id="gSun"><stop offset="0" stop-color="rgba(255,250,220,.95)"/><stop offset=".25" stop-color="rgba(255,240,180,.5)"/><stop offset="1" stop-color="rgba(255,240,180,0)"/></radialGradient></defs>`);
+  sea += `<rect x="${VX-1500}" y="${VY-1500}" width="${WW+3000}" height="${WH+3000}" fill="url(#gSky)"/>`;
+  const sx=VX+WW*0.82, sy=VY+70;
+  sea += `<g transform="translate(${sx} ${sy})" opacity=".9"><g class="sunrays">${Array.from({length:12},(_,k)=>`<path transform="rotate(${k*30})" d="M-18 0 L18 0 L70 -900 L-70 -900Z" fill="rgba(255,248,210,.10)"/>`).join('')}</g></g><circle cx="${sx}" cy="${sy}" r="160" fill="url(#gSun)"/>`;
+  [["isl0",0,0,207,125,0],["isl1",1083,0,261,154,1.7],["isl2",1279,117,65,126,3.1]].forEach(([n,x,y,w,h,ph])=>{
+    sea += `<image class="floaty" style="animation-delay:-${ph}s" href="${A(n)}" x="${x*IS-40}" y="${y*IS-40}" width="${w*IS}" height="${h*IS}"/>`; });
+  // 萌獸主頁浮空島
+  island += `<image href="${A('home_island')}" x="0" y="0" width="${IW}" height="${IH}"/>`;
+  // 瀑布水花
+  island += `<ellipse class="wave" cx="${105*IS}" cy="${600*IS}" rx="28" ry="8" fill="#fff" opacity=".7"/>`;
 
   // 田區底＋木圍欄
   ground += poly(dia(4.1,6.5,10.15,5.35),'#97C964',`stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"`);
@@ -672,13 +663,10 @@ function buildWorld(){
     const a=iso(x0,y0), b=iso(x1,y1); s+=`<path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="${col}" stroke-width="2.6" stroke-linecap="round"/>`;
     for(let k=0;k<=n;k++){ const p=iso(x0+(x1-x0)*k/n, y0+(y1-y0)*k/n); s+=`<rect x="${p[0]-2.5}" y="${p[1]-21}" width="5" height="21" rx="2" fill="#F3E3BF" stroke="${INK}" stroke-width="1.5"/>`; } return s; };
   ground += fence(4.1,6.5,14.25,6.5,'#D9B98A') + fence(4.1,6.5,4.1,11.85,'#D9B98A');
-  objs.push({depth:4.1+11.85+14.25+0.2, svg: fence(4.1,11.85,9.0,11.85,'#D9B98A')});
+  objs.push({depth:4.1+11.85+14.25+0.2, svg: fence(4.1,11.85,14.25,11.85,'#D9B98A') + fence(14.25,6.5,14.25,11.85,'#D9B98A')});
 
-  // 牧場
-  const RX=9.4,RY=12.1,RW=6.2,RD=1.9;
-  ground += poly(dia(RX,RY,RW,RD),'#B2DB7A',`stroke="${INK}" stroke-width="2"`);
-  ground += fence(RX,RY,RX+RW,RY) + fence(RX,RY,RX,RY+RD);
-  objs.push({depth:RX+RW+RY+RD+0.5, svg: fence(RX,RY+RD,RX+RW,RY+RD) + fence(RX+RW,RY,RX+RW,RY+RD)});
+  // 牧場（放在右側地基上）
+  const RC=HG(1190,420), RX=RC[0]-1.3, RY=RC[1]-1.3, RW=2.6, RD=2.6;
 
   // 建築
   BLD.forEach(o=>{
@@ -693,32 +681,14 @@ function buildWorld(){
     const [lx,ly]=iso(gx,gy);
     lab += labelPill(lx, ly - h*o.foot + (o.id==='coop'?4:18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
   });
-  const bd=board(1.6,7.4); objs.push({depth:bd.depth, svg:`<g class="tap" data-b="board">${bd.svg}</g>`});
-  lab += labelPill(iso(1.6,7.4)[0], iso(1.6,7.4)[1]-92, '好友布告欄', {bg:'#E3F6EA',fg:'#2E9660'});
+  const BDc=HG(935,358); const bd=board(BDc[0],BDc[1]); objs.push({depth:bd.depth, svg:`<g class="tap" data-b="board"><g transform="translate(${iso(...BDc)[0]} ${iso(...BDc)[1]}) scale(1.5) translate(${-iso(...BDc)[0]} ${-iso(...BDc)[1]})">${bd.svg}</g></g>`});
+  lab += labelPill(iso(...BDc)[0], iso(...BDc)[1]-132, '好友布告欄', {bg:'#E3F6EA',fg:'#2E9660'});
 
   // 裝飾（萌獸星球素材）
   const deco=(n,gx,gy,w,extra='')=>objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`});
-  const lamps=[[4.75,4.55],[9.75,4.6],[14.6,4.6],[2.4,10.0]];
-  lamps.forEach(([x,y])=>{ deco('dc_lamp',x,y,48); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
-  deco('dc_fountain'in RATIO?'dc_fountain':'b_fountain', 16.1, 5.5, 118);
-  deco('dc_bench', 13.0, 4.65, 62); deco('dc_mail', 14.0, 3.9, 44); deco('dc_kennel', 15.0, 2.6, 70);
-  deco('dc_flower', 2.4, 8.9, 64); deco('dc_flower', 9.6, 0.3, 58); deco('dc_pond', 7.4, 16.0, 96);
-  deco('dc_hay', 14.2, 12.9, 70); deco('dc_picnic', 14.8, 15.8, 76); deco('dc_balloon', -0.1, 9.3, 62, 'class="floaty"');
-  deco('dc_sakura', 16.2, 1.9, 96); deco('dc_swing', -0.4, 7.4, 86); deco('dc_lantree', 5.0, 15.9, 90);
-
-  // 外圍森林（填滿四周）
-  const inView=(gx,gy,m=40)=>{ const [x,y]=iso(gx,gy); return x>VX-m && x<VX+WW+m && y>VY-m && y<VY+WH+m+60; };
-  const onRoad=(gx,gy)=>(gy>4.6&&gy<6.4)||(gx>2.6&&gx<4.4&&gy>5)||(gy>13.9&&gy<15.7);
-  for(let gx=-14;gx<32;gx+=1.25) for(let gy=-14;gy<32;gy+=1.25){
-    const x=gx+(rnd()-0.5)*0.9, y=gy+(rnd()-0.5)*0.9;
-    const out=Math.max(-1.6-x, -1.6-y, x-17.6, y-17.6); if(out<0 || !inView(x,y) || onRoad(x,y)) continue;
-    const r=rnd();
-    if(r<0.72) objs.push(tree(x,y,0.85+rnd()*0.45, true, out>2.5));
-    else if(r<0.86) objs.push(bush(x,y,[null,'#FF9AA2','#FFFFFF','#FFE066'][Math.floor(rnd()*4)]));
-  }
-  // 樹木與花叢
-  [[-0.4,3.4],[-0.3,13.2],[5,13.1],[7.6,13.3],[16,15.6],[13,16.2],[1.5,16.3],[15.6,-0.4],[4.9,-0.3],[9.4,-0.4],[-0.6,0.3],[16.6,11.2],[16.4,8.5]].forEach(([x,y],k)=>objs.push(tree(x,y,0.85+((k*37)%30)/100)));
-  [[9.7,4.5,'#FF9AA2'],[15.6,10.4,'#FFFFFF'],[2.4,12.9,null],[8.3,4.6,'#FFE066']].forEach(([x,y,f])=>objs.push(bush(x,y,f)));
+  const FC=HG(645,352); deco('b_fountain', FC[0], FC[1], 150);
+  [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
+  deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(790,262), 58); deco('dc_balloon', ...HG(1040,560), 64, 'class="floaty"');
 
   // 田地（可點）
   PLOTS.forEach((_,i)=>{ objs.push({depth:PLOTS[i][0]+PLOTS[i][1]+PS, svg:`<g class="tap plot" data-p="${i}"><g class="pg"></g><g class="ps"></g></g>`}); });
@@ -752,9 +722,10 @@ function buildWorld(){
   const addMover=(html,o)=>{ const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML=`<g class="mvin">${html}</g>`; mv.appendChild(g); movers.push(Object.assign({el:g,wait:0,face:1},o)); };
   const pet=(n,w)=>{ const h=w*(RATIO[n]||1); return `<ellipse cx="0" cy="1" rx="${w*0.32}" ry="${w*0.1}" fill="rgba(0,0,0,.16)"/><g class="hop"><image href="${A(n)}" x="${-w/2}" y="${-h*0.96}" width="${w}" height="${h}"/></g>`; };
   // 農場主人（用頭像做的人物，自己家＝自己，拜訪＝好友）
-  addMover('',{x:3.5,y:9,path:[[3.5,6.4],[3.5,13.3],[3.5,5.5],[8.6,5.5],[12.6,5.6],[7.4,5.5],[3.5,5.6],[0.6,5.5],[3.5,5.6]],tgt:1,speed:0.55,s:1.25,farmer:true});
+  const C0=HG(645,395), WP=[[645,395],[470,250],[645,395],[668,215],[645,395],[860,255],[645,395],[935,395],[1120,440],[935,395],[645,395],[430,395],[645,395],[560,470]].map(([x,y])=>HG(x,y));
+  addMover('',{x:C0[0],y:C0[1],path:WP,tgt:1,speed:0.55,s:1.25,farmer:true});
   farmerMover=movers[movers.length-1]; farmerAv=null;
-  for(let k=0;k<4;k++) addMover(CHICK,{x:RX+0.6+rnd()*(RW-1.2),y:RY+0.6+rnd()*(RD-1.0),chick:true,area:[RX+0.4,RY+0.5,RX+RW-1.6,RY+RD-0.3],speed:0.5,s:1.25,wait:rnd()*2});
+  for(let k=0;k<4;k++) addMover(CHICK,{x:RX+0.6+rnd()*(RW-1.2),y:RY+0.6+rnd()*(RD-1.0),chick:true,area:[RX+0.3,RY+0.3,RX+RW-0.3,RY+RD-0.3],speed:0.5,s:1.25,wait:rnd()*2});
   ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
 
@@ -843,15 +814,19 @@ function plotSpriteSVG(p,i){
 /* ================= 地圖縮放與拖曳 ================= */
 const map=$('map'), world=$('world');
 let scale=1;
+let VBX=VX, VBY=VY, VBW=WW, VBH=WH;
 function layout(){
   const vw=innerWidth, vh=innerHeight;
-  scale=Math.max(vw/WW, vh/WH, vw<700?0.82:Math.min(vw/1150, vh/720));
-  world.setAttribute('width',(WW*scale).toFixed(0)); world.setAttribute('height',(WH*scale).toFixed(0));
-  world.style.margin=`${PAD.t}px ${PAD.r}px ${PAD.b}px ${PAD.l}px`;
+  scale = vw<700 ? Math.max(vw/WW, 0.6) : Math.max(vw/WW, vh/WH, Math.min(vw/1300, vh/800));
+  // 畫面比世界大時，用天空往外延伸補滿（不留空白）
+  VBW=Math.max(WW, vw/scale); VBH=Math.max(WH, vh/scale); VBX=VX-(VBW-WW)/2; VBY=VY-(VBH-WH)/2;
+  world.setAttribute('viewBox',`${VBX} ${VBY} ${VBW} ${VBH}`);
+  world.setAttribute('width',(VBW*scale).toFixed(0)); world.setAttribute('height',(VBH*scale).toFixed(0));
+  world.style.margin='0';
 }
 function centerOn(gx,gy,smooth){
   const [x,y]=iso(gx,gy), vh=innerHeight, wide=innerWidth>=700, topH=wide?230:110, botH=wide?90:120;
-  map.scrollTo({left:(x-VX)*scale-innerWidth/2, top:(y-VY)*scale-(topH+(vh-topH-botH)/2), behavior:smooth?'smooth':'auto'});
+  map.scrollTo({left:(x-VBX)*scale-innerWidth/2, top:(y-VBY)*scale-(topH+(vh-topH-botH)/2), behavior:smooth?'smooth':'auto'});
 }
 let drag=null, moved=false;
 map.addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') return; drag={x:e.clientX,y:e.clientY,sl:map.scrollLeft,st:map.scrollTop}; moved=false; });
@@ -991,7 +966,7 @@ function openAvatarPicker(){
 
 /* ================= 讀取畫面 ================= */
 (function preload(){
-  const list = ['b_shop','b_farm','b_academy','bc_shop','b_fountain','b_sail','dc_flower','dc_lamp','dc_bench','dc_pond','dc_hay','dc_mail','dc_kennel','dc_lantree','dc_swing','dc_sakura','dc_picnic','dc_balloon','c_bunny1','n_friends','i_coin','i_gem','bg_forest','av11'];
+  const list = ['home_island','b_shop','b_farm','b_academy','bc_shop','b_fountain','b_sail','dc_flower','dc_lamp','dc_bench','dc_pond','dc_hay','dc_mail','dc_kennel','dc_lantree','dc_swing','dc_sakura','dc_picnic','dc_balloon','c_bunny1','n_friends','i_coin','i_gem','bg_forest','av11'];
   let n=0; const done=()=>{ n++; $('ldbar').style.width = Math.round(n/list.length*100)+'%'; if(n>=list.length) finish(); };
   let fin=false; const finish=()=>{ if(fin) return; fin=true; $('loader').classList.add('hide'); setTimeout(()=>$('loader').remove(), 600); };
   list.forEach(k=>{ const im=new Image(); im.onload=im.onerror=done; im.src=`assets/${k}.webp`; });

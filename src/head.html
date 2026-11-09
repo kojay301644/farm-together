@@ -27,7 +27,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden}
-body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#8CCB5B;user-select:none;-webkit-user-select:none}
+body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#8fcdfb;user-select:none;-webkit-user-select:none}
 button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 
 /* 地圖 */
@@ -194,6 +194,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .bfly{animation:flap .25s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 50%}
 @keyframes flap{50%{transform:scaleX(.35)}}
 .floaty{animation:floaty 3.5s ease-in-out infinite}
+.sunrays{animation:spin 160s linear infinite;transform-box:fill-box;transform-origin:50% 50%}
 @keyframes floaty{50%{transform:translateY(-8px)}}
 .bird{animation:bird 38s linear infinite}
 @keyframes bird{from{transform:translateX(-200px)}to{transform:translateX(1600px)}}
