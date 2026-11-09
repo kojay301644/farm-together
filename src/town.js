@@ -61,7 +61,7 @@ const BLD = [
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:HG(930,203),  w:240, foot:0.80},
   {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
-  {id:'coop',  name:'牧場',     img:'dc_hay',     c:[14.25+1.5, 6.5+2.8], w:120, foot:0.78, locked:'牧場將在第四階段開放'},
+  {id:'coop',  name:'牧場',     img:'dc_hay',     c:[7.6+3.4, 11.85+1.6], w:120, foot:0.78, locked:'牧場將在第四階段開放'},
   {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(448,572), w:430, foot:0.74, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
 
@@ -221,7 +221,7 @@ function buildWorld(){
     ground += fence(x,y,x,y+d,col);
     objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col)}); };
   // 牧場（農田左邊、島的下方中間）
-  const RX=14.25, RY=6.5, RW=2.9, RD=5.35;  // 農田右下方、靠吊橋那一側（同長、共用一條邊）
+  const RX=7.6, RY=11.85, RW=6.65, RD=3.0;  // 農田下方（同方向），靠吊橋那一端對齊
   pen(RX,RY,RW,RD,'#E8D3A2','url(#pGrass)');
   { const [tx,ty]=iso(RX+RW-0.7, RY+0.6); objs.push({depth:RX+RW+RY, svg: ol(`<path d="M${tx-22} ${ty-6} l22 -11 l22 11 l-22 11z" fill="#8B5E3C"/><path d="M${tx-18} ${ty-6} l18 -9 l18 9 l-18 9z" fill="#F4D35E"/>`,2)}); }
 
