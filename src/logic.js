@@ -146,7 +146,7 @@ async function act(i){
   }
   if(tool==='seed'){
     if(p.s!=='empty') return toast('這塊地已經種了東西');
-    if(!(S.me.seeds[ui.seed]>0)) return openSeedPicker(i);
+    if(!SEED_KEEP || !(S.me.seeds[ui.seed]>0)) return openSeedPicker(i);   // 沒開連續播種：每塊地都重新選
     return plant(i, ui.seed);
   }
   if(tool==='water'){
@@ -226,17 +226,22 @@ async function actVisit(i){
 }
 
 /* ================= 視窗：商店、倉庫、播種 ================= */
+let SEED_KEEP = PREF('seedkeep', false);
 function openSeedPicker(i){
   if(mode==='visit') return;
   const own = Object.entries(S.me.seeds).filter(([,n])=>n>0);
   if(!own.length) return modal('沒有種子', `<div class="empty">倉庫裡沒有種子了，<br>先去種子商店買一些吧！</div>`, [['去商店','o',()=>openShop()]]);
-  const body = own.map(([id,n])=>{ const c=CROP[id];
-    return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}</b> <span class="tag">×${n}</span><div>成熟 ${dur(c.time)}・收成 ${c.yield} 個</div></div><button class="mini" data-seed="${id}">${i==null?'選擇':'種下'}</button></div>`;
+  const keep = `<label class="skeep${SEED_KEEP?' on':''}"><input type="checkbox" id="seedKeep" ${SEED_KEEP?'checked':''}><span><b>🔁 連續播種</b><br><small>${SEED_KEEP?'選一次後點空地就一直種同一種，想換就再點下面的「播種」':'沒打勾：每塊地都會問你要種什麼'}</small></span></label>`;
+  const body = keep + own.map(([id,n])=>{ const c=CROP[id], cur=SEED_KEEP && ui.seed===id;
+    return `<div class="row${cur?' scur':''}"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}</b> <span class="tag">×${n}</span>${cur?' <span class="tag" style="background:#E8F8EE;color:#2E9660">連續播種中</span>':''}<div>成熟 ${dur(c.time)}・收成 ${c.yield} 個</div></div><button class="mini" data-seed="${id}">${i==null?'選擇':'種下'}</button></div>`;
   }).join('');
   modal(i==null?'選擇要播的種子':'要種什麼？', body);
+  $('seedKeep').onchange = e => { SEED_KEEP = e.target.checked; SETPREF('seedkeep', SEED_KEEP); openSeedPicker(i); };
   $('md').querySelectorAll('[data-seed]').forEach(b=>b.onclick=()=>{
     ui.seed = b.dataset.seed; setTool('seed'); closeModal();
-    if(i!=null) plant(i, ui.seed); else toast(`點空地就能種下${CROP[ui.seed].name}`);
+    if(i!=null) plant(i, ui.seed);
+    else toast(SEED_KEEP ? `連續播種：點空地就能一直種${CROP[ui.seed].name}` : `點空地種下${CROP[ui.seed].name}`);
+    if(i!=null && SEED_KEEP) toast(`連續播種：接著點空地就能一直種${CROP[ui.seed].name}`);
   });
 }
 const barnNav = cur => `<div class="snav"><button data-bn="bag" class="${cur==='bag'?'on':''}">📦 倉庫</button><button data-bn="seed" class="${cur==='seed'?'on':''}">🌱 種子商店</button></div>`;
