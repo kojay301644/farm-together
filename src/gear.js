@@ -1,0 +1,108 @@
+
+/* ================= 萌獸進化與裝備 ================= */
+let GEAR = {}, GEAR_LIST = [], EVO = [10,20];
+const GEAR_FUNC = {plant:['自動播種','🌱'], water:['自動澆水','💧'], dog:['看門狗','🐶'], bug:['自動除蟲','🐛'],
+  weed:['自動除草','🌿'], clear:['自動剷除','🔥'], harvest:['自動收成','🧺'], scare:['稻草人','🎃']};
+const ROMAN = ['','I','II','III','IV'];
+function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
+  return ({plant:`空地自動種下你指定的種子（第 1～${v} 塊地）`, water:`土乾了自動澆水（第 1～${v} 塊地）`,
+    dog:`小偷來偷菜時 ${pc}% 被趕走`, bug:`蟲一出現 ${pc}% 自動除掉`, weed:`雜草一長出 ${pc}% 自動拔掉`,
+    clear:`收成後自動整地（第 1～${v} 塊地）`, harvest:`作物成熟 ${v} 分鐘後自動收成，小偷來不及偷`,
+    scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
+function setGearConfig(list, st){ GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
+  if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
+const chrStage = lv => lv>=EVO[1] ? 3 : lv>=EVO[0] ? 2 : 1;
+const chrSpecies = k => (/^([a-z]+)/.exec(k||'bunny')||[0,'bunny'])[1];
+const chrKey = (k, lv) => chrSpecies(k) + chrStage(lv||1);
+const chrName = key => { const c=chrInfo(key); return (CHR_NAMES[c.sp]||[])[c.st-1] || c.name; };
+const gearImg = (g, sz=40) => g ? `<img src="${A(g.icon)}" style="width:${sz}px;height:${sz}px;object-fit:contain" alt="">` : '';
+const gearTitle = g => `${g.name} ${ROMAN[g.tier]}`;
+
+/* 我的萌獸面板（我的家裡） */
+function beastPanelHTML(){
+  const me=S.me, key=chrKey(me.chara, me.lv), st=chrStage(me.lv), g=GEAR[me.equip];
+  const next = st===1 ? `Lv${EVO[0]} 會進化成「${chrName(chrSpecies(key)+2)}」` : st===2 ? `Lv${EVO[1]} 會進化成「${chrName(chrSpecies(key)+3)}」` : '已經是最終型態了！';
+  return `<div class="beast">
+    <div class="bimg"><img src="${chrSrc(key)}" alt=""><span class="bst">${ROMAN[st]} 階</span></div>
+    <div class="binfo"><b>${chrName(key)}</b><div class="bnext">${next}</div>
+      <button class="gslot" id="hGear">${g?gearImg(g,34):'<span class="plus">＋</span>'}<span><b>${g?gearTitle(g):'裝備欄（空）'}</b><small>${g?`${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}`:'點這裡插上裝備，萌獸會幫你自動做事'}</small></span></button>
+    </div></div>
+    <div class="homebtns"><button class="btn sub" id="hCh">🐾 更換萌獸</button><button class="btn o" id="hGshop">🛒 買裝備</button></div>`;
+}
+function bindBeastPanel(){ $('hGear').onclick=openGearBag; $('hCh').onclick=openCharPicker; $('hGshop').onclick=()=>openGearShop(); }
+
+/* 裝備背包 */
+function openGearBag(){
+  const me=S.me, own=Object.entries(me.gear||{}).filter(([id,n])=>n>0 && GEAR[id]).map(([id,n])=>[GEAR[id],n]).sort((a,b)=>GEAR_LIST.indexOf(a[0])-GEAR_LIST.indexOf(b[0]));
+  const cur=GEAR[me.equip];
+  let body = `<div class="sec">裝備欄</div>`;
+  body += cur ? `<div class="row gon"><div class="ic">${gearImg(cur,44)}</div><div class="tx"><b>${gearTitle(cur)}</b> <span class="tag">${GEAR_FUNC[cur.func][1]} ${GEAR_FUNC[cur.func][0]}</span><div>${gearDesc(cur)}</div></div><button class="mini o" data-uneq>卸下</button></div>`
+    : `<div class="empty" style="padding:8px 0">還沒有插上裝備</div>`;
+  if(cur && cur.func==='plant'){
+    const opts = CROPS.filter(c=>me.lv>=c.lv).map(c=>`<option value="${c.id}" ${me.auto_seed===c.id?'selected':''}>${c.name}（背包 ${me.seeds[c.id]||0} 包）</option>`).join('');
+    body += `<div class="autoseed">🌱 自動種：<select id="aSeed"><option value="">（不種）</option>${opts}</select></div><div class="hint">會用背包裡的種子，種子用完就停</div>`;
+  }
+  body += `<div class="sec">背包裡的裝備</div>`;
+  body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span><div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
+      ${me.equip===g.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">裝備中</span>':`<button class="mini" data-eq="${g.id}">插上</button>`}</div>`).join('')
+    : `<div class="empty">還沒有裝備<br><small>可以在商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
+  modal('萌獸裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
+  const md=$('md');
+  md.querySelectorAll('[data-eq]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_equip',{p_id:b.dataset.eq})); refresh(); sfx('coin'); toast('裝備好了！'); openGearBag(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-uneq]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_equip',{p_id:null})); refresh(); openGearBag(); }catch(e){ toast(e.message); } });
+  if($('aSeed')) $('aSeed').onchange=async e=>{ try{ applyState(await rpc('farm_set_auto_seed',{p_crop:e.target.value||null})); refresh(); toast(e.target.value?`會自動種${CROP[e.target.value].name}`:'不自動播種'); }catch(err){ toast(err.message); } };
+}
+
+/* 裝備商店：金幣（I、II 級）／鑽石（III、IV 級） */
+let gearShopTab='gold';
+function openGearShop(t){
+  if(mode==='visit') return toast('回到自己的農場才能買東西');
+  if(t) gearShopTab=t;
+  const me=S.me, list=GEAR_LIST.filter(g=>gearShopTab==='gold' ? g.gold!=null : g.gems!=null);
+  const tabs=`<div class="tabs"><button data-gs="gold" class="${gearShopTab==='gold'?'on':''}">金幣裝備</button><button data-gs="gem" class="${gearShopTab==='gem'?'on':''}">💎 高級裝備</button></div>`;
+  const byF={}; list.forEach(g=>(byF[g.func]=byF[g.func]||[]).push(g));
+  let body=tabs;
+  Object.keys(GEAR_FUNC).forEach(f=>{ if(!byF[f]) return;
+    body+=`<div class="sec">${GEAR_FUNC[f][1]} ${GEAR_FUNC[f][0]}</div>`;
+    body+=byF[f].map(g=>{ const lock=g.gold!=null && me.lv<g.lv, cost=g.gold!=null?`${g.gold.toLocaleString()} 金`:`💎${g.gems}`;
+      const poor=g.gold!=null ? me.gold<g.gold : (me.gems||0)<g.gems, n=(me.gear||{})[g.id]||0;
+      return `<div class="row" style="${lock?'opacity:.55':''}"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b>${n?` <span class="tag">已有 ${n}</span>`:''}<div>${gearDesc(g)}</div></div>
+        ${lock?`<span class="lock">Lv${g.lv} 解鎖</span>`:`<button class="mini ${g.gems!=null?'gem':''}" data-bg="${g.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('');
+  });
+  modal(`萌獸裝備商店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`, body);
+  const md=$('md');
+  md.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>openGearShop(b.dataset.gs));
+  md.querySelectorAll('[data-bg]').forEach(b=>b.onclick=async()=>{ const g=GEAR[b.dataset.bg];
+    try{ applyState(await rpc('farm_buy_gear',{p_id:g.id})); refresh(); sfx('coin');
+      modal('買到了！', `<div style="text-align:center;padding:6px 0">${gearImg(g,80)}<div style="font-weight:900;font-size:18px;margin-top:6px">${gearTitle(g)}</div><div style="color:var(--ink2);font-weight:700;margin-top:4px">${gearDesc(g)}</div></div>`,
+        [['馬上插上','',async()=>{ try{ applyState(await rpc('farm_equip',{p_id:g.id})); refresh(); toast('裝備好了！'); closeModal(); }catch(e){ toast(e.message); } }],['繼續逛','sub',()=>openGearShop()]]);
+    }catch(e){ toast(e.message); } });
+}
+
+/* 得到裝備（寶箱／升級禮物） */
+function showGift(txt){
+  const names = String(txt).split('、');
+  const items = names.map(s=>{ const nm=s.replace(/^.*：/,''); return GEAR_LIST.find(g=>g.name===nm); }).filter(Boolean);
+  fxConfetti(); sfx('lvup');
+  modal('🎁 獲得裝備！', `<div style="text-align:center;padding:6px 0">${items.map(g=>`<div class="giftg">${gearImg(g,72)}<div><b>${gearTitle(g)}</b><small>${GEAR_FUNC[g.func][1]} ${gearDesc(g)}</small></div></div>`).join('')}
+    <div style="color:var(--ink2);font-weight:700;margin-top:6px">${names.map(s=>s.replace(/：.*/,'')).join('、')}</div></div>`,
+    [['去裝備','',openGearBag],['好','sub',closeModal]]);
+}
+
+/* 進化動畫 */
+function playEvolve(fromKey, toKey){
+  const ov=document.createElement('div'); ov.className='evo';
+  ov.innerHTML=`<div class="evo-rays"></div><div class="evo-stage"><img class="evo-old" src="${chrSrc(fromKey)}" alt=""><img class="evo-new" src="${chrSrc(toKey)}" alt=""></div>
+    <div class="evo-flash"></div><div class="evo-txt"><div class="t1">咦？${chrName(fromKey)} 的樣子……</div><div class="t2">進化成功！</div><div class="t3">${chrName(fromKey)} → <b>${chrName(toKey)}</b></div><button class="btn">太好了！</button></div>`;
+  document.body.appendChild(ov); sfx('tap');
+  setTimeout(()=>{ sfx('lvup'); vib([40,40,80]); }, 2300);
+  setTimeout(()=>{ fxConfetti(); for(let k=0;k<14;k++) spawn('⭐', innerWidth/2+(Math.random()-.5)*260, innerHeight*0.42+(Math.random()-.5)*200, 'emo', 1500); }, 2450);
+  ov.querySelector('.btn').onclick=()=>{ ov.classList.add('out'); setTimeout(()=>ov.remove(), 400); };
+}
+function checkEvolve(){
+  if(!S || mode!=='home') return;
+  const k='ytzt_stage_'+S.me.id, st=chrStage(S.me.lv);
+  let prev=null; try{ prev=+localStorage.getItem(k)||null; }catch(e){}
+  if(prev && st>prev){ const sp=chrSpecies(S.me.chara); setTimeout(()=>playEvolve(sp+prev, sp+st), 900); }
+  try{ localStorage.setItem(k, st); }catch(e){}
+}

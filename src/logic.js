@@ -73,6 +73,7 @@ async function doAct(action, i, crop, n){
     const r = await rpc('farm_act', {p_action:action, p_idx:(i==null?null:i), p_crop:crop||null, p_n:n||1});
     applyState(r.state); refresh();
     if(r.lvup) setTimeout(showLevelUp, 400);
+    if(r.gift) setTimeout(()=>showGift(r.gift), r.lvup?1600:500);
     return r;
   }catch(e){ sfx('err'); toast(e.message); return null; }
   finally{ ui.busy = false; }
@@ -160,15 +161,18 @@ async function actVisit(i){
   try{
     const r = await rpc('farm_friend_act', {p_owner:V.owner.id, p_action:action, p_idx:i});
     applyState(r.state); applyVisit(r.visit); refresh();
-    if(action==='steal'){ fxSteal(i, c); floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066'); }
+    if(r.ab==='dog'){ sfx('err'); vib(60); try{ farmerDo(i,'steal'); }catch(e){} floatAt(el, '被看門狗趕走了！🐶', '#FFD6E5'); }
+    else if(r.ab==='scare'){ sfx('err'); try{ farmerDo(i,'prank'); }catch(e){} floatAt(el, '被稻草人擋下了！🎃', '#FFD6E5'); }
+    else if(action==='steal'){ fxSteal(i, c); floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066'); }
     else if(action==='help_water') fxWater(i);
     else if(action.startsWith('help')) fxPoof(i, action==='help_bug'?'bug':'weed');
     else fxSmoke(i);
-    if(action==='steal'){}
+    if(action==='steal' || r.ab){}
     else if(action.startsWith('help')) floatAt(el, action==='help_weed'?'幫忙除草！':action==='help_bug'?'幫忙除蟲！':'幫忙澆水！', action==='help_water'?'#BDE6FF':null);
     else floatAt(el, action==='prank_weed'?'放了一棵草 😈':'放了一隻蟲 😈', '#FFD6E5');
     xpFloat(el, r.xp);
     if(r.lvup) setTimeout(showLevelUp, 400);
+    if(r.gift) setTimeout(()=>showGift(r.gift), r.lvup?1600:500);
   }catch(e){ toast(e.message); }
   finally{ ui.busy = false; }
 }
@@ -199,7 +203,7 @@ function openShop(){
       <div>成熟 ${dur(c.time)}・收成 ${c.yield}×${c.price} 金 = ${c.yield*c.price} 金</div></div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">${btn}</div></div>`;
   }).join('');
-  modal(`種子商店　<span style="font-size:14px;color:var(--ink2)">金幣 ${me.gold}</span>`, body);
+  modal(`種子商店　<span style="font-size:14px;color:var(--ink2)">金幣 ${me.gold}</span>`, body, [['🐾 萌獸裝備','o',()=>openGearShop('gold')]]);
   $('md').querySelectorAll('[data-buy]').forEach(b=>b.onclick=async()=>{
     const c = CROP[b.dataset.buy], n = +b.dataset.n;
     const r = await doAct('buy', null, c.id, n);
@@ -232,8 +236,9 @@ async function openHome(){
   if(mode==='visit') return toast('這是好友的家喔');
   const {data:{user}} = await sb.auth.getUser();
   modal('我的家', `
+    <div class="sec">我的萌獸</div>${beastPanelHTML()}
     <div class="sec">玩家</div>
-    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button><button class="mini" id="hCh">更換角色</button></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
     <div class="sec">玩法小提醒</div>
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
@@ -245,7 +250,7 @@ async function openHome(){
     <div class="seg" style="margin-top:6px"><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
     <div style="text-align:center;margin-top:10px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`);
   $('hGem').onclick = ()=>openGemShop();
-  $('hAv').onclick = openAvatarPicker; $('hCh').onclick = openCharPicker;
+  $('hAv').onclick = openAvatarPicker; bindBeastPanel();
   $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openHome(); };
   $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openHome(); };
   $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openHome(); };
@@ -258,7 +263,8 @@ const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':
 let boardTab = 'friends', rankScope = 'f';
 function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60) return '剛剛'; if(s<3600) return `${Math.floor(s/60)} 分鐘前`; if(s<86400) return `${Math.floor(s/3600)} 小時前`; return `${Math.floor(s/86400)} 天前`; }
 const LOG_TXT = {help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了水`, steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
-  prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`};
+  prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`,
+  dog:(l)=>`想偷你的${CROP[l.crop]?.name||'作物'}，被看門狗趕走了 🐶`, scare:(l)=>`想惡作劇，被稻草人擋下了 🎃`, auto_harvest:(l)=>`幫你自動收成了 ${l.qty} 個${CROP[l.crop]?.name||''} 🧺`};
 
 async function openBoard(tab){
   if(tab) boardTab = tab;
@@ -430,7 +436,7 @@ function renderHUD(){
   else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
   $('hint').innerHTML = `<span>🌱</span><span>${h}</span>`;
 }
-function refresh(){ renderPlots(); renderHUD(); try{ setFarmer(mode==='visit' && V ? (V.owner.chara||'bunny1') : (S && S.me.chara)||'bunny1'); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V) setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); else if(S) setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); checkEvolve(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -516,6 +522,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
+    setGearConfig(c.gear, c.settings);
   }catch(e){}
 }
 async function showNotices(){
@@ -527,7 +534,7 @@ async function showNotices(){
 }
 function startGame(st){
   applyState(st); mode = 'home'; V = null;
-  loadConfig();
+  loadConfig().then(()=>{ if(S) refresh(); });
   showScreen('game');
   if(!built){ buildWorld(); requestAnimationFrame(animate); built = true; }
   plotSig = plotSig.map(()=> '');

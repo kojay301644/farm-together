@@ -57,6 +57,9 @@ function openHelp(){
     <li><b>幫忙</b>：幫好友除草除蟲可以拿經驗</li>
     <li><b>惡作劇</b>：在好友還沒成熟的作物放草放蟲，每天 10 次</li></ul>
     <p>作物成熟後要快點收，不然會被好友偷走喔！誰偷了你的菜，都會記在「動態」裡。</p>
+    <h4>🐾 萌獸夥伴</h4>
+    <p>在「我的家」選一隻萌獸當夥伴，牠會在農場走來走去，你收成澆水時牠會跑過去幫忙。玩家升到 <b>Lv10、Lv20</b> 萌獸會自動進化！</p>
+    <p>萌獸身上有 <b>1 格裝備欄</b>，插上裝備就會幫你自動做事：自動澆水、自動播種、自動除蟲、自動除草、自動剷除、自動收成、看門狗（趕走小偷）、稻草人（擋下惡作劇）。裝備可以在商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物。</p>
     <h4>🏆 排行榜</h4>
     <p>依等級排名，同等級再比經驗。可以看好友排行和全服前 50 名。</p></div>`,
     [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); }catch(e){} tut={step:0}; tutRender(); }],['知道了','',closeModal]]);
@@ -112,8 +115,10 @@ function openGemShop(t){
     body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard"><div class="bonus">首儲 ×2</div><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">${p.name}${p.extra?`・${p.extra}`:''}</div><div class="price">NT$${p.price}</div></div>`).join('')}</div>`;
     body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center">每個方案第一次購買，鑽石加倍送</div>`;
   } else {
+    body += `<button class="btn" id="gGear" style="width:100%;margin:2px 0 10px;background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">🐾 萌獸高級裝備（可以用鑽石買）</button>`;
     body += GEM_ITEMS.map(x=>`<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${x.icon}</div><div class="tx"><b>${x.name}</b><div>${x.desc}</div></div><span class="lock">💎${x.gems}</span></div>`).join('');
   }
   modal(`鑽石商店　<span style="font-size:14px;color:#5B4ED6">💎 ${(S.me.gems||0).toLocaleString()}</span>`, tabs + body);
   document.querySelectorAll('[data-gt]').forEach(b=>b.onclick=()=>openGemShop(b.dataset.gt));
+  if($('gGear')) $('gGear').onclick=()=>openGearShop('gem');
 }

@@ -165,10 +165,18 @@ async function pageCf(){
     <table><tr><th>作物</th><th>解鎖等級</th><th>種子價</th><th>成熟秒數</th><th>收成數</th><th>單價</th><th>經驗</th><th></th></tr>
     ${C.crops.map(c=>`<tr><td><b>${esc(c.name)}</b></td>${['lv','seed','grow_sec','yield','price','exp'].map(f=>`<td><input class="num" id="c_${c.id}_${f}" type="number" value="${c[f]}"></td>`).join('')}<td><button class="btn" data-cid="${c.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>開墾條件</h2><table><tr><th>第幾塊</th><th>需要等級</th><th>費用</th><th></th></tr>
-    ${C.land.map(l=>`<tr><td>第 ${l.idx+1} 塊</td><td><input class="num" id="l_${l.idx}_lv" type="number" value="${l.lv}"></td><td><input class="num" id="l_${l.idx}_cost" type="number" value="${l.cost}"></td><td><button class="btn" data-li="${l.idx}">儲存</button></td></tr>`).join('')}</table></div>`);
+    ${C.land.map(l=>`<tr><td>第 ${l.idx+1} 塊</td><td><input class="num" id="l_${l.idx}_lv" type="number" value="${l.lv}"></td><td><input class="num" id="l_${l.idx}_cost" type="number" value="${l.cost}"></td><td><button class="btn" data-li="${l.idx}">儲存</button></td></tr>`).join('')}</table></div>
+    <div class="card"><h2>萌獸裝備</h2><div class="muted" style="margin-bottom:8px">數值：自動澆水／播種／剷除＝第 1～N 塊地；看門狗／除蟲／除草／稻草人＝機率（0.5＝50%）；自動收成＝成熟後幾分鐘。金幣價留空＝不能用金幣買；鑽石價留空＝不能用鑽石買。</div>
+    <table><tr><th>裝備</th><th>功能</th><th>名稱</th><th>數值</th><th>金幣價</th><th>鑽石價</th><th>金幣購買等級</th><th></th></tr>
+    ${(C.gear||[]).map(g=>`<tr><td><img src="assets/${g.icon}.webp" style="width:34px;height:34px;object-fit:contain;vertical-align:middle"> ${['','I','II','III','IV'][g.tier]}</td><td>${({plant:'自動播種',water:'自動澆水',dog:'看門狗',bug:'自動除蟲',weed:'自動除草',clear:'自動剷除',harvest:'自動收成',scare:'稻草人'})[g.func]}</td>
+      <td><input id="g_${g.id}_name" value="${esc(g.name)}" style="width:7em"></td><td><input class="num" id="g_${g.id}_val" type="number" step="any" value="${g.val}"></td>
+      <td><input class="num" id="g_${g.id}_gold" type="number" value="${g.gold??''}"></td><td><input class="num" id="g_${g.id}_gems" type="number" value="${g.gems??''}"></td>
+      <td><input class="num" id="g_${g.id}_lv" type="number" value="${g.lv}"></td><td><button class="btn" data-gid="${g.id}">儲存</button></td></tr>`).join('')}</table></div>`);
   document.querySelectorAll('[data-sk]').forEach(b=>b.onclick=async()=>{ try{ await rpc('adm_setting_set',{p_key:b.dataset.sk,p_value:+$('s_'+b.dataset.sk).value}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-cid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.cid, v=f=>+$(`c_${id}_${f}`).value;
     try{ await rpc('adm_crop_save',{p_id:id,p_seed:v('seed'),p_grow_sec:v('grow_sec'),p_yield:v('yield'),p_price:v('price'),p_exp:v('exp'),p_lv:v('lv')}); toast('已儲存'); }catch(e){ toast(e.message); } });
+  document.querySelectorAll('[data-gid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.gid, v=f=>$(`g_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
+    try{ await rpc('adm_gear_save',{p_id:id,p_name:v('name'),p_val:+v('val'),p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv')}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-li]').forEach(b=>b.onclick=async()=>{ const i=b.dataset.li;
     try{ await rpc('adm_land_save',{p_idx:+i,p_lv:+$(`l_${i}_lv`).value,p_cost:+$(`l_${i}_cost`).value}); toast('已儲存'); }catch(e){ toast(e.message); } });
 }

@@ -113,7 +113,9 @@ function charSVG(k){
       <g class="cp-a">${img(id+'a')}</g><g class="cp-b">${img(id+'b')}</g><g class="cp-t">${img(id+'t')}</g>`; }
   return `<ellipse class="cp-sh" cx="0" cy="0" rx="${b*.3}" ry="${n*.08}" fill="rgba(0,0,0,.2)"/><g class="cp-root">${body}</g>`;
 }
-function setFarmer(k){ if(!farmerMover || farmerAv===k) return; farmerAv=k; const m=farmerMover; m.el.firstChild.innerHTML=charSVG(k);
+function setFarmer(k, gid){ const sig=k+'|'+((typeof GEAR!=='undefined'&&GEAR[gid])?gid:''); if(!farmerMover || farmerAv===sig) return; farmerAv=sig; const m=farmerMover; m.el.firstChild.innerHTML=charSVG(k);
+  const g=(typeof GEAR!=='undefined')&&GEAR[gid]; if(g){ const c=chrInfo(k), n=48+c.st*9, sz=Math.round(n*.42), tgt=m.el.querySelector('.cp-t')||m.el.querySelector('.cp-root');
+    tgt.insertAdjacentHTML('beforeend',`<g class="gbadge"><circle cx="${n*.18}" cy="${-n*.42}" r="${sz*.55}" fill="#FFF8E6" stroke="#4B3423" stroke-width="1.8"/><image href="${A(g.icon)}" x="${n*.18-sz/2}" y="${-n*.42-sz/2}" width="${sz}" height="${sz}"/></g>`); }
   m.c=chrInfo(k); m.n=48+m.c.st*9; m.ph=0; m.anim=Math.random()*9; m.jump=0;
   m.parts={root:m.el.querySelector('.cp-root'), a:m.el.querySelector('.cp-a'), b:m.el.querySelector('.cp-b'), t:m.el.querySelector('.cp-t'), sh:m.el.querySelector('.cp-sh')}; }
 /* 每幀姿勢（照萌獸的算法） */
@@ -140,10 +142,11 @@ function farmerPose(m, dt, moving){
 }
 function openCharPicker(){
   const cur=(S.me.chara)||'bunny1';
-  modal('選擇角色', `<p class="mut" style="margin:0 0 8px">選一隻萌獸當你的農場角色，牠會在農場裡走來走去幫你做事</p><div class="chgrid">${Object.keys(CHR_SP).map(sp=>[1,2,3].map(st=>{ const k=sp+st;
-    return `<button class="chpick${k===cur?' on':''}" data-ch="${k}"><img src="${chrSrc(k)}" alt=""><span>${(CHR_NAMES[sp]||[])[st-1]||CHR_SP[sp][0]}</span></button>`; }).join('')).join('')}</div>`);
+  const evo=(typeof EVO!=='undefined')?EVO:[10,20];
+  modal('選擇萌獸', `<p class="mut" style="margin:0 0 8px">選一隻萌獸當你的農場夥伴，牠會在農場裡走來走去幫你做事。<br>升到 <b>Lv${evo[0]}</b>、<b>Lv${evo[1]}</b> 會自動進化！換萌獸會從第一階開始。</p><div class="chgrid">${Object.keys(CHR_SP).map(sp=>{ const k=sp+'1';
+    return `<button class="chpick${sp===chrSpecies(cur)?' on':''}" data-ch="${k}"><img src="${chrSrc(k)}" alt=""><span>${(CHR_NAMES[sp]||[])[0]||CHR_SP[sp][0]}</span></button>`; }).join('')}</div>`);
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=async()=>{
-    try{ applyState(await rpc('farm_set_chara', {p_c:b.dataset.ch})); refresh(); sfx('coin'); toast('角色已更換'); closeModal(); }catch(e){ toast(e.message); }
+    try{ applyState(await rpc('farm_set_chara', {p_c:b.dataset.ch})); refresh(); sfx('coin'); toast('萌獸已更換'); closeModal(); }catch(e){ toast(e.message); }
   });
 }
 /* 角色動作 */

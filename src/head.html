@@ -263,6 +263,44 @@ body.lowfx .bird{display:none}
 .chpick.on{border-color:#3BB273;background:#E8F8EE;box-shadow:0 0 0 2px #3BB27355}
 .fxp.emo{font-size:24px;line-height:1;animation:emo 1.5s ease-out forwards;filter:drop-shadow(0 2px 0 rgba(75,52,35,.35))}
 @keyframes emo{0%{transform:translateY(8px) scale(.3);opacity:0}18%{transform:translateY(-6px) scale(1.2);opacity:1}30%{transform:translateY(-4px) scale(1)}80%{opacity:1}100%{transform:translateY(-26px);opacity:0}}
+
+/* 我的萌獸、裝備 */
+.beast{display:flex;gap:12px;align-items:center;margin:6px 0 4px}
+.bimg{position:relative;width:96px;height:96px;flex:none;border-radius:20px;background:radial-gradient(circle at 50% 60%,#FFF6D8,#F3E5C4);border:2.5px solid #E6D2A8;display:grid;place-items:center}
+.bimg img{width:86px;height:86px;object-fit:contain;animation:floaty 3s ease-in-out infinite}
+.bst{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);background:#FF9F43;color:#fff;font-size:11px;font-weight:900;border-radius:10px;padding:1px 8px;border:2px solid #4B3423;white-space:nowrap}
+.binfo{flex:1;min-width:0}.binfo>b{font-size:17px}.bnext{font-size:12px;font-weight:700;color:var(--ink2);margin:2px 0 6px}
+.gslot{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font:inherit;background:#FFF8EC;border:2.5px dashed #D9C39A;border-radius:14px;padding:6px 8px;cursor:pointer}
+.gslot .plus{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#F1E4C8;font-size:22px;font-weight:900;color:#B08A55}
+.gslot span{display:flex;flex-direction:column;min-width:0}.gslot small{font-size:11px;font-weight:700;color:var(--ink2);line-height:1.35}
+.row.gon{background:#E8F8EE;border-radius:12px}
+.autoseed{font-weight:800;margin:8px 0 2px}.autoseed select{font:inherit;font-weight:700;padding:4px 6px;border-radius:10px;border:2px solid #D9C39A;background:#fff}
+.hint{font-size:11px;font-weight:700;color:var(--ink2)}
+.mini.gem{background:#7B6CF6;box-shadow:0 2px 0 #5B4ED6}
+.giftg{display:flex;align-items:center;gap:10px;text-align:left;background:#FFF8EC;border-radius:14px;padding:8px 10px;margin:6px 0}.giftg small{display:block;font-size:12px;font-weight:700;color:var(--ink2)}
+/* 進化動畫 */
+.evo{position:fixed;inset:0;z-index:300;background:radial-gradient(circle at 50% 42%,#3B2E6E 0%,#14102A 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:evoIn .4s ease-out;overflow:hidden}
+.evo.out{animation:evoOut .4s ease-in forwards}
+@keyframes evoIn{from{opacity:0}}@keyframes evoOut{to{opacity:0}}
+.evo-rays{position:absolute;left:50%;top:42%;width:1400px;height:1400px;margin:-700px 0 0 -700px;background:repeating-conic-gradient(rgba(255,240,170,.10) 0 8deg,transparent 8deg 20deg);opacity:0;animation:evoRays 8s linear infinite, evoRaysIn .6s 2.3s forwards}
+@keyframes evoRays{to{transform:rotate(360deg)}}@keyframes evoRaysIn{to{opacity:1}}
+.evo-stage{position:relative;width:220px;height:220px;margin-top:-60px}
+.evo-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.evo-old{animation:evoGlow 2.3s ease-in forwards}
+@keyframes evoGlow{0%{filter:brightness(1) drop-shadow(0 0 0 #fff)}20%{filter:brightness(1.6) drop-shadow(0 0 12px #fff)}30%{filter:brightness(1)}45%{filter:brightness(2.2) drop-shadow(0 0 18px #fff)}55%{filter:brightness(1.2)}65%{filter:brightness(3) drop-shadow(0 0 24px #fff)}72%{filter:brightness(1.5)}80%{filter:brightness(5) drop-shadow(0 0 30px #fff);transform:scale(1.05)}88%{filter:brightness(2)}100%{filter:brightness(12) drop-shadow(0 0 40px #fff);transform:scale(1.15);opacity:0}}
+.evo-new{opacity:0;transform:scale(.2);animation:evoPop .9s 2.35s cubic-bezier(.2,1.6,.4,1) forwards, floaty 3s 3.3s ease-in-out infinite}
+@keyframes evoPop{0%{opacity:1;transform:scale(.2);filter:brightness(8)}60%{filter:brightness(2)}100%{opacity:1;transform:scale(1);filter:brightness(1) drop-shadow(0 0 16px rgba(255,230,140,.8))}}
+.evo-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;animation:evoFlash .9s 2.2s ease-out}
+@keyframes evoFlash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.evo-txt{position:relative;text-align:center;color:#fff;margin-top:18px;min-height:150px}
+.evo-txt .t1{font-weight:800;font-size:16px;opacity:.9;animation:evoT1 2.3s forwards}
+@keyframes evoT1{0%,85%{opacity:.9}100%{opacity:0;height:0}}
+.evo-txt .t2{font-size:34px;font-weight:900;color:#FFE066;text-shadow:0 3px 0 #B87A1E,0 0 18px rgba(255,220,120,.7);opacity:0;transform:scale(.4);animation:evoPop2 .6s 2.6s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes evoPop2{to{opacity:1;transform:scale(1)}}
+.evo-txt .t3{font-weight:800;font-size:16px;margin-top:6px;opacity:0;animation:evoIn .5s 3s forwards reverse;animation-direction:normal;animation-name:evoShow}
+@keyframes evoShow{to{opacity:1}}
+.evo-txt .btn{margin-top:16px;opacity:0;pointer-events:none;animation:evoShow .4s 3.3s forwards}
+.evo-txt .btn{pointer-events:auto}
 </style>
 </head>
 <body>
@@ -322,7 +360,7 @@ body.lowfx .bird{display:none}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/bunny1.webp" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
