@@ -20,16 +20,11 @@ const gearTitle = g => `${g.name} ${ROMAN[g.tier]}`;
 
 /* 我的寵物面板（我的家裡） */
 function beastPanelHTML(){
-  const me=S.me, key=chrKey(me.chara, me.lv), st=chrStage(me.lv), g=GEAR[partyOf(me)[0].g];
-  const next = `👑 隊長・夥伴 ${partyOf(me).length}/${me.party_cap||1} 隻`;
-  return `<div class="beast">
-    <div class="bimg"><img src="${chrSrc(key)}" alt=""></div>
-    <div class="binfo"><b>${chrName(key)}</b><div class="bnext">${next}</div>
-      <button class="gslot" id="hGear">${g?gearImg(g,34):'<span class="plus">＋</span>'}<span><b>${g?gearTitle(g):'裝備欄（空）'}</b><small>${g?`${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}`:'點這裡插上裝備，寵物會幫你自動做事'}</small></span></button>
-    </div></div>
-    <div class="homebtns"><button class="btn sub" id="hCh">🐾 夥伴隊伍</button><button class="btn o" id="hBag">🎒 背包</button></div>`;
+  const me=S.me, pt=partyOf(me);
+  return partyRowHTML(me, true) + `<div class="rhint" style="text-align:center">夥伴 ${pt.length}/${me.party_cap||1} 隻・👑 第一隻是隊長・點寵物下方的格子可以插裝備</div>
+    <div class="homebtns"><button class="btn sub" id="hCh">🐾 換夥伴</button><button class="btn o" id="hBag">🎒 背包</button></div>`;
 }
-function bindBeastPanel(){ $('hGear').onclick=()=>openGearBag(0); $('hCh').onclick=()=>openBeastPark('mine'); $('hBag').onclick=()=>openPack(); }
+function bindBeastPanel(){ document.querySelectorAll('#md [data-pg]').forEach(b=>b.onclick=()=>openGearBag(+b.dataset.pg)); $('hCh').onclick=()=>openBeastPark('mine'); $('hBag').onclick=()=>openPack(); }
 
 /* 裝備背包 */
 function openGearBag(slot){

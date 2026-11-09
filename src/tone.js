@@ -111,7 +111,7 @@ function toneFxLoop(now){
 
 /* ================= 商店（裝飾、外觀、色調、裝備都在這裡） ================= */
 const SHOP_TABS = [['decor','🎨 裝飾'],['skin','🏠 建築外觀'],['tone','🌈 城鎮色調']];
-const shopTitle = () => `裝飾商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`;
+const shopTitle = () => `建築商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`;
 const shopNav = cur => `<div class="snav">${SHOP_TABS.map(([k,n])=>`<button data-snav="${k}" class="${k===cur?'on':''}">${n}</button>`).join('')}</div>`;
 function bindShopNav(){ document.querySelectorAll('[data-snav]').forEach(b=>b.onclick=()=>openShopTab(b.dataset.snav)); }
 function openShopTab(k){

@@ -49,7 +49,7 @@ function openDecorShop(t){
     body += own.length ? own.map(d=>`<div class="row"><div class="ic"><img src="${A('dc_'+d.id)}" style="width:44px;height:44px;object-fit:contain" alt=""></div>
         <div class="tx"><b>${esc(d.name)}</b> <span class="tag">擺了 ${placed[d.id]||0}/${inv[d.id]}</span>${d.bonus?`<div style="color:#7B6CF6">${bonusTxt(d)}</div>`:''}</div>
         <button class="mini" data-pd="${d.id}" ${(placed[d.id]||0)>=inv[d.id]?'disabled':''}>擺放</button></div>`).join('')
-      : `<div class="empty">還沒有裝飾，去裝飾商店買一些吧！</div>`;
+      : `<div class="empty">還沒有裝飾，去建築商店買一些吧！</div>`;
   }
   body += `<div class="rhint" style="text-align:center;margin-top:8px">同一種加成裝飾只算一次・最多擺 ${DECOR_MAX} 個・好友來拜訪看得到</div>`;
   modal(shopTitle(), body, [['🖐️ 擺放模式','o',()=>enterDecorEdit()]]);

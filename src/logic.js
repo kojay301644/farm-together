@@ -262,7 +262,7 @@ async function openHome(){
   if(mode==='visit') return toast('這是好友的家喔');
   const {data:{user}} = await sb.auth.getUser();
   modal('我的家', `
-    <div class="sec">我的寵物</div>${beastPanelHTML()}
+    <div class="sec">我的寵物夥伴</div>${beastPanelHTML()}
     <div class="sec">玩家</div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>

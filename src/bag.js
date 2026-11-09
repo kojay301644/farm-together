@@ -19,7 +19,7 @@ function openPack(t){
     body += own.length ? own.map(d=>`<div class="row"><div class="ic"><img src="${A('dc_'+d.id)}" style="width:44px;height:44px;object-fit:contain" alt=""></div>
         <div class="tx"><b>${esc(d.name)}</b> <span class="tag">擺了 ${placed[d.id]||0}/${inv[d.id]}</span>${d.bonus?`<div style="color:#7B6CF6">${bonusTxt(d)}</div>`:''}</div>
         <button class="mini" data-pd="${d.id}" ${(placed[d.id]||0)>=inv[d.id]?'disabled':''}>擺放</button></div>`).join('')
-      : `<div class="empty">還沒有裝飾，去裝飾商店買一些吧！</div>`;
+      : `<div class="empty">還沒有裝飾，去建築商店買一些吧！</div>`;
   } else if(bagTab==='skin'){
     const owned=me.skins||{}, on=me.skin_on||{};
     body += Object.keys(SKIN_BLD).map(b=>{ const cur=on[b]||SKIN_DEF[b];
@@ -34,7 +34,7 @@ function openPack(t){
       return `<div class="skcard${t.id===cur?' on':''}"><div class="tsw" data-tpv="${t.id}" style="background:linear-gradient(${fx.sky[0]},${fx.sky[1]} 60%,${fx.sky[2]})"><img alt="" src="${A('home_island')}"><span>${TONE_ICON[fx.fx]||'🌼'}</span></div><b>${esc(t.name)}</b>
         ${t.id===cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':`<button class="mini" data-tu="${t.id}">套用</button>`}</div>`; }).join('')}</div>`;
   }
-  modal('🎒 背包', body, [[bagTab==='gear'?'🛒 去裝備商店':'🛒 去裝飾商店','o',()=>openShopTab(bagTab==='gear'?'gear':bagTab)]]);
+  modal('🎒 背包', body, [[bagTab==='gear'?'🛒 去裝備商店':'🛒 去建築商店','o',()=>openShopTab(bagTab==='gear'?'gear':bagTab)]]);
   const md=$('md');
   md.querySelectorAll('[data-bag]').forEach(b=>b.onclick=()=>openPack(b.dataset.bag));
   md.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>enterDecorEdit(b.dataset.pd));

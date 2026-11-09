@@ -64,7 +64,7 @@ const RATIO = {bc_forge:1.0928, b_play:0.6936, bf_train:564/504, b_shop:690/627,
 // 建築（萌獸星球素材），footprint 用來算前後順序與點擊
 const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
-  {id:'shop',  name:'裝飾商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
+  {id:'shop',  name:'建築商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'裝備商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
