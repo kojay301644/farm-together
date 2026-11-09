@@ -359,7 +359,13 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
 .bcard{display:flex;flex-direction:column;align-items:center;gap:2px;background:#FFF8EC;border:2.5px solid #E6D9C3;border-radius:14px;padding:6px 4px 8px;text-align:center}
 .bcard img{width:100%;height:76px;object-fit:contain}.bcard b{font-size:13px}.bcard small{font-size:10px;font-weight:700;color:var(--ink2)}
-.bcard.on{border-color:#3BB273;background:#E8F8EE}.bcard.dark{background:#FFFDF8;border-style:dashed}
+.bcard.on{border-color:#3BB273;background:#E8F8EE}
+.skbtn{border:0;background:#F1E9FF;color:#6C4FD8;font-weight:900;font-size:11px;border-radius:9px;padding:2px 7px;margin:1px 0 2px;cursor:pointer}
+.skprev{text-align:center;padding:4px 0 6px}.skprev img{height:120px;max-width:80%;object-fit:contain;animation:floaty 3s ease-in-out infinite}
+.skrow{background:#FFF8EC;border:2px solid #E6D9C3;border-radius:14px;padding:8px;margin-top:8px}.skrow.dim{opacity:.6}
+.skhd{display:flex;align-items:center;gap:8px}.skhd img{width:36px;height:36px;object-fit:contain}.skhd b{font-size:14px}.skhd small{color:var(--ink2);font-weight:700;font-size:11px}
+.skks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}.skk{display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;border-radius:10px;padding:4px}
+.skk img{width:100%;height:70px;object-fit:contain}.skk small{font-weight:900;font-size:11px}.bcard.dark{background:#FFFDF8;border-style:dashed}
 .kick{position:fixed;inset:0;z-index:400;background:rgba(30,24,18,.72);display:grid;place-items:center;padding:20px}
 .kbox{background:#fff;border:3px solid #4B3423;border-radius:22px;padding:22px 20px;max-width:360px;text-align:center}.kbox h3{margin:6px 0}.kbox p{font-weight:700;line-height:1.6;margin:8px 0}.kbox .mut{color:var(--ink2);font-size:13px}.kbox .btn{width:100%;margin-top:8px}
 .prow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 8px}
@@ -437,18 +443,18 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794246846" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794247185" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794246846" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794246846" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794247185" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794247185" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794246846" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794247185" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794246846" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794247185" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -463,11 +469,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794246846" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794247185" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794246846";
+const BUILD="1794247185";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -680,7 +686,7 @@ const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
   {id:'shop',  name:'建築商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
-  {id:'decor', name:'裝備商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
+  {id:'decor', name:'寵物商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
   {id:'bin',   name:'收集倉',   img:'dc_hay',   c:[3.0,11.3], w:104, foot:0.80},
   {id:'pen',   name:'寵物園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
@@ -736,9 +742,13 @@ const CHR_SP={bunny:['蘑菇兔',.9,'quad',.74,.5],mouse:['小鼠',1.3,'quad',.7
   owl:['貓頭鷹',.6,'waddle'],lizard:['蜥蜴',1,'quad',.72,.5],deer:['小鹿',1.1,'quad',.62,.5],moth:['飛蛾',.8,'float'],armad:['犰狳',.55,'quad',.74,.5],
   seal:['海豹',.5,'waddle'],marten:['貂',1.35,'quad',.7,.5],phoenix:['鳳凰',.9,'float'],fox:['狐狸',1.2,'quad',.7,.5],otter:['水獺',.8,'biped',.8,.48],
   penguin:['企鵝',.65,'waddle'],pango:['穿山甲',.55,'quad',.7,.5],ferret:['雪貂',1.35,'quad',.68,.5],bear:['熊',.6,'biped',.8,.48],dragon:['龍',.85,'quad',.74,.5]};
-const chrInfo=k=>{ const m=/^([a-z]+)([1-3])$/.exec(k||'')||[0,'bunny','1']; const sp=CHR_SP[m[1]]?m[1]:'bunny', d=CHR_SP[sp];
+const PS_RATIO={"bunny@mage":1.054,"bunny@mech":0.988,"bunny@star":0.917,"dragon@mage":1.212,"dragon@mech":1.125,"dragon@star":1.183,"marten@mage":1.242,"marten@mech":1.317,"marten@star":1.246,"mouse@mage":1.229,"mouse@mech":1.271,"mouse@star":1.221,"phoenix@mage":1.054,"phoenix@mech":1.062,"phoenix@star":0.988,"mole@mage":1.146,"mole@mech":1.204,"mole@star":1.171,"otter@mage":1.108,"otter@mech":1.125,"otter@star":1.137,"penguin@mage":0.954,"penguin@mech":1.083,"penguin@star":1.042,"seal@mage":1.321,"seal@mech":1.033,"seal@star":1.188,"armad@mage":1.129,"armad@mech":1.317,"armad@star":1.096,"pango@mage":1.146,"pango@mech":1.179,"pango@star":1.071,"lizard@mage":1.212,"lizard@mech":1.212,"lizard@star":1.05,"owl@mage":0.992,"owl@mech":1.054,"owl@star":0.988,"ferret@mage":1.208,"ferret@mech":1.337,"ferret@star":1.408,"moth@mage":1.146,"moth@mech":0.992,"moth@star":0.988,"bear@mage":1.025,"bear@mech":1.075,"bear@star":0.954,"fox@mage":1.304,"fox@mech":1.146,"fox@star":1.3,"deer@mage":0.979,"deer@mech":0.912,"deer@star":1.021};
+Object.assign(CHR_RATIO, PS_RATIO);
+const chrInfo=k=>{ const sk=/^([a-z]+)@([a-z]+)$/.exec(k||'');   // 寵物造型：fox@mage
+  if(sk && CHR_SP[sk[1]]){ const d=CHR_SP[sk[1]]; return {k, sp:sk[1], st:3, skin:sk[2], name:d[0], spd:d[1], type:'waddle', legY:.8, mid:.5}; }
+  const m=/^([a-z]+)([1-3])$/.exec(k||'')||[0,'bunny','1']; const sp=CHR_SP[m[1]]?m[1]:'bunny', d=CHR_SP[sp];
   return {k:sp+m[2], sp, st:+m[2], name:d[0], spd:d[1], type:d[2], legY:d[3]||.8, mid:d[4]||.5}; };
-const chrSrc=k=>A('c_'+k);
+const chrSrc=k=>{ const sk=/^([a-z]+)@([a-z]+)$/.exec(k||''); return sk ? A('ps_'+sk[1]+'_'+sk[2]) : A('c_'+k); };
 function charSVG(k){
   const c=chrInfo(k), n=48+c.st*9, b=n*(CHR_RATIO[c.k]||1), src=chrSrc(c.k), id='ck'+c.k;
   const img=clip=>`<image href="${src}" x="${-b/2}" y="${-n}" width="${b}" height="${n}"${clip?` clip-path="url(#${clip})"`:''}/>`;
@@ -1240,7 +1250,7 @@ const TUT_STEPS = [
   {text:'點<b>穀倉</b>可以把作物賣掉換金幣；穀倉裡的<b>種子商店</b>可以買更多、更高級的種子', target:()=>bEl('barn'), next:true},
   {text:'這是<b>你的家</b>：可以看寵物夥伴、幫寵物插裝備、打開背包、<b>擺放城鎮</b>裝飾，還有<b>成就</b>可以拿鑽石 💎', target:()=>bEl('home'), next:true},
   {text:'<b>寵物園</b>可以買新寵物、讓牠們上場當夥伴。夥伴會在農場陪你，插上裝備還會<b>自動幫你做事</b>', target:()=>bEl('pen'), next:true},
-  {text:'<b>裝備商店</b>賣寵物裝備：自動播種、澆水、收成、除草、除蟲…插滿 9 種就是<b>全自動農場</b>，休息時間也在賺錢！', target:()=>bEl('decor'), next:true},
+  {text:'<b>寵物商店</b>賣寵物、寵物造型和寵物裝備。裝備會自動播種、澆水、收成、除草、除蟲…插滿 9 種就是<b>全自動農場</b>，休息時間也在賺錢！', target:()=>bEl('decor'), next:true},
   {text:'上面的功能條：點<b>頭像</b>換頭像，📬 <b>禮物信箱</b>收獎勵，📖 <b>遊戲說明</b>，⚙️ 設定（可以開關🎵音樂）。左邊 ✍️ <b>每日簽到</b>，連續 7 天有大獎！', target:()=>$('bGift'), next:true},
   {text:'最後，點中間的<b>好友廣場</b>用暱稱加好友、拜訪鄰居，成熟的菜可以偷喔！祝你玩得開心 🎉', target:()=>bEl('board'), next:true, last:true},
 ];
@@ -1251,7 +1261,7 @@ const FEAT_TUTS = [
   {id:'party2', when:()=>(S.me.party_cap||1)>=2,
    text:'🐾 <b>第 2 個夥伴格</b>開放了！到<b>寵物園</b>買新寵物，按「上場當夥伴」讓牠一起幫忙', target:()=>bEl('pen')},
   {id:'gear', when:()=>S.me.lv>=3 && !Object.values(S.me.gear||{}).some(n=>n>0),
-   text:'🛡️ <b>裝備商店</b>可以買裝備了！買完選一隻寵物插上，牠就會自動幫你做事（例如自動澆水、自動收成）', target:()=>bEl('decor')},
+   text:'🛡️ <b>寵物商店</b>可以買裝備了！買完選一隻寵物插上，牠就會自動幫你做事（例如自動澆水、自動收成）', target:()=>bEl('decor')},
   {id:'ranch', when:()=>S.me.lv>=RANCH_LV,
    text:'🐔 <b>牧場</b>開放了！買小雞、用穀倉的作物餵牠，過一段時間就會生產雞蛋，可以拿去賣錢', target:()=>bEl('coop')},
   {id:'auto', when:()=>partyOf(S.me).some(p=>p.g),
@@ -1351,7 +1361,7 @@ function openHelp(){
     <p>Lv3 開放。在牧場買小雞、小鴨、綿羊、乳牛、小豬，用倉庫裡的作物餵牠們，過一段時間就會產出雞蛋、牛奶、羊毛等，收成後到穀倉賣錢。好友可以來偷、幫忙餵食和拍蚊子，惡作劇的人會放蚊子讓產量變少。</p>
     <h4>🐾 寵物夥伴</h4>
     <p>在「我的家」選一隻寵物當夥伴，牠會在農場走來走去，你收成澆水時牠會跑過去幫忙。</p>
-    <p>寵物身上有 <b>1 格裝備欄</b>，插上裝備就會幫你自動做事：自動澆水、自動播種、自動除蟲、自動除草、自動餵食、自動收成、自動拍蚊子、看門狗（趕走小偷）、稻草人（擋下惡作劇）。每種裝備只能有 1 件，在裝備商店先買 I 階，再一階一階升級（I、II 階用金幣，III、IV 階用鑽石）；收成時也可能撿到寶箱，或升到 Lv5／10／15／20 領禮物。</p>
+    <p>寵物身上有 <b>1 格裝備欄</b>，插上裝備就會幫你自動做事：自動澆水、自動播種、自動除蟲、自動除草、自動餵食、自動收成、自動拍蚊子、看門狗（趕走小偷）、稻草人（擋下惡作劇）。每種裝備只能有 1 件，在寵物商店先買 I 階，再一階一階升級（I、II 階用金幣，III、IV 階用鑽石）；收成時也可能撿到寶箱，或升到 Lv5／10／15／20 領禮物。</p>
     <h4>🏆 排行榜</h4>
     <p>依等級排名，同等級再比經驗。可以看好友排行和全服前 50 名。</p></div>`,
     [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); FEAT_TUTS.forEach(f=>localStorage.removeItem(featKey(f.id))); }catch(e){} feat=null; tut={step:0}; tutRender(); }],['知道了','',closeModal]]);
@@ -1484,7 +1494,7 @@ function openGearBag(slot){
   body += `<div class="sec">背包裡的裝備</div>`;
   body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span><div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
       ${mem.g===g.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">裝備中</span>':`<button class="mini" data-eq="${g.id}">${(used[g.id]||0)>=n?'換過來':'插上'}</button>`}</div>`).join('')
-    : `<div class="empty">還沒有裝備<br><small>可以在裝備商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
+    : `<div class="empty">還沒有裝備<br><small>可以在寵物商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
   modal('寵物裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
   const md=$('md');
   md.querySelectorAll('[data-eq]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.eq, n=(me.gear||{})[id]||0;
@@ -1500,7 +1510,8 @@ const gearOwned = (me, f) => GEAR_LIST.filter(g=>g.func===f && ((me.gear||{})[g.
 function openGearShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   const me=S.me, funcs=[...new Set(GEAR_LIST.map(g=>g.func==='clear'?'feed':g.func))];
-  let body=`<div class="rhint" style="margin-bottom:6px">每種裝備只能有 1 件。先買 I 階，之後升級會直接變成下一階（插在寵物身上的也會自動換新）。</div>`;
+  petShopTab='gear';
+  let body=petShopTabs()+`<div class="rhint" style="margin-bottom:6px">每種裝備只能有 1 件。先買 I 階，之後升級會直接變成下一階（插在寵物身上的也會自動換新）。</div>`;
   funcs.forEach(f=>{ const tiers=GEAR_LIST.filter(g=>(g.func==='clear'?'feed':g.func)===f).sort((a,b)=>a.tier-b.tier); if(!tiers.length) return;
     const cur=gearOwned(me, tiers[0].func), next=cur ? tiers.find(g=>g.tier===cur.tier+1) : tiers[0], show=cur||tiers[0];
     const pips=tiers.map(g=>`<span class="tp${cur&&g.tier<=cur.tier?' on':''}">${ROMAN[g.tier]}</span>`).join('');
@@ -1512,13 +1523,13 @@ function openGearShop(){
     body+=`<div class="row gshop"><div class="ic">${gearImg(show,44)}</div><div class="tx"><b>${GEAR_FUNC[f][1]} ${GEAR_FUNC[f][0]}</b> <span class="tps">${pips}</span>
       <div>${cur?`目前 ${esc(gearTitle(cur))}：${gearDesc(cur)}`:'還沒有'}</div>${next?`<div class="gnext">下一階 ${esc(gearTitle(next))}：${gearDesc(next)}</div>`:''}<div class="tprs">${prices}</div></div>${btn}</div>`;
   });
-  modal(`裝備商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`, body);
-  const md=$('md');
+  modal(`寵物商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`, body);
+  const md=$('md'); bindPetShopTabs();
   md.querySelectorAll('[data-bg]').forEach(b=>b.onclick=async()=>{ const g=GEAR[b.dataset.bg], upgrade=g.tier>1;
     try{ applyState(await rpc('farm_buy_gear',{p_id:g.id})); refresh(); sfx(upgrade?'lvup':'coin');
       if(upgrade){ fxConfetti(); toast(`升級成 ${gearTitle(g)}！`); return openGearShop(); }
       const pt=JSON.parse(JSON.stringify(partyOf(S.me)));
-      const pick=pt.map((p,i)=>{ const cg=GEAR[p.g]; return `<button class="eqpick" data-eqto="${i}"><img src="${chrSrc(p.s+'1')}" alt=""><b>${i===0?'👑 ':''}${esc(bName(p.s))}</b><small>${cg?`換下 ${esc(gearTitle(cg))}`:'空的裝備格'}</small></button>`; }).join('');
+      const pick=pt.map((p,i)=>{ const cg=GEAR[p.g]; return `<button class="eqpick" data-eqto="${i}"><img src="${petSrc(p.s, S.me)}" alt=""><b>${i===0?'👑 ':''}${esc(bName(p.s))}</b><small>${cg?`換下 ${esc(gearTitle(cg))}`:'空的裝備格'}</small></button>`; }).join('');
       modal('買到了！', `<div style="text-align:center;padding:6px 0">${gearImg(g,80)}<div style="font-weight:900;font-size:18px;margin-top:6px">${gearTitle(g)}</div><div style="color:var(--ink2);font-weight:700;margin-top:4px">${gearDesc(g)}</div></div>
         <div class="sec">要插在哪一隻寵物身上？</div><div class="eqgrid">${pick}</div>`,
         [['先放背包','sub',()=>openGearShop()]]);
@@ -1855,7 +1866,12 @@ function bindDecorLayer(){
 
 /* ================= 寵物園：我的寵物＋購買新寵物 ================= */
 let BEASTS = [], BST = {}, parkTab = 'mine';
-function setBeastConfig(list){ if(list){ BEASTS=list; BST={}; list.forEach(b=>BST[b.id]=b); } }
+function setBeastConfig(list, skins){ if(list){ BEASTS=list; BST={}; list.forEach(b=>BST[b.id]=b); } if(skins){ PSKINS=skins; PSK={}; skins.forEach(k=>PSK[k.id]=k); } }
+let PSKINS = [], PSK = {};
+const PSK_KIND = {mage:'🪄 魔法', mech:'🤖 機甲', star:'✨ 星辰'};
+/* 寵物目前用的圖（有換造型就用造型） */
+const petKey = (sp, who) => { const on = ((who||{}).pskin_on||{})[sp]; return on && /@/.test(on) ? on : sp+'1'; };
+const petSrc = (sp, who) => chrSrc(petKey(sp, who));
 const ownedBeasts = o => Object.keys((o && o.beasts) || {});
 const bName = sp => (CHR_NAMES[sp]||[])[0] || (BST[sp]||{}).name || sp;
 const fmtDate = ms => { if(!ms) return '一開始就在'; const d=new Date(+ms); return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} 加入`; };
@@ -1876,7 +1892,7 @@ function openBeastPark(t){
       else if(k===0) btn='<span class="tag" style="background:#FFF1DC;color:#C77A1E">👑 隊長</span>';
       else if(k>0) btn=`<div style="display:flex;gap:4px"><button class="mini o" data-lead="${b.id}">隊長</button><button class="mini sub" data-off="${b.id}">下場</button></div>`;
       else btn=`<button class="mini" data-on="${b.id}" ${pt.length>=cap?'disabled':''}>上場</button>`;
-      return `<div class="bcard${k>=0?' on':''}"><img src="${chrSrc(b.id+'1')}" alt=""><b>${bName(b.id)}</b><small>${fmtDate(own[b.id])}</small>${btn}</div>`; }).join('')}</div>`;
+      return `<div class="bcard${k>=0?' on':''}"><img src="${petSrc(b.id, who)}" alt=""${visit?'':` data-skin="${b.id}" style="cursor:pointer"`}>${visit?'':`<button class="skbtn" data-skin="${b.id}">🎨 換造型</button>`}<b>${bName(b.id)}</b><small>${fmtDate(own[b.id])}</small>${btn}</div>`; }).join('')}</div>`;
   } else {
     body += `<div class="bgrid">${BEASTS.map(b=>{ const has=own[b.id]!=null, lock=!visit && S.me.lv<b.lv;
       const cost = b.gold!=null ? `${b.gold.toLocaleString()} 金` : `💎${b.gems}`;
@@ -1892,6 +1908,7 @@ function openBeastPark(t){
   md.querySelectorAll('[data-off]').forEach(b=>b.onclick=async()=>{ const pt=pt0().filter(p=>p.s!==b.dataset.off); await saveParty(pt, `${bName(b.dataset.off)} 回寵物園玩了`); openBeastPark('mine'); });
   md.querySelectorAll('[data-lead]').forEach(b=>b.onclick=async()=>{ const pt=pt0(), i=pt.findIndex(p=>p.s===b.dataset.lead); const [m]=pt.splice(i,1); pt.unshift(m); await saveParty(pt, `${bName(m.s)} 當上隊長！`); openBeastPark('mine'); });
   md.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>openGearBag(+b.dataset.pg));
+  md.querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>openPetSkin(b.dataset.skin, ()=>openBeastPark('mine')));
   md.querySelectorAll('[data-bb]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.bb;
     try{ applyState(await rpc('farm_buy_beast',{p_id:id})); refresh(); fxConfetti(); sfx('lvup');
       modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">已經住進寵物園了</div></div>`,
@@ -1905,11 +1922,11 @@ function syncParkMovers(){
   if(!PARK) return;
   const who = mode==='visit' && V ? V.owner : S && S.me; if(!who) return;
   const inParty = partyOf(who).map(p=>p.s), list = ownedBeasts(who).filter(sp=>!inParty.includes(sp) && BST[sp]).slice(0, 12);
-  const sig = list.join(',') + (mode==='visit'); if(sig===parkSig) return; parkSig = sig;
+  const sig = list.map(sp=>petKey(sp,who)).join(',') + (mode==='visit'); if(sig===parkSig) return; parkSig = sig;
   const mv=$('movers'); if(!mv) return;
   parkMovers.forEach(m=>{ m.el.remove(); const i=movers.indexOf(m); if(i>=0) movers.splice(i,1); }); parkMovers=[];
   const [cx,cy,r]=PARK;
-  list.forEach(sp=>{ const k=sp+'1', n=50, w=n*(CHR_RATIO[k]||1);
+  list.forEach(sp=>{ const k=petKey(sp, who), n=50, w=n*(CHR_RATIO[k]||1);
     const g=document.createElementNS('http://www.w3.org/2000/svg','g');
     g.innerHTML=`<g class="mvin"><ellipse cx="0" cy="0" rx="${w*0.3}" ry="${n*0.08}" fill="rgba(0,0,0,.2)"/><g class="hop"><image href="${chrSrc(k)}" x="${-w/2}" y="${-n}" width="${w}" height="${n}"/></g></g>`;
     mv.appendChild(g);
@@ -1923,7 +1940,7 @@ const partyOf = who => (who && who.party && who.party.length) ? who.party : [{s:
 function syncParty(){
   const who = mode==='visit' && V ? V.owner : S && S.me; if(!who || !farmerMover) return;
   const pt = partyOf(who);
-  setMoverChar(farmerMover, pt[0].s+'1', pt[0].g);
+  setMoverChar(farmerMover, petKey(pt[0].s, who0()), pt[0].g);
   const extra = pt.slice(1), mv=$('movers'); if(!mv) return;
   while(partyMovers.length > extra.length){ const m=partyMovers.pop(); m.el.remove(); const i=movers.indexOf(m); if(i>=0) movers.splice(i,1); }
   while(partyMovers.length < extra.length){
@@ -1932,7 +1949,7 @@ function syncParty(){
     const m={el:g, wait:Math.random()*2, face:1, x:px, y:py, path:[], tgt:0, speed:0.5, s:1.1, farmer:true, member:true};
     movers.push(m); partyMovers.push(m);
   }
-  extra.forEach((p,i)=>setMoverChar(partyMovers[i], p.s+'1', p.g));
+  extra.forEach((p,i)=>setMoverChar(partyMovers[i], petKey(p.s, who0()), p.g));
 }
 function partyLvs(){ const st=(typeof CFG_SET!=='undefined'&&CFG_SET)||{}; return [1, +(st.party_lv2??5), +(st.party_lv3??10), +(st.party_lv4??15), +(st.party_lv5??20), +(st.party_lv6??25), +(st.party_lv7??7), +(st.party_lv8??8), +(st.party_lv9??9)]; }
 async function saveParty(pt, msg){
@@ -1941,9 +1958,57 @@ async function saveParty(pt, msg){
 function partyRowHTML(who, editable){
   const pt=partyOf(who), cap=editable ? (who.party_cap||1) : pt.length, lvs=partyLvs();
   return `<div class="prow">${[0,1,2,3,4,5,6,7,8].map(i=>{ const p=pt[i];
-    if(p){ const g=GEAR[p.g]; return `<div class="pslot${i===0?' lead':''}">${i===0?'<span class="crown">👑</span>':''}<img class="pb" src="${chrSrc(p.s+'1')}" alt="">${editable?`<button class="pg${g?' on':''}" data-pg="${i}">${g?`<img src="${A(g.icon)}" alt="">`:'<i>＋</i>'}<span>${g?'✓':'裝備'}</span></button>`:(g?`<span class="pg on"><img src="${A(g.icon)}" alt=""><span>裝備</span></span>`:'')}</div>`; }
+    if(p){ const g=GEAR[p.g]; return `<div class="pslot${i===0?' lead':''}">${i===0?'<span class="crown">👑</span>':''}<img class="pb" src="${petSrc(p.s, who)}" alt="">${editable?`<button class="pg${g?' on':''}" data-pg="${i}">${g?`<img src="${A(g.icon)}" alt="">`:'<i>＋</i>'}<span>${g?'✓':'裝備'}</span></button>`:(g?`<span class="pg on"><img src="${A(g.icon)}" alt=""><span>裝備</span></span>`:'')}</div>`; }
     if(i<cap) return `<div class="pslot empty">空位</div>`;
     return `<div class="pslot lock">🔒<br>Lv${lvs[i]}</div>`; }).join('')}</div>`;
+}
+
+const who0 = () => (mode==='visit' && V) ? V.owner : (S && S.me);
+
+/* 換造型：點寵物就跳出來 */
+function openPetSkin(sp, back){
+  const me=S.me, on=(me.pskin_on||{})[sp]||'', own=me.pskins||{}, list=PSKINS.filter(k=>k.beast===sp);
+  const card=(key,name,img,state)=>`<div class="bcard${state==='on'?' on':''}"><img src="${img}" alt=""><b>${name}</b>${state}</div>`;
+  const cells=[`<div class="bcard${!on?' on':''}"><img src="${chrSrc(sp+'1')}" alt=""><b>原本的樣子</b>${!on?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':`<button class="mini sub" data-wear="">換上</button>`}</div>`]
+    .concat(list.map(k=>{ const has=own[k.id], cost=k.gold!=null?`${k.gold.toLocaleString()} 金`:`💎${k.gems}`, poor=k.gold!=null?me.gold<k.gold:(me.gems||0)<k.gems;
+      return `<div class="bcard${on===k.id?' on':has?'':' dark'}"><img src="${chrSrc(k.id)}" alt=""><b>${PSK_KIND[k.kind]||''}</b>${on===k.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':has?`<button class="mini" data-wear="${k.id}">換上</button>`:`<button class="mini ${k.gems!=null?'gem':''}" data-bsk="${k.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }));
+  modal(`🎨 ${esc(bName(sp))} 的造型`, `<div class="skprev"><img src="${chrSrc(on||sp+'1')}" alt=""></div><div class="bgrid">${cells.join('')}</div><div class="rhint">買了造型會自動換上，之後可以隨時換回原本的樣子</div>`, back?[['← 返回','sub',back]]:undefined);
+  const md=$('md');
+  md.querySelectorAll('[data-wear]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_pskin',{p_beast:sp,p_skin:b.dataset.wear||null})); refresh(); sfx('coin'); openPetSkin(sp, back); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-bsk]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_pskin',{p_id:b.dataset.bsk})); refresh(); sfx('lvup'); fxConfetti(); toast('新造型換上了！'); openPetSkin(sp, back); }catch(e){ toast(e.message); } });
+}
+
+/* 寵物商店：裝備／寵物／寵物造型 */
+let petShopTab = 'gear';
+function petShopTabs(){ return `<div class="tabs"><button data-pst="gear" class="${petShopTab==='gear'?'on':''}">🛡️ 裝備</button><button data-pst="pet" class="${petShopTab==='pet'?'on':''}">🐾 寵物</button><button data-pst="skin" class="${petShopTab==='skin'?'on':''}">🎨 寵物造型</button></div>`; }
+function bindPetShopTabs(){ document.querySelectorAll('#md [data-pst]').forEach(b=>b.onclick=()=>openPetShop(b.dataset.pst)); }
+function openPetShop(t){
+  if(mode==='visit') return toast('回到自己的農場才能買東西');
+  if(t) petShopTab=t;
+  if(petShopTab==='gear') return openGearShop();
+  const me=S.me, title=`寵物商店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`;
+  if(petShopTab==='pet'){
+    const own=me.beasts||{};
+    const body = petShopTabs() + `<div class="bgrid">${BEASTS.map(b=>{ const has=own[b.id]!=null, lock=me.lv<b.lv;
+      const cost = b.gold!=null ? `${b.gold.toLocaleString()} 金` : `💎${b.gems}`, poor = b.gold!=null ? me.gold<b.gold : (me.gems||0)<b.gems;
+      return `<div class="bcard${has?'':' dark'}"><img src="${petSrc(b.id, me)}" alt=""><b>${bName(b.id)}</b><small>${has?'已擁有':(b.gems!=null?'✨ 稀有寵物':'還沒擁有')}</small>
+        ${has?'<span class="tag" style="background:#E8F8EE;color:#2E9660">已擁有</span>':lock?`<span class="lock">Lv${b.lv} 解鎖</span>`:`<button class="mini ${b.gems!=null?'gem':''}" data-bb="${b.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('')}</div>`;
+    modal(title, body); bindPetShopTabs();
+    document.querySelectorAll('#md [data-bb]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.bb;
+      try{ applyState(await rpc('farm_buy_beast',{p_id:id})); refresh(); fxConfetti(); sfx('lvup');
+        modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">已經住進寵物園了</div></div>`,
+          [['上場當夥伴','',async()=>{ const pt=JSON.parse(JSON.stringify(partyOf(S.me))); if(pt.length>=(S.me.party_cap||1)) return toast('夥伴格子滿了，先讓一隻下場'); pt.push({s:id,g:null}); await saveParty(pt, `${bName(id)} 上場了！`); closeModal(); }],['繼續逛','sub',()=>openPetShop('pet')]]);
+      }catch(e){ toast(e.message); } });
+    return;
+  }
+  // 寵物造型：先列自己有的寵物，再列還沒有的
+  const own=me.beasts||{}, have=BEASTS.filter(b=>own[b.id]!=null), not=BEASTS.filter(b=>own[b.id]==null);
+  const rowFor=b=>{ const has=own[b.id]!=null, ks=PSKINS.filter(k=>k.beast===b.id);
+    return `<div class="skrow${has?'':' dim'}"><div class="skhd"><img src="${chrSrc(b.id+'1')}" alt=""><b>${bName(b.id)}</b>${has?'':'<small>先擁有寵物才能買</small>'}</div><div class="skks">${ks.map(k=>{ const got=(me.pskins||{})[k.id], cost=k.gold!=null?`${k.gold.toLocaleString()} 金`:`💎${k.gems}`, poor=k.gold!=null?me.gold<k.gold:(me.gems||0)<k.gems;
+      return `<div class="skk"><img src="${chrSrc(k.id)}" alt=""><small>${PSK_KIND[k.kind]||''}</small>${got?'<span class="tag" style="background:#E8F8EE;color:#2E9660">已擁有</span>':has?`<button class="mini ${k.gems!=null?'gem':''}" data-bsk="${k.id}" ${poor?'disabled':''}>${cost}</button>`:`<span class="lock">${cost}</span>`}</div>`; }).join('')}</div></div>`; };
+  modal(title, petShopTabs() + `<div class="rhint">每隻寵物都有 3 款特別造型，買了會自動換上；在寵物園點寵物可以隨時換回來</div>` + have.concat(not).map(rowFor).join(''));
+  bindPetShopTabs();
+  document.querySelectorAll('#md [data-bsk]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_pskin',{p_id:b.dataset.bsk})); refresh(); sfx('lvup'); fxConfetti(); toast('新造型換上了！'); openPetShop('skin'); }catch(e){ toast(e.message); } });
 }
 
 /* ================= 城鎮色調 ================= */
@@ -2098,7 +2163,7 @@ function openPack(t){
     const own=Object.entries(me.gear||{}).filter(([id,n])=>n>0&&GEAR[id]).map(([id,n])=>[GEAR[id],n]).sort((a,b)=>GEAR_LIST.indexOf(a[0])-GEAR_LIST.indexOf(b[0]));
     body += own.length ? own.map(([g,n])=>{ const on=(used[g.id]||[]).map(i=>bName(pt[i].s)).join('、');
       return `<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span>${on?` <span class="tag" style="background:#E8F8EE;color:#2E9660">${esc(on)} 裝備中</span>`:''}<div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div></div>`; }).join('')
-      : `<div class="empty">還沒有裝備<br><small>可以在裝備商店買、收成時撿到寶箱，或升級領禮物</small></div>`;
+      : `<div class="empty">還沒有裝備<br><small>可以在寵物商店買、收成時撿到寶箱，或升級領禮物</small></div>`;
     body += `<div class="sec">自動設定</div>` + autoSeedHTML() + autoFeedHTML();
     body += `<div class="rhint" style="text-align:center;margin-top:8px">到「我的家」點寵物下面的裝備格就能插上</div>`;
   } else if(bagTab==='decor'){
@@ -2122,7 +2187,7 @@ function openPack(t){
       return `<div class="skcard${t.id===cur?' on':''}"><div class="tsw" data-tpv="${t.id}" style="background:linear-gradient(${fx.sky[0]},${fx.sky[1]} 60%,${fx.sky[2]})"><img alt="" src="${A('home_island')}"><span>${TONE_ICON[fx.fx]||'🌼'}</span></div><b>${esc(t.name)}</b>
         ${t.id===cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':`<button class="mini" data-tu="${t.id}">套用</button>`}</div>`; }).join('')}</div>`;
   }
-  modal('🎒 背包', body, [[bagTab==='gear'?'🛒 去裝備商店':'🛒 去建築商店','o',()=>openShopTab(bagTab==='gear'?'gear':bagTab)]]);
+  modal('🎒 背包', body, [[bagTab==='gear'?'🛒 去寵物商店':'🛒 去建築商店','o',()=>openShopTab(bagTab==='gear'?'gear':bagTab)]]);
   const md=$('md');
   md.querySelectorAll('[data-bag]').forEach(b=>b.onclick=()=>openPack(b.dataset.bag));
   md.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>enterDecorEdit(b.dataset.pd));
@@ -2568,7 +2633,7 @@ function tapBuilding(g){
   if(id==='barn') return openBag();
   if(id==='home') return openHome();
   if(id==='coop') return openRanch();
-  if(id==='decor') return openGearShop();
+  if(id==='decor') return openPetShop();
   if(id==='pen') return openBeastPark();
   const o = BLD.find(b=>b.id===id); if(o && o.locked) toast(o.locked);
 }
@@ -2743,7 +2808,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts); setToneConfig(c.tones); CFG_SET=c.settings||{};
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts, c.pet_skins); setToneConfig(c.tones); CFG_SET=c.settings||{};
   }catch(e){}
 }
 async function showNotices(){

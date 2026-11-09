@@ -73,7 +73,7 @@ const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
   {id:'shop',  name:'建築商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
-  {id:'decor', name:'裝備商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
+  {id:'decor', name:'寵物商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
   {id:'bin',   name:'收集倉',   img:'dc_hay',   c:[3.0,11.3], w:104, foot:0.80},
   {id:'pen',   name:'寵物園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
@@ -129,9 +129,13 @@ const CHR_SP={bunny:['蘑菇兔',.9,'quad',.74,.5],mouse:['小鼠',1.3,'quad',.7
   owl:['貓頭鷹',.6,'waddle'],lizard:['蜥蜴',1,'quad',.72,.5],deer:['小鹿',1.1,'quad',.62,.5],moth:['飛蛾',.8,'float'],armad:['犰狳',.55,'quad',.74,.5],
   seal:['海豹',.5,'waddle'],marten:['貂',1.35,'quad',.7,.5],phoenix:['鳳凰',.9,'float'],fox:['狐狸',1.2,'quad',.7,.5],otter:['水獺',.8,'biped',.8,.48],
   penguin:['企鵝',.65,'waddle'],pango:['穿山甲',.55,'quad',.7,.5],ferret:['雪貂',1.35,'quad',.68,.5],bear:['熊',.6,'biped',.8,.48],dragon:['龍',.85,'quad',.74,.5]};
-const chrInfo=k=>{ const m=/^([a-z]+)([1-3])$/.exec(k||'')||[0,'bunny','1']; const sp=CHR_SP[m[1]]?m[1]:'bunny', d=CHR_SP[sp];
+const PS_RATIO={"bunny@mage":1.054,"bunny@mech":0.988,"bunny@star":0.917,"dragon@mage":1.212,"dragon@mech":1.125,"dragon@star":1.183,"marten@mage":1.242,"marten@mech":1.317,"marten@star":1.246,"mouse@mage":1.229,"mouse@mech":1.271,"mouse@star":1.221,"phoenix@mage":1.054,"phoenix@mech":1.062,"phoenix@star":0.988,"mole@mage":1.146,"mole@mech":1.204,"mole@star":1.171,"otter@mage":1.108,"otter@mech":1.125,"otter@star":1.137,"penguin@mage":0.954,"penguin@mech":1.083,"penguin@star":1.042,"seal@mage":1.321,"seal@mech":1.033,"seal@star":1.188,"armad@mage":1.129,"armad@mech":1.317,"armad@star":1.096,"pango@mage":1.146,"pango@mech":1.179,"pango@star":1.071,"lizard@mage":1.212,"lizard@mech":1.212,"lizard@star":1.05,"owl@mage":0.992,"owl@mech":1.054,"owl@star":0.988,"ferret@mage":1.208,"ferret@mech":1.337,"ferret@star":1.408,"moth@mage":1.146,"moth@mech":0.992,"moth@star":0.988,"bear@mage":1.025,"bear@mech":1.075,"bear@star":0.954,"fox@mage":1.304,"fox@mech":1.146,"fox@star":1.3,"deer@mage":0.979,"deer@mech":0.912,"deer@star":1.021};
+Object.assign(CHR_RATIO, PS_RATIO);
+const chrInfo=k=>{ const sk=/^([a-z]+)@([a-z]+)$/.exec(k||'');   // 寵物造型：fox@mage
+  if(sk && CHR_SP[sk[1]]){ const d=CHR_SP[sk[1]]; return {k, sp:sk[1], st:3, skin:sk[2], name:d[0], spd:d[1], type:'waddle', legY:.8, mid:.5}; }
+  const m=/^([a-z]+)([1-3])$/.exec(k||'')||[0,'bunny','1']; const sp=CHR_SP[m[1]]?m[1]:'bunny', d=CHR_SP[sp];
   return {k:sp+m[2], sp, st:+m[2], name:d[0], spd:d[1], type:d[2], legY:d[3]||.8, mid:d[4]||.5}; };
-const chrSrc=k=>A('c_'+k);
+const chrSrc=k=>{ const sk=/^([a-z]+)@([a-z]+)$/.exec(k||''); return sk ? A('ps_'+sk[1]+'_'+sk[2]) : A('c_'+k); };
 function charSVG(k){
   const c=chrInfo(k), n=48+c.st*9, b=n*(CHR_RATIO[c.k]||1), src=chrSrc(c.k), id='ck'+c.k;
   const img=clip=>`<image href="${src}" x="${-b/2}" y="${-n}" width="${b}" height="${n}"${clip?` clip-path="url(#${clip})"`:''}/>`;

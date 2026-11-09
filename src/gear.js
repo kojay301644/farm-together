@@ -56,7 +56,7 @@ function openGearBag(slot){
   body += `<div class="sec">背包裡的裝備</div>`;
   body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span><div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
       ${mem.g===g.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">裝備中</span>':`<button class="mini" data-eq="${g.id}">${(used[g.id]||0)>=n?'換過來':'插上'}</button>`}</div>`).join('')
-    : `<div class="empty">還沒有裝備<br><small>可以在裝備商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
+    : `<div class="empty">還沒有裝備<br><small>可以在寵物商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
   modal('寵物裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
   const md=$('md');
   md.querySelectorAll('[data-eq]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.eq, n=(me.gear||{})[id]||0;
@@ -72,7 +72,8 @@ const gearOwned = (me, f) => GEAR_LIST.filter(g=>g.func===f && ((me.gear||{})[g.
 function openGearShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   const me=S.me, funcs=[...new Set(GEAR_LIST.map(g=>g.func==='clear'?'feed':g.func))];
-  let body=`<div class="rhint" style="margin-bottom:6px">每種裝備只能有 1 件。先買 I 階，之後升級會直接變成下一階（插在寵物身上的也會自動換新）。</div>`;
+  petShopTab='gear';
+  let body=petShopTabs()+`<div class="rhint" style="margin-bottom:6px">每種裝備只能有 1 件。先買 I 階，之後升級會直接變成下一階（插在寵物身上的也會自動換新）。</div>`;
   funcs.forEach(f=>{ const tiers=GEAR_LIST.filter(g=>(g.func==='clear'?'feed':g.func)===f).sort((a,b)=>a.tier-b.tier); if(!tiers.length) return;
     const cur=gearOwned(me, tiers[0].func), next=cur ? tiers.find(g=>g.tier===cur.tier+1) : tiers[0], show=cur||tiers[0];
     const pips=tiers.map(g=>`<span class="tp${cur&&g.tier<=cur.tier?' on':''}">${ROMAN[g.tier]}</span>`).join('');
@@ -84,13 +85,13 @@ function openGearShop(){
     body+=`<div class="row gshop"><div class="ic">${gearImg(show,44)}</div><div class="tx"><b>${GEAR_FUNC[f][1]} ${GEAR_FUNC[f][0]}</b> <span class="tps">${pips}</span>
       <div>${cur?`目前 ${esc(gearTitle(cur))}：${gearDesc(cur)}`:'還沒有'}</div>${next?`<div class="gnext">下一階 ${esc(gearTitle(next))}：${gearDesc(next)}</div>`:''}<div class="tprs">${prices}</div></div>${btn}</div>`;
   });
-  modal(`裝備商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`, body);
-  const md=$('md');
+  modal(`寵物商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`, body);
+  const md=$('md'); bindPetShopTabs();
   md.querySelectorAll('[data-bg]').forEach(b=>b.onclick=async()=>{ const g=GEAR[b.dataset.bg], upgrade=g.tier>1;
     try{ applyState(await rpc('farm_buy_gear',{p_id:g.id})); refresh(); sfx(upgrade?'lvup':'coin');
       if(upgrade){ fxConfetti(); toast(`升級成 ${gearTitle(g)}！`); return openGearShop(); }
       const pt=JSON.parse(JSON.stringify(partyOf(S.me)));
-      const pick=pt.map((p,i)=>{ const cg=GEAR[p.g]; return `<button class="eqpick" data-eqto="${i}"><img src="${chrSrc(p.s+'1')}" alt=""><b>${i===0?'👑 ':''}${esc(bName(p.s))}</b><small>${cg?`換下 ${esc(gearTitle(cg))}`:'空的裝備格'}</small></button>`; }).join('');
+      const pick=pt.map((p,i)=>{ const cg=GEAR[p.g]; return `<button class="eqpick" data-eqto="${i}"><img src="${petSrc(p.s, S.me)}" alt=""><b>${i===0?'👑 ':''}${esc(bName(p.s))}</b><small>${cg?`換下 ${esc(gearTitle(cg))}`:'空的裝備格'}</small></button>`; }).join('');
       modal('買到了！', `<div style="text-align:center;padding:6px 0">${gearImg(g,80)}<div style="font-weight:900;font-size:18px;margin-top:6px">${gearTitle(g)}</div><div style="color:var(--ink2);font-weight:700;margin-top:4px">${gearDesc(g)}</div></div>
         <div class="sec">要插在哪一隻寵物身上？</div><div class="eqgrid">${pick}</div>`,
         [['先放背包','sub',()=>openGearShop()]]);

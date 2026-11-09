@@ -432,7 +432,7 @@ function tapBuilding(g){
   if(id==='barn') return openBag();
   if(id==='home') return openHome();
   if(id==='coop') return openRanch();
-  if(id==='decor') return openGearShop();
+  if(id==='decor') return openPetShop();
   if(id==='pen') return openBeastPark();
   const o = BLD.find(b=>b.id===id); if(o && o.locked) toast(o.locked);
 }
@@ -607,7 +607,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts); setToneConfig(c.tones); CFG_SET=c.settings||{};
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts, c.pet_skins); setToneConfig(c.tones); CFG_SET=c.settings||{};
   }catch(e){}
 }
 async function showNotices(){

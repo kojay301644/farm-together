@@ -359,7 +359,13 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
 .bcard{display:flex;flex-direction:column;align-items:center;gap:2px;background:#FFF8EC;border:2.5px solid #E6D9C3;border-radius:14px;padding:6px 4px 8px;text-align:center}
 .bcard img{width:100%;height:76px;object-fit:contain}.bcard b{font-size:13px}.bcard small{font-size:10px;font-weight:700;color:var(--ink2)}
-.bcard.on{border-color:#3BB273;background:#E8F8EE}.bcard.dark{background:#FFFDF8;border-style:dashed}
+.bcard.on{border-color:#3BB273;background:#E8F8EE}
+.skbtn{border:0;background:#F1E9FF;color:#6C4FD8;font-weight:900;font-size:11px;border-radius:9px;padding:2px 7px;margin:1px 0 2px;cursor:pointer}
+.skprev{text-align:center;padding:4px 0 6px}.skprev img{height:120px;max-width:80%;object-fit:contain;animation:floaty 3s ease-in-out infinite}
+.skrow{background:#FFF8EC;border:2px solid #E6D9C3;border-radius:14px;padding:8px;margin-top:8px}.skrow.dim{opacity:.6}
+.skhd{display:flex;align-items:center;gap:8px}.skhd img{width:36px;height:36px;object-fit:contain}.skhd b{font-size:14px}.skhd small{color:var(--ink2);font-weight:700;font-size:11px}
+.skks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}.skk{display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;border-radius:10px;padding:4px}
+.skk img{width:100%;height:70px;object-fit:contain}.skk small{font-weight:900;font-size:11px}.bcard.dark{background:#FFFDF8;border-style:dashed}
 .kick{position:fixed;inset:0;z-index:400;background:rgba(30,24,18,.72);display:grid;place-items:center;padding:20px}
 .kbox{background:#fff;border:3px solid #4B3423;border-radius:22px;padding:22px 20px;max-width:360px;text-align:center}.kbox h3{margin:6px 0}.kbox p{font-weight:700;line-height:1.6;margin:8px 0}.kbox .mut{color:var(--ink2);font-size:13px}.kbox .btn{width:100%;margin-top:8px}
 .prow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 8px}
