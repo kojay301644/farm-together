@@ -45,7 +45,7 @@ function openGearBag(slot){
   body += `<div class="sec">背包裡的裝備</div>`;
   body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span><div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
       ${mem.g===g.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">裝備中</span>':`<button class="mini" data-eq="${g.id}">${(used[g.id]||0)>=n?'換過來':'插上'}</button>`}</div>`).join('')
-    : `<div class="empty">還沒有裝備<br><small>可以在商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
+    : `<div class="empty">還沒有裝備<br><small>可以在裝備商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
   modal('寵物裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
   const md=$('md');
   md.querySelectorAll('[data-eq]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.eq, n=(me.gear||{})[id]||0;
@@ -64,7 +64,7 @@ function openGearShop(t){
   const me=S.me, list=GEAR_LIST.filter(g=>gearShopTab==='gold' ? g.gold!=null : g.gems!=null);
   const tabs=`<div class="tabs"><button data-gs="gold" class="${gearShopTab==='gold'?'on':''}">金幣裝備</button><button data-gs="gem" class="${gearShopTab==='gem'?'on':''}">💎 高級裝備</button></div>`;
   const byF={}; list.forEach(g=>(byF[g.func]=byF[g.func]||[]).push(g));
-  let body=shopNav('gear')+tabs;
+  let body=tabs;
   Object.keys(GEAR_FUNC).forEach(f=>{ if(!byF[f]) return;
     body+=`<div class="sec">${GEAR_FUNC[f][1]} ${GEAR_FUNC[f][0]}</div>`;
     body+=byF[f].map(g=>{ const lock=g.gold!=null && me.lv<g.lv, cost=g.gold!=null?`${g.gold.toLocaleString()} 金`:`💎${g.gems}`;
@@ -72,7 +72,7 @@ function openGearShop(t){
       return `<div class="row" style="${lock?'opacity:.55':''}"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b>${n?` <span class="tag">已有 ${n}</span>`:''}<div>${gearDesc(g)}</div></div>
         ${lock?`<span class="lock">Lv${g.lv} 解鎖</span>`:`<button class="mini ${g.gems!=null?'gem':''}" data-bg="${g.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('');
   });
-  modal(shopTitle(), body); bindShopNav();
+  modal(`裝備商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`, body);
   const md=$('md');
   md.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>openGearShop(b.dataset.gs));
   md.querySelectorAll('[data-bg]').forEach(b=>b.onclick=async()=>{ const g=GEAR[b.dataset.bg];

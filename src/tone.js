@@ -19,12 +19,14 @@ function _recolor(cv,e){const s=cv.getContext('2d'),n=s.getImageData(0,0,cv.widt
 /* 把一張圖套上色調（跟萌獸星球的 Xn 一樣：先換植物顏色，再疊色，最後依原圖透明度裁切） */
 const _toneCache=new Map(); let _toneQ=Promise.resolve();
 /* 大圖（島嶼、遠景、草地）預先算好四款植物變色版本，放在 assets/ */
-const TONE_PRE=['home_island','backdrop','grass_tile'];
+const TONE_PRE=/^(home_island|backdrop|grass_tile|b[bcfijl]?_[a-z]+|dc_[a-z]+)$/;
+const toneName = url => (url.match(/assets\/([a-z0-9_]+)\.webp/)||[])[1];
+/* 有預先算好的檔案就直接回傳網址（同步，不會先閃一下原色） */
+function tonePreURL(url,id){ const t=TONE_FX[id], nm=toneName(url); return (t&&t.px&&nm&&TONE_PRE.test(nm)) ? A(nm+'_'+t.px) : null; }
 function tonedURL(url,id){
   const t=TONE_FX[id]; if(!t||(!t.g.length&&!t.px)) return Promise.resolve(url);
   const key=id+'|'+url; if(_toneCache.has(key)) return _toneCache.get(key);
-  const nm=(url.match(/assets\/([a-z0-9_]+)\.webp/)||[])[1];
-  if(t.px && TONE_PRE.includes(nm)){ const pu=A(nm+'_'+t.px); _toneCache.set(key,Promise.resolve(pu)); return _toneCache.get(key); }
+  const pu=tonePreURL(url,id); if(pu){ _toneCache.set(key,Promise.resolve(pu)); return _toneCache.get(key); }
   const pr=_toneQ=_toneQ.then(()=>new Promise(res=>{ const im=new Image(); im.onload=()=>{ try{
       const cv=document.createElement('canvas'); cv.width=im.naturalWidth; cv.height=im.naturalHeight;
       const c=cv.getContext('2d',{willReadFrequently:true}); c.drawImage(im,0,0);
@@ -39,9 +41,10 @@ let toneCur='spring';
 const _toneSkip=el=>el.closest('#movers,.gbadge,#labels');
 function toneImage(el){
   if(_toneSkip(el)) return;
-  const href=el.getAttribute('href')||''; if(href.startsWith('blob:')||/_(autumn|sakura|snow|candy)\.webp/.test(href)) return;
+  const href=el.getAttribute('href')||''; if(href.startsWith('blob:')||(el.dataset.th&&href===el.dataset.th)) return;
   el.dataset.o=href; const id=toneCur;
   const t=TONE_FX[id]; if(!t||(!t.g.length&&!t.px)) return;
+  const pu=tonePreURL(href,id); if(pu){ el.dataset.th=pu; el.setAttribute('href',pu); return; }
   tonedURL(href,id).then(u=>{ if(u!==href && toneCur===id && el.dataset.o===href && el.getAttribute('href')===href) el.setAttribute('href',u); });
 }
 function toneAllImages(){
@@ -53,7 +56,7 @@ let _toneObs=null;
 function watchToneImages(){
   const W=$('world'); if(!W||W._toneObs) return;
   W._toneObs=new MutationObserver(ms=>{ for(const m of ms){
-    if(m.type==='attributes'){ const el=m.target, h=el.getAttribute('href')||''; if(!h.startsWith('blob:') && h!==el.dataset.o && !/_(autumn|sakura|snow|candy)\.webp/.test(h)) toneImage(el); continue; }
+    if(m.type==='attributes'){ const el=m.target, h=el.getAttribute('href')||''; if(!h.startsWith('blob:') && h!==el.dataset.o && h!==el.dataset.th) toneImage(el); continue; }
     m.addedNodes.forEach(n=>{ if(n.nodeType!==1) return; if(n.tagName==='image') toneImage(n); else n.querySelectorAll&&n.querySelectorAll('image').forEach(toneImage); }); } });
   W._toneObs.observe(W,{childList:true,subtree:true,attributes:true,attributeFilter:['href']});
 }
@@ -107,8 +110,8 @@ function toneFxLoop(now){
 }
 
 /* ================= 商店（裝飾、外觀、色調、裝備都在這裡） ================= */
-const SHOP_TABS = [['decor','🎨 裝飾'],['skin','🏠 建築外觀'],['tone','🌈 城鎮色調'],['gear','🐾 寵物裝備']];
-const shopTitle = () => `商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`;
+const SHOP_TABS = [['decor','🎨 裝飾'],['skin','🏠 建築外觀'],['tone','🌈 城鎮色調']];
+const shopTitle = () => `裝飾商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`;
 const shopNav = cur => `<div class="snav">${SHOP_TABS.map(([k,n])=>`<button data-snav="${k}" class="${k===cur?'on':''}">${n}</button>`).join('')}</div>`;
 function bindShopNav(){ document.querySelectorAll('[data-snav]').forEach(b=>b.onclick=()=>openShopTab(b.dataset.snav)); }
 function openShopTab(k){

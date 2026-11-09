@@ -56,7 +56,7 @@ textarea{width:100%;min-height:90px}
 <header><h1>🌱 一起種田吧｜營運後台</h1><span class="who" id="who"></span><a href="./" target="_blank">開啟遊戲</a></header>
 <nav id="nav" style="display:none">
   <button data-t="ov" class="on">總覽</button><button data-t="pl">玩家管理</button><button data-t="nt">公告</button>
-  <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="lg">操作紀錄</button>
+  <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="bt">電腦玩家</button><button data-t="lg">操作紀錄</button>
 </nav>
 <main id="main"><div class="center"><div class="muted">讀取中…</div></div></main>
 <div class="toast" id="toast"></div>
@@ -95,7 +95,7 @@ function showLogin(){
   $('li').onclick = async()=>{ const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('pw').value}); if(error) return toast('登入失敗：'+error.message); location.reload(); };
   $('gl').onclick = ()=>sb.auth.signInWithOAuth({provider:'google', options:{redirectTo: location.origin+location.pathname}});
 }
-function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,lg:pageLg})[t](); }
+function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,bt:pageBt,lg:pageLg})[t](); }
 const M = h => $('main').innerHTML = h;
 
 /* 總覽 */
@@ -211,6 +211,31 @@ async function pageCl(){
 async function pageLg(){
   const L = await rpc('adm_logs');
   M(`<div class="card"><h2>後台操作紀錄（最近 100 筆）</h2>${L.length?`<table><tr><th>時間</th><th>管理員</th><th>動作</th><th>內容</th></tr>${L.map(l=>`<tr><td style="white-space:nowrap">${dt(l.at)}</td><td>${esc(l.admin||'')}</td><td>${ACT[l.action]||l.action}</td><td class="log">${esc(JSON.stringify(l.detail))}</td></tr>`).join('')}</table>`:'<span class="muted">還沒有操作紀錄</span>'}</div>`);
+}
+
+/* ================= 電腦玩家、一鍵全部重玩 ================= */
+const STYLE = {busy:'勤勞型',casual:'休閒型',thief:'愛偷菜',helper:'熱心型',normal:'一般'};
+async function pageBt(data){
+  let L; try{ L = data || await rpc('adm_bots'); }catch(e){ return M(`<div class="card"><h2>電腦玩家</h2><p class="muted">還沒有電腦玩家資料（伺服器更新 SQL 執行後才會出現）：${esc(e.message)}</p></div>`); }
+  M(`<div class="card"><h2>電腦玩家（${L.length} 隻）</h2>
+    <p class="muted">電腦玩家在遊戲裡跟真人一樣：種田、收成、養牧場、偷菜、幫忙、惡作劇，會自動接受好友邀請。有玩家在線時伺服器每幾分鐘讓一批動一次（頻率、每天偷真人的次數在「遊戲數值」調：bot_every_min、bot_batch、bot_real_steal_daily）。</p>
+    <table><tr><th>暱稱</th><th>等級</th><th>金幣</th><th>個性</th><th>重玩時的等級</th><th>好友</th><th>今天偷真人</th><th>上次動</th><th>啟用</th><th></th></tr>
+    ${L.map(b=>`<tr><td><input data-n="${b.id}" value="${esc(b.nickname)}" style="width:120px"></td><td>Lv${b.lv}</td><td>${(b.gold||0).toLocaleString()}</td><td>${STYLE[b.style]||b.style}</td>
+      <td><input class="num" type="number" min="1" max="30" data-l="${b.id}" value="${b.start_lv}"></td><td>${b.friends}</td><td>${b.steal_n}</td><td style="white-space:nowrap">${dt(b.last_act)}</td>
+      <td><input type="checkbox" data-a="${b.id}" ${b.active?'checked':''}></td>
+      <td style="white-space:nowrap"><button class="btn" data-sv="${b.id}">儲存</button> <button class="btn o" data-rs="${b.id}">重玩</button></td></tr>`).join('')}</table>
+    <div class="row" style="margin-top:10px"><button class="btn o" id="rsBots">全部電腦玩家重玩</button></div></div>
+    <div class="card" style="border:2px solid #F2545B"><h2>⚠️ 一鍵全部重玩</h2>
+    <p>所有玩家（真人＋電腦）的等級、經驗、金幣、鑽石、種子、作物、田地、牧場、寵物、裝備、裝飾、建築外觀、城鎮色調、偷菜紀錄全部回到新手狀態。<br><b>保留</b>：帳號、暱稱、頭像、好友關係。電腦玩家會回到各自設定的起始等級。<b>做了就不能復原。</b></p>
+    <div class="row"><input id="rsTxt" placeholder="輸入「全部重玩」才能執行" style="flex:1"><button class="btn" id="rsAll" style="background:#F2545B">一鍵全部重玩</button></div></div>`);
+  document.querySelectorAll('[data-sv]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.sv;
+    try{ pageBt(await rpc('adm_bot_save',{p_id:id,p_nick:document.querySelector(`[data-n="${id}"]`).value,p_active:document.querySelector(`[data-a="${id}"]`).checked,p_lv:+document.querySelector(`[data-l="${id}"]`).value})); toast('已儲存'); }catch(e){ toast(e.message); } });
+  document.querySelectorAll('[data-rs]').forEach(b=>b.onclick=async()=>{ const x=L.find(y=>y.id===b.dataset.rs); if(!confirm(`讓「${x.nickname}」重玩？會回到 Lv${x.start_lv}`)) return;
+    try{ pageBt(await rpc('adm_bot_reset',{p_id:x.id})); toast('已重玩'); }catch(e){ toast(e.message); } });
+  $('rsBots').onclick=async()=>{ if(!confirm('全部電腦玩家都重玩？')) return; try{ pageBt(await rpc('adm_bot_reset',{p_id:null})); toast('全部電腦玩家已重玩'); }catch(e){ toast(e.message); } };
+  $('rsAll').onclick=async()=>{ if($('rsTxt').value.trim()!=='全部重玩') return toast('請先輸入「全部重玩」');
+    if(!confirm('最後確認：所有玩家的進度都會清空，不能復原。確定嗎？')) return;
+    try{ const r=await rpc('adm_reset_all',{p_confirm:'全部重玩'}); toast(`已重玩，共 ${r.players} 位玩家`); pageBt(); }catch(e){ toast(e.message); } };
 }
 
 boot();

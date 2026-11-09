@@ -213,6 +213,8 @@ function openSeedPicker(i){
     if(i!=null) plant(i, ui.seed); else toast(`點空地就能種下${CROP[ui.seed].name}`);
   });
 }
+const barnNav = cur => `<div class="snav"><button data-bn="bag" class="${cur==='bag'?'on':''}">📦 倉庫</button><button data-bn="seed" class="${cur==='seed'?'on':''}">🌱 種子商店</button></div>`;
+function bindBarnNav(){ document.querySelectorAll('[data-bn]').forEach(b=>b.onclick=()=> b.dataset.bn==='seed' ? openShop() : openBag()); }
 function openShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   const me = S.me;
@@ -225,7 +227,7 @@ function openShop(){
       <div>成熟 ${dur(c.time)}・收成 ${c.yield}×${c.price} 金 = ${c.yield*c.price} 金</div></div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">${btn}</div></div>`;
   }).join('');
-  modal(`種子商店　<span style="font-size:14px;color:var(--ink2)">金幣 ${me.gold}</span>`, body, [['🐾 寵物裝備','o',()=>openGearShop('gold')]]);
+  modal(`穀倉　<span style="font-size:14px;color:var(--ink2)">金幣 ${me.gold}</span>`, barnNav('seed')+body); bindBarnNav();
   $('md').querySelectorAll('[data-buy]').forEach(b=>b.onclick=async()=>{
     const c = CROP[b.dataset.buy], n = +b.dataset.n;
     const r = await doAct('buy', null, c.id, n);
@@ -238,7 +240,7 @@ function openBag(){
   const cr = Object.entries(me.crops).filter(([,n])=>n>0);
   const sd = Object.entries(me.seeds).filter(([,n])=>n>0);
   const total = cr.reduce((a,[id,n])=>a+n*CROP[id].price, 0);
-  let body = `<div class="sec">作物</div>`;
+  let body = barnNav('bag')+`<div class="sec">作物</div>`;
   body += cr.length ? cr.map(([id,n])=>{ const c=CROP[id];
     return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}</b> <span class="tag">×${n}</span><div>每個 ${c.price} 金・共 ${n*c.price} 金</div></div>
       <button class="mini o" data-sell="${id}">全部賣出</button></div>`; }).join('')
@@ -248,7 +250,7 @@ function openBag(){
     return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}種子</b> <span class="tag">×${n}</span><div>成熟 ${dur(c.time)}</div></div><button class="mini" data-use="${id}">拿來種</button></div>`; }).join('')
     : `<div class="empty">沒有種子</div>`;
   body += goodsHTML(me);
-  modal('穀倉（倉庫）', body, cr.length?[[`一鍵全部賣出（${total} 金）`,'o',async()=>{ const r=await doAct('sell_all'); if(r){ sfx('coin'); toast(`全部賣出，獲得 ${r.amt} 金`); closeModal(); } }]]:null);
+  modal('穀倉', body, cr.length?[[`一鍵全部賣出（${total} 金）`,'o',async()=>{ const r=await doAct('sell_all'); if(r){ sfx('coin'); toast(`全部賣出，獲得 ${r.amt} 金`); closeModal(); } }]]:null); bindBarnNav();
   $('md').querySelectorAll('[data-sell]').forEach(b=>b.onclick=async()=>{
     const id=b.dataset.sell; const r = await doAct('sell', null, id);
     if(r){ sfx('coin'); toast(`賣出 ${CROP[id].name}，獲得 ${r.amt} 金`); openBag(); }
@@ -315,7 +317,7 @@ function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60)
 const LOG_TXT = {help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了水`, steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
   prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`,
   r_steal:(l)=>`偷走了你牧場的 ${l.qty} 個${(ANIMALS.find(a=>a.good===l.crop)||{}).good_name||'產品'}`, r_feed:(l)=>`幫你餵了${(ANI[l.crop]||{}).name||'動物'} 🌾`, r_swat:(l)=>`幫你的${(ANI[l.crop]||{}).name||'動物'}拍掉蚊子`, r_prank:(l)=>`在你的${(ANI[l.crop]||{}).name||'動物'}旁邊放了蚊子 😈`,
-  dog:(l)=>`想偷你的${CROP[l.crop]?.name||'作物'}，被看門狗趕走了 🐶`, scare:(l)=>`想惡作劇，被稻草人擋下了 🎃`, auto_harvest:(l)=>`幫你自動收成了 ${l.qty} 個${CROP[l.crop]?.name||''} 🧺`};
+  dog:(l)=>`想偷你的${CROP[l.crop]?.name||'作物'}，被看門狗趕走了 🐶`, scare:(l)=>`想惡作劇，被稻草人擋下了 🎃`, auto_harvest:(l)=>`幫你自動收成了 ${l.qty} 個${CROP[l.crop]?.name||''} 🧺`, auto_collect:(l)=>`幫你自動收了牧場的 ${l.qty} 個${(ANIMALS.find(a=>a.good===l.crop)||{}).good_name||'產品'} 🧺`};
 
 async function openBoard(tab){
   if(tab) boardTab = tab;
@@ -405,12 +407,12 @@ function tapBuilding(g){
   g.classList.remove('hit'); void g.getBBox(); g.classList.add('hit');
   const id = g.dataset.b;
   if(id==='board') return openBoard();
-  if(mode==='visit' && ['shop','barn','home'].includes(id)) return toast('回到自己的農場才能使用');
-  if(id==='shop') return openShop();
+  if(mode==='visit' && ['shop','barn','home','decor'].includes(id)) return toast('回到自己的農場才能使用');
+  if(id==='shop') return openShopTab('decor');
   if(id==='barn') return openBag();
   if(id==='home') return openHome();
   if(id==='coop') return openRanch();
-  if(id==='decor') return openDecorShop();
+  if(id==='decor') return openGearShop();
   if(id==='pen') return openBeastPark();
   const o = BLD.find(b=>b.id===id); if(o && o.locked) toast(o.locked);
 }

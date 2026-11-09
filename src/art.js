@@ -17,8 +17,8 @@ const CROPS = [
   {id:'mango',     name:'芒果',   lv:14,seed:880, time:64800, yield:16, price:75, exp:255, type:'bush',  color:'#FFB02E', fruit:'long'},
 ];
 const CROP = Object.fromEntries(CROPS.map(c=>[c.id,c]));
-// 22 塊田的開墾條件（第 0～3 塊一開始就有），要跟伺服器的 land 表一致
-const LAND = [null,null,null,null,{lv:1,cost:50},{lv:1,cost:80},{lv:1,cost:100},{lv:2,cost:200},{lv:2,cost:300},{lv:3,cost:500},{lv:4,cost:800},{lv:5,cost:1200},{lv:6,cost:1600},{lv:7,cost:2000},{lv:8,cost:2500},{lv:9,cost:3000},{lv:10,cost:4000},{lv:11,cost:5000},{lv:12,cost:6500},{lv:13,cost:8000},{lv:14,cost:10000},{lv:15,cost:12000}];
+// 20 塊田的開墾條件（第 0～1 塊一開始就有），要跟伺服器的 land 表一致
+const LAND = [null,null,{lv:1,cost:50},{lv:1,cost:80},{lv:1,cost:100},{lv:2,cost:200},{lv:2,cost:300},{lv:3,cost:500},{lv:4,cost:800},{lv:5,cost:1200},{lv:6,cost:1600},{lv:7,cost:2000},{lv:8,cost:2500},{lv:9,cost:3000},{lv:10,cost:4000},{lv:11,cost:5000},{lv:12,cost:6500},{lv:13,cost:8000},{lv:14,cost:10000},{lv:15,cost:12000}];
 const WILD = LAND;
 const MAX_LV = 30;
 const needExp = lv => 30*lv*lv;
