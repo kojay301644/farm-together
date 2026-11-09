@@ -18,11 +18,10 @@ create table if not exists public.land(
 insert into public.land values
  (4,1,100),(5,2,300),(6,3,500),(7,4,800),(8,5,1200),(9,6,1600),(10,7,2000),
  (11,8,2500),(12,9,3000),(13,10,4000),(14,11,5000),(15,12,6500),(16,13,8000),(17,14,10000)
-on conflict (idx) do update set lv = excluded.lv, cost = excluded.cost;
+on conflict (idx) do nothing;
 alter table public.land enable row level security;
-drop policy if exists land_read on public.land;
 create policy land_read on public.land for select to anon, authenticated using (true);
-revoke insert, update, delete on public.land from anon, authenticated;
+-- land 只開放讀取（沒有寫入的 RLS 規則，玩家無法修改）
 
 -- 既有玩家補上第 7～18 塊荒地
 insert into public.plots(owner, idx, state)
@@ -161,5 +160,5 @@ begin
   );
 end $$;
 
-revoke execute on function public.farm_rank() from public, anon;
+-- 沒登入呼叫會直接回「請先登入」
 grant execute on function public.farm_rank() to authenticated;
