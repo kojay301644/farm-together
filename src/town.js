@@ -38,20 +38,20 @@ function sprite(name, gx, gy, w, opt={}){
   return `<image href="${A(name)}" x="${(x-w/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" ${opt.cls?`class="${opt.cls}"`:''}/>`;
 }
 /* 建築外觀（萌獸 7 種樣式） */
-const SKIN_R = {"b_academy": 1.0702, "bb_academy": 1.115, "bc_academy": 1.25, "bf_academy": 1.115, "bi_academy": 1.1918, "bj_academy": 1.113, "bl_academy": 1.115, "b_farm": 1.0357, "bb_farm": 1.0317, "bc_farm": 1.0793, "bf_farm": 1.0556, "bi_farm": 1.1327, "bj_farm": 1.0575, "bl_farm": 1.0575, "b_shop": 1.0997, "bb_shop": 1.1268, "bc_shop": 1.1615, "bf_shop": 1.115, "bi_shop": 1.1388, "bj_shop": 1.1189, "bl_shop": 1.1348, "b_fountain": 1.1679, "bb_fountain": 1.1532, "bc_fountain": 1.1228, "bf_fountain": 1.147, "bi_fountain": 1.1429, "bj_fountain": 1.1449, "bl_fountain": 1.1615, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
-const SKIN_PART = {home:'academy', barn:'farm', shop:'shop', fountain:'fountain', pen:'train'};
-const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'bf'};
+const SKIN_R = {"b_play": 1.1599, "bb_play": 1.164, "bc_play": 1.203, "bf_play": 1.166, "bi_play": 1.1429, "bj_play": 1.1721, "bl_play": 1.1802, "b_academy": 1.0702, "bb_academy": 1.115, "bc_academy": 1.25, "bf_academy": 1.115, "bi_academy": 1.1918, "bj_academy": 1.113, "bl_academy": 1.115, "b_farm": 1.0357, "bb_farm": 1.0317, "bc_farm": 1.0793, "bf_farm": 1.0556, "bi_farm": 1.1327, "bj_farm": 1.0575, "bl_farm": 1.0575, "b_shop": 1.0997, "bb_shop": 1.1268, "bc_shop": 1.1615, "bf_shop": 1.115, "bi_shop": 1.1388, "bj_shop": 1.1189, "bl_shop": 1.1348, "b_fountain": 1.1679, "bb_fountain": 1.1532, "bc_fountain": 1.1228, "bf_fountain": 1.147, "bi_fountain": 1.1429, "bj_fountain": 1.1449, "bl_fountain": 1.1615, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
+const SKIN_PART = {home:'academy', barn:'farm', shop:'shop', fountain:'fountain', pen:'play'};
+const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'b'};
 const SKIN_NAME = {b:'原版', bb:'紅磚', bc:'糖果', bf:'森林', bi:'冰雪', bj:'翡翠', bl:'熔岩'};
 const skinImg = (k, st) => (st||SKIN_DEF[k]) + '_' + SKIN_PART[k];
 function skinSprite(k, gx, gy, w, foot){ const [x,y]=iso(gx,gy), img=skinImg(k), h=w*(SKIN_R[img]||1);
   const im=`<image class="skin" data-sk="${k}" data-fy="${y}" data-w="${w}" data-foot="${foot}" href="${A(img)}" x="${(x-w/2).toFixed(1)}" y="${(y-h*foot).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"/>`;
   return SKIN_FLIP[k] ? `<g transform="translate(${2*x} 0) scale(-1 1)">${im}</g>` : im; }
-const SKIN_FLIP = {pen:true};  // 萌獸園左右翻轉（木塔在左）
+const SKIN_FLIP = {};
 let skinSig='';
 function applySkins(on){ on=on||{}; const sig=JSON.stringify(on); if(sig===skinSig) return; skinSig=sig;
   document.querySelectorAll('#world image.skin').forEach(el=>{ const k=el.dataset.sk, img=skinImg(k, on[k]), w=+el.dataset.w, h=w*(SKIN_R[img]||1);
     el.setAttribute('href', A(img)); el.setAttribute('height', h.toFixed(1)); el.setAttribute('y', (+el.dataset.fy - h*(+el.dataset.foot)).toFixed(1)); }); }
-const RATIO = {b_play:1.1599, bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
+const RATIO = {bc_forge:1.1532, b_play:1.1599, bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
   dc_flower:1, dc_lamp:1, dc_bench:1, dc_pond:1, dc_hay:1, dc_mail:1, dc_kennel:1, dc_lantree:1, dc_swing:1, dc_sakura:1, dc_picnic:1, dc_balloon:1,
   bunny1:396/310, bear1:1, fox1:1, penguin1:1, otter1:1, mouse1:1};
 
@@ -60,9 +60,9 @@ const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:HG(930,203),  w:240, foot:0.80},
-  {id:'decor', name:'裝飾店',   img:'b_play',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
+  {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:HG(694,560), w:104, foot:0.78, locked:'牧場將在第四階段開放'},
-  {id:'pen',   name:'萌獸園',   img:'bf_train',   c:HG(398,552), w:390, foot:0.70, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
+  {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(398,552), w:340, foot:0.74, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
 
 // 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
