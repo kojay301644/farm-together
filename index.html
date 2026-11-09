@@ -398,13 +398,13 @@ body.lowfx #tfx{display:none}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794234806" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794234969" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794234806" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794234806" alt=""><span id="pgems">0</span></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794234806" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794234969" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794234969" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794234969" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>
@@ -420,11 +420,11 @@ body.lowfx #tfx{display:none}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794234806" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794234969" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794234806";
+const BUILD="1794234969";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -806,7 +806,9 @@ function buildWorld(){
 
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
-    if(o.id!=='pen' && o.id!=='coop') addObst(o.c[0],o.c[1],o.w*0.42,o.w*0.24,-o.w*0.08);
+    if(o.id!=='pen' && o.id!=='coop'){ // 擋住整個建築圖的範圍（含後面），萌獸才不會走到屋頂上
+      const hh=o.w*(SKIN_PART[o.id] ? (SKIN_R[skinImg(o.id)]||1.1) : (RATIO[o.img]||1))*o.foot;
+      addObst(o.c[0],o.c[1],o.w*0.52,hh/2+16,-hh/2+8); }
     const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
     let s = (SKIN_PART[o.id] ? skinSprite(o.id, gx, gy, o.w, o.foot) : sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot}));
     if(o.id==='barn'){ // 風車葉片
@@ -823,7 +825,7 @@ function buildWorld(){
 
   // 裝飾（萌獸星球素材）
   const deco=(n,gx,gy,w,extra='')=>(addObst(gx,gy,w*0.38,w*0.2,-w*0.06), objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`}));
-  const FC=HG(645,352); addObst(FC[0],FC[1],70,38,-12); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
+  const FC=HG(645,352); addObst(FC[0],FC[1],80,70,-40); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
   lab += labelPill(iso(...FC)[0], iso(...FC)[1]-150, '好友廣場', {bg:'#E3F6EA',fg:'#2E9660'});
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');

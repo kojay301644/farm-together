@@ -242,7 +242,9 @@ function buildWorld(){
 
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
-    if(o.id!=='pen' && o.id!=='coop') addObst(o.c[0],o.c[1],o.w*0.42,o.w*0.24,-o.w*0.08);
+    if(o.id!=='pen' && o.id!=='coop'){ // 擋住整個建築圖的範圍（含後面），萌獸才不會走到屋頂上
+      const hh=o.w*(SKIN_PART[o.id] ? (SKIN_R[skinImg(o.id)]||1.1) : (RATIO[o.img]||1))*o.foot;
+      addObst(o.c[0],o.c[1],o.w*0.52,hh/2+16,-hh/2+8); }
     const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
     let s = (SKIN_PART[o.id] ? skinSprite(o.id, gx, gy, o.w, o.foot) : sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot}));
     if(o.id==='barn'){ // 風車葉片
@@ -259,7 +261,7 @@ function buildWorld(){
 
   // 裝飾（萌獸星球素材）
   const deco=(n,gx,gy,w,extra='')=>(addObst(gx,gy,w*0.38,w*0.2,-w*0.06), objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`}));
-  const FC=HG(645,352); addObst(FC[0],FC[1],70,38,-12); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
+  const FC=HG(645,352); addObst(FC[0],FC[1],80,70,-40); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
   lab += labelPill(iso(...FC)[0], iso(...FC)[1]-150, '好友廣場', {bg:'#E3F6EA',fg:'#2E9660'});
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
