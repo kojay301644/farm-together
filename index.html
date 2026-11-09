@@ -360,13 +360,13 @@ body.lowfx .bird{display:none}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794231718" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794231848" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794231718" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794231718" alt=""><span id="pgems">0</span></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794231718" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794231848" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794231848" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794231848" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>
@@ -382,11 +382,11 @@ body.lowfx .bird{display:none}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794231718" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794231848" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794231718";
+const BUILD="1794231848";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -689,7 +689,7 @@ function openCharPicker(){
   const cur=(S.me.chara)||'bunny1';
   const evo=(typeof EVO!=='undefined')?EVO:[10,20];
   modal('選擇萌獸', `<p class="mut" style="margin:0 0 8px">選一隻萌獸當你的農場夥伴，牠會在農場裡走來走去幫你做事。</p><div class="chgrid">${Object.keys(CHR_SP).map(sp=>{ const k=sp+'1';
-    return `<button class="chpick${sp===chrSpecies(cur)?' on':''}" data-ch="${k}"><img src="${chrSrc(k)}" alt=""><span>${(CHR_NAMES[sp]||[])[0]||CHR_SP[sp][0]}</span></button>`; }).join('')}</div>`);
+    return `<button class="chpick${sp===chrSpecies(cur)?' on':''}" data-ch="${k}"><img src="${chrSrc(sp+'3')}" alt=""><span>${(CHR_NAMES[sp]||[])[2]||CHR_SP[sp][0]}</span></button>`; }).join('')}</div>`);
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=async()=>{
     try{ applyState(await rpc('farm_set_chara', {p_c:b.dataset.ch})); refresh(); sfx('coin'); toast('萌獸已更換'); closeModal(); }catch(e){ toast(e.message); }
   });
@@ -1219,7 +1219,7 @@ function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
     scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
 function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
   if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
-const chrStage = lv => 1;  // 不進化：一律第一階
+const chrStage = lv => 3;  // 不進化：一律用第三階造型
 const chrSpecies = k => (/^([a-z]+)/.exec(k||'bunny')||[0,'bunny'])[1];
 const chrKey = (k, lv) => chrSpecies(k) + chrStage(lv||1);
 const chrName = key => { const c=chrInfo(key); return (CHR_NAMES[c.sp]||[])[c.st-1] || c.name; };

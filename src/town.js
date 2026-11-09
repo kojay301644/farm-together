@@ -162,7 +162,7 @@ function openCharPicker(){
   const cur=(S.me.chara)||'bunny1';
   const evo=(typeof EVO!=='undefined')?EVO:[10,20];
   modal('選擇萌獸', `<p class="mut" style="margin:0 0 8px">選一隻萌獸當你的農場夥伴，牠會在農場裡走來走去幫你做事。</p><div class="chgrid">${Object.keys(CHR_SP).map(sp=>{ const k=sp+'1';
-    return `<button class="chpick${sp===chrSpecies(cur)?' on':''}" data-ch="${k}"><img src="${chrSrc(k)}" alt=""><span>${(CHR_NAMES[sp]||[])[0]||CHR_SP[sp][0]}</span></button>`; }).join('')}</div>`);
+    return `<button class="chpick${sp===chrSpecies(cur)?' on':''}" data-ch="${k}"><img src="${chrSrc(sp+'3')}" alt=""><span>${(CHR_NAMES[sp]||[])[2]||CHR_SP[sp][0]}</span></button>`; }).join('')}</div>`);
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=async()=>{
     try{ applyState(await rpc('farm_set_chara', {p_c:b.dataset.ch})); refresh(); sfx('coin'); toast('萌獸已更換'); closeModal(); }catch(e){ toast(e.message); }
   });
