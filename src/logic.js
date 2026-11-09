@@ -61,7 +61,24 @@ let V = null;          // 拜訪中的好友農場：{owner, plots, off}
 let mode = 'home';
 const ui = {tool:'hand', seed:'radish', busy:false};
 
-function applyState(st){ if(st) S = {me:st.me, plots:st.plots, ranch:st.ranch||[], off:st.now - Date.now()}; }
+function applyState(st){ if(!st) return; const old=S; S = {me:st.me, plots:st.plots, ranch:st.ranch||[], off:st.now - Date.now()};
+  try{ if(old && mode==='home' && Date.now()-(ui.lastLocal||0) > 3000) autoJobs(old, S); }catch(e){} }
+/* 比對前後狀態，看出是寵物裝備自動做的事 → 叫對應的寵物跑過去 */
+function autoJobs(a, b){
+  if(typeof petDo!=='function') return;
+  const A={}; (a.plots||[]).forEach(p=>A[p.i]=p);
+  (b.plots||[]).forEach(p=>{ const o=A[p.i]; if(!o) return;
+    if(o.s==='empty' && p.s==='grow') petDo('plant', p.i);
+    else if(o.s==='grow' && p.s==='empty') petDo('harvest', p.i);
+    else if(o.s==='grow' && p.s==='grow' && o.c===p.c){
+      if((p.wu||0) > (o.wu||0) + 1000 && (o.wu||0) < Date.now()+(b.off||0)) petDo('water', p.i);
+      if((p.w||0) < (o.w||0)) petDo('weed', p.i);
+      if((p.b||0) < (o.b||0)) petDo('bug', p.i); } });
+  const R={}; (a.ranch||[]).forEach(r=>R[r.slot]=r);
+  (b.ranch||[]).forEach(r=>{ const o=R[r.slot]; if(!o) return;
+    if(!o.ra && r.ra) petDo('feed', 'ranch');
+    else if(o.ra && !r.ra) petDo('harvest', 'ranch'); });
+}
 function applyVisit(v){ if(v) V = {owner:v.owner, plots:v.plots, ranch:v.ranch||[], bin:v.bin||{}, off:v.now - Date.now(), friend:!!v.friend, protected:!!v.protected}; }
 
 // 依伺服器時間預測目前生長進度（實際以伺服器為準）
@@ -98,7 +115,7 @@ function xpFloat(el, xp){ if(xp>0 && el) setTimeout(()=>floatAt(el, `+${xp} 經�
 /* ================= 自己農場的動作 ================= */
 async function doAct(action, i, crop, n){
   if(ui.busy) return null;
-  ui.busy = true;
+  ui.busy = true; ui.lastLocal = Date.now();
   try{
     const r = await rpc('farm_act', {p_action:action, p_idx:(i==null?null:i), p_crop:crop||null, p_n:n||1});
     applyState(r.state); refresh();

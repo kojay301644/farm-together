@@ -198,6 +198,21 @@ function farmerDo(i, kind){
   setAct(m,null); m.wait=0; m.goal=null;
 }
 
+/* 寵物身上的裝備自動做事時，帶那件裝備的寵物會跑過去做動作 */
+const PET_JOB = {plant:['work','🌱'], water:['water','💧'], harvest:['work','🧺'], weed:['work','🌿'], bug:['work','🐛'], feed:['work','🥕']};
+function petDo(func, target){
+  if(typeof mode!=='undefined' && mode!=='home') return;
+  const pt=(typeof partyOf==='function' && S && S.me) ? partyOf(S.me) : [];
+  let i=pt.findIndex(p=>{ const g=GEAR[p.g]; return g && (g.func===func || (func==='feed' && g.func==='clear')); }); if(i<0) i=0;
+  const m = i===0 ? farmerMover : (partyMovers[i-1] || farmerMover); if(!m) return;
+  const [act,emo]=PET_JOB[func]||['work','✨'];
+  let pos, look;
+  if(target==='ranch'){ if(!RANCH) return; pos=[RANCH[0]+RANCH[2]*(0.2+Math.random()*0.6), RANCH[1]-0.5]; look=[pos[0], RANCH[1]+1]; }
+  else { const P=PLOTS[target]; if(!P) return; pos=[P[0]+PS*0.5, P[1]+PS+0.12]; look=[P[0]+PS/2, P[1]+PS/2]; }
+  m.jobs=m.jobs||[]; if(m.jobs.length>=6) return;
+  m.jobs.push({pos, act, emo, dur:1.3, started:false, look});
+}
+
 function buildWorld(){
   toneCur=null;
   OBST=[];
@@ -362,6 +377,7 @@ function farmerStep(m, dt){
   let moving=false;
   if(m.wait>0){ m.wait-=dt; if(m.wait<=0){ setAct(m,null); if(m.task && m.task.started) m.task=null; } }
   else {
+    if(!m.task && m.jobs && m.jobs.length){ m.task=m.jobs.shift(); m.goal=null; }
     if(!m.task && !m.goal) m.goal = (m.route && m.route.length) ? m.route.shift() : pickRoam(m);
     if(m.task && !m.task.via){ m.task.via = viaAround([m.x,m.y], m.task.pos); }
     const goal = m.task ? (m.task.via.length ? m.task.via[0] : m.task.pos) : m.goal;

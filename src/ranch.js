@@ -85,7 +85,7 @@ function openRanch(){
   md.querySelectorAll('[data-rf]').forEach(b=>b.onclick=()=>ranchFriend(b.dataset.rf, +b.dataset.s));
 }
 async function ranchAct(action, slot, kind){
-  if(ui.busy) return; ui.busy=true;
+  if(ui.busy) return; ui.busy=true; ui.lastLocal=Date.now();
   try{
     const r = await rpc('farm_ranch_act', {p_action:action, p_slot:slot, p_kind:kind||null});
     applyState(r.state); refresh();
