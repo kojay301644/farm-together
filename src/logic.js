@@ -487,9 +487,9 @@ function renderPlots(){
         if(mode==='visit'){
           if(p.mine){ txt='你偷過了'; bg='#E8DCC8'; }
           else if(p.st >= p.cap){ txt='被偷光了'; bg='#E8DCC8'; }
-          else { txt=`${c.name}可以偷！`; bg='#F2545B'; fg='#fff'; }
-        } else { txt=`${c.name}可收成！`; bg='#FF9F43'; fg='#fff'; }
-      } else { txt = `${c.name} ${fmtS(leftSec(p))}`; pct = p.g/c.time; if(p.dry) bg='#DDF0FF'; }
+          else { txt='可以偷！'; bg='#F2545B'; fg='#fff'; }
+        } else { txt='可收成！'; bg='#FF9F43'; fg='#fff'; }
+      } else { txt = fmtS(leftSec(p)); pct = p.g/c.time; if(p.dry) bg='#DDF0FF'; }
     }
     if(t.textContent !== txt){ t.textContent = txt; const w=[...txt].reduce((a,ch)=>a+(ch.charCodeAt(0)>255?15:8.5),0)+20; r.setAttribute('width', w.toFixed(0)); r.setAttribute('x', (-w/2).toFixed(0)); }
     r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('stroke', fg==='#fff' ? '#3A3226' : '#fff'); t.setAttribute('y', pct>=0?2:5);
