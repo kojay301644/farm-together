@@ -301,6 +301,10 @@ body.lowfx .bird{display:none}
 @keyframes evoShow{to{opacity:1}}
 .evo-txt .btn{margin-top:16px;opacity:0;pointer-events:none;animation:evoShow .4s 3.3s forwards}
 .evo-txt .btn{pointer-events:auto}
+.sktabs{flex-wrap:wrap}.sktabs button{flex:1 0 30%;font-size:13px}
+.skgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.skcard{display:flex;flex-direction:column;align-items:center;gap:3px;background:#FFF8EC;border:2.5px solid #E6D9C3;border-radius:14px;padding:6px 4px 8px}
+.skcard img{width:100%;height:84px;object-fit:contain}.skcard b{font-size:13px}.skcard.on{border-color:#3BB273;background:#E8F8EE}
 </style>
 </head>
 <body>
@@ -541,7 +545,19 @@ function sprite(name, gx, gy, w, opt={}){
   const yy = y - h*(opt.foot ?? 0.82);
   return `<image href="${A(name)}" x="${(x-w/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" ${opt.cls?`class="${opt.cls}"`:''}/>`;
 }
-const RATIO = {bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
+/* 建築外觀（萌獸 7 種樣式） */
+const SKIN_R = {"b_academy": 1.0702, "bb_academy": 1.115, "bc_academy": 1.25, "bf_academy": 1.115, "bi_academy": 1.1918, "bj_academy": 1.113, "bl_academy": 1.115, "b_farm": 1.0357, "bb_farm": 1.0317, "bc_farm": 1.0793, "bf_farm": 1.0556, "bi_farm": 1.1327, "bj_farm": 1.0575, "bl_farm": 1.0575, "b_shop": 1.0997, "bb_shop": 1.1268, "bc_shop": 1.1615, "bf_shop": 1.115, "bi_shop": 1.1388, "bj_shop": 1.1189, "bl_shop": 1.1348, "b_fountain": 1.1679, "bb_fountain": 1.1532, "bc_fountain": 1.1228, "bf_fountain": 1.147, "bi_fountain": 1.1429, "bj_fountain": 1.1449, "bl_fountain": 1.1615, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
+const SKIN_PART = {home:'academy', barn:'farm', shop:'shop', fountain:'fountain', pen:'train'};
+const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'bf'};
+const SKIN_NAME = {b:'原版', bb:'紅磚', bc:'糖果', bf:'森林', bi:'冰雪', bj:'翡翠', bl:'熔岩'};
+const skinImg = (k, st) => (st||SKIN_DEF[k]) + '_' + SKIN_PART[k];
+function skinSprite(k, gx, gy, w, foot){ const [x,y]=iso(gx,gy), img=skinImg(k), h=w*(SKIN_R[img]||1);
+  return `<image class="skin" data-sk="${k}" data-fy="${y}" data-w="${w}" data-foot="${foot}" href="${A(img)}" x="${(x-w/2).toFixed(1)}" y="${(y-h*foot).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"/>`; }
+let skinSig='';
+function applySkins(on){ on=on||{}; const sig=JSON.stringify(on); if(sig===skinSig) return; skinSig=sig;
+  document.querySelectorAll('#world image.skin').forEach(el=>{ const k=el.dataset.sk, img=skinImg(k, on[k]), w=+el.dataset.w, h=w*(SKIN_R[img]||1);
+    el.setAttribute('href', A(img)); el.setAttribute('height', h.toFixed(1)); el.setAttribute('y', (+el.dataset.fy - h*(+el.dataset.foot)).toFixed(1)); }); }
+const RATIO = {b_play:1.1599, bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
   dc_flower:1, dc_lamp:1, dc_bench:1, dc_pond:1, dc_hay:1, dc_mail:1, dc_kennel:1, dc_lantree:1, dc_swing:1, dc_sakura:1, dc_picnic:1, dc_balloon:1,
   bunny1:396/310, bear1:1, fox1:1, penguin1:1, otter1:1, mouse1:1};
 
@@ -550,7 +566,7 @@ const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:HG(930,203),  w:240, foot:0.80},
-  {id:'decor', name:'裝飾店',   img:'bc_shop',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
+  {id:'decor', name:'裝飾店',   img:'b_play',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:HG(694,560), w:104, foot:0.78, locked:'牧場將在第四階段開放'},
   {id:'pen',   name:'萌獸園',   img:'bf_train',   c:HG(398,552), w:390, foot:0.70, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
@@ -672,6 +688,7 @@ function farmerDo(i, kind){
 }
 
 function buildWorld(){
+  skinSig='';
   const W=$('world');
   W.setAttribute('viewBox',`${VX} ${VY} ${WW} ${WH}`);
   seed=11;
@@ -718,7 +735,7 @@ function buildWorld(){
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
     const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
-    let s = `<ellipse cx="${iso(gx,gy)[0]}" cy="${iso(gx,gy)[1]+4}" rx="${o.w*0.42}" ry="${o.w*0.16}" fill="rgba(0,0,0,.14)"/>` + sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot});
+    let s = `<ellipse cx="${iso(gx,gy)[0]}" cy="${iso(gx,gy)[1]+4}" rx="${o.w*0.42}" ry="${o.w*0.16}" fill="rgba(0,0,0,.14)"/>` + (SKIN_PART[o.id] ? skinSprite(o.id, gx, gy, o.w, o.foot) : sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot}));
     if(o.id==='barn'){ // 風車葉片
       const [x,y]=iso(gx,gy), top=y-h*o.foot; const cx=x-o.w*0.5+o.w*0.235, cy=top+h*0.2;
       s += `<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})"><g class="blades"><image href="${A('b_sail')}" x="-55" y="-55" width="110" height="110"/></g></g>`;
@@ -733,7 +750,7 @@ function buildWorld(){
 
   // 裝飾（萌獸星球素材）
   const deco=(n,gx,gy,w,extra='')=>objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`});
-  const FC=HG(645,352); deco('b_fountain', FC[0], FC[1], 150);
+  const FC=HG(645,352); objs.push({depth:FC[0]+FC[1], svg:skinSprite('fountain', FC[0], FC[1], 150, 0.8)});
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
 
@@ -1145,7 +1162,7 @@ function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
     dog:`小偷來偷菜時 ${pc}% 被趕走`, bug:`蟲一出現 ${pc}% 自動除掉`, weed:`雜草一長出 ${pc}% 自動拔掉`,
     clear:`收成後自動整地（第 1～${v} 塊地）`, harvest:`作物成熟 ${v} 分鐘後自動收成，小偷來不及偷`,
     scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
-function setGearConfig(list, st){ GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
+function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
   if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
 const chrStage = lv => lv>=EVO[1] ? 3 : lv>=EVO[0] ? 2 : 1;
 const chrSpecies = k => (/^([a-z]+)/.exec(k||'bunny')||[0,'bunny'])[1];
@@ -1163,9 +1180,10 @@ function beastPanelHTML(){
     <div class="binfo"><b>${chrName(key)}</b><div class="bnext">${next}</div>
       <button class="gslot" id="hGear">${g?gearImg(g,34):'<span class="plus">＋</span>'}<span><b>${g?gearTitle(g):'裝備欄（空）'}</b><small>${g?`${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}`:'點這裡插上裝備，萌獸會幫你自動做事'}</small></span></button>
     </div></div>
-    <div class="homebtns"><button class="btn sub" id="hCh">🐾 更換萌獸</button><button class="btn o" id="hGshop">🛒 買裝備</button></div>`;
+    <div class="homebtns"><button class="btn sub" id="hCh">🐾 更換萌獸</button><button class="btn o" id="hGshop">🛒 買裝備</button></div>
+    <div class="homebtns"><button class="btn" id="hSkin" style="background:#FF8FB1;box-shadow:0 3px 0 #D9628A">🏠 建築外觀</button></div>`;
 }
-function bindBeastPanel(){ $('hGear').onclick=openGearBag; $('hCh').onclick=openCharPicker; $('hGshop').onclick=()=>openGearShop(); }
+function bindBeastPanel(){ $('hSkin').onclick=()=>openSkinShop(); $('hGear').onclick=openGearBag; $('hCh').onclick=openCharPicker; $('hGshop').onclick=()=>openGearShop(); }
 
 /* 裝備背包 */
 function openGearBag(){
@@ -1241,6 +1259,27 @@ function checkEvolve(){
   let prev=null; try{ prev=+localStorage.getItem(k)||null; }catch(e){}
   if(prev && st>prev){ const sp=chrSpecies(S.me.chara); setTimeout(()=>playEvolve(sp+prev, sp+st), 900); }
   try{ localStorage.setItem(k, st); }catch(e){}
+}
+
+/* ================= 建築外觀商店 ================= */
+let SKINS = [], skinTab = 'home';
+const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'萌獸園'};
+function openSkinShop(t){
+  if(mode==='visit') return toast('回到自己的農場才能換外觀');
+  if(t) skinTab=t;
+  const me=S.me, owned=me.skins||{}, on=(me.skin_on||{})[skinTab]||SKIN_DEF[skinTab];
+  const tabs=`<div class="tabs sktabs">${Object.keys(SKIN_BLD).map(k=>`<button data-skt="${k}" class="${skinTab===k?'on':''}">${SKIN_BLD[k]}</button>`).join('')}</div>`;
+  const styles=[SKIN_DEF[skinTab], ...SKINS.filter(x=>x.bld===skinTab).map(x=>x.style)];
+  const body=tabs+`<div class="skgrid">${styles.map(st=>{ const def=st===SKIN_DEF[skinTab], k=SKINS.find(x=>x.bld===skinTab&&x.style===st), have=def||owned[skinTab+'_'+st], cur=st===on;
+    const price = k ? (k.gold!=null?`${k.gold.toLocaleString()} 金`:`💎${k.gems}`) : '';
+    return `<div class="skcard${cur?' on':''}"><img src="${A('th_'+st+'_'+SKIN_PART[skinTab])}" alt=""><b>${def?'預設':(k?k.name:SKIN_NAME[st])}</b>
+      ${cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-skuse="${def?'def':st}">套用</button>`:`<button class="mini ${k&&k.gems!=null?'gem':''}" data-skbuy="${k.id}" ${(k.gold!=null?me.gold<k.gold:(me.gems||0)<k.gems)?'disabled':''}>${price}</button>`}</div>`; }).join('')}</div>
+    <div class="hint" style="text-align:center;margin-top:8px">買過的外觀可以隨時免費切換，好友來拜訪也看得到</div>`;
+  modal(`建築外觀　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`, body);
+  const md=$('md');
+  md.querySelectorAll('[data-skt]').forEach(b=>b.onclick=()=>openSkinShop(b.dataset.skt));
+  md.querySelectorAll('[data-skuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_skin',{p_bld:skinTab,p_style:b.dataset.skuse})); refresh(); sfx('coin'); openSkinShop(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
 }
 
 /* ================= 連線設定 ================= */
@@ -1680,7 +1719,7 @@ function renderHUD(){
   else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
   $('hint').innerHTML = `<span>🌱</span><span>${h}</span>`;
 }
-function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V) setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); else if(S) setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); checkEvolve(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } checkEvolve(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -1766,7 +1805,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings);
+    setGearConfig(c.gear, c.settings, c.skins);
   }catch(e){}
 }
 async function showNotices(){

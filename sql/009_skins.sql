@@ -1,0 +1,3 @@
+-- 009: 建築外觀（我的家、穀倉、種子商店、噴水池、萌獸園 × 萌獸 7 種樣式），已於線上套用
+-- 內容同線上：skins 表、players.skins / skin_on、farm_buy_skin、farm_set_skin('def' 回預設)、adm_skin_save，
+-- 並在 farm_config / adm_config / _state / farm_visit 加入 skins、skin_on。萌獸園預設是森林款（bf），原木款 id = pen_b。

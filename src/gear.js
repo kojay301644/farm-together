@@ -9,7 +9,7 @@ function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
     dog:`小偷來偷菜時 ${pc}% 被趕走`, bug:`蟲一出現 ${pc}% 自動除掉`, weed:`雜草一長出 ${pc}% 自動拔掉`,
     clear:`收成後自動整地（第 1～${v} 塊地）`, harvest:`作物成熟 ${v} 分鐘後自動收成，小偷來不及偷`,
     scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
-function setGearConfig(list, st){ GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
+function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
   if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
 const chrStage = lv => lv>=EVO[1] ? 3 : lv>=EVO[0] ? 2 : 1;
 const chrSpecies = k => (/^([a-z]+)/.exec(k||'bunny')||[0,'bunny'])[1];
@@ -27,9 +27,10 @@ function beastPanelHTML(){
     <div class="binfo"><b>${chrName(key)}</b><div class="bnext">${next}</div>
       <button class="gslot" id="hGear">${g?gearImg(g,34):'<span class="plus">＋</span>'}<span><b>${g?gearTitle(g):'裝備欄（空）'}</b><small>${g?`${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}`:'點這裡插上裝備，萌獸會幫你自動做事'}</small></span></button>
     </div></div>
-    <div class="homebtns"><button class="btn sub" id="hCh">🐾 更換萌獸</button><button class="btn o" id="hGshop">🛒 買裝備</button></div>`;
+    <div class="homebtns"><button class="btn sub" id="hCh">🐾 更換萌獸</button><button class="btn o" id="hGshop">🛒 買裝備</button></div>
+    <div class="homebtns"><button class="btn" id="hSkin" style="background:#FF8FB1;box-shadow:0 3px 0 #D9628A">🏠 建築外觀</button></div>`;
 }
-function bindBeastPanel(){ $('hGear').onclick=openGearBag; $('hCh').onclick=openCharPicker; $('hGshop').onclick=()=>openGearShop(); }
+function bindBeastPanel(){ $('hSkin').onclick=()=>openSkinShop(); $('hGear').onclick=openGearBag; $('hCh').onclick=openCharPicker; $('hGshop').onclick=()=>openGearShop(); }
 
 /* 裝備背包 */
 function openGearBag(){
@@ -105,4 +106,25 @@ function checkEvolve(){
   let prev=null; try{ prev=+localStorage.getItem(k)||null; }catch(e){}
   if(prev && st>prev){ const sp=chrSpecies(S.me.chara); setTimeout(()=>playEvolve(sp+prev, sp+st), 900); }
   try{ localStorage.setItem(k, st); }catch(e){}
+}
+
+/* ================= 建築外觀商店 ================= */
+let SKINS = [], skinTab = 'home';
+const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'萌獸園'};
+function openSkinShop(t){
+  if(mode==='visit') return toast('回到自己的農場才能換外觀');
+  if(t) skinTab=t;
+  const me=S.me, owned=me.skins||{}, on=(me.skin_on||{})[skinTab]||SKIN_DEF[skinTab];
+  const tabs=`<div class="tabs sktabs">${Object.keys(SKIN_BLD).map(k=>`<button data-skt="${k}" class="${skinTab===k?'on':''}">${SKIN_BLD[k]}</button>`).join('')}</div>`;
+  const styles=[SKIN_DEF[skinTab], ...SKINS.filter(x=>x.bld===skinTab).map(x=>x.style)];
+  const body=tabs+`<div class="skgrid">${styles.map(st=>{ const def=st===SKIN_DEF[skinTab], k=SKINS.find(x=>x.bld===skinTab&&x.style===st), have=def||owned[skinTab+'_'+st], cur=st===on;
+    const price = k ? (k.gold!=null?`${k.gold.toLocaleString()} 金`:`💎${k.gems}`) : '';
+    return `<div class="skcard${cur?' on':''}"><img src="${A('th_'+st+'_'+SKIN_PART[skinTab])}" alt=""><b>${def?'預設':(k?k.name:SKIN_NAME[st])}</b>
+      ${cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-skuse="${def?'def':st}">套用</button>`:`<button class="mini ${k&&k.gems!=null?'gem':''}" data-skbuy="${k.id}" ${(k.gold!=null?me.gold<k.gold:(me.gems||0)<k.gems)?'disabled':''}>${price}</button>`}</div>`; }).join('')}</div>
+    <div class="hint" style="text-align:center;margin-top:8px">買過的外觀可以隨時免費切換，好友來拜訪也看得到</div>`;
+  modal(`建築外觀　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`, body);
+  const md=$('md');
+  md.querySelectorAll('[data-skt]').forEach(b=>b.onclick=()=>openSkinShop(b.dataset.skt));
+  md.querySelectorAll('[data-skuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_skin',{p_bld:skinTab,p_style:b.dataset.skuse})); refresh(); sfx('coin'); openSkinShop(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
 }

@@ -37,7 +37,19 @@ function sprite(name, gx, gy, w, opt={}){
   const yy = y - h*(opt.foot ?? 0.82);
   return `<image href="${A(name)}" x="${(x-w/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" ${opt.cls?`class="${opt.cls}"`:''}/>`;
 }
-const RATIO = {bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
+/* 建築外觀（萌獸 7 種樣式） */
+const SKIN_R = {"b_academy": 1.0702, "bb_academy": 1.115, "bc_academy": 1.25, "bf_academy": 1.115, "bi_academy": 1.1918, "bj_academy": 1.113, "bl_academy": 1.115, "b_farm": 1.0357, "bb_farm": 1.0317, "bc_farm": 1.0793, "bf_farm": 1.0556, "bi_farm": 1.1327, "bj_farm": 1.0575, "bl_farm": 1.0575, "b_shop": 1.0997, "bb_shop": 1.1268, "bc_shop": 1.1615, "bf_shop": 1.115, "bi_shop": 1.1388, "bj_shop": 1.1189, "bl_shop": 1.1348, "b_fountain": 1.1679, "bb_fountain": 1.1532, "bc_fountain": 1.1228, "bf_fountain": 1.147, "bi_fountain": 1.1429, "bj_fountain": 1.1449, "bl_fountain": 1.1615, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
+const SKIN_PART = {home:'academy', barn:'farm', shop:'shop', fountain:'fountain', pen:'train'};
+const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'bf'};
+const SKIN_NAME = {b:'原版', bb:'紅磚', bc:'糖果', bf:'森林', bi:'冰雪', bj:'翡翠', bl:'熔岩'};
+const skinImg = (k, st) => (st||SKIN_DEF[k]) + '_' + SKIN_PART[k];
+function skinSprite(k, gx, gy, w, foot){ const [x,y]=iso(gx,gy), img=skinImg(k), h=w*(SKIN_R[img]||1);
+  return `<image class="skin" data-sk="${k}" data-fy="${y}" data-w="${w}" data-foot="${foot}" href="${A(img)}" x="${(x-w/2).toFixed(1)}" y="${(y-h*foot).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"/>`; }
+let skinSig='';
+function applySkins(on){ on=on||{}; const sig=JSON.stringify(on); if(sig===skinSig) return; skinSig=sig;
+  document.querySelectorAll('#world image.skin').forEach(el=>{ const k=el.dataset.sk, img=skinImg(k, on[k]), w=+el.dataset.w, h=w*(SKIN_R[img]||1);
+    el.setAttribute('href', A(img)); el.setAttribute('height', h.toFixed(1)); el.setAttribute('y', (+el.dataset.fy - h*(+el.dataset.foot)).toFixed(1)); }); }
+const RATIO = {b_play:1.1599, bf_train:564/504, b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
   dc_flower:1, dc_lamp:1, dc_bench:1, dc_pond:1, dc_hay:1, dc_mail:1, dc_kennel:1, dc_lantree:1, dc_swing:1, dc_sakura:1, dc_picnic:1, dc_balloon:1,
   bunny1:396/310, bear1:1, fox1:1, penguin1:1, otter1:1, mouse1:1};
 
@@ -46,7 +58,7 @@ const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:HG(930,203),  w:240, foot:0.80},
-  {id:'decor', name:'裝飾店',   img:'bc_shop',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
+  {id:'decor', name:'裝飾店',   img:'b_play',    c:HG(322,362),  w:200, foot:0.80, locked:'裝飾店將在第四階段開放'},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:HG(694,560), w:104, foot:0.78, locked:'牧場將在第四階段開放'},
   {id:'pen',   name:'萌獸園',   img:'bf_train',   c:HG(398,552), w:390, foot:0.70, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
 ];
@@ -168,6 +180,7 @@ function farmerDo(i, kind){
 }
 
 function buildWorld(){
+  skinSig='';
   const W=$('world');
   W.setAttribute('viewBox',`${VX} ${VY} ${WW} ${WH}`);
   seed=11;
@@ -214,7 +227,7 @@ function buildWorld(){
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
     const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
-    let s = `<ellipse cx="${iso(gx,gy)[0]}" cy="${iso(gx,gy)[1]+4}" rx="${o.w*0.42}" ry="${o.w*0.16}" fill="rgba(0,0,0,.14)"/>` + sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot});
+    let s = `<ellipse cx="${iso(gx,gy)[0]}" cy="${iso(gx,gy)[1]+4}" rx="${o.w*0.42}" ry="${o.w*0.16}" fill="rgba(0,0,0,.14)"/>` + (SKIN_PART[o.id] ? skinSprite(o.id, gx, gy, o.w, o.foot) : sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot}));
     if(o.id==='barn'){ // 風車葉片
       const [x,y]=iso(gx,gy), top=y-h*o.foot; const cx=x-o.w*0.5+o.w*0.235, cy=top+h*0.2;
       s += `<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})"><g class="blades"><image href="${A('b_sail')}" x="-55" y="-55" width="110" height="110"/></g></g>`;
@@ -229,7 +242,7 @@ function buildWorld(){
 
   // 裝飾（萌獸星球素材）
   const deco=(n,gx,gy,w,extra='')=>objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`});
-  const FC=HG(645,352); deco('b_fountain', FC[0], FC[1], 150);
+  const FC=HG(645,352); objs.push({depth:FC[0]+FC[1], svg:skinSprite('fountain', FC[0], FC[1], 150, 0.8)});
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
 

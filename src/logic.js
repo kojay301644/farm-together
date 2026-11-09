@@ -436,7 +436,7 @@ function renderHUD(){
   else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
   $('hint').innerHTML = `<span>🌱</span><span>${h}</span>`;
 }
-function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V) setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); else if(S) setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); checkEvolve(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } checkEvolve(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -522,7 +522,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings);
+    setGearConfig(c.gear, c.settings, c.skins);
   }catch(e){}
 }
 async function showNotices(){
