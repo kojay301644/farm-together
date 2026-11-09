@@ -186,10 +186,8 @@ function buildWorld(){
   defs = defs.replace('</defs>',`<linearGradient id="gSky" gradientUnits="userSpaceOnUse" x1="0" y1="${VY}" x2="0" y2="${VY+WH}"><stop offset="0" stop-color="#3f9be8"/><stop offset=".55" stop-color="#8fcdfb"/><stop offset="1" stop-color="#d6efff"/></linearGradient>
     <radialGradient id="gSun"><stop offset="0" stop-color="rgba(255,250,220,.95)"/><stop offset=".25" stop-color="rgba(255,240,180,.5)"/><stop offset="1" stop-color="rgba(255,240,180,0)"/></radialGradient></defs>`);
   sea += `<rect x="${VX-1500}" y="${VY-1500}" width="${WW+3000}" height="${WH+3000}" fill="url(#gSky)"/>`;
-  const sx=VX+WW*0.82, sy=VY+70;
-  sea += `<g transform="translate(${sx} ${sy})" opacity=".9"><g class="sunrays">${Array.from({length:12},(_,k)=>`<path transform="rotate(${k*30})" d="M-18 0 L18 0 L70 -900 L-70 -900Z" fill="rgba(255,248,210,.10)"/>`).join('')}</g></g><circle cx="${sx}" cy="${sy}" r="160" fill="url(#gSun)"/>`;
-  [["isl0",0,0,207,125,0],["isl1",1083,0,261,154,1.7],["isl2",1279,117,65,126,3.1]].forEach(([n,x,y,w,h,ph])=>{
-    sea += `<image class="floaty" style="animation-delay:-${ph}s" href="${A(n)}" x="${x*IS-40}" y="${y*IS-40}" width="${w*IS}" height="${h*IS}"/>`; });
+  // 遠景：用萌獸主頁圖四周的山、瀑布、浮島、森林拼成
+  sea += `<image href="${A('backdrop')}" x="-400" y="-300" width="2400" height="1400" preserveAspectRatio="none"/>`;
   // 萌獸主頁浮空島
   island += `<image href="${A('home_island')}" x="0" y="0" width="${IW}" height="${IH}"/>`;
   // 瀑布水花
