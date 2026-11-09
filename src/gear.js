@@ -82,8 +82,14 @@ function openGearShop(t){
   md.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>openGearShop(b.dataset.gs));
   md.querySelectorAll('[data-bg]').forEach(b=>b.onclick=async()=>{ const g=GEAR[b.dataset.bg];
     try{ applyState(await rpc('farm_buy_gear',{p_id:g.id})); refresh(); sfx('coin');
-      modal('買到了！', `<div style="text-align:center;padding:6px 0">${gearImg(g,80)}<div style="font-weight:900;font-size:18px;margin-top:6px">${gearTitle(g)}</div><div style="color:var(--ink2);font-weight:700;margin-top:4px">${gearDesc(g)}</div></div>`,
-        [['馬上插上','',async()=>{ try{ applyState(await rpc('farm_equip',{p_id:g.id})); refresh(); toast('裝備好了！'); closeModal(); }catch(e){ toast(e.message); } }],['繼續逛','sub',()=>openGearShop()]]);
+      const pt=JSON.parse(JSON.stringify(partyOf(S.me)));
+      const pick=pt.map((p,i)=>{ const cg=GEAR[p.g]; return `<button class="eqpick" data-eqto="${i}"><img src="${chrSrc(p.s+'1')}" alt=""><b>${i===0?'👑 ':''}${esc(bName(p.s))}</b><small>${cg?`換下 ${esc(gearTitle(cg))}`:'空的裝備格'}</small></button>`; }).join('');
+      modal('買到了！', `<div style="text-align:center;padding:6px 0">${gearImg(g,80)}<div style="font-weight:900;font-size:18px;margin-top:6px">${gearTitle(g)}</div><div style="color:var(--ink2);font-weight:700;margin-top:4px">${gearDesc(g)}</div></div>
+        <div class="sec">要插在哪一隻寵物身上？</div><div class="eqgrid">${pick}</div>`,
+        [['先放背包','sub',()=>openGearShop()]]);
+      document.querySelectorAll('[data-eqto]').forEach(b=>b.onclick=async()=>{ const i=+b.dataset.eqto, n=(S.me.gear||{})[g.id]||0, used=pt.filter((p,j)=>j!==i&&p.g===g.id).length;
+        if(used>=n){ for(let j=pt.length-1;j>=0;j--){ if(j!==i && pt[j].g===g.id){ pt[j].g=null; break; } } }
+        pt[i].g=g.id; await saveParty(pt, `${bName(pt[i].s)} 裝備好了！`); closeModal(); });
     }catch(e){ toast(e.message); } });
 }
 
