@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>一起種田吧</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#3A3226; --ink2:#7A6E5D; --card:#FFFFFF; --line:#EFE6D8;
+  --green:#3BB273; --green-d:#2E9660; --orange:#FF9F43; --orange-d:#F0851A;
+  --gold:#FFC93C; --sky1:#AEE1FF; --sky2:#E8F7FF; --grass:#8ACB5B; --grass-d:#6DB548;
+  --red:#F2545B; --blue:#3DA5F4;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden}
+body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#8FD3F4;user-select:none;-webkit-user-select:none}
+button{font-family:inherit;color:inherit;border:0;cursor:pointer}
+
+/* 地圖 */
+#map{position:fixed;inset:0;overflow:auto;scrollbar-width:none;cursor:grab}
+#map::-webkit-scrollbar{display:none}
+#map.drag{cursor:grabbing}
+#world{display:block}
+.tap{cursor:pointer}
+.tap.hit{animation:hit .25s ease-out}
+@keyframes hit{50%{transform:translateY(-4px)}}
+.tap.hit{transform-box:fill-box;transform-origin:center bottom}
+.ripe .crop{animation:bob 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center bottom}
+@keyframes bob{50%{transform:translateY(-2px) scale(1.04)}}
+.spark{animation:tw 1.2s ease-in-out infinite}
+@keyframes tw{50%{opacity:.2}}
+.blades{transform-box:fill-box;transform-origin:center;animation:spin 7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cloud{animation:drift linear infinite}
+@keyframes drift{from{transform:translateX(-300px)}to{transform:translateX(1700px)}}
+.flow{stroke-dasharray:14 22;animation:flow 2.4s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-36}}
+.wave{animation:wave 3s ease-in-out infinite}
+@keyframes wave{50%{transform:translateY(4px);opacity:.5}}
+.walk .lg1{animation:lg 0.5s ease-in-out infinite}
+.walk .lg2{animation:lg 0.5s ease-in-out infinite reverse}
+@keyframes lg{50%{transform:translateY(-2px)}}
+.walk .bd{animation:bdy .5s ease-in-out infinite}
+@keyframes bdy{50%{transform:translateY(-1px)}}
+.smoke{animation:smk 3s ease-out infinite}
+@keyframes smk{from{transform:translateY(0);opacity:.8}to{transform:translateY(-26px);opacity:0}}
+.plab{pointer-events:none}
+
+/* 上方資訊 */
+.hud{position:fixed;left:0;right:0;top:0;z-index:20;padding:10px 10px 0;pointer-events:none}
+.hud>*{pointer-events:auto}
+.top{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.96);border-radius:20px;padding:8px 12px;box-shadow:0 4px 0 rgba(0,0,0,.08)}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;font-weight:900;font-size:19px;flex:none}
+.who{flex:1;min-width:0}
+.who .nm{font-weight:900;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvrow{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2);font-weight:700}
+.lvtag{background:var(--green);color:#fff;border-radius:8px;padding:0 7px;font-weight:900}
+.bar{flex:1;height:8px;background:#EEF2E6;border-radius:8px;overflow:hidden;max-width:160px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#7ED957,var(--green));border-radius:8px;transition:width .4s}
+.gold{display:flex;align-items:center;gap:6px;background:#FFF6DB;border-radius:14px;padding:6px 12px;font-weight:900;font-size:16px}
+.coin{width:18px;height:18px;border-radius:50%;background:var(--gold);box-shadow:inset 0 -2px 0 #E8A919;display:inline-block;position:relative}
+.coin:after{content:"";position:absolute;inset:5px;border-radius:50%;border:2px solid #E8A919}
+.hint{max-width:720px;margin:8px auto 0;background:rgba(255,255,255,.92);border-radius:14px;padding:7px 12px;font-size:13px;font-weight:700;display:flex;gap:8px;align-items:center;box-shadow:0 2px 0 rgba(0,0,0,.06)}
+.hint b{color:var(--green-d)}
+
+/* 工具列 */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:0 10px calc(10px + env(safe-area-inset-bottom));pointer-events:none}
+.dock-in{max-width:720px;margin:0 auto;background:rgba(255,255,255,.97);border-radius:22px;box-shadow:0 -2px 14px rgba(0,0,0,.1),0 4px 0 rgba(0,0,0,.08);padding:8px;pointer-events:auto}
+.tools{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.tool{background:#F6F1E8;border-radius:14px;padding:6px 2px 4px;display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:900;color:var(--ink2);position:relative}
+.tool svg{width:30px;height:30px}
+.tool.on{background:#E3F6EA;color:var(--green-d);box-shadow:inset 0 0 0 2px var(--green)}
+.tool .badge{position:absolute;top:2px;right:4px;background:var(--orange);color:#fff;border-radius:8px;font-size:10px;padding:0 5px}
+.home{max-width:720px;margin:0 auto 8px;display:flex;justify-content:flex-end;pointer-events:none}
+.home button{pointer-events:auto;background:#fff;border-radius:16px;padding:7px 12px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px}
+
+/* 視窗 */
+.ov{position:fixed;inset:0;background:rgba(40,30,20,.45);z-index:50;display:none;align-items:flex-end;justify-content:center;padding:12px}
+.ov.show{display:flex}
+@media(min-width:560px){.ov{align-items:center}}
+.md{background:var(--card);width:100%;max-width:520px;max-height:84vh;border-radius:24px;display:flex;flex-direction:column;overflow:hidden;animation:pop .18s ease-out}
+@keyframes pop{from{transform:translateY(20px);opacity:0}}
+.md h3{margin:0;padding:16px 18px 10px;font-size:19px;font-weight:900;display:flex;align-items:center;justify-content:space-between}
+.md .x{background:#F3EEE5;width:32px;height:32px;border-radius:50%;font-size:18px;font-weight:900}
+.md .bd{padding:0 18px 12px;overflow:auto}
+.md .ft{padding:10px 18px 16px;display:flex;gap:8px}
+.btn{flex:1;background:var(--green);color:#fff;font-weight:900;font-size:15px;padding:11px;border-radius:14px;box-shadow:0 3px 0 var(--green-d)}
+.btn.sub{background:#EFE9DF;color:var(--ink);box-shadow:0 3px 0 #DDD3C3}
+.btn.o{background:var(--orange);box-shadow:0 3px 0 var(--orange-d)}
+.btn.r{background:var(--red);box-shadow:0 3px 0 #C93D44}
+.btn:disabled,.mini:disabled{opacity:.4;cursor:default}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .ic{width:54px;height:46px;flex:none;background:#F4F9EC;border-radius:12px}
+.row .ic svg{width:100%;height:100%}
+.row .tx{flex:1;min-width:0}
+.row .tx b{font-size:15px}
+.row .tx div{font-size:12px;color:var(--ink2);font-weight:700}
+.mini{background:var(--green);color:#fff;font-weight:900;font-size:13px;padding:7px 10px;border-radius:10px;box-shadow:0 2px 0 var(--green-d);white-space:nowrap}
+.mini.o{background:var(--orange);box-shadow:0 2px 0 var(--orange-d)}
+.lock{font-size:12px;font-weight:900;color:#B0A592;background:#F3EEE5;border-radius:10px;padding:6px 10px}
+.tag{display:inline-block;background:#FFF1DC;color:var(--orange-d);border-radius:6px;padding:0 6px;font-size:11px;font-weight:900;margin-left:4px}
+.sec{font-size:13px;font-weight:900;color:var(--ink2);margin:12px 0 2px}
+.empty{color:var(--ink2);text-align:center;padding:22px 0;font-weight:700;font-size:14px}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;background:#F3EEE5;border-radius:10px;padding:8px 0;font-weight:900}
+.seg button.on{background:var(--green);color:#fff}
+
+.toast{position:fixed;left:50%;top:120px;transform:translateX(-50%);background:rgba(58,50,38,.92);color:#fff;font-weight:700;font-size:14px;padding:9px 16px;border-radius:14px;z-index:80;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.fl{position:fixed;z-index:70;font-weight:900;font-size:15px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35);pointer-events:none;animation:up 1.1s ease-out forwards;white-space:nowrap;transform:translateX(-50%)}
+@keyframes up{to{transform:translate(-50%,-46px);opacity:0}}
+
+/* 登入 */
+.login{position:fixed;inset:0;z-index:100;background:linear-gradient(var(--sky1),var(--sky2) 55%,var(--grass) 55%);display:flex;align-items:center;justify-content:center;padding:20px}
+.login .card{background:#fff;border-radius:28px;padding:26px 22px;width:100%;max-width:380px;text-align:center;box-shadow:0 6px 0 var(--line)}
+.logo{font-size:34px;font-weight:900;color:var(--green-d);letter-spacing:2px;margin:6px 0 2px}
+.logo span{color:var(--orange)}
+.login p{color:var(--ink2);font-weight:700;font-size:13px;margin:4px 0 16px}
+.login input{width:100%;font-family:inherit;font-size:17px;font-weight:700;padding:12px 14px;border-radius:14px;border:2px solid var(--line);outline:none;text-align:center;margin-bottom:12px;color:var(--ink)}
+.login input:focus{border-color:var(--green)}
+.login input{margin-bottom:10px}
+.amsg{font-size:13px;font-weight:700;min-height:18px;margin-top:8px}
+.link{background:none;color:var(--ink2);font-weight:700;font-size:13px;text-decoration:underline;margin-top:6px}
+.or{display:flex;align-items:center;gap:10px;color:#B0A592;font-size:12px;font-weight:700;margin:12px 0}
+.or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px;font-weight:900;font-size:15px}
+.gbtn.off{opacity:.5}
+.tabs{display:flex;gap:6px;margin-bottom:6px;position:sticky;top:0;background:#fff;padding-bottom:6px;z-index:1}
+.tabs button{flex:1;background:#F3EEE5;border-radius:10px;padding:8px 0;font-weight:900;font-size:13px}
+.tabs button.on{background:var(--green);color:#fff}
+.dot{font-style:normal;background:var(--red);color:#fff;border-radius:8px;padding:0 6px;font-size:11px}
+.avatar.sm{width:40px;height:40px;font-size:16px;flex:none}
+.mini.sub{background:#EFE9DF;color:var(--ink);box-shadow:0 2px 0 #DDD3C3}
+.inp{flex:1;font-family:inherit;font-size:15px;font-weight:700;padding:10px 12px;border-radius:12px;border:2px solid var(--line);outline:none;color:var(--ink);min-width:0}
+.inp:focus{border-color:var(--green)}
+.note{font-size:11px;color:#A89C88;margin-top:12px;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="login" id="login" style="display:flex">
+  <div class="card" id="loginCard">
+    <svg viewBox="0 0 120 70" width="130" aria-hidden="true">
+      <rect x="10" y="40" width="100" height="26" rx="12" fill="#A06F49"/>
+      <rect x="10" y="40" width="100" height="7" rx="3.5" fill="#B98258"/>
+      <g transform="translate(0,-6)"><ellipse cx="40" cy="38" rx="6" ry="15" fill="#6CC655" transform="rotate(-20 40 38)"/><ellipse cx="50" cy="36" rx="6" ry="16" fill="#5DB54A"/><ellipse cx="45" cy="50" rx="11" ry="8" fill="#FF8A3D"/></g>
+      <g><circle cx="74" cy="34" r="12" fill="#5DB54A"/><circle cx="86" cy="36" r="11" fill="#6CC655"/><circle cx="80" cy="27" r="11" fill="#7CC85A"/><circle cx="74" cy="36" r="5" fill="#F2545B"/><circle cx="87" cy="33" r="5" fill="#F2545B"/><circle cx="81" cy="25" r="4.5" fill="#F2545B"/></g>
+    </svg>
+    <div class="logo">一起<span>種田</span>吧</div>
+    <p>種菜、收成、和朋友一起偷菜</p>
+    <div class="seg" style="margin-bottom:12px"><button data-am="login" class="on">登入</button><button data-am="signup">註冊</button></div>
+    <input id="email" type="email" placeholder="Email" autocomplete="email">
+    <input id="pw" type="password" placeholder="密碼（至少 6 個字）" autocomplete="current-password">
+    <input id="pw2" type="password" placeholder="再輸入一次密碼" autocomplete="new-password" style="display:none">
+    <button class="btn" id="authBtn" style="width:100%">登入</button>
+    <div id="authMsg" class="amsg"></div>
+    <button class="link" id="forgot">忘記密碼？</button>
+    <div class="or"><span>或</span></div>
+    <button class="gbtn" id="gBtn"><svg viewBox="0 0 48 48" width="20" height="20"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>用 Google 帳號登入</button>
+  </div>
+  <div class="card" id="nickCard" style="display:none">
+    <div class="logo" style="font-size:26px">幫自己取個名字</div>
+    <p>好友會用這個暱稱找到你（1～10 個字，之後不能改）</p>
+    <input id="nickIn" maxlength="10" placeholder="輸入暱稱" autocomplete="off">
+    <button class="btn" id="nickBtn" style="width:100%">開始種田</button>
+    <button class="link" id="nickOut">換一個帳號</button>
+  </div>
+</div>
+
+<div id="map" style="display:none"><svg id="world" xmlns="http://www.w3.org/2000/svg"></svg></div>
+
+<div class="hud" id="hud" style="display:none">
+  <div class="top">
+    <div class="avatar" id="avatar">農</div>
+    <div class="who">
+      <div class="nm" id="pname"></div>
+      <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
+    </div>
+    <div class="gold"><span class="coin"></span><span id="pgold">0</span></div>
+  </div>
+  <div class="hint" id="hint"></div>
+</div>
+
+<div class="dock" id="dock" style="display:none">
+  <div class="home"><button id="bHome">🌾 回到農田</button></div>
+  <div class="dock-in"><div class="tools" id="tools"></div></div>
+</div>
+
+<div class="ov" id="ov"><div class="md" id="md"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="supabase.js"></script>
+<script>

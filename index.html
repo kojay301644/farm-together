@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>一起種田吧</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#3A3226; --ink2:#7A6E5D; --card:#FFFFFF; --line:#EFE6D8;
+  --green:#3BB273; --green-d:#2E9660; --orange:#FF9F43; --orange-d:#F0851A;
+  --gold:#FFC93C; --sky1:#AEE1FF; --sky2:#E8F7FF; --grass:#8ACB5B; --grass-d:#6DB548;
+  --red:#F2545B; --blue:#3DA5F4;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden}
+body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#8FD3F4;user-select:none;-webkit-user-select:none}
+button{font-family:inherit;color:inherit;border:0;cursor:pointer}
+
+/* 地圖 */
+#map{position:fixed;inset:0;overflow:auto;scrollbar-width:none;cursor:grab}
+#map::-webkit-scrollbar{display:none}
+#map.drag{cursor:grabbing}
+#world{display:block}
+.tap{cursor:pointer}
+.tap.hit{animation:hit .25s ease-out}
+@keyframes hit{50%{transform:translateY(-4px)}}
+.tap.hit{transform-box:fill-box;transform-origin:center bottom}
+.ripe .crop{animation:bob 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center bottom}
+@keyframes bob{50%{transform:translateY(-2px) scale(1.04)}}
+.spark{animation:tw 1.2s ease-in-out infinite}
+@keyframes tw{50%{opacity:.2}}
+.blades{transform-box:fill-box;transform-origin:center;animation:spin 7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cloud{animation:drift linear infinite}
+@keyframes drift{from{transform:translateX(-300px)}to{transform:translateX(1700px)}}
+.flow{stroke-dasharray:14 22;animation:flow 2.4s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-36}}
+.wave{animation:wave 3s ease-in-out infinite}
+@keyframes wave{50%{transform:translateY(4px);opacity:.5}}
+.walk .lg1{animation:lg 0.5s ease-in-out infinite}
+.walk .lg2{animation:lg 0.5s ease-in-out infinite reverse}
+@keyframes lg{50%{transform:translateY(-2px)}}
+.walk .bd{animation:bdy .5s ease-in-out infinite}
+@keyframes bdy{50%{transform:translateY(-1px)}}
+.smoke{animation:smk 3s ease-out infinite}
+@keyframes smk{from{transform:translateY(0);opacity:.8}to{transform:translateY(-26px);opacity:0}}
+.plab{pointer-events:none}
+
+/* 上方資訊 */
+.hud{position:fixed;left:0;right:0;top:0;z-index:20;padding:10px 10px 0;pointer-events:none}
+.hud>*{pointer-events:auto}
+.top{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.96);border-radius:20px;padding:8px 12px;box-shadow:0 4px 0 rgba(0,0,0,.08)}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;font-weight:900;font-size:19px;flex:none}
+.who{flex:1;min-width:0}
+.who .nm{font-weight:900;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvrow{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2);font-weight:700}
+.lvtag{background:var(--green);color:#fff;border-radius:8px;padding:0 7px;font-weight:900}
+.bar{flex:1;height:8px;background:#EEF2E6;border-radius:8px;overflow:hidden;max-width:160px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#7ED957,var(--green));border-radius:8px;transition:width .4s}
+.gold{display:flex;align-items:center;gap:6px;background:#FFF6DB;border-radius:14px;padding:6px 12px;font-weight:900;font-size:16px}
+.coin{width:18px;height:18px;border-radius:50%;background:var(--gold);box-shadow:inset 0 -2px 0 #E8A919;display:inline-block;position:relative}
+.coin:after{content:"";position:absolute;inset:5px;border-radius:50%;border:2px solid #E8A919}
+.hint{max-width:720px;margin:8px auto 0;background:rgba(255,255,255,.92);border-radius:14px;padding:7px 12px;font-size:13px;font-weight:700;display:flex;gap:8px;align-items:center;box-shadow:0 2px 0 rgba(0,0,0,.06)}
+.hint b{color:var(--green-d)}
+
+/* 工具列 */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:0 10px calc(10px + env(safe-area-inset-bottom));pointer-events:none}
+.dock-in{max-width:720px;margin:0 auto;background:rgba(255,255,255,.97);border-radius:22px;box-shadow:0 -2px 14px rgba(0,0,0,.1),0 4px 0 rgba(0,0,0,.08);padding:8px;pointer-events:auto}
+.tools{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.tool{background:#F6F1E8;border-radius:14px;padding:6px 2px 4px;display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:900;color:var(--ink2);position:relative}
+.tool svg{width:30px;height:30px}
+.tool.on{background:#E3F6EA;color:var(--green-d);box-shadow:inset 0 0 0 2px var(--green)}
+.tool .badge{position:absolute;top:2px;right:4px;background:var(--orange);color:#fff;border-radius:8px;font-size:10px;padding:0 5px}
+.home{max-width:720px;margin:0 auto 8px;display:flex;justify-content:flex-end;pointer-events:none}
+.home button{pointer-events:auto;background:#fff;border-radius:16px;padding:7px 12px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px}
+
+/* 視窗 */
+.ov{position:fixed;inset:0;background:rgba(40,30,20,.45);z-index:50;display:none;align-items:flex-end;justify-content:center;padding:12px}
+.ov.show{display:flex}
+@media(min-width:560px){.ov{align-items:center}}
+.md{background:var(--card);width:100%;max-width:520px;max-height:84vh;border-radius:24px;display:flex;flex-direction:column;overflow:hidden;animation:pop .18s ease-out}
+@keyframes pop{from{transform:translateY(20px);opacity:0}}
+.md h3{margin:0;padding:16px 18px 10px;font-size:19px;font-weight:900;display:flex;align-items:center;justify-content:space-between}
+.md .x{background:#F3EEE5;width:32px;height:32px;border-radius:50%;font-size:18px;font-weight:900}
+.md .bd{padding:0 18px 12px;overflow:auto}
+.md .ft{padding:10px 18px 16px;display:flex;gap:8px}
+.btn{flex:1;background:var(--green);color:#fff;font-weight:900;font-size:15px;padding:11px;border-radius:14px;box-shadow:0 3px 0 var(--green-d)}
+.btn.sub{background:#EFE9DF;color:var(--ink);box-shadow:0 3px 0 #DDD3C3}
+.btn.o{background:var(--orange);box-shadow:0 3px 0 var(--orange-d)}
+.btn.r{background:var(--red);box-shadow:0 3px 0 #C93D44}
+.btn:disabled,.mini:disabled{opacity:.4;cursor:default}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .ic{width:54px;height:46px;flex:none;background:#F4F9EC;border-radius:12px}
+.row .ic svg{width:100%;height:100%}
+.row .tx{flex:1;min-width:0}
+.row .tx b{font-size:15px}
+.row .tx div{font-size:12px;color:var(--ink2);font-weight:700}
+.mini{background:var(--green);color:#fff;font-weight:900;font-size:13px;padding:7px 10px;border-radius:10px;box-shadow:0 2px 0 var(--green-d);white-space:nowrap}
+.mini.o{background:var(--orange);box-shadow:0 2px 0 var(--orange-d)}
+.lock{font-size:12px;font-weight:900;color:#B0A592;background:#F3EEE5;border-radius:10px;padding:6px 10px}
+.tag{display:inline-block;background:#FFF1DC;color:var(--orange-d);border-radius:6px;padding:0 6px;font-size:11px;font-weight:900;margin-left:4px}
+.sec{font-size:13px;font-weight:900;color:var(--ink2);margin:12px 0 2px}
+.empty{color:var(--ink2);text-align:center;padding:22px 0;font-weight:700;font-size:14px}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;background:#F3EEE5;border-radius:10px;padding:8px 0;font-weight:900}
+.seg button.on{background:var(--green);color:#fff}
+
+.toast{position:fixed;left:50%;top:120px;transform:translateX(-50%);background:rgba(58,50,38,.92);color:#fff;font-weight:700;font-size:14px;padding:9px 16px;border-radius:14px;z-index:80;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.fl{position:fixed;z-index:70;font-weight:900;font-size:15px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35);pointer-events:none;animation:up 1.1s ease-out forwards;white-space:nowrap;transform:translateX(-50%)}
+@keyframes up{to{transform:translate(-50%,-46px);opacity:0}}
+
+/* 登入 */
+.login{position:fixed;inset:0;z-index:100;background:linear-gradient(var(--sky1),var(--sky2) 55%,var(--grass) 55%);display:flex;align-items:center;justify-content:center;padding:20px}
+.login .card{background:#fff;border-radius:28px;padding:26px 22px;width:100%;max-width:380px;text-align:center;box-shadow:0 6px 0 var(--line)}
+.logo{font-size:34px;font-weight:900;color:var(--green-d);letter-spacing:2px;margin:6px 0 2px}
+.logo span{color:var(--orange)}
+.login p{color:var(--ink2);font-weight:700;font-size:13px;margin:4px 0 16px}
+.login input{width:100%;font-family:inherit;font-size:17px;font-weight:700;padding:12px 14px;border-radius:14px;border:2px solid var(--line);outline:none;text-align:center;margin-bottom:12px;color:var(--ink)}
+.login input:focus{border-color:var(--green)}
+.login input{margin-bottom:10px}
+.amsg{font-size:13px;font-weight:700;min-height:18px;margin-top:8px}
+.link{background:none;color:var(--ink2);font-weight:700;font-size:13px;text-decoration:underline;margin-top:6px}
+.or{display:flex;align-items:center;gap:10px;color:#B0A592;font-size:12px;font-weight:700;margin:12px 0}
+.or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px;font-weight:900;font-size:15px}
+.gbtn.off{opacity:.5}
+.tabs{display:flex;gap:6px;margin-bottom:6px;position:sticky;top:0;background:#fff;padding-bottom:6px;z-index:1}
+.tabs button{flex:1;background:#F3EEE5;border-radius:10px;padding:8px 0;font-weight:900;font-size:13px}
+.tabs button.on{background:var(--green);color:#fff}
+.dot{font-style:normal;background:var(--red);color:#fff;border-radius:8px;padding:0 6px;font-size:11px}
+.avatar.sm{width:40px;height:40px;font-size:16px;flex:none}
+.mini.sub{background:#EFE9DF;color:var(--ink);box-shadow:0 2px 0 #DDD3C3}
+.inp{flex:1;font-family:inherit;font-size:15px;font-weight:700;padding:10px 12px;border-radius:12px;border:2px solid var(--line);outline:none;color:var(--ink);min-width:0}
+.inp:focus{border-color:var(--green)}
+.note{font-size:11px;color:#A89C88;margin-top:12px;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="login" id="login" style="display:flex">
+  <div class="card" id="loginCard">
+    <svg viewBox="0 0 120 70" width="130" aria-hidden="true">
+      <rect x="10" y="40" width="100" height="26" rx="12" fill="#A06F49"/>
+      <rect x="10" y="40" width="100" height="7" rx="3.5" fill="#B98258"/>
+      <g transform="translate(0,-6)"><ellipse cx="40" cy="38" rx="6" ry="15" fill="#6CC655" transform="rotate(-20 40 38)"/><ellipse cx="50" cy="36" rx="6" ry="16" fill="#5DB54A"/><ellipse cx="45" cy="50" rx="11" ry="8" fill="#FF8A3D"/></g>
+      <g><circle cx="74" cy="34" r="12" fill="#5DB54A"/><circle cx="86" cy="36" r="11" fill="#6CC655"/><circle cx="80" cy="27" r="11" fill="#7CC85A"/><circle cx="74" cy="36" r="5" fill="#F2545B"/><circle cx="87" cy="33" r="5" fill="#F2545B"/><circle cx="81" cy="25" r="4.5" fill="#F2545B"/></g>
+    </svg>
+    <div class="logo">一起<span>種田</span>吧</div>
+    <p>種菜、收成、和朋友一起偷菜</p>
+    <div class="seg" style="margin-bottom:12px"><button data-am="login" class="on">登入</button><button data-am="signup">註冊</button></div>
+    <input id="email" type="email" placeholder="Email" autocomplete="email">
+    <input id="pw" type="password" placeholder="密碼（至少 6 個字）" autocomplete="current-password">
+    <input id="pw2" type="password" placeholder="再輸入一次密碼" autocomplete="new-password" style="display:none">
+    <button class="btn" id="authBtn" style="width:100%">登入</button>
+    <div id="authMsg" class="amsg"></div>
+    <button class="link" id="forgot">忘記密碼？</button>
+    <div class="or"><span>或</span></div>
+    <button class="gbtn" id="gBtn"><svg viewBox="0 0 48 48" width="20" height="20"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>用 Google 帳號登入</button>
+  </div>
+  <div class="card" id="nickCard" style="display:none">
+    <div class="logo" style="font-size:26px">幫自己取個名字</div>
+    <p>好友會用這個暱稱找到你（1～10 個字，之後不能改）</p>
+    <input id="nickIn" maxlength="10" placeholder="輸入暱稱" autocomplete="off">
+    <button class="btn" id="nickBtn" style="width:100%">開始種田</button>
+    <button class="link" id="nickOut">換一個帳號</button>
+  </div>
+</div>
+
+<div id="map" style="display:none"><svg id="world" xmlns="http://www.w3.org/2000/svg"></svg></div>
+
+<div class="hud" id="hud" style="display:none">
+  <div class="top">
+    <div class="avatar" id="avatar">農</div>
+    <div class="who">
+      <div class="nm" id="pname"></div>
+      <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
+    </div>
+    <div class="gold"><span class="coin"></span><span id="pgold">0</span></div>
+  </div>
+  <div class="hint" id="hint"></div>
+</div>
+
+<div class="dock" id="dock" style="display:none">
+  <div class="home"><button id="bHome">🌾 回到農田</button></div>
+  <div class="dock-in"><div class="tools" id="tools"></div></div>
+</div>
+
+<div class="ov" id="ov"><div class="md" id="md"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="supabase.js"></script>
+<script>
+/* ================= 遊戲資料 ================= */
+const CROPS = [
+  {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
+  {id:'carrot',    name:'紅蘿蔔', lv:1, seed:16,  time:300,   yield:10, price:3,  exp:6,   type:'root',  color:'#FF8A3D'},
+  {id:'cabbage',   name:'高麗菜', lv:2, seed:30,  time:900,   yield:10, price:6,  exp:10,  type:'leafy', color:'#A6D96A'},
+  {id:'corn',      name:'玉米',   lv:3, seed:50,  time:1800,  yield:12, price:7,  exp:16,  type:'stalk', color:'#FFD23F'},
+  {id:'tomato',    name:'番茄',   lv:4, seed:80,  time:3600,  yield:14, price:9,  exp:24,  type:'bush',  color:'#F2545B', fruit:'round'},
+  {id:'eggplant',  name:'茄子',   lv:5, seed:110, time:7200,  yield:14, price:12, exp:32,  type:'bush',  color:'#7B4BB7', fruit:'long'},
+  {id:'strawberry',name:'草莓',   lv:6, seed:160, time:10800, yield:16, price:15, exp:45,  type:'bush',  color:'#E8384F', fruit:'berry'},
+  {id:'pumpkin',   name:'南瓜',   lv:7, seed:220, time:14400, yield:12, price:28, exp:60,  type:'ground',color:'#FF9F1C'},
+  {id:'watermelon',name:'西瓜',   lv:8, seed:300, time:21600, yield:10, price:48, exp:80,  type:'ground',color:'#3E9B4F', stripe:true},
+  {id:'grape',     name:'葡萄',   lv:9, seed:400, time:28800, yield:16, price:38, exp:110, type:'bush',  color:'#8E5CC9', fruit:'grape'},
+];
+const CROP = Object.fromEntries(CROPS.map(c=>[c.id,c]));
+const WILD = [null,null,null,null,{cost:100,lv:1},{cost:300,lv:2}]; // 第5、6塊是荒地
+const MAX_LV = 30;
+const needExp = lv => 30*lv*lv;
+const wetDur = c => Math.min(3600, Math.max(45, c.time*0.3));
+/* ================= 美術（向量繪製） ================= */
+const L = (cx,cy,rx,ry,rot,f)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" transform="rotate(${rot} ${cx} ${cy})" fill="${f}"/>`;
+const UNRIPE = '#B6DB7A';
+
+function cropArt(c, st){
+  if(st===0) return `<ellipse cx="60" cy="74" rx="14" ry="5" fill="#8B5A3A"/><circle cx="54" cy="72" r="2" fill="#F0DFAE"/><circle cx="61" cy="70" r="2" fill="#F0DFAE"/><circle cx="67" cy="73" r="2" fill="#F0DFAE"/>`;
+  if(st===1) return `<rect x="58.5" y="62" width="3" height="12" rx="1.5" fill="#5DB54A"/>${L(53,62,8,4,-30,'#7CC85A')}${L(67,62,8,4,30,'#7CC85A')}`;
+  if(st===2) return `<rect x="58" y="52" width="4" height="22" rx="2" fill="#5DB54A"/>${L(47,58,13,6,-30,'#6CC655')}${L(73,58,13,6,30,'#6CC655')}${L(52,48,10,5,-60,'#7CC85A')}${L(68,48,10,5,60,'#7CC85A')}`;
+  const ripe = st===4, k = ripe?1:0.75, col = ripe?c.color:UNRIPE;
+  switch(c.type){
+    case 'root':
+      return `${L(50,52,7,17,-25,'#5DB54A')}${L(70,52,7,17,25,'#5DB54A')}${L(60,48,7,19,0,'#6CC655')}
+        <ellipse cx="60" cy="72" rx="${13*k}" ry="${9*k}" fill="${ripe?c.color:'#E8D9B5'}" ${c.edge&&ripe?`stroke="${c.edge}" stroke-width="1.5"`:''}/>
+        <path d="M54 72 h5 M61 75 h5" stroke="rgba(0,0,0,.12)" stroke-width="1.5" stroke-linecap="round"/>`;
+    case 'leafy':
+      return `<circle cx="60" cy="64" r="${22*k}" fill="#7FBF4D"/><circle cx="60" cy="63" r="${16*k}" fill="${ripe?c.color:'#93CF62'}"/><circle cx="60" cy="62" r="${9*k}" fill="#CDEB8F"/>
+        <path d="M60 ${63-14*k} V${63+14*k}" stroke="#7FBF4D" stroke-width="1.5"/>`;
+    case 'stalk':
+      return `<rect x="58" y="${ripe?18:28}" width="4" height="${ripe?58:48}" rx="2" fill="#6DB548"/>${L(47,54,5,17,-40,'#5DB54A')}${L(73,48,5,17,40,'#6CC655')}${L(48,40,4,12,-50,'#7CC85A')}
+        <ellipse cx="67" cy="40" rx="${6*k}" ry="${13*k}" fill="${col}"/>${ripe?'<path d="M64 32 h6 M64 38 h6 M64 44 h6" stroke="#E8B520" stroke-width="1.2"/>':''}
+        ${L(64,46,4,10,15,'#8CCB5E')}<path d="M60 ${ripe?18:28} l-5 -8 M60 ${ripe?18:28} l0 -9 M60 ${ripe?18:28} l5 -8" stroke="#D9B44A" stroke-width="2" stroke-linecap="round"/>`;
+    case 'bush': {
+      const pts = [[47,62],[71,63],[59,48],[58,68],[66,53]];
+      let fr = '';
+      for(const [x,y] of pts){
+        if(c.fruit==='round') fr += `<circle cx="${x}" cy="${y}" r="${6*k}" fill="${col}"/><rect x="${x-2}" y="${y-7*k}" width="4" height="3" rx="1" fill="#3E8E3A"/>`;
+        else if(c.fruit==='long') fr += `<ellipse cx="${x}" cy="${y+2}" rx="${4*k}" ry="${8*k}" fill="${col}"/><rect x="${x-3}" y="${y-7*k}" width="6" height="3" rx="1.5" fill="#3E8E3A"/>`;
+        else if(c.fruit==='berry') fr += `<path d="M${x-5*k} ${y-3*k} Q${x} ${y-7*k} ${x+5*k} ${y-3*k} Q${x+4*k} ${y+5*k} ${x} ${y+7*k} Q${x-4*k} ${y+5*k} ${x-5*k} ${y-3*k}Z" fill="${col}"/>${ripe?`<circle cx="${x-1.5}" cy="${y}" r=".9" fill="#FFE066"/><circle cx="${x+1.8}" cy="${y+2}" r=".9" fill="#FFE066"/>`:''}`;
+        else if(c.fruit==='grape'){ const r=3*k; fr += [[0,0],[-3,-3],[3,-3],[-1.5,3],[1.5,3],[0,6]].map(([a,b])=>`<circle cx="${x+a*k}" cy="${y-2+b*k}" r="${r}" fill="${col}"/>`).join(''); }
+      }
+      return `<rect x="58" y="62" width="4" height="13" fill="#5A9E3E"/><circle cx="47" cy="60" r="15" fill="#5DB54A"/><circle cx="73" cy="60" r="15" fill="#5DB54A"/><circle cx="60" cy="50" r="17" fill="#6CC655"/><circle cx="54" cy="45" r="6" fill="#86D46A" opacity=".7"/>${fr}`;
+    }
+    case 'ground':
+      return `<path d="M30 70 Q45 56 60 66 T92 64" stroke="#5A9E3E" stroke-width="3" fill="none"/>${L(36,62,13,7,-20,'#5DB54A')}${L(86,60,13,7,20,'#6CC655')}
+        <ellipse cx="60" cy="66" rx="${22*k}" ry="${15*k}" fill="${col}"/>
+        ${c.stripe?`<path d="M${60-12*k} ${54*1+(1-k)*8} Q${60-16*k} 66 ${60-12*k} ${78-(1-k)*8} M60 ${51+(1-k)*4} V${81-(1-k)*4} M${60+12*k} ${54+(1-k)*8} Q${60+16*k} 66 ${60+12*k} ${78-(1-k)*8}" stroke="${ripe?'#2C7A3B':'#8DBF55'}" stroke-width="3" fill="none"/>`
+                  :`<path d="M${60-10*k} ${54+(1-k)*6} Q${60-15*k} 66 ${60-10*k} ${78-(1-k)*6} M${60+10*k} ${54+(1-k)*6} Q${60+15*k} 66 ${60+10*k} ${78-(1-k)*6}" stroke="${ripe?'#E8830C':'#95C25E'}" stroke-width="2.5" fill="none"/>`}
+        <rect x="58" y="${50+(1-k)*5}" width="5" height="6" rx="2" fill="#6B8E3A"/>`;
+  }
+}
+const deadArt = `<path d="M60 76 Q58 60 64 50 Q70 44 74 50" stroke="#9C7A54" stroke-width="3.5" fill="none" stroke-linecap="round"/>${L(50,66,9,4,25,'#B89566')}${L(70,62,9,4,-35,'#A8865B')}${L(76,54,6,3,40,'#B89566')}`;
+const weedArt = (x,y)=>`<g transform="translate(${x} ${y}) scale(1.5)"><path d="M0 0 L-7 -12 L-2 -4 L0 -16 L2 -4 L8 -11 Z" fill="#2F7D32"/><path d="M-4 0 L-10 -6 L-2 0Z" fill="#3E9B3E"/></g>`;
+const bugArt  = (x,y)=>`<g transform="translate(${x} ${y}) scale(1.6)"><ellipse cx="0" cy="0" rx="6" ry="4.5" fill="#7A4F2A"/><circle cx="-6" cy="-1" r="3" fill="#4E331C"/><path d="M0 -4.5 V4.5" stroke="#4E331C" stroke-width="1"/><circle cx="-2.5" cy="-1.5" r="1.1" fill="#F4C27A"/><circle cx="2.5" cy="1.5" r="1.1" fill="#F4C27A"/><path d="M-8 -3 l-3 -3 M-8 0 l-4 -1" stroke="#4E331C" stroke-width="1"/></g>`;
+const WEED_POS=[[24,86],[98,64],[30,62]], BUG_POS=[[86,84],[44,80],[80,62]];
+
+function stageOf(p){ const c=CROP[p.c]; const r=p.g/c.time; return r>=1?4: r<0.1?0: r<0.4?1: r<0.75?2:3; }
+function iconSVG(c){ return `<svg viewBox="10 14 100 72">${cropArt(c,4)}</svg>`; }
+
+const ICONS = {
+  hand:`<svg viewBox="0 0 32 32"><path d="M6 13 h20 l-2.5 13 a2 2 0 0 1 -2 1.6 h-11 a2 2 0 0 1 -2 -1.6Z" fill="#E0A45E"/><path d="M8 17 h16 M9 21 h14" stroke="#C4843D" stroke-width="1.6"/><path d="M10 13 Q16 3 22 13" stroke="#C4843D" stroke-width="2.4" fill="none"/><circle cx="12" cy="11" r="3.2" fill="#F2545B"/><circle cx="19" cy="10" r="3.2" fill="#FF8A3D"/></svg>`,
+  seed:`<svg viewBox="0 0 32 32"><path d="M9 10 Q7 26 10 28 h12 Q25 26 23 10Z" fill="#F3D9A8"/><path d="M9 10 h14 l-2 -4 h-10Z" fill="#E0BE82"/><path d="M12 8 h8" stroke="#B07A4F" stroke-width="2"/><ellipse cx="16" cy="19" rx="3.5" ry="5" fill="#6CC655"/><path d="M16 15 v8" stroke="#3E8E3A" stroke-width="1.2"/></svg>`,
+  water:`<svg viewBox="0 0 32 32"><rect x="7" y="13" width="14" height="13" rx="3" fill="#3DA5F4"/><path d="M21 17 L29 11 L29 13.5 L22 20Z" fill="#2F8FD9"/><path d="M10 13 Q14 5 18 13" stroke="#2F8FD9" stroke-width="2.4" fill="none"/><circle cx="30" cy="16" r="1.3" fill="#9ED8FF"/><circle cx="28" cy="19" r="1.3" fill="#9ED8FF"/></svg>`,
+  weed:`<svg viewBox="0 0 32 32"><path d="M8 26 L4 12 L10 20 L12 6 L15 20 L20 10 L18 26Z" fill="#3E9B3E"/><circle cx="23" cy="22" r="7" fill="#F2545B"/><path d="M20 22 h6" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+  bug:`<svg viewBox="0 0 32 32"><rect x="10" y="12" width="11" height="15" rx="3" fill="#7ED957"/><rect x="12" y="7" width="7" height="6" rx="1.5" fill="#5DB54A"/><path d="M19 9 h6 v3 h-3" fill="#5DB54A"/><rect x="12" y="16" width="7" height="6" rx="1.5" fill="#fff"/><circle cx="27" cy="7" r="1.2" fill="#B5E8A0"/><circle cx="29" cy="11" r="1.2" fill="#B5E8A0"/><circle cx="26" cy="14" r="1.2" fill="#B5E8A0"/></svg>`,
+  shovel:`<svg viewBox="0 0 32 32"><rect x="14.5" y="3" width="3" height="16" rx="1.5" fill="#C98B5E"/><rect x="11" y="2" width="10" height="3.5" rx="1.7" fill="#A86F45"/><path d="M10 18 h12 v4 a6 6 0 0 1 -12 0Z" fill="#9AA6B2"/><path d="M12 19.5 h8" stroke="#C5CED6" stroke-width="1.5"/></svg>`,
+};
+const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','除草'],['bug','除蟲'],['shovel','剷除']];
+
+/* ================= 工具函式 ================= */
+const $ = id=>document.getElementById(id);
+function dur(sec){ sec=Math.round(sec); const h=Math.floor(sec/3600), m=Math.round(sec%3600/60); if(h) return m?`${h}小時${m}分鐘`:`${h}小時`; if(sec>=60) return `${Math.round(sec/60)}分鐘`; return `${sec}秒`; }
+function fmt(sec){
+  sec = Math.max(0, Math.ceil(sec));
+  const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60;
+  if(h) return `${h}小時${m}分`;
+  if(m) return `${m}分${String(s).padStart(2,'0')}秒`;
+  return `${s}秒`;
+}
+let toastT;
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1800); }
+function floatAt(el, text, color){
+  const r = el.getBoundingClientRect();
+  const f = document.createElement('div'); f.className='fl'; f.textContent=text; if(color) f.style.color=color;
+  f.style.left = (r.left + r.width/2)+'px'; f.style.top = (r.top + r.height*0.3)+'px';
+  document.body.appendChild(f); setTimeout(()=>f.remove(),1100);
+}
+/* ================= 視窗 ================= */
+function modal(title, body, btns){
+  $('md').innerHTML = `<h3><span>${title}</span><button class="x" id="mx">×</button></h3><div class="bd">${body}</div>${btns&&btns.length?'<div class="ft" id="mft"></div>':''}`;
+  $('mx').onclick = closeModal;
+  if(btns && btns.length){
+    const ft=$('mft');
+    btns.forEach(([t,cls,fn])=>{ const b=document.createElement('button'); b.className='btn '+(cls||''); b.textContent=t; b.onclick=fn; ft.appendChild(b); });
+  }
+  $('ov').classList.add('show');
+}
+function closeModal(){ $('ov').classList.remove('show'); }
+$('ov').addEventListener('click', e=>{ if(e.target.id==='ov') closeModal(); });
+
+/* ================= 小鎮地圖：斜角座標 ================= */
+const TW=72, TH=36, OX=680, OY=96, WW=1360, WH=800;
+const PAD={t:120,b:150,l:40,r:40};
+const iso=(x,y)=>[OX+(x-y)*TW/2, OY+(x+y)*TH/2];
+const P=a=>a.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+const up=(p,h)=>[p[0],p[1]-h];
+const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+const poly=(pts,f,extra='')=>`<polygon points="${P(pts)}" fill="${f}" ${extra}/>`;
+const dia=(x,y,w,d)=>[iso(x,y),iso(x+w,y),iso(x+w,y+d),iso(x,y+d)];
+function fpt(P0,P1,u,v){ return [P0[0]+(P1[0]-P0[0])*u, P0[1]+(P1[1]-P0[1])*u - v]; }
+function fq(P0,P1,u0,u1,v0,v1,f,extra=''){ return poly([fpt(P0,P1,u0,v0),fpt(P0,P1,u1,v0),fpt(P0,P1,u1,v1),fpt(P0,P1,u0,v1)],f,extra); }
+let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
+
+/* 田地位置（格座標，3×2） */
+const PS=1.8;
+const PLOTS=[0,1,2,3,4,5].map(i=>[5.6+(i%3)*2.1, 7+Math.floor(i/3)*2.1]);
+const plotCenter=i=>iso(PLOTS[i][0]+PS/2, PLOTS[i][1]+PS/2);
+const FARM_C=[8.7,8.9];
+
+/* ================= 美術元件 ================= */
+function labelPill(x,y,text,opt={}){
+  const w = text.length*13+24;
+  const bg = opt.locked?'#D9D2C4':(opt.bg||'#FFFFFF');
+  const fg = opt.locked?'#7A6E5D':(opt.fg||'#3A3226');
+  return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" style="pointer-events:none">
+    <rect x="${-w/2}" y="-13" width="${w}" height="26" rx="13" fill="${bg}" stroke="rgba(0,0,0,.08)" stroke-width="2"/>
+    <path d="M-5 12 L0 18 L5 12Z" fill="${bg}"/>
+    <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="900" fill="${fg}" font-family="Noto Sans TC,sans-serif">${opt.locked?'🔒 ':''}${text}</text></g>`;
+}
+
+function building(o){
+  const A=iso(o.x,o.y),B=iso(o.x+o.w,o.y),C=iso(o.x+o.w,o.y+o.d),D=iso(o.x,o.y+o.d);
+  const h=o.h, rh=o.rh;
+  const R1=up(mid(A,D),h+rh), R2=up(mid(B,C),h+rh);
+  let s = `<ellipse cx="${mid(A,C)[0]}" cy="${mid(A,C)[1]+6}" rx="${(B[0]-D[0])/2+8}" ry="${(C[1]-A[1])/2+5}" fill="rgba(0,0,0,.12)"/>`;
+  s += poly([D,C,up(C,h),up(D,h)], o.wallL) + poly([C,B,up(B,h),up(C,h)], o.wallR);
+  s += `<path d="M${P([D,C,B])}" stroke="rgba(0,0,0,.12)" stroke-width="3" fill="none"/>`;
+  if(o.deco) s += o.deco(D,C,B,h);
+  s += poly([up(A,h),up(B,h),R2,R1], o.roofB);
+  s += poly([up(C,h),up(B,h),R2], o.wallR) + `<path d="M${P([up(C,h),R2,up(B,h)])}" stroke="${o.roofB}" stroke-width="4" fill="none" stroke-linejoin="round"/>`;
+  const e=4, Df=[up(D,h)[0]-e,up(D,h)[1]+e*0.5], Cf=[up(C,h)[0]+e*0.3,up(C,h)[1]+e];
+  s += poly([Df,Cf,R2,R1], o.roofF);
+  s += `<path d="M${P([Df,Cf])}" stroke="rgba(0,0,0,.18)" stroke-width="3"/>`;
+  for(let k=1;k<=3;k++){ const t=k/4; const p1=[Df[0]+(R1[0]-Df[0])*t, Df[1]+(R1[1]-Df[1])*t], p2=[Cf[0]+(R2[0]-Cf[0])*t, Cf[1]+(R2[1]-Cf[1])*t]; s+=`<path d="M${P([p1,p2])}" stroke="rgba(255,255,255,.18)" stroke-width="2"/>`; }
+  if(o.top) s += o.top(R1,R2);
+  const L = up(mid(R1,R2), 26);
+  return {svg:s, label:L, depth:o.x+o.w/2+o.y+o.d/2};
+}
+
+const BLD = [
+  {id:'barn', name:'穀倉', x:1.3,y:1.2,w:3,d:2.8,h:52,rh:30, wallL:'#E2574C', wallR:'#C8453B', roofF:'#8B5E3C', roofB:'#6E4A2E',
+    deco:(D,C,B,h)=> fq(D,C,.28,.72,0,36,'#FFF3E0')+fq(D,C,.32,.68,0,32,'#B5413A')
+      +`<path d="M${P([fpt(D,C,.32,0),fpt(D,C,.68,32)])} M${P([fpt(D,C,.68,0),fpt(D,C,.32,32)])}" stroke="#FFF3E0" stroke-width="3"/>`
+      +fq(D,C,.42,.58,40,48,'#FFF3E0')+fq(C,B,.35,.65,18,32,'#FFF3E0')+fq(C,B,.39,.61,20,30,'#7A3B33')},
+  {id:'shop', name:'種子商店', x:6,y:1.6,w:2.8,d:2.5,h:42,rh:24, wallL:'#FFF8E7', wallR:'#EEDFC2', roofF:'#3BB273', roofB:'#2E9660',
+    deco:(D,C,B,h)=>{ let s=fq(D,C,.08,.46,6,26,'#9ED8FF')+fq(D,C,.1,.44,8,12,'#7CC85A')+fq(D,C,.58,.82,0,28,'#5A9E3E')+fq(D,C,.62,.78,2,24,'#7CC85A');
+      for(let k=0;k<6;k++) s+=fq(D,C,.04+k*.155,.04+(k+1)*.155,30,38,k%2?'#FFFFFF':'#FF8A8A');
+      s+=fq(C,B,.2,.8,20,32,'#FFE7A3'); return s; }},
+  {id:'home', name:'我的家', x:10.4,y:1.2,w:3,d:2.8,h:44,rh:30, wallL:'#FFF3E0', wallR:'#F0DCBD', roofF:'#FF8A3D', roofB:'#E0701F',
+    deco:(D,C,B,h)=> fq(D,C,.42,.58,0,26,'#C98B5E')+`<circle cx="${fpt(D,C,.54,13)[0]}" cy="${fpt(D,C,.54,13)[1]}" r="1.6" fill="#FFE066"/>`
+      +fq(D,C,.1,.3,14,30,'#9ED8FF')+fq(D,C,.7,.9,14,30,'#9ED8FF')+fq(D,C,.1,.3,12,15,'#C98B5E')+fq(D,C,.7,.9,12,15,'#C98B5E')
+      +fq(C,B,.35,.65,16,32,'#9ED8FF'),
+    top:(R1,R2)=>{ const p=[R1[0]+(R2[0]-R1[0])*.72, R1[1]+(R2[1]-R1[1])*.72+6]; return `<rect x="${p[0]-5}" y="${p[1]-16}" width="11" height="18" fill="#B5654A"/><rect x="${p[0]-6}" y="${p[1]-18}" width="13" height="4" fill="#8E4A35"/>
+      <circle class="smoke" cx="${p[0]+1}" cy="${p[1]-24}" r="5" fill="#fff" opacity=".7"/><circle class="smoke" style="animation-delay:1.5s" cx="${p[0]+4}" cy="${p[1]-26}" r="4" fill="#fff" opacity=".7"/>`; }},
+  {id:'decor', name:'裝飾店', x:0.4,y:10.1,w:2.4,d:2.2,h:36,rh:22, wallL:'#FFFFFF', wallR:'#ECE4EE', roofF:'#F78FB3', roofB:'#D86F94', locked:'裝飾店將在第四階段開放',
+    deco:(D,C,B,h)=> fq(D,C,.4,.62,0,22,'#F78FB3')+fq(D,C,.08,.32,10,24,'#FFD6E5')+fq(D,C,.72,.94,10,24,'#FFD6E5')+fq(C,B,.3,.7,14,26,'#FFD6E5')},
+  {id:'coop', name:'牧場', x:14,y:9.9,w:1.5,d:1.3,h:24,rh:14, wallL:'#FFE0A3', wallR:'#EFC982', roofF:'#E2574C', roofB:'#B5413A', locked:'牧場將在第四階段開放',
+    deco:(D,C,B,h)=> fq(D,C,.35,.65,0,14,'#8B5E3C')},
+];
+
+function tree(gx,gy,k=1){ const [x,y]=iso(gx,gy); return {depth:gx+gy, svg:`<g transform="translate(${x} ${y}) scale(${k})"><ellipse cx="0" cy="2" rx="17" ry="6.5" fill="rgba(0,0,0,.13)"/><rect x="-3.5" y="-22" width="7" height="24" rx="3" fill="#9C6B43"/><circle cx="0" cy="-36" r="19" fill="#4FA845"/><circle cx="-10" cy="-27" r="13" fill="#5DB54A"/><circle cx="10" cy="-29" r="14" fill="#5DB54A"/><circle cx="-5" cy="-43" r="8" fill="#7CC85A" opacity=".8"/></g>`}; }
+function bush(gx,gy,fc){ const [x,y]=iso(gx,gy); return {depth:gx+gy, svg:`<g transform="translate(${x} ${y})"><ellipse cx="0" cy="1" rx="14" ry="5" fill="rgba(0,0,0,.12)"/><circle cx="-7" cy="-6" r="8" fill="#5DB54A"/><circle cx="7" cy="-6" r="8" fill="#5DB54A"/><circle cx="0" cy="-11" r="9" fill="#6CC655"/>${fc?`<circle cx="-6" cy="-10" r="2.4" fill="${fc}"/><circle cx="5" cy="-13" r="2.4" fill="${fc}"/><circle cx="8" cy="-5" r="2.4" fill="${fc}"/><circle cx="-2" cy="-4" r="2.4" fill="${fc}"/>`:''}</g>`}; }
+function windmill(gx,gy){ const [x,y]=iso(gx,gy);
+  let bl=''; for(let a=0;a<360;a+=90) bl+=`<g transform="rotate(${a})"><rect x="-2.5" y="-40" width="5" height="40" fill="#A86F45"/><rect x="2.5" y="-38" width="12" height="28" fill="#FFFFFF" stroke="#E6D8C4" stroke-width="1.5"/></g>`;
+  return {depth:gx+gy, svg:`<g transform="translate(${x} ${y})"><ellipse cx="0" cy="2" rx="24" ry="8" fill="rgba(0,0,0,.12)"/><path d="M-17 0 L-10 -74 L10 -74 L17 0Z" fill="#FFF3E0"/><path d="M0 0 L10 -74 L17 0Z" fill="#EAD9BD"/><path d="M-13 -74 L0 -90 L13 -74Z" fill="#E2574C"/><rect x="-6" y="-20" width="12" height="20" rx="5" fill="#9C6B43"/><rect x="-4" y="-50" width="8" height="9" fill="#9ED8FF"/>
+    <g transform="translate(0 -72)"><g class="blades">${bl}<circle r="4.5" fill="#8B5E3C"/></g></g></g>`}; }
+function board(gx,gy){ const [x,y]=iso(gx,gy); return {depth:gx+gy, id:'board', svg:`<g transform="translate(${x} ${y})"><ellipse cx="0" cy="2" rx="26" ry="7" fill="rgba(0,0,0,.12)"/><rect x="-22" y="-38" width="5" height="40" fill="#9C6B43"/><rect x="17" y="-38" width="5" height="40" fill="#9C6B43"/><rect x="-26" y="-44" width="52" height="32" rx="4" fill="#C98B5E"/><rect x="-22" y="-40" width="44" height="24" rx="2" fill="#E8C49A"/>
+  <rect x="-18" y="-37" width="12" height="14" fill="#fff" transform="rotate(-5 -12 -30)"/><rect x="-2" y="-38" width="12" height="10" fill="#FFF6C9"/><rect x="11" y="-33" width="8" height="12" fill="#D9F2FF" transform="rotate(6 15 -27)"/><path d="M-30 -44 L0 -54 L30 -44Z" fill="#8B5E3C"/></g>`}; }
+
+function personSVG(o){
+  const skin=o.skin||'#FFD7B5', pants=o.pants||'#4A6FA5';
+  return `<ellipse cx="0" cy="1" rx="9" ry="3.5" fill="rgba(0,0,0,.16)"/>
+  <rect class="lg1" x="-5" y="-11" width="4" height="11" rx="2" fill="${pants}"/><rect class="lg2" x="1" y="-11" width="4" height="11" rx="2" fill="${pants}"/>
+  <g class="bd"><rect x="-7.5" y="-23" width="15" height="14" rx="5" fill="${o.shirt}"/>
+  ${o.apron?`<rect x="-5" y="-19" width="10" height="10" rx="2" fill="${o.apron}"/>`:''}
+  ${o.overall?`<rect x="-6" y="-17" width="12" height="8" rx="2" fill="${o.overall}"/><rect x="-5" y="-23" width="2" height="7" fill="${o.overall}"/><rect x="3" y="-23" width="2" height="7" fill="${o.overall}"/>`:''}
+  <circle cx="0" cy="-30" r="8.5" fill="${skin}"/>
+  <path d="M-8.5 -29 Q-9 -41 0 -40 Q9 -41 8.5 -29 Q5 -35 -1 -35 Q-6 -35 -8.5 -29Z" fill="${o.hair}"/>
+  ${o.long?`<path d="M-8.5 -30 Q-10 -22 -6 -20 L-6 -30Z" fill="${o.hair}"/>`:''}
+  <circle cx="2.5" cy="-29" r="1.2" fill="#3A3226"/><circle cx="6.2" cy="-29" r="1.2" fill="#3A3226"/>
+  <circle cx="4.5" cy="-25.8" r="1.6" fill="#FF9AA2" opacity=".75"/>
+  ${o.hat?`<ellipse cx="0" cy="-36" rx="14" ry="4" fill="#E8C766"/><path d="M-7.5 -36 Q-7 -46 0 -46 Q7 -46 7.5 -36Z" fill="#F2D57E"/><rect x="-7.5" y="-39" width="15" height="2.6" fill="#E2574C"/>`:''}
+  ${o.tool==='hoe'?`<path d="M-9 -20 L-14 -46" stroke="#A86F45" stroke-width="2.5" stroke-linecap="round"/><path d="M-14 -46 l-6 2" stroke="#9AA6B2" stroke-width="4" stroke-linecap="round"/>`:''}</g>`;
+}
+const CHICK = `<ellipse cy="1" rx="6" ry="2" fill="rgba(0,0,0,.15)"/><path d="M-2 -1 v2.5 M2 -1 v2.5" stroke="#F0A030" stroke-width="1.5"/><g class="bd"><ellipse cx="0" cy="-6" rx="7.5" ry="5.5" fill="#fff"/><path d="M-7 -8 l-4 -3 l1 5z" fill="#F1ECE4"/><circle cx="5" cy="-11" r="3.8" fill="#fff"/><path d="M3.5 -14.5 q1 -2.5 2 0 q1 -2.5 2.2 0z" fill="#F2545B"/><path d="M8.6 -11.2 l3.2 1 l-3.2 1z" fill="#F0A030"/><circle cx="6.2" cy="-11.6" r=".9" fill="#333"/></g>`;
+
+/* ================= 組合地圖 ================= */
+let plotEls=[], plotSig=[], plotLabs=[];
+const movers=[];
+
+function buildWorld(){
+  const W=$('world');
+  W.setAttribute('viewBox',`0 0 ${WW} ${WH}`);
+  seed=11;
+  let sea='', island='', ground='', objs=[], lab='', cloud='';
+
+  // 海
+  sea += `<rect x="-200" y="-200" width="${WW+400}" height="${WH+400}" fill="#8FD3F4"/>`;
+  for(let k=0;k<26;k++){ const x=rnd()*WW, y=rnd()*WH; sea+=`<path class="wave" style="animation-delay:${(rnd()*3).toFixed(2)}s" d="M${x} ${y} q8 -5 16 0 t16 0" stroke="#C6EBFB" stroke-width="3" fill="none" stroke-linecap="round"/>`; }
+
+  // 島
+  const I=dia(-1,-1,18,18), cl=40;
+  island += `<ellipse cx="${OX}" cy="${iso(17,17)[1]+cl-10}" rx="660" ry="40" fill="rgba(40,110,150,.25)"/>`;
+  island += poly([I[3],I[2],up(I[2],-cl),up(I[3],-cl*0.6)],'#B07A4F') + poly([I[2],I[1],up(I[1],-cl*0.6),up(I[2],-cl)],'#8F603D');
+  island += `<path d="M${P([up(I[3],-cl*0.3),up(I[2],-cl*0.55),up(I[1],-cl*0.3)])}" stroke="rgba(0,0,0,.12)" stroke-width="4" fill="none"/>`;
+  island += poly(I,'#8ACB5B') + `<path d="M${P([I[3],I[2],I[1]])}" stroke="#6DB548" stroke-width="7" fill="none" stroke-linejoin="round"/>`;
+  // 瀑布（河流流出島嶼）
+  const wf1=iso(17,14.35), wf2=iso(17,15.25);
+  island += poly([wf1,wf2,up(wf2,-cl*0.9),up(wf1,-cl*0.9)],'#5BB8E8') + `<path class="flow" d="M${(wf1[0]+wf2[0])/2} ${(wf1[1]+wf2[1])/2} v${cl}" stroke="#E3F6FF" stroke-width="3"/>`;
+
+  // 草地點綴
+  for(let k=0;k<70;k++){ const gx=rnd()*17-0.5, gy=rnd()*17-0.5; const [x,y]=iso(gx,gy);
+    ground += rnd()<0.7 ? `<path d="M${x-4} ${y} l2 -6 l2 6 l2 -5 l2 5" stroke="#6DB548" stroke-width="1.6" fill="none"/>`
+      : `<circle cx="${x}" cy="${y}" r="2.6" fill="${['#FFE066','#FFFFFF','#FF9AA2'][k%3]}"/>`; }
+
+  // 小路
+  const path=(x,y,w,d)=>poly(dia(x,y,w,d),'#E8D3A2','stroke="#D8BE86" stroke-width="2"');
+  ground += path(-1,5,18,1) + path(3,6,1,11) + path(7.2,4.1,0.8,0.9) + path(11.6,4,0.8,1) + path(2.6,4,0.8,1);
+  for(let k=0;k<30;k++){ const t=rnd(); const [x,y]= k<20? iso(-0.5+t*17, 5.2+rnd()*0.6) : iso(3.2+rnd()*0.6, 6.5+t*10); ground+=`<ellipse cx="${x}" cy="${y}" rx="3" ry="1.6" fill="#D2B47C"/>`; }
+
+  // 河
+  ground += poly(dia(-1,14.2,18,1.2),'#7FD0F0') + poly(dia(-1,14.35,18,0.9),'#5BB8E8');
+  ground += `<path class="flow" d="M${P([iso(-1,14.65),iso(17,14.65)])}" stroke="#E3F6FF" stroke-width="2.5" opacity=".8"/><path class="flow" style="animation-delay:-1s" d="M${P([iso(-1,14.95),iso(17,14.95)])}" stroke="#E3F6FF" stroke-width="2" opacity=".6"/>`;
+  // 橋
+  const bw=dia(2.75,13.9,1.5,1.8);
+  ground += poly(bw,'#C98B5E');
+  for(let k=1;k<6;k++){ ground+=`<path d="M${P([iso(2.75,13.9+k*0.3),iso(4.25,13.9+k*0.3)])}" stroke="#A86F45" stroke-width="2"/>`; }
+  ground += `<path d="M${P([up(iso(2.75,13.9),8),up(iso(2.75,15.7),8)])} M${P([up(iso(4.25,13.9),8),up(iso(4.25,15.7),8)])}" stroke="#8B5E3C" stroke-width="3"/>`;
+
+  // 田區底
+  ground += poly(dia(5.25,6.65,6.95,4.6),'#9ACF6A','stroke="#7DB14C" stroke-width="3"');
+  // 牧場底與圍欄
+  const RX=11.9,RY=9.5,RW=3.9,RD=4;
+  ground += poly(dia(RX,RY,RW,RD),'#A7D46F');
+  const fence=(x0,y0,x1,y1)=>{ let s=''; const n=Math.ceil(Math.hypot(x1-x0,y1-y0)/0.55);
+    const a=iso(x0,y0), b=iso(x1,y1); s+=`<path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="#E8D3A2" stroke-width="3"/>`;
+    for(let k=0;k<=n;k++){ const p=iso(x0+(x1-x0)*k/n, y0+(y1-y0)*k/n); s+=`<rect x="${p[0]-2}" y="${p[1]-20}" width="4" height="20" rx="1.5" fill="#F3E3BF"/>`; } return s; };
+  ground += fence(RX,RY,RX+RW,RY) + fence(RX,RY,RX,RY+RD);
+  objs.push({depth:RX+RW+RY+RD+0.5, svg: fence(RX,RY+RD,RX+RW,RY+RD) + fence(RX+RW,RY,RX+RW,RY+RD)});
+  // 飼料槽
+  objs.push({depth:RX+1+RY+2.6, svg:(()=>{ const [x,y]=iso(RX+1,RY+2.6); return `<rect x="${x-14}" y="${y-8}" width="28" height="8" rx="3" fill="#A86F45"/><rect x="${x-12}" y="${y-8}" width="24" height="3" fill="#F2D57E"/>`; })()});
+
+  // 建築
+  BLD.forEach(o=>{ const b=building(o);
+    objs.push({depth:b.depth, svg:`<g class="tap" data-b="${o.id}">${b.svg}</g>`});
+    lab += labelPill(b.label[0], b.label[1], o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
+  });
+  const bd=board(1.6,7.4); objs.push({depth:bd.depth, svg:`<g class="tap" data-b="board">${bd.svg}</g>`});
+  lab += labelPill(iso(1.6,7.4)[0], iso(1.6,7.4)[1]-68, '好友布告欄', {bg:'#E3F6EA',fg:'#2E9660'});
+  const wm=windmill(13.7,7.4); objs.push(wm);
+  // 信箱
+  objs.push((()=>{ const [x,y]=iso(13.9,4.5); return {depth:18.4, svg:`<g transform="translate(${x} ${y})"><rect x="-1.5" y="-22" width="3" height="22" fill="#9C6B43"/><rect x="-8" y="-32" width="16" height="11" rx="5" fill="#3DA5F4"/><rect x="5" y="-36" width="2" height="8" fill="#F2545B"/></g>`}; })());
+
+  // 樹木與花叢
+  [[-0.4,3.4],[-0.5,7.6],[-0.3,13.2],[5,13.1],[8,13.4],[10.8,13.2],[16,7],[16,15.6],[13,16.2],[1.5,16.3],[7.5,16.4],[16.2,2.2],[15.6,-0.4],[4.9,-0.3],[9.4,-0.4],[-0.6,0.3],[16.3,13.6],[5.2,15.9]].forEach(([x,y],k)=>objs.push(tree(x,y,0.85+((k*37)%30)/100)));
+  [[9.7,4.5,'#FF9AA2'],[14.4,4.6,'#FFE066'],[4.9,4.5,null],[12.4,6.6,'#FFFFFF'],[2.3,8.8,'#FFE066'],[4.6,11.6,null]].forEach(([x,y,f])=>objs.push(bush(x,y,f)));
+
+  // 田地（可點）
+  PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i); objs.push({depth:PLOTS[i][0]+PLOTS[i][1]+PS, svg:`<g class="tap plot" data-p="${i}"><g class="pg"></g><g class="ps"></g></g>`}); });
+
+  // 固定人物
+  const stand=(gx,gy,o,flip)=>{ const [x,y]=iso(gx,gy); objs.push({depth:gx+gy, svg:`<g transform="translate(${x} ${y}) scale(${flip?-1.15:1.15} 1.15)">${personSVG(o)}</g>`}); };
+  stand(4.85,8.3,{shirt:'#FFFFFF',overall:'#3DA5F4',hair:'#5A3A22',hat:true,tool:'hoe'},false);
+  stand(7.45,4.6,{shirt:'#3BB273',apron:'#FFF3E0',hair:'#3A3226'},true);
+
+  objs.sort((a,b)=>a.depth-b.depth);
+
+  // 雲
+  for(let k=0;k<4;k++){ const y=40+k*150+rnd()*60, d=50+rnd()*40, s=0.8+rnd()*0.7;
+    cloud+=`<g class="cloud" style="animation-duration:${d}s;animation-delay:${-rnd()*d}s"><g transform="translate(0 ${y}) scale(${s})" opacity=".85"><ellipse cx="0" cy="0" rx="40" ry="14" fill="#fff"/><ellipse cx="18" cy="-10" rx="22" ry="14" fill="#fff"/><ellipse cx="-14" cy="-6" rx="16" ry="11" fill="#fff"/></g></g>`; }
+
+  W.innerHTML = `<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="movers"></g><g id="labels">${lab}<g id="plabs"></g></g><g style="pointer-events:none">${cloud}</g>`;
+
+  // 田地元素與標籤
+  plotEls=[]; plotSig=[]; plotLabs=[];
+  const pl=$('plabs');
+  W.querySelectorAll('[data-p]').forEach(g=>{ const i=+g.dataset.p; plotEls[i]=g; plotSig[i]=''; g.addEventListener('click',()=>act(i)); });
+  PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i);
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-62})`);
+    g.innerHTML=`<rect x="-44" y="-12" width="88" height="25" rx="11" fill="#fff" stroke="rgba(0,0,0,.08)" stroke-width="2"/><text x="0" y="3" text-anchor="middle" font-size="12" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-32" y="6" width="64" height="4" rx="2" fill="#EEE6D6"/><rect class="bf" x="-32" y="6" width="0" height="4" rx="2" fill="#7ED957"/>`;
+    pl.appendChild(g); plotLabs[i]=g; });
+  W.querySelectorAll('[data-b]').forEach(g=>g.addEventListener('click',()=>tapBuilding(g)));
+
+  // 會動的人物與小雞
+  movers.length=0;
+  const mv=$('movers');
+  const addMover=(html,o)=>{ const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML=`<g>${html}</g>`; mv.appendChild(g); movers.push(Object.assign({el:g,inner:g.firstChild,wait:0,face:1},o)); };
+  addMover(personSVG({shirt:'#5DADE2',hair:'#6B4423',pants:'#3A5A8C'}),{x:2,y:5.5,path:[[0.2,5.5],[15.8,5.5]],tgt:1,speed:0.9,s:1.1});
+  addMover(personSVG({shirt:'#F78FB3',hair:'#2F2F2F',long:true,pants:'#7A6E9E'}),{x:12,y:5.6,path:[[15.6,5.6],[0.4,5.6]],tgt:1,speed:0.7,s:1.1});
+  addMover(personSVG({shirt:'#FFD23F',hair:'#8B5E3C',pants:'#5A7A3A'}),{x:3.5,y:9,path:[[3.5,6.3],[3.5,15]],tgt:1,speed:0.6,s:1.1});
+  for(let k=0;k<4;k++) addMover(CHICK,{x:RX+0.6+rnd()*(RW-1.2),y:RY+0.8+rnd()*(RD-1.4),chick:true,area:[RX+0.5,RY+1.6,RX+RW-0.5,RY+RD-0.4],speed:0.5,s:1.2,wait:rnd()*2});
+}
+
+/* 移動動畫 */
+let lastF=performance.now();
+function animate(now){
+  const dt=Math.min(0.1,(now-lastF)/1000); lastF=now;
+  for(const m of movers){
+    let moving=false;
+    if(m.wait>0){ m.wait-=dt; }
+    else {
+      if(!m.goal){
+        if(m.chick){ const a=m.area; m.goal=[a[0]+Math.random()*(a[2]-a[0]), a[1]+Math.random()*(a[3]-a[1])]; }
+        else { m.goal=m.path[m.tgt]; }
+      }
+      const dx=m.goal[0]-m.x, dy=m.goal[1]-m.y, dist=Math.hypot(dx,dy), step=m.speed*dt;
+      if(dist<=step){ m.x=m.goal[0]; m.y=m.goal[1]; m.goal=null;
+        if(m.chick) m.wait=0.6+Math.random()*2.5; else { m.tgt=1-m.tgt; m.wait=1+Math.random()*3; } }
+      else { m.x+=dx/dist*step; m.y+=dy/dist*step; moving=true;
+        const sdx=(dx-dy); if(Math.abs(sdx)>0.01) m.face = sdx>0?1:-1; }
+    }
+    const [sx,sy]=iso(m.x,m.y);
+    m.el.setAttribute('transform',`translate(${sx.toFixed(1)} ${sy.toFixed(1)}) scale(${m.face*m.s} ${m.s})`);
+    if(m.moving!==moving){ m.moving=moving; m.el.classList.toggle('walk',moving); }
+  }
+  requestAnimationFrame(animate);
+}
+
+/* ================= 田地繪製 ================= */
+const SPR=0.85;
+function plotGroundSVG(p,i){
+  const [x,y]=PLOTS[i], pts=dia(x,y,PS,PS), B=pts[1], C=pts[2], D=pts[3];
+  let top='#A06F49', sl='#7E5638', sr='#6B4830';
+  if(p.s==='wild'){ top='#7DB14C'; sl='#8B5E3C'; sr='#76502F'; }
+  else if(p.s==='grow'){ if(isDry(p)){ top='#C08A5C'; } else { top='#7A4E33'; } }
+  let s = poly([D,C,[C[0],C[1]+7],[D[0],D[1]+7]],sl) + poly([C,B,[B[0],B[1]+7],[C[0],C[1]+7]],sr) + poly(pts,top);
+  if(p.s!=='wild') for(const k of [0.45,0.9,1.35]) s+=`<path d="M${P([iso(x+0.15,y+k),iso(x+PS-0.15,y+k)])}" stroke="rgba(0,0,0,.12)" stroke-width="3" stroke-linecap="round"/>`;
+  if(p.s==='grow' && isDry(p)) s+=`<path d="M${P([iso(x+0.4,y+0.3),iso(x+0.6,y+0.5),iso(x+0.5,y+0.7)])} M${P([iso(x+1.3,y+1.2),iso(x+1.5,y+1.3)])}" stroke="#8C6040" stroke-width="1.6" fill="none"/>`;
+  return s;
+}
+function plotSpriteSVG(p,i){
+  let body='';
+  if(p.s==='wild'){
+    body = `${weedArt(30,80)}${weedArt(90,70)}${weedArt(56,64)}<ellipse cx="76" cy="84" rx="8" ry="5" fill="#B5AFA3"/><ellipse cx="74" cy="82" rx="4" ry="2" fill="#CFCAC0"/>
+      <g transform="translate(36 24)"><rect x="22" y="14" width="4" height="26" fill="#B07A4F"/><rect x="0" y="0" width="48" height="20" rx="5" fill="#F3D9A8"/><text x="24" y="14.5" font-size="11" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">荒地</text></g>`;
+  } else if(p.s==='grow'){
+    const st=stageOf(p);
+    body += `<g class="crop">${cropArt(CROP[p.c],st)}</g>`;
+    for(let k=0;k<p.w;k++) body += weedArt(...WEED_POS[k]);
+    for(let k=0;k<p.b;k++) body += bugArt(...BUG_POS[k]);
+    if(st===4) body += `<g class="spark" fill="#FFF"><path d="M100 22 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2z"/><path d="M18 30 l1.4 4 l4 1.4 l-4 1.4 l-1.4 4 l-1.4 -4 l-4 -1.4 l4 -1.4z"/></g>`;
+    if(isDry(p)) body += `<g transform="translate(98 26)"><path d="M0 0 Q-8 11 0 15 Q8 11 0 0Z" fill="#3DA5F4"/><path d="M-1 7 h2" stroke="#fff" stroke-width="1.5"/></g>`;
+  } else if(p.s==='dead') body = deadArt;
+  const [cx,cy]=plotCenter(i);
+  return `<g transform="translate(${(cx-60*SPR).toFixed(1)} ${(cy-74*SPR).toFixed(1)}) scale(${SPR})">${body}</g>`;
+}
+
+/* ================= 地圖縮放與拖曳 ================= */
+const map=$('map'), world=$('world');
+let scale=1;
+function layout(){
+  const vw=innerWidth, vh=innerHeight;
+  scale=Math.max(0.6, Math.min(vw/470, vh/560, 1.6));
+  world.setAttribute('width',(WW*scale).toFixed(0)); world.setAttribute('height',(WH*scale).toFixed(0));
+  world.style.margin=`${PAD.t}px ${PAD.r}px ${PAD.b}px ${PAD.l}px`;
+}
+function centerOn(gx,gy,smooth){
+  const [x,y]=iso(gx,gy), vh=innerHeight, topH=110, botH=120;
+  map.scrollTo({left:PAD.l+x*scale-innerWidth/2, top:PAD.t+y*scale-(topH+(vh-topH-botH)/2), behavior:smooth?'smooth':'auto'});
+}
+let drag=null, moved=false;
+map.addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') return; drag={x:e.clientX,y:e.clientY,sl:map.scrollLeft,st:map.scrollTop}; moved=false; });
+addEventListener('pointermove',e=>{ if(!drag) return; const dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+  if(!moved && Math.abs(dx)+Math.abs(dy)>6){ moved=true; map.classList.add('drag'); }
+  if(moved){ map.scrollLeft=drag.sl-dx; map.scrollTop=drag.st-dy; } });
+addEventListener('pointerup',()=>{ drag=null; map.classList.remove('drag'); });
+map.addEventListener('click',e=>{ if(moved){ e.stopPropagation(); e.preventDefault(); moved=false; } },true);
+addEventListener('resize',()=>{ if(S){ layout(); centerOn(...FARM_C); } });
+
+
+/* ================= 連線設定 ================= */
+const SB_URL = 'https://qnxnuyfvkrvhnaewvrik.supabase.co';
+const SB_KEY = 'sb_publishable_nX97hqqEgiGRwKQMOz56ow_uvMEAdht';
+const GOOGLE_ON = false;   // Google 登入金鑰設定好之後改成 true
+const SITE_URL = location.origin + location.pathname;
+const sb = window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}});
+
+function zhErr(m){
+  m = String(m||'');
+  if(/Failed to fetch|NetworkError|Load failed/i.test(m)) return '連線失敗，請檢查網路後再試';
+  if(/Invalid login credentials/i.test(m)) return 'Email 或密碼錯誤';
+  if(/already registered|already been registered/i.test(m)) return '這個 Email 已經註冊過了，請直接登入';
+  if(/Email not confirmed/i.test(m)) return '還沒完成 Email 驗證，請到信箱點驗證連結';
+  if(/at least 6 characters/i.test(m)) return '密碼至少要 6 個字';
+  if(/rate limit|too many/i.test(m)) return '操作太頻繁了，請稍後再試';
+  if(/valid email|invalid format|Unable to validate email/i.test(m)) return 'Email 格式不正確';
+  if(/JWT|not authenticated|請先登入/i.test(m)) return '登入已過期，請重新登入';
+  if(/provider is not enabled/i.test(m)) return 'Google 登入還沒開通';
+  return m;
+}
+async function rpc(fn, args){
+  const {data, error} = await sb.rpc(fn, args||{});
+  if(error) throw new Error(zhErr(error.message));
+  return data;
+}
+
+/* ================= 遊戲狀態 ================= */
+let S = null;          // 自己：{me, plots, off}
+let V = null;          // 拜訪中的好友農場：{owner, plots, off}
+let mode = 'home';
+const ui = {tool:'hand', seed:'radish', busy:false};
+
+function applyState(st){ if(st) S = {me:st.me, plots:st.plots, off:st.now - Date.now()}; }
+function applyVisit(v){ if(v) V = {owner:v.owner, plots:v.plots, off:v.now - Date.now()}; }
+
+// 依伺服器時間預測目前生長進度（實際以伺服器為準）
+function pred(p, off){
+  const q = Object.assign({}, p); q.dry = false;
+  if(p.s !== 'grow') return q;
+  const c = CROP[p.c], now = Date.now() + off;
+  if(p.g < c.time){
+    const el = Math.max(0, (now - p.t)/1000);
+    const wet = Math.min(el, Math.max(0, ((p.wu||p.t) - p.t)/1000));
+    q.g = Math.min(c.time, p.g + wet + (el-wet)*0.5);
+    q.dry = q.g < c.time && now > (p.wu||0);
+  }
+  return q;
+}
+function isDry(p){ return !!p.dry; }
+function curPlots(){ const src = mode==='visit' ? V : S; return src.plots.map(p=>pred(p, src.off)); }
+const leftSec = p => { const c=CROP[p.c]; return (c.time - p.g)/(p.dry?0.5:1); };
+
+/* ================= 回饋 ================= */
+function showLevelUp(){
+  const lv = S.me.lv;
+  const un = CROPS.filter(c=>c.lv===lv).map(c=>c.name);
+  const w = WILD.filter(x=>x && x.lv===lv).length;
+  modal('升級了！', `<div style="text-align:center;padding:10px 0 4px">
+    <div style="font-size:46px;font-weight:900;color:var(--green-d)">Lv${lv}</div>
+    ${un.length?`<div style="font-weight:700;margin-top:6px">解鎖新作物：<b style="color:var(--orange-d)">${un.join('、')}</b></div>`:''}
+    ${w?`<div style="font-weight:700;margin-top:4px">可以開墾新的荒地了</div>`:''}
+    <div style="color:var(--ink2);font-size:13px;margin-top:8px">到種子商店看看新種子吧</div></div>`, [['太好了','',closeModal]]);
+}
+function xpFloat(el, xp){ if(xp>0 && el) setTimeout(()=>floatAt(el, `+${xp} 經驗`, '#C8F7A0'), 160); }
+
+/* ================= 自己農場的動作 ================= */
+async function doAct(action, i, crop, n){
+  if(ui.busy) return null;
+  ui.busy = true;
+  try{
+    const r = await rpc('farm_act', {p_action:action, p_idx:(i==null?null:i), p_crop:crop||null, p_n:n||1});
+    applyState(r.state); refresh();
+    if(r.lvup) setTimeout(showLevelUp, 400);
+    return r;
+  }catch(e){ toast(e.message); return null; }
+  finally{ ui.busy = false; }
+}
+
+async function act(i){
+  if(mode==='visit') return actVisit(i);
+  const p = curPlots()[i], el = plotEls[i], c = p.c && CROP[p.c], tool = ui.tool;
+  if(p.s==='wild') return askTill(i);
+  let r;
+  if(tool==='hand'){
+    if(p.s==='empty') return openSeedPicker(i);
+    if(p.s==='dead'){ r = await doAct('clear', i); if(r){ floatAt(el,'整地完成'); xpFloat(el,r.xp); } return; }
+    if(p.g >= c.time){
+      r = await doAct('harvest', i);
+      if(r){ floatAt(el, `${c.name} +${r.amt}`, '#FFE066'); xpFloat(el, r.xp);
+        if(r.amt < c.yield) setTimeout(()=>toast(`雜草、蟲害或被偷，產量少了 ${c.yield-r.amt} 個`), 300); }
+      return;
+    }
+    const issues = [p.w?`雜草×${p.w}`:'', p.b?`蟲×${p.b}`:'', p.dry?'缺水':''].filter(Boolean).join('、');
+    return toast(`${c.name}：約 ${fmt(leftSec(p))} 後成熟${issues?'｜'+issues:''}`);
+  }
+  if(tool==='seed'){
+    if(p.s!=='empty') return toast(p.s==='dead'?'先用鏟子剷除枯萎的作物':'這塊地已經種了東西');
+    if(!(S.me.seeds[ui.seed]>0)) return openSeedPicker(i);
+    return plant(i, ui.seed);
+  }
+  if(tool==='water'){
+    if(p.s!=='grow' || p.g>=c.time) return toast('這塊地不需要澆水');
+    if(!p.dry) return toast('土壤還很濕潤，晚點再澆');
+    r = await doAct('water', i); if(r){ floatAt(el,'澆水！','#BDE6FF'); xpFloat(el,r.xp); } return;
+  }
+  if(tool==='weed'){
+    if(p.s!=='grow' || !p.w) return toast('這裡沒有雜草');
+    r = await doAct('weed', i); if(r){ floatAt(el,'除草！'); xpFloat(el,r.xp); } return;
+  }
+  if(tool==='bug'){
+    if(p.s!=='grow' || !p.b) return toast('這裡沒有蟲');
+    r = await doAct('bug', i); if(r){ floatAt(el,'除蟲！'); xpFloat(el,r.xp); } return;
+  }
+  if(tool==='shovel'){
+    if(p.s==='dead'){ r = await doAct('clear', i); if(r){ floatAt(el,'整地完成'); xpFloat(el,r.xp); } return; }
+    if(p.s==='grow') return modal('剷除作物', `<p style="font-weight:700">確定要剷除還沒收成的<b>${c.name}</b>嗎？種子不會退回。</p>`,
+      [['取消','sub',closeModal],['剷除','r',async()=>{ closeModal(); await doAct('dig', i); }]]);
+    return toast('這塊地是空的');
+  }
+}
+async function plant(i, id){
+  const r = await doAct('plant', i, id);
+  if(r) floatAt(plotEls[i], `種下${CROP[id].name}`);
+}
+function askTill(i){
+  const w = WILD[i];
+  if(S.me.lv < w.lv) return toast(`需要 Lv${w.lv} 才能開墾這塊荒地`);
+  modal('開墾荒地', `<p style="font-weight:700;text-align:center">花 <b style="color:var(--orange-d)">${w.cost}</b> 金幣開墾這塊荒地？</p>`,
+    [['取消','sub',closeModal],['開墾','o',async()=>{
+      if(S.me.gold < w.cost) return toast('金幣不夠喔');
+      closeModal(); const r = await doAct('till', i);
+      if(r){ floatAt(plotEls[i],'開墾成功！'); xpFloat(plotEls[i], r.xp); }
+    }]]);
+}
+
+/* ================= 好友農場的動作 ================= */
+async function actVisit(i){
+  if(ui.busy) return;
+  const p = curPlots()[i], el = plotEls[i], c = p.c && CROP[p.c], t = ui.tool;
+  const growing = p.s==='grow', ripe = growing && p.g >= c.time;
+  let action;
+  if(t==='steal'){
+    if(!ripe) return toast(growing ? `${c.name}還沒成熟，約 ${fmt(leftSec(p))} 後` : '這塊地沒有可以偷的作物');
+    if(p.mine) return toast('這塊地你已經偷過了');
+    if(p.st >= p.cap) return toast('這塊地已經被偷光了，留點給主人吧');
+    action = 'steal';
+  } else if(t==='hweed'){ if(!growing || !p.w) return toast('這裡沒有雜草'); action='help_weed'; }
+  else if(t==='hbug'){ if(!growing || !p.b) return toast('這裡沒有蟲'); action='help_bug'; }
+  else if(t==='pweed' || t==='pbug'){
+    if(!growing || ripe) return toast('只能在還沒成熟的作物上惡作劇');
+    if(S.me.prank_left < 1) return toast('今天的惡作劇次數用完了');
+    if(t==='pweed' && p.w>=3) return toast('這裡的草已經夠多了');
+    if(t==='pbug' && p.b>=3) return toast('這裡的蟲已經夠多了');
+    action = t==='pweed' ? 'prank_weed' : 'prank_bug';
+  }
+  ui.busy = true;
+  try{
+    const r = await rpc('farm_friend_act', {p_owner:V.owner.id, p_action:action, p_idx:i});
+    applyState(r.state); applyVisit(r.visit); refresh();
+    if(action==='steal') floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066');
+    else if(action.startsWith('help')) floatAt(el, action==='help_weed'?'幫忙除草！':'幫忙除蟲！');
+    else floatAt(el, action==='prank_weed'?'放了一棵草 😈':'放了一隻蟲 😈', '#FFD6E5');
+    xpFloat(el, r.xp);
+    if(r.lvup) setTimeout(showLevelUp, 400);
+  }catch(e){ toast(e.message); }
+  finally{ ui.busy = false; }
+}
+
+/* ================= 視窗：商店、倉庫、播種 ================= */
+function openSeedPicker(i){
+  if(mode==='visit') return;
+  const own = Object.entries(S.me.seeds).filter(([,n])=>n>0);
+  if(!own.length) return modal('沒有種子', `<div class="empty">倉庫裡沒有種子了，<br>先去種子商店買一些吧！</div>`, [['去商店','o',()=>openShop()]]);
+  const body = own.map(([id,n])=>{ const c=CROP[id];
+    return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}</b> <span class="tag">×${n}</span><div>成熟 ${dur(c.time)}・收成 ${c.yield} 個</div></div><button class="mini" data-seed="${id}">${i==null?'選擇':'種下'}</button></div>`;
+  }).join('');
+  modal(i==null?'選擇要播的種子':'要種什麼？', body);
+  $('md').querySelectorAll('[data-seed]').forEach(b=>b.onclick=()=>{
+    ui.seed = b.dataset.seed; setTool('seed'); closeModal();
+    if(i!=null) plant(i, ui.seed); else toast(`點空地就能種下${CROP[ui.seed].name}`);
+  });
+}
+function openShop(){
+  if(mode==='visit') return toast('回到自己的農場才能買東西');
+  const me = S.me;
+  const body = CROPS.map(c=>{
+    const locked = me.lv < c.lv;
+    const btn = locked ? `<span class="lock">Lv${c.lv} 解鎖</span>`
+      : [1,5,10].map(n=>`<button class="mini ${n===1?'':'o'}" data-buy="${c.id}" data-n="${n}" ${me.gold<c.seed*n?'disabled':''}>${n===1?'買1':'×'+n}</button>`).join(' ');
+    return `<div class="row" style="${locked?'opacity:.55':''}"><div class="ic">${iconSVG(c)}</div>
+      <div class="tx"><b>${c.name}</b><span class="tag">${c.seed} 金</span>
+      <div>成熟 ${dur(c.time)}・收成 ${c.yield}×${c.price} 金 = ${c.yield*c.price} 金</div></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">${btn}</div></div>`;
+  }).join('');
+  modal(`種子商店　<span style="font-size:14px;color:var(--ink2)">金幣 ${me.gold}</span>`, body);
+  $('md').querySelectorAll('[data-buy]').forEach(b=>b.onclick=async()=>{
+    const c = CROP[b.dataset.buy], n = +b.dataset.n;
+    const r = await doAct('buy', null, c.id, n);
+    if(r){ toast(`買了 ${n} 包${c.name}種子`); ui.seed = c.id; openShop(); }
+  });
+}
+function openBag(){
+  if(mode==='visit') return toast('回到自己的農場才能打開倉庫');
+  const me = S.me;
+  const cr = Object.entries(me.crops).filter(([,n])=>n>0);
+  const sd = Object.entries(me.seeds).filter(([,n])=>n>0);
+  const total = cr.reduce((a,[id,n])=>a+n*CROP[id].price, 0);
+  let body = `<div class="sec">作物</div>`;
+  body += cr.length ? cr.map(([id,n])=>{ const c=CROP[id];
+    return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}</b> <span class="tag">×${n}</span><div>每個 ${c.price} 金・共 ${n*c.price} 金</div></div>
+      <button class="mini o" data-sell="${id}">全部賣出</button></div>`; }).join('')
+    : `<div class="empty">還沒有收成的作物</div>`;
+  body += `<div class="sec">種子</div>`;
+  body += sd.length ? sd.map(([id,n])=>{ const c=CROP[id];
+    return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}種子</b> <span class="tag">×${n}</span><div>成熟 ${dur(c.time)}</div></div><button class="mini" data-use="${id}">拿來種</button></div>`; }).join('')
+    : `<div class="empty">沒有種子</div>`;
+  modal('穀倉（倉庫）', body, cr.length?[[`一鍵全部賣出（${total} 金）`,'o',async()=>{ const r=await doAct('sell_all'); if(r){ toast(`全部賣出，獲得 ${r.amt} 金`); closeModal(); } }]]:null);
+  $('md').querySelectorAll('[data-sell]').forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.sell; const r = await doAct('sell', null, id);
+    if(r){ toast(`賣出 ${CROP[id].name}，獲得 ${r.amt} 金`); openBag(); }
+  });
+  $('md').querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{ ui.seed=b.dataset.use; setTool('seed'); closeModal(); toast(`點空地就能種下${CROP[ui.seed].name}`); });
+}
+async function openHome(){
+  if(mode==='visit') return toast('這是好友的家喔');
+  const {data:{user}} = await sb.auth.getUser();
+  modal('我的家', `
+    <div class="sec">玩家</div>
+    <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
+    <div class="sec">玩法小提醒</div>
+    <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
+      ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友布告欄」加好友、拜訪好友農場</div>
+    <div style="display:flex;gap:8px;margin-top:16px"><button class="btn sub" id="logout">登出</button></div>`);
+  $('logout').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
+}
+const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+/* ================= 好友布告欄 ================= */
+let boardTab = 'friends';
+function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60) return '剛剛'; if(s<3600) return `${Math.floor(s/60)} 分鐘前`; if(s<86400) return `${Math.floor(s/3600)} 小時前`; return `${Math.floor(s/86400)} 天前`; }
+const LOG_TXT = {steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
+  prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`};
+
+async function openBoard(tab){
+  if(tab) boardTab = tab;
+  modal('好友布告欄', `<div class="empty">讀取中…</div>`);
+  let F, logs;
+  try{ [F, logs] = await Promise.all([rpc('farm_friends'), rpc('farm_logs_get')]); }
+  catch(e){ return modal('好友布告欄', `<div class="empty">${esc(e.message)}</div>`); }
+  const nIn = F.incoming.length;
+  const tabs = `<div class="tabs">
+    <button data-tab="friends" class="${boardTab==='friends'?'on':''}">好友 ${F.friends.length}</button>
+    <button data-tab="add" class="${boardTab==='add'?'on':''}">加好友${nIn?` <i class="dot">${nIn}</i>`:''}</button>
+    <button data-tab="logs" class="${boardTab==='logs'?'on':''}">農場動態</button></div>`;
+  let body = '';
+  if(boardTab==='friends'){
+    body = F.friends.length ? F.friends.map(f=>`<div class="row">
+        <div class="avatar sm">${esc(f.nickname.slice(0,1))}</div>
+        <div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>
+          <div>${f.ripe?`<span style="color:var(--orange-d)">🧺 有 ${f.ripe} 塊地可以偷</span>`:'目前沒有可偷的菜'}${f.issues?`・🐛 需要幫忙 ${f.issues}`:''}</div></div>
+        <button class="mini ${f.ripe?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('')
+      : `<div class="empty">還沒有好友，<br>到「加好友」輸入朋友的暱稱吧！</div>`;
+  } else if(boardTab==='add'){
+    body = `<div class="sec">用暱稱加好友</div>
+      <div style="display:flex;gap:8px;margin-top:6px"><input id="fnick" class="inp" maxlength="10" placeholder="輸入朋友的暱稱"><button class="mini" id="fsend" style="padding:0 16px">送出</button></div>
+      <div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:6px">你的暱稱是「${esc(S.me.nickname)}」，把它告訴朋友吧</div>`;
+    body += `<div class="sec">等你確認的邀請</div>` + (F.incoming.length ? F.incoming.map(f=>`<div class="row">
+        <div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span><div>想成為你的好友</div></div>
+        <button class="mini" data-acc="${f.id}">接受</button><button class="mini sub" data-rej="${f.id}">拒絕</button></div>`).join('') : `<div class="empty" style="padding:10px 0">沒有新的邀請</div>`);
+    if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row"><div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
+  } else {
+    body = logs.length ? logs.map(l=>`<div class="row"><div class="avatar sm" style="background:${l.kind.startsWith('prank')?'#F78FB3':l.kind==='steal'?'#FF9F43':'#3BB273'}">${esc((l.who||'?').slice(0,1))}</div>
+        <div class="tx"><b>${esc(l.who||'')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}<div>${ago(l.at)}</div></div></div>`).join('')
+      : `<div class="empty">還沒有任何動態</div>`;
+  }
+  modal('好友布告欄', tabs + body);
+  const md = $('md');
+  md.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>openBoard(b.dataset.tab));
+  md.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>visit(b.dataset.visit));
+  md.querySelectorAll('[data-acc]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.acc,p_accept:true})); openBoard(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-rej]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.rej,p_accept:false})); openBoard(); }catch(e){ toast(e.message); } });
+  const fs = $('fsend');
+  if(fs){ const send = async()=>{ const v=$('fnick').value.trim(); if(!v) return toast('請輸入暱稱');
+      try{ toast(await rpc('farm_friend_request',{p_nick:v})); openBoard(); }catch(e){ toast(e.message); } };
+    fs.onclick = send; $('fnick').addEventListener('keydown', e=>{ if(e.key==='Enter') send(); }); }
+}
+
+/* ================= 拜訪 / 回家 ================= */
+async function visit(id){
+  try{ applyVisit(await rpc('farm_visit', {p_owner:id})); }
+  catch(e){ return toast(e.message); }
+  closeModal(); mode = 'visit'; plotSig = plotSig.map(()=> '');
+  buildTools(); setTool('steal'); refresh();
+  $('bHome').textContent = '🏠 回我的農場';
+  centerOn(...FARM_C, true);
+  toast(`來到 ${V.owner.nickname} 的農場`);
+}
+async function goHome(){
+  if(mode==='home'){ centerOn(...FARM_C, true); return; }
+  mode = 'home'; V = null; plotSig = plotSig.map(()=> '');
+  buildTools(); setTool('hand'); refresh();
+  $('bHome').textContent = '🌾 回到農田';
+  centerOn(...FARM_C, true);
+  sync();
+}
+
+function tapBuilding(g){
+  g.classList.remove('hit'); void g.getBBox(); g.classList.add('hit');
+  const id = g.dataset.b;
+  if(id==='board') return openBoard();
+  if(mode==='visit' && ['shop','barn','home'].includes(id)) return toast('回到自己的農場才能使用');
+  if(id==='shop') return openShop();
+  if(id==='barn') return openBag();
+  if(id==='home') return openHome();
+  const o = BLD.find(b=>b.id===id); if(o && o.locked) toast(o.locked);
+}
+
+/* ================= 畫面 ================= */
+const TOOLS_VISIT = [['steal','偷菜'],['hweed','幫除草'],['hbug','幫除蟲'],['pweed','放草'],['pbug','放蟲']];
+ICONS.steal = `<svg viewBox="0 0 32 32"><path d="M9 14 Q8 6 13 6 L13 15 M13 8 Q13 4 17 4 Q19 4 19 8 L19 15 M19 8 Q19 5 22 5.5 Q24 6 24 9 L24 16 Q24 26 16 27 Q9 27 7 20 L5 15 Q5 12 8 13 L10 17" fill="#FFD7B5" stroke="#C98B5E" stroke-width="1.6" stroke-linejoin="round"/><circle cx="25" cy="24" r="5" fill="#F2545B"/></svg>`;
+ICONS.hweed = ICONS.weed; ICONS.hbug = ICONS.bug;
+ICONS.pweed = `<svg viewBox="0 0 32 32"><path d="M8 26 L4 12 L10 20 L12 6 L15 20 L20 10 L18 26Z" fill="#3E9B3E"/><circle cx="23" cy="22" r="7" fill="#F78FB3"/><path d="M20 22 h6 M23 19 v6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+ICONS.pbug = `<svg viewBox="0 0 32 32"><g transform="translate(12 16) scale(1.5)"><ellipse rx="6" ry="4.5" fill="#7A4F2A"/><circle cx="-6" cy="-1" r="3" fill="#4E331C"/><circle cx="-2.5" cy="-1.5" r="1.1" fill="#F4C27A"/><circle cx="2.5" cy="1.5" r="1.1" fill="#F4C27A"/></g><circle cx="24" cy="23" r="7" fill="#F78FB3"/><path d="M21 23 h6 M24 20 v6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+
+function buildTools(){
+  const list = mode==='visit' ? TOOLS_VISIT : TOOLS;
+  $('tools').style.gridTemplateColumns = `repeat(${list.length},1fr)`;
+  $('tools').innerHTML = list.map(([k,n])=>`<button class="tool" data-tool="${k}">${ICONS[k]}<span>${n}</span>${k==='seed'?'<span class="badge" id="seedBadge"></span>':''}${k==='pweed'?'<span class="badge" id="prankBadge"></span>':''}</button>`).join('');
+  $('tools').querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{
+    if(b.dataset.tool==='seed') return openSeedPicker(null);
+    setTool(b.dataset.tool);
+  });
+}
+function setTool(t){ ui.tool=t; document.querySelectorAll('.tool').forEach(b=>b.classList.toggle('on', b.dataset.tool===t)); }
+
+function renderPlots(){
+  if(!S) return;
+  const P = curPlots();
+  P.forEach(p=>{
+    const i = p.i, el = plotEls[i]; if(!el) return;
+    const st = p.s==='grow' ? stageOf(p) : -1;
+    const sig = [mode, p.s, p.c, st, p.w, p.b, p.dry].join('|');
+    if(sig !== plotSig[i]){ el.querySelector('.pg').innerHTML = plotGroundSVG(p,i); el.querySelector('.ps').innerHTML = plotSpriteSVG(p,i); plotSig[i] = sig; }
+    el.classList.toggle('ripe', st===4);
+    const L = plotLabs[i], t = L.querySelector('text'), r = L.querySelector('rect'), bb = L.querySelector('.bb'), bf = L.querySelector('.bf');
+    L.style.display = (p.s==='wild'||p.s==='empty') ? 'none' : '';
+    let txt='', pct=-1, bg='#fff', fg='#3A3226';
+    if(p.s==='dead'){ txt = mode==='visit' ? '已收成' : '枯萎・點我剷除'; bg='#E8DCC8'; }
+    else if(p.s==='grow'){ const c = CROP[p.c];
+      if(st===4){
+        if(mode==='visit'){
+          if(p.mine){ txt='你偷過了'; bg='#E8DCC8'; }
+          else if(p.st >= p.cap){ txt='被偷光了'; bg='#E8DCC8'; }
+          else { txt=`${c.name} 可以偷！`; bg='#F2545B'; fg='#fff'; }
+        } else { txt=`${c.name} 可收成！`; bg='#FF9F43'; fg='#fff'; }
+      } else { txt = `${c.name} ${fmt(leftSec(p))}`; pct = p.g/c.time; if(p.dry) bg='#DDF0FF'; }
+    }
+    if(t.textContent !== txt) t.textContent = txt;
+    r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('y', pct>=0?3:5);
+    bb.style.display = bf.style.display = pct>=0 ? '' : 'none';
+    if(pct>=0) bf.setAttribute('width', (64*pct).toFixed(1));
+  });
+}
+function renderHUD(){
+  if(!S) return;
+  const me = S.me;
+  $('pname').textContent = me.nickname; $('avatar').textContent = me.nickname.slice(0,1);
+  $('plv').textContent = 'Lv'+me.lv; $('pgold').textContent = me.gold.toLocaleString();
+  const need = needExp(me.lv);
+  $('pexp').style.width = (me.lv>=MAX_LV?100:Math.min(100, me.exp/need*100))+'%';
+  $('pexpt').textContent = me.lv>=MAX_LV ? 'MAX' : `${me.exp}/${need}`;
+  const n = Object.values(me.seeds).reduce((a,b)=>a+b,0);
+  const bd = $('seedBadge'); if(bd){ bd.textContent=n; bd.style.display=n?'':'none'; }
+  const pb = $('prankBadge'); if(pb){ pb.textContent=me.prank_left; }
+  const PL = curPlots(); let h;
+  if(mode==='visit'){
+    const can = PL.filter(p=>p.s==='grow' && p.g>=CROP[p.c].time && !p.mine && p.st<p.cap).length;
+    h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}）的農場・` + (can ? `有 <b>${can}</b> 塊地可以偷！` : `今天惡作劇還剩 ${me.prank_left} 次`);
+    $('hint').innerHTML = `<span>🧺</span><span>${h}</span>`; return;
+  }
+  if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
+  else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，不處理會減少收成';
+  else if(PL.some(isDry)) h='有田地<b>缺水</b>了，澆水才能長得快';
+  else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';
+  else if(PL.some(p=>p.s==='empty')) h = n?'點<b>空地</b>選種子種下去吧':'沒有種子了，點<b>種子商店</b>買一些吧';
+  else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
+  $('hint').innerHTML = `<span>🌱</span><span>${h}</span>`;
+}
+function refresh(){ renderPlots(); renderHUD(); }
+
+/* ================= 同步 ================= */
+let syncing = false;
+async function sync(){
+  if(!S || syncing || document.hidden) return;
+  syncing = true;
+  try{
+    if(mode==='visit' && V) applyVisit(await rpc('farm_visit', {p_owner:V.owner.id}));
+    else { const st = await rpc('farm_me'); if(st) applyState(st); }
+    refresh();
+  }catch(e){ if(/還不是好友/.test(e.message)){ toast(e.message); goHome(); } }
+  finally{ syncing = false; }
+}
+setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); } }, 1000);
+setInterval(sync, 15000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sync(); });
+
+/* ================= 登入流程 ================= */
+let authMode = 'login';
+function showScreen(which){
+  $('login').style.display = (which==='login'||which==='nick') ? 'flex' : 'none';
+  $('loginCard').style.display = which==='login' ? '' : 'none';
+  $('nickCard').style.display = which==='nick' ? '' : 'none';
+  ['map','hud','dock'].forEach(k=>$(k).style.display = which==='game' ? '' : 'none');
+}
+function setAuthMode(m){
+  authMode = m;
+  document.querySelectorAll('[data-am]').forEach(b=>b.classList.toggle('on', b.dataset.am===m));
+  $('authBtn').textContent = m==='login' ? '登入' : '註冊新帳號';
+  $('pw2').style.display = m==='signup' ? '' : 'none';
+  $('authMsg').textContent = '';
+}
+function authMsg(t, ok){ const m=$('authMsg'); m.textContent=t; m.style.color = ok?'var(--green-d)':'var(--red)'; }
+
+async function doAuth(){
+  const email = $('email').value.trim(), pw = $('pw').value;
+  if(!email || !pw) return authMsg('請輸入 Email 和密碼');
+  const btn = $('authBtn'); btn.disabled = true;
+  try{
+    if(authMode==='signup'){
+      if(pw.length < 6) return authMsg('密碼至少要 6 個字');
+      if(pw !== $('pw2').value) return authMsg('兩次輸入的密碼不一樣');
+      const {data, error} = await sb.auth.signUp({email, password:pw, options:{emailRedirectTo:SITE_URL}});
+      if(error) return authMsg(zhErr(error.message));
+      if(data.user && data.user.identities && data.user.identities.length===0) return authMsg('這個 Email 已經註冊過了，請直接登入');
+      if(!data.session) return authMsg(`驗證信已寄到 ${email}，請點信中的連結完成註冊`, true);
+    } else {
+      const {error} = await sb.auth.signInWithPassword({email, password:pw});
+      if(error) return authMsg(zhErr(error.message));
+    }
+  } finally { btn.disabled = false; }
+}
+async function forgotPw(){
+  const email = $('email').value.trim();
+  if(!email) return authMsg('請先在上面輸入你的 Email');
+  const {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo:SITE_URL});
+  if(error) return authMsg(zhErr(error.message));
+  authMsg(`重設密碼的信已寄到 ${email}`, true);
+}
+function showResetPw(){
+  modal('設定新密碼', `<input id="npw" class="inp" type="password" placeholder="新密碼（至少 6 個字）" style="width:100%">`,
+    [['確定','',async()=>{ const v=$('npw').value; if(v.length<6) return toast('密碼至少要 6 個字');
+      const {error} = await sb.auth.updateUser({password:v}); if(error) return toast(zhErr(error.message)); closeModal(); toast('密碼已更新'); }]]);
+}
+async function createNick(){
+  const v = $('nickIn').value.trim(); if(!v) return toast('請輸入暱稱');
+  try{ const st = await rpc('farm_create', {p_nick:v}); startGame(st); }
+  catch(e){ toast(e.message); }
+}
+
+let built = false, entering = false;
+async function enterGame(){
+  if(entering) return; entering = true;
+  try{
+    const st = await rpc('farm_me');
+    if(!st){ showScreen('nick'); setTimeout(()=>$('nickIn').focus(), 50); return; }
+    startGame(st);
+  }catch(e){ toast(e.message); showScreen('login'); }
+  finally{ entering = false; }
+}
+function startGame(st){
+  applyState(st); mode = 'home'; V = null;
+  showScreen('game');
+  if(!built){ buildWorld(); requestAnimationFrame(animate); built = true; }
+  plotSig = plotSig.map(()=> '');
+  buildTools(); layout(); setTool('hand'); refresh();
+  $('bHome').textContent = '🌾 回到農田';
+  requestAnimationFrame(()=>centerOn(...FARM_C));
+  toast(`歡迎回到小鎮，${S.me.nickname}！`);
+}
+
+$('authBtn').onclick = doAuth;
+$('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') doAuth(); });
+$('pw2').addEventListener('keydown', e=>{ if(e.key==='Enter') doAuth(); });
+document.querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>setAuthMode(b.dataset.am));
+$('forgot').onclick = forgotPw;
+$('gBtn').onclick = async()=>{
+  if(!GOOGLE_ON) return authMsg('Google 登入正在設定中，請先用 Email 註冊');
+  const {error} = await sb.auth.signInWithOAuth({provider:'google', options:{redirectTo:SITE_URL}});
+  if(error) authMsg(zhErr(error.message));
+};
+if(!GOOGLE_ON) $('gBtn').classList.add('off');
+$('nickBtn').onclick = createNick;
+$('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); });
+$('nickOut').onclick = ()=>sb.auth.signOut();
+$('bHome').onclick = goHome;
+
+sb.auth.onAuthStateChange((ev, session)=>{
+  if(ev==='PASSWORD_RECOVERY'){ setTimeout(showResetPw, 300); }
+  if(session && (ev==='SIGNED_IN' || ev==='INITIAL_SESSION') && !S) setTimeout(enterGame, 0);
+  if(ev==='SIGNED_OUT'){ S=null; V=null; mode='home'; showScreen('login'); setAuthMode('login'); }
+  if(ev==='INITIAL_SESSION' && !session) showScreen('login');
+});
+setAuthMode('login');
+
+</script>
+</body>
+</html>
