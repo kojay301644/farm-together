@@ -419,13 +419,13 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794244789" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794244881" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794244789" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794244789" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794244789" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794244881" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794244881" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794244881" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
@@ -442,11 +442,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794244789" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794244881" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794244789";
+const BUILD="1794244881";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1734,7 +1734,7 @@ function bindDecorLayer(){
   $('map').addEventListener('click', e=>{ if(EDIT && !e.target.closest('[data-di]') && EDIT.sel>=0){ EDIT.sel=-1; renderDecor(true); renderEditBar(); } });
 }
 
-/* ================= 寵物園：我的寵物＋圖鑑 ================= */
+/* ================= 寵物園：我的寵物＋購買新寵物 ================= */
 let BEASTS = [], BST = {}, parkTab = 'mine';
 function setBeastConfig(list){ if(list){ BEASTS=list; BST={}; list.forEach(b=>BST[b.id]=b); } }
 const ownedBeasts = o => Object.keys((o && o.beasts) || {});
@@ -1744,7 +1744,7 @@ const fmtDate = ms => { if(!ms) return '一開始就在'; const d=new Date(+ms);
 function openBeastPark(t){
   if(t) parkTab=t;
   const visit = mode==='visit' && V, who = visit ? V.owner : S.me, own = who.beasts || {};
-  const tabs = `<div class="tabs"><button data-pt="mine" class="${parkTab==='mine'?'on':''}">${visit?'牠的寵物':'我的寵物'}（${ownedBeasts(who).length}）</button><button data-pt="dex" class="${parkTab==='dex'?'on':''}">圖鑑 ${ownedBeasts(who).length}/${BEASTS.length}</button></div>`;
+  const tabs = `<div class="tabs"><button data-pt="mine" class="${parkTab==='mine'?'on':''}">${visit?'牠的寵物':'我的寵物'}（${ownedBeasts(who).length}）</button><button data-pt="dex" class="${parkTab==='dex'?'on':''}">購買新寵物 ${ownedBeasts(who).length}/${BEASTS.length}</button></div>`;
   let body = tabs;
   if(parkTab==='mine'){
     const pt=partyOf(who), inP=sp=>pt.findIndex(p=>p.s===sp), cap=visit?6:(who.party_cap||1);

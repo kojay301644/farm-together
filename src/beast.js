@@ -1,5 +1,5 @@
 
-/* ================= 寵物園：我的寵物＋圖鑑 ================= */
+/* ================= 寵物園：我的寵物＋購買新寵物 ================= */
 let BEASTS = [], BST = {}, parkTab = 'mine';
 function setBeastConfig(list){ if(list){ BEASTS=list; BST={}; list.forEach(b=>BST[b.id]=b); } }
 const ownedBeasts = o => Object.keys((o && o.beasts) || {});
@@ -9,7 +9,7 @@ const fmtDate = ms => { if(!ms) return '一開始就在'; const d=new Date(+ms);
 function openBeastPark(t){
   if(t) parkTab=t;
   const visit = mode==='visit' && V, who = visit ? V.owner : S.me, own = who.beasts || {};
-  const tabs = `<div class="tabs"><button data-pt="mine" class="${parkTab==='mine'?'on':''}">${visit?'牠的寵物':'我的寵物'}（${ownedBeasts(who).length}）</button><button data-pt="dex" class="${parkTab==='dex'?'on':''}">圖鑑 ${ownedBeasts(who).length}/${BEASTS.length}</button></div>`;
+  const tabs = `<div class="tabs"><button data-pt="mine" class="${parkTab==='mine'?'on':''}">${visit?'牠的寵物':'我的寵物'}（${ownedBeasts(who).length}）</button><button data-pt="dex" class="${parkTab==='dex'?'on':''}">購買新寵物 ${ownedBeasts(who).length}/${BEASTS.length}</button></div>`;
   let body = tabs;
   if(parkTab==='mine'){
     const pt=partyOf(who), inP=sp=>pt.findIndex(p=>p.s===sp), cap=visit?6:(who.party_cap||1);
