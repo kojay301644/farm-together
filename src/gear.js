@@ -37,7 +37,7 @@ function autoSeedHTML(){ const me=S.me;
   return `<div class="autoseed">🌱 自動播種要種：<select id="aSeed"><option value="">（不種）</option>${opts}</select></div><div class="rhint">用穀倉裡的種子，種子用完就停</div>`; }
 function autoFeedHTML(){ const me=S.me;
   const opts = CROPS.filter(c=>(me.crops[c.id]||0)>0 || me.auto_feed===c.id).map(c=>`<option value="${c.id}" ${me.auto_feed===c.id?'selected':''}>${c.name}（穀倉 ${me.crops[c.id]||0} 個）</option>`).join('');
-  return `<div class="autoseed">🥕 餵動物要用：<select id="aFeed"><option value="">（自動挑最便宜的作物）</option>${opts}</select></div><div class="rhint">自己餵和自動餵食都會用這個；指定的作物不夠就不會餵</div>`; }
+  return `<div class="autoseed">🥕 餵動物要用：<select id="aFeed"><option value="">（自動挑最便宜的作物）</option>${opts}</select></div><div class="rhint">手動餵食和自動餵食裝備都會用這個；指定的作物不夠就不會餵</div>`; }
 function bindAutoSel(){
   if($('aSeed')) $('aSeed').onchange=async e=>{ try{ applyState(await rpc('farm_set_auto_seed',{p_crop:e.target.value||null})); refresh(); toast(e.target.value?`會自動種${CROP[e.target.value].name}`:'不自動播種'); }catch(err){ toast(err.message); } };
   if($('aFeed')) $('aFeed').onchange=async e=>{ try{ applyState(await rpc('farm_set_auto_feed',{p_crop:e.target.value||null})); refresh(); toast(e.target.value?`會用${CROP[e.target.value].name}餵動物`:'自動挑最便宜的作物來餵'); }catch(err){ toast(err.message); } };

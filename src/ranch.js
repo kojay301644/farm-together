@@ -51,10 +51,10 @@ function openRanch(){
   const list = visit ? (V.ranch||[]) : (S.ranch||[]), off = visit ? V.off : S.off, me=S.me;
   const cap = visit ? null : (me.ranch_cap||0);
   let body = '';
-  if(!visit) body += `<div class="rhint">餵動物要用倉庫裡的作物當飼料（自動從最便宜的開始扣）。倉庫現在有 <b>${cropCount(me)}</b> 個作物。</div>`;
+  if(!visit) body += `<div class="rhint">倉庫現在有 <b>${cropCount(me)}</b> 個作物${me.auto_feed&&CROP[me.auto_feed]?`（其中${CROP[me.auto_feed].name} <b>${me.crops[me.auto_feed]||0}</b> 個）`:''}。</div>`;
   body += list.length ? list.map(r=>{ const a=ANI[r.k]||{name:r.k}; const st=aniState(r,off);
     const status = st==='ready' ? `<b style="color:#E08A1E">${GOOD_ICON[a.good]||''} ${a.good_name} 可以收了！</b>${r.st?`（被偷 ${r.st}）`:''}`
-      : st==='busy' ? `生產中・還要 ${fmtLeft(aniLeft(r,off))}` : `肚子餓了，要 <b>${a.feed}</b> 個作物當飼料`;
+      : st==='busy' ? `生產中・還要 ${fmtLeft(aniLeft(r,off))}` : `肚子餓了，要 <b>${a.feed}</b> 個${(!visit&&S.me.auto_feed&&CROP[S.me.auto_feed])?CROP[S.me.auto_feed].name:'作物'}當飼料`;
     let btns='';
     if(!visit){
       if(st==='hungry') btns+=`<button class="mini" data-ra="feed" data-s="${r.slot}" ${cropCount(me)<a.feed?'disabled':''}>餵食</button>`;
@@ -76,7 +76,9 @@ function openRanch(){
         <div class="tx"><b>${a.name}</b><span class="tag">${a.price.toLocaleString()} 金</span><div>吃 ${a.feed} 個作物・${dur(a.prod_sec)}後產 ${a.yield} 個${GOOD_ICON[a.good]||''}${a.good_name}（每個 ${a.good_price} 金）</div></div>
         ${lock?`<span class="lock">Lv${a.lv} 解鎖</span>`:`<button class="mini" data-buyani="${a.id}" ${me.gold<a.price||list.length>=cap?'disabled':''}>買</button>`}</div>`; }).join('');
   }
+  if(!visit) body = autoFeedHTML() + body;
   modal(visit ? `${esc(V.owner.nickname)} 的牧場` : '我的牧場', body);
+  if(!visit) bindAutoSel();
   const md=$('md');
   md.querySelectorAll('[data-ra]').forEach(b=>b.onclick=()=>ranchAct(b.dataset.ra, +b.dataset.s));
   md.querySelectorAll('[data-buyani]').forEach(b=>b.onclick=()=>ranchAct('buy', null, b.dataset.buyani));
