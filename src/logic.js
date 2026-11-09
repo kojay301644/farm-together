@@ -32,7 +32,7 @@ let mode = 'home';
 const ui = {tool:'hand', seed:'radish', busy:false};
 
 function applyState(st){ if(st) S = {me:st.me, plots:st.plots, off:st.now - Date.now()}; }
-function applyVisit(v){ if(v) V = {owner:v.owner, plots:v.plots, off:v.now - Date.now()}; }
+function applyVisit(v){ if(v) V = {owner:v.owner, plots:v.plots, off:v.now - Date.now(), friend:!!v.friend, protected:!!v.protected}; }
 
 // 依伺服器時間預測目前生長進度（實際以伺服器為準）
 function pred(p, off){
@@ -145,7 +145,8 @@ async function actVisit(i){
     if(p.mine) return toast('這塊地你已經偷過了');
     if(p.st >= p.cap) return toast('這塊地已經被偷光了，留點給主人吧');
     action = 'steal';
-  } else if(t==='hweed'){ if(!growing || !p.w) return toast('這裡沒有雜草'); action='help_weed'; }
+  } else if(t==='hwater'){ if(!growing || ripe) return toast('這塊地不需要澆水'); if(!p.dry) return toast('土壤還很濕潤'); action='help_water'; }
+  else if(t==='hweed'){ if(!growing || !p.w) return toast('這裡沒有雜草'); action='help_weed'; }
   else if(t==='hbug'){ if(!growing || !p.b) return toast('這裡沒有蟲'); action='help_bug'; }
   else if(t==='pweed' || t==='pbug'){
     if(!growing || ripe) return toast('只能在還沒成熟的作物上惡作劇');
@@ -159,7 +160,7 @@ async function actVisit(i){
     const r = await rpc('farm_friend_act', {p_owner:V.owner.id, p_action:action, p_idx:i});
     applyState(r.state); applyVisit(r.visit); refresh();
     if(action==='steal') floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066');
-    else if(action.startsWith('help')) floatAt(el, action==='help_weed'?'幫忙除草！':'幫忙除蟲！');
+    else if(action.startsWith('help')) floatAt(el, action==='help_weed'?'幫忙除草！':action==='help_bug'?'幫忙除蟲！':'幫忙澆水！', action==='help_water'?'#BDE6FF':null);
     else floatAt(el, action==='prank_weed'?'放了一棵草 😈':'放了一隻蟲 😈', '#FFD6E5');
     xpFloat(el, r.xp);
     if(r.lvup) setTimeout(showLevelUp, 400);
@@ -232,8 +233,10 @@ async function openHome(){
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
       ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友布告欄」加好友、拜訪好友農場</div>
     <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
-    <div class="homebtns"><button class="btn sub" id="hInv">💌 邀請朋友</button><button class="btn sub" id="logout">登出</button></div>
+    <div class="homebtns"><button class="btn o" id="hGem" style="background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">💎 鑽石商店</button><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
+    <div class="homebtns">${S.me.admin?'<a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">🛠️ 營運後台</a>':''}<button class="btn sub" id="logout">登出</button></div>
     <div style="text-align:center;margin-top:10px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`);
+  $('hGem').onclick = ()=>openGemShop();
   $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
   $('logout').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
 }
@@ -242,20 +245,22 @@ const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':
 /* ================= 好友布告欄 ================= */
 let boardTab = 'friends', rankScope = 'f';
 function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60) return '剛剛'; if(s<3600) return `${Math.floor(s/60)} 分鐘前`; if(s<86400) return `${Math.floor(s/3600)} 小時前`; return `${Math.floor(s/86400)} 天前`; }
-const LOG_TXT = {steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
+const LOG_TXT = {help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了水`, steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
   prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`};
 
 async function openBoard(tab){
   if(tab) boardTab = tab;
   modal('好友布告欄', `<div class="empty">讀取中…</div>`);
-  let F, logs, R;
-  try{ [F, logs, R] = await Promise.all([rpc('farm_friends'), boardTab==='logs'?rpc('farm_logs_get'):[], boardTab==='rank'?rpc('farm_rank'):null]); }
+  let F, logs, R, NB;
+  try{ [F, logs, R] = await Promise.all([rpc('farm_friends'), boardTab==='logs'?rpc('farm_logs_get'):[], boardTab==='rank'?rpc('farm_rank'):null]);
+    if(boardTab==='near') NB = await rpc('farm_neighbors'); }
   catch(e){ return modal('好友布告欄', `<div class="empty">${esc(e.message)}</div>`); }
   const nIn = F.incoming.length;
   const tabs = `<div class="tabs">
-    <button data-tab="friends" class="${boardTab==='friends'?'on':''}">好友 ${F.friends.length}</button>
+    <button data-tab="friends" class="${boardTab==='friends'?'on':''}">好友</button>
     <button data-tab="add" class="${boardTab==='add'?'on':''}">加好友${nIn?` <i class="dot">${nIn}</i>`:''}</button>
-    <button data-tab="rank" class="${boardTab==='rank'?'on':''}">排行榜</button>
+    <button data-tab="near" class="${boardTab==='near'?'on':''}">鄰居</button>
+    <button data-tab="rank" class="${boardTab==='rank'?'on':''}">排行</button>
     <button data-tab="logs" class="${boardTab==='logs'?'on':''}">動態</button></div>`;
   let body = '';
   if(boardTab==='friends'){
@@ -273,9 +278,16 @@ async function openBoard(tab){
         <div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span><div>想成為你的好友</div></div>
         <button class="mini" data-acc="${f.id}">接受</button><button class="mini sub" data-rej="${f.id}">拒絕</button></div>`).join('') : `<div class="empty" style="padding:10px 0">沒有新的邀請</div>`);
     if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row"><div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
+  } else if(boardTab==='near'){
+    body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（今天還能偷陌生人 <b style="color:var(--orange-d)">${S.me.steal_left}</b> 次）</div>`;
+    body += NB.length ? NB.map(f=>`<div class="row"><div class="avatar sm">${esc(f.nickname.slice(0,1))}</div>
+        <div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}
+          <div>${f.ripe?`<span style="color:var(--orange-d)">🧺 有 ${f.ripe} 塊地可以偷</span>`:'目前沒有可偷的菜'}</div></div>
+        <button class="mini ${f.ripe?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('') + `<button class="btn sub" id="nbMore" style="width:100%;margin-top:8px">換一批</button>`
+      : `<div class="empty">附近還沒有其他玩家種菜，<br>邀請朋友一起來玩吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
   } else if(boardTab==='rank'){
     const medal = r => r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
-    const row = (rk, x) => `<div class="row rk${x.me?' mine':''}"><div class="rkn">${medal(rk)}</div><div class="avatar sm">${esc(x.nickname.slice(0,1))}</div>
+    const row = (rk, x) => `<div class="row rk${x.me?' mine':''}"${x.me?'':` data-visit="${x.id}" style="cursor:pointer"`}><div class="rkn">${medal(rk)}</div><div class="avatar sm">${esc(x.nickname.slice(0,1))}</div>
         <div class="tx"><b>${esc(x.nickname)}</b>${x.me?' <span class="tag">我</span>':''}<div>經驗 ${x.exp}</div></div><span class="tag" style="font-size:13px">Lv${x.lv}</span></div>`;
     body = `<div class="seg" style="margin:4px 0 6px"><button data-rs="f" class="${rankScope==='f'?'on':''}">好友排行</button><button data-rs="a" class="${rankScope==='a'?'on':''}">全服前 50 名</button></div>`;
     if(rankScope==='f') body += R.friends.map((x,k)=>row(k+1, x)).join('') + (R.friends.length<2?`<div class="empty" style="padding:10px 0">加更多好友一起比賽吧！</div>`:'');
@@ -290,6 +302,7 @@ async function openBoard(tab){
   const md = $('md');
   md.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>openBoard(b.dataset.tab));
   md.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>{ rankScope=b.dataset.rs; openBoard('rank'); });
+  if($('nbMore')) $('nbMore').onclick = ()=>openBoard('near');
   md.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>visit(b.dataset.visit));
   md.querySelectorAll('[data-acc]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.acc,p_accept:true})); openBoard(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-rej]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.rej,p_accept:false})); openBoard(); }catch(e){ toast(e.message); } });
@@ -331,14 +344,15 @@ function tapBuilding(g){
 }
 
 /* ================= 畫面 ================= */
-const TOOLS_VISIT = [['steal','偷菜'],['hweed','幫除草'],['hbug','幫除蟲'],['pweed','放草'],['pbug','放蟲']];
+const TOOLS_FRIEND = [['steal','偷菜'],['hwater','幫澆水'],['hweed','幫除草'],['hbug','幫除蟲'],['pweed','放草'],['pbug','放蟲']];
+const TOOLS_STRANGER = [['steal','偷菜'],['pweed','放草'],['pbug','放蟲']];
 ICONS.steal = `<svg viewBox="0 0 32 32"><path d="M9 14 Q8 6 13 6 L13 15 M13 8 Q13 4 17 4 Q19 4 19 8 L19 15 M19 8 Q19 5 22 5.5 Q24 6 24 9 L24 16 Q24 26 16 27 Q9 27 7 20 L5 15 Q5 12 8 13 L10 17" fill="#FFD7B5" stroke="#C98B5E" stroke-width="1.6" stroke-linejoin="round"/><circle cx="25" cy="24" r="5" fill="#F2545B"/></svg>`;
-ICONS.hweed = ICONS.weed; ICONS.hbug = ICONS.bug;
+ICONS.hweed = ICONS.weed; ICONS.hbug = ICONS.bug; ICONS.hwater = ICONS.water;
 ICONS.pweed = `<svg viewBox="0 0 32 32"><path d="M8 26 L4 12 L10 20 L12 6 L15 20 L20 10 L18 26Z" fill="#3E9B3E"/><circle cx="23" cy="22" r="7" fill="#F78FB3"/><path d="M20 22 h6 M23 19 v6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>`;
 ICONS.pbug = `<svg viewBox="0 0 32 32"><g transform="translate(12 16) scale(1.5)"><ellipse rx="6" ry="4.5" fill="#7A4F2A"/><circle cx="-6" cy="-1" r="3" fill="#4E331C"/><circle cx="-2.5" cy="-1.5" r="1.1" fill="#F4C27A"/><circle cx="2.5" cy="1.5" r="1.1" fill="#F4C27A"/></g><circle cx="24" cy="23" r="7" fill="#F78FB3"/><path d="M21 23 h6 M24 20 v6" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>`;
 
 function buildTools(){
-  const list = mode==='visit' ? TOOLS_VISIT : TOOLS;
+  const list = mode==='visit' ? (V && V.friend ? TOOLS_FRIEND : TOOLS_STRANGER) : TOOLS;
   $('tools').style.gridTemplateColumns = `repeat(${list.length},1fr)`;
   $('tools').innerHTML = list.map(([k,n])=>`<button class="tool" data-tool="${k}">${ICONS[k]}<span>${n}</span>${k==='seed'?'<span class="badge" id="seedBadge"></span>':''}${k==='pweed'?'<span class="badge" id="prankBadge"></span>':''}</button>`).join('');
   $('tools').querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{
@@ -384,13 +398,16 @@ function renderHUD(){
   const need = needExp(me.lv);
   $('pexp').style.width = (me.lv>=MAX_LV?100:Math.min(100, me.exp/need*100))+'%';
   $('pexpt').textContent = me.lv>=MAX_LV ? 'MAX' : `${me.exp}/${need}`;
+  $('pgems').textContent = (me.gems||0).toLocaleString();
   const n = Object.values(me.seeds).reduce((a,b)=>a+b,0);
   const bd = $('seedBadge'); if(bd){ bd.textContent=n; bd.style.display=n?'':'none'; }
   const pb = $('prankBadge'); if(pb){ pb.textContent=me.prank_left; }
   const PL = curPlots(); let h;
   if(mode==='visit'){
     const can = PL.filter(p=>p.s==='grow' && p.g>=CROP[p.c].time && !p.mine && p.st<p.cap).length;
-    h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}）的農場・` + (can ? `有 <b>${can}</b> 塊地可以偷！` : `今天惡作劇還剩 ${me.prank_left} 次`);
+    h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
+    if(V.protected) h += '對方在<b>新手保護</b>中，不能偷菜和惡作劇';
+    else h += (can ? `有 <b>${can}</b> 塊地可以偷！` : `惡作劇還剩 ${me.prank_left} 次`) + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次）`);
     $('hint').innerHTML = `<span>🧺</span><span>${h}</span>`; return;
   }
   if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
@@ -479,11 +496,26 @@ async function enterGame(){
     const st = await rpc('farm_me');
     if(!st){ showScreen('nick'); setTimeout(()=>$('nickIn').focus(), 50); return; }
     startGame(st);
-  }catch(e){ toast(e.message); showScreen('login'); }
+  }catch(e){ showScreen('login'); authMsg(e.message); if(/停權/.test(e.message)) sb.auth.signOut(); }
   finally{ entering = false; }
+}
+async function loadConfig(){
+  try{
+    const c = await rpc('farm_config');
+    c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
+    c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
+  }catch(e){}
+}
+async function showNotices(){
+  let L; try{ L = await rpc('farm_notices'); }catch(e){ return; }
+  let seen = []; try{ seen = JSON.parse(localStorage.getItem('ytzt_seen_notices')||'[]'); }catch(e){}
+  const n = L.find(x=>!seen.includes(x.id)); if(!n) return;
+  seen.push(n.id); try{ localStorage.setItem('ytzt_seen_notices', JSON.stringify(seen.slice(-50))); }catch(e){}
+  modal('📢 ' + esc(n.title), `<div style="white-space:pre-wrap;font-size:14px;font-weight:500;line-height:1.8">${esc(n.body)}</div>`, [['知道了','',()=>{ closeModal(); setTimeout(showNotices, 300); }]]);
 }
 function startGame(st){
   applyState(st); mode = 'home'; V = null;
+  loadConfig();
   showScreen('game');
   if(!built){ buildWorld(); requestAnimationFrame(animate); built = true; }
   plotSig = plotSig.map(()=> '');
@@ -492,6 +524,7 @@ function startGame(st){
   requestAnimationFrame(()=>centerOn(...FARM_C));
   toast(`歡迎回到小鎮，${S.me.nickname}！`);
   setTimeout(tutMaybeStart, 900);
+  setTimeout(showNotices, 1200);
 }
 
 $('authBtn').onclick = doAuth;
@@ -509,6 +542,7 @@ $('nickBtn').onclick = createNick;
 $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); });
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
+$('gemBox').onclick = ()=>{ if(S && mode==='home') openGemShop('pack'); };
 $('tutNext').onclick = ()=>tutNext();
 $('tutSkip').onclick = ()=>tutFinish();
 

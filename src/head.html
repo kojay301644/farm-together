@@ -147,6 +147,15 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .rk.mine{background:#F4FBEF;border-radius:12px;padding-left:6px;padding-right:6px}
 .myrank{margin-top:10px;background:#FFF6DB;border-radius:12px;padding:10px;text-align:center;font-weight:700;font-size:13px}
 .myrank b{color:var(--orange-d);font-size:16px}
+.cur{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.cur .gold{padding:3px 10px;font-size:14px}
+.gem{background:#EEEBFF;cursor:pointer}
+.gemcard{border:2px solid #E6E1FF;border-radius:14px;padding:10px;text-align:center;position:relative}
+.gemcard b{font-size:18px;color:#5B4ED6}
+.gemcard .price{font-weight:900;margin-top:4px}
+.gemcard .bonus{position:absolute;top:-8px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-weight:900;border-radius:8px;padding:1px 6px}
+.gemgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+.soon{background:#FFF6DB;border-radius:12px;padding:10px;font-size:13px;font-weight:700;text-align:center;margin:6px 0 10px}
 .homebtns{display:flex;gap:8px;margin-top:10px}
 .plink{color:var(--ink2);font-size:12px;font-weight:700}
 .help h4{margin:14px 0 4px;font-size:15px}
@@ -209,7 +218,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="gold"><span class="coin"></span><span id="pgold">0</span></div>
+    <div class="cur"><div class="gold"><span class="coin"></span><span id="pgold">0</span></div><div class="gold gem" id="gemBox">💎<span id="pgems">0</span></div></div>
   </div>
   <div class="hint" id="hint"></div>
 </div>

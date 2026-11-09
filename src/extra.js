@@ -84,3 +84,36 @@ async function invite(){
   }
   copyText(text + '\n' + GAME_URL, '邀請訊息已複製，貼給朋友吧！');
 }
+
+/* ================= 鑽石商店（儲值即將開放） ================= */
+const GEM_PACKS = [
+  {name:'小袋鑽石', price:30, gems:60},
+  {name:'中袋鑽石', price:150, gems:330, extra:'多 10%'},
+  {name:'大袋鑽石', price:490, gems:1150, extra:'多 17%'},
+  {name:'超值鑽石', price:990, gems:2500, extra:'多 26%'},
+];
+const GEM_ITEMS = [
+  {icon:'🐕', name:'看門狗（7 天）', gems:120, desc:'有機率咬走來偷菜的人，小偷會掉金幣'},
+  {icon:'🐕', name:'看門狗（30 天）', gems:400, desc:'長期守護你的農場'},
+  {icon:'⚡', name:'加速肥料', gems:10, desc:'讓一塊田少 1 小時'},
+  {icon:'✨', name:'神奇肥料', gems:30, desc:'讓一塊田立刻成熟'},
+  {icon:'🎃', name:'黃金南瓜種子', gems:50, desc:'會發光的稀有作物，賣價超高'},
+  {icon:'🧑‍🌾', name:'小幫手（7 天）', gems:150, desc:'每天自動幫你澆水、除草一次'},
+  {icon:'🏡', name:'造型裝飾', gems:'80～300', desc:'房子、圍欄、農夫服裝（裝飾店開放後上架）'},
+];
+let gemTab = 'pack';
+function openGemShop(t){
+  if(t) gemTab = t;
+  const tabs = `<div class="tabs"><button data-gt="pack" class="${gemTab==='pack'?'on':''}">儲值方案</button><button data-gt="item" class="${gemTab==='item'?'on':''}">鑽石商品</button></div>`;
+  let body = `<div class="soon">💎 儲值功能即將開放，敬請期待！</div>`;
+  if(gemTab==='pack'){
+    body += `<div class="gemcard" style="background:#F7F5FF;margin-bottom:10px"><div class="bonus">首儲 ×2</div><div style="font-weight:900">🌟 農夫月卡　NT$150</div>
+      <div style="font-size:12px;font-weight:700;color:var(--ink2);margin-top:4px">立刻拿 💎300，30 天內每天登入再領 💎50（共 💎1,800）</div></div>`;
+    body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard"><div class="bonus">首儲 ×2</div><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">${p.name}${p.extra?`・${p.extra}`:''}</div><div class="price">NT$${p.price}</div></div>`).join('')}</div>`;
+    body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center">每個方案第一次購買，鑽石加倍送</div>`;
+  } else {
+    body += GEM_ITEMS.map(x=>`<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${x.icon}</div><div class="tx"><b>${x.name}</b><div>${x.desc}</div></div><span class="lock">💎${x.gems}</span></div>`).join('');
+  }
+  modal(`鑽石商店　<span style="font-size:14px;color:#5B4ED6">💎 ${(S.me.gems||0).toLocaleString()}</span>`, tabs + body);
+  document.querySelectorAll('[data-gt]').forEach(b=>b.onclick=()=>openGemShop(b.dataset.gt));
+}
