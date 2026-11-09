@@ -377,11 +377,11 @@ async function openBoard(tab){
       : `<div class="empty">附近還沒有其他玩家種菜，<br>邀請朋友一起來玩吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
   } else if(boardTab==='rank'){
     const medal = r => r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
-    const val = x => rankKind==='gold' ? `💰 ${(+x.sc).toLocaleString()} 金` : rankKind==='pros' ? `🏙️ 繁榮度 ${(+x.sc).toLocaleString()}` : rankKind==='steal' ? `🥕 偷菜 ${(+x.sc).toLocaleString()} 次` : `Lv${x.lv}`;
+    const val = x => rankKind==='gold' ? `💰 ${(+x.sc).toLocaleString()} 金` : rankKind==='pros' ? `🏙️ 繁榮度 ${(+x.sc).toLocaleString()}` : rankKind==='steal' ? `🥕 ${(+x.sc).toLocaleString()} 金・${(+x.n||0)} 次` : `Lv${x.lv}`;
     const row = (rk, x) => `<div class="row rk${x.me?' mine':''}"${x.me?'':` data-visit="${x.id}" style="cursor:pointer"`}><div class="rkn">${medal(rk)}</div>${avImg(x)}
         <div class="tx"><b>${esc(x.nickname)}</b>${x.me?' <span class="tag">我</span>':''}<div>${rankKind==='lv'?`經驗 ${x.exp}`:`Lv${x.lv}`}</div></div><span class="tag" style="font-size:13px">${val(x)}</span></div>`;
     body = `<div class="seg rkk" style="margin:4px 0 6px">${[['lv','🏆 等級'],['gold','💰 財富'],['pros','🏙️ 繁榮'],['steal','🥕 偷菜']].map(([k,t])=>`<button data-rk="${k}" class="${rankKind===k?'on':''}">${t}</button>`).join('')}</div>`
-      + (rankKind==='pros' ? `<div class="rhint" style="margin-bottom:6px">繁榮度：寵物、寵物造型、建築外觀、城鎮色調、裝飾、裝備階數、開墾的田地越多越高</div>` : '');
+      + (rankKind==='pros' ? `<div class="rhint" style="margin-bottom:6px">繁榮度：寵物、寵物造型、建築外觀、城鎮色調、裝飾、裝備階數、開墾的田地越多越高</div>` : rankKind==='steal' ? `<div class="rhint" style="margin-bottom:6px">比偷到的東西總價值（田地、收集倉、牧場都算），一樣多再比偷的次數</div>` : '');
     body += `<div class="seg" style="margin:4px 0 6px"><button data-rs="f" class="${rankScope==='f'?'on':''}">好友排行</button><button data-rs="a" class="${rankScope==='a'?'on':''}">全服前 50 名</button></div>`;
     if(rankScope==='f') body += R.friends.map((x,k)=>row(k+1, x)).join('') + (R.friends.length<2?`<div class="empty" style="padding:10px 0">加更多好友一起比賽吧！</div>`:'');
     else body += R.top.map(x=>row(x.rk, x)).join('');
