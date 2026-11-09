@@ -316,6 +316,12 @@ body.lowfx .bird{display:none}
 .cur .icn{width:17px;height:17px}
 .hint{margin-top:5px;padding:5px 10px;font-size:12px;transition:opacity .5s,transform .5s}
 .hint.hide{opacity:0;transform:translateY(-8px);pointer-events:none}
+.setbtn{flex:none;width:36px;height:36px;border-radius:12px;border:0;background:#F3EBDD;display:grid;place-items:center;cursor:pointer;padding:0}
+.setbtn img{width:28px;height:28px;object-fit:contain}
+.admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
+.admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}
+.admrow input{font:inherit;font-weight:800;padding:5px 8px;border-radius:10px;border:2px solid #E6D2A8;width:100%;box-sizing:border-box}
+.admquick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 </style>
 </head>
 <body>
@@ -360,6 +366,7 @@ body.lowfx .bird{display:none}
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
     <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>

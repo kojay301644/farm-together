@@ -12,7 +12,7 @@ const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
 const poly=(pts,f,extra='')=>`<polygon points="${P(pts)}" fill="${f}" ${extra}/>`;
 const dia=(x,y,w,d)=>[iso(x,y),iso(x+w,y),iso(x+w,y+d),iso(x,y+d)];
 let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
-const A = n => `assets/${n}.webp`;
+const A = n => `assets/${n}.webp?v=${typeof BUILD!=='undefined'?BUILD:''}`;
 
 /* 田地位置（格座標，3 排 × 6 塊） */
 const PS=1.45, PG=1.65;
@@ -105,6 +105,8 @@ const BUTTERFLY = c => `<g class="bfly"><ellipse cx="-4" cy="-2" rx="4.5" ry="3.
 /* ================= 組合地圖 ================= */
 let plotEls=[], plotSig=[], plotLabs=[];
 const movers=[];
+let OBST=[], RANCH=null;  // 不能踩的範圍（畫面座標橢圓）
+const addObst=(gx,gy,rx,ry,dy=0)=>{ const [x,y]=iso(gx,gy); OBST.push([x,y+dy,rx,ry]); };
 let farmerMover=null, farmerAv=null;
 /* 玩家角色＝萌獸（動作仿萌獸星球：腿部切片擺動、搖擺、漂浮、呼吸） */
 const CHR_RATIO={"bunny1":0.782,"bunny2":0.771,"bunny3":0.812,"mouse1":1.341,"mouse2":1.276,"mouse3":1.1,"mole1":0.882,"mole2":0.976,"mole3":0.976,"puffer1":1.0,"puffer2":0.982,"puffer3":0.965,"owl1":0.888,"owl2":0.841,"owl3":0.853,"lizard1":1.453,"lizard2":1.288,"lizard3":1.259,"deer1":0.747,"deer2":0.647,"deer3":0.712,"moth1":0.924,"moth2":0.988,"moth3":0.865,"armad1":1.112,"armad2":1.035,"armad3":0.971,"seal1":1.1,"seal2":1.059,"seal3":0.994,"marten1":1.006,"marten2":1.212,"marten3":1.276,"phoenix1":0.841,"phoenix2":0.947,"phoenix3":0.882,"fox1":1.018,"fox2":0.994,"fox3":1.0,"otter1":0.9,"otter2":0.865,"otter3":0.841,"penguin1":0.871,"penguin2":0.953,"penguin3":0.929,"pango1":1.188,"pango2":1.365,"pango3":1.147,"ferret1":0.971,"ferret2":1.053,"ferret3":1.012,"whale1":1.376,"whale2":1.182,"whale3":1.088,"bear1":0.965,"bear2":0.9,"bear3":0.935,"dragon1":0.941,"dragon2":0.935,"dragon3":0.947};
@@ -182,6 +184,7 @@ function farmerDo(i, kind){
 }
 
 function buildWorld(){
+  OBST=[];
   skinSig='';
   const W=$('world');
   W.setAttribute('viewBox',`${VX} ${VY} ${WW} ${WH}`);
@@ -226,11 +229,12 @@ function buildWorld(){
   // 牧場（農田左邊、島的下方中間）
   const RX=4.1, RY=11.85, RW=10.15, RD=3.0;  // 農田左下邊，長度跟農田切齊
   pen(RX,RY,RW,RD,'#E8D3A2','url(#pGrass)','front');
-  const GATE=[RX+RW*0.32, RY+RD];  // 牧場門（萌獸從這裡進出）
+  const GATE=[RX+RW*0.32, RY+RD]; RANCH=[RX,RY,RW,RD];  // 牧場門（萌獸從這裡進出）
   { const [tx,ty]=iso(RX+RW-0.7, RY+0.6); objs.push({depth:RX+RW+RY, svg: ol(`<path d="M${tx-22} ${ty-6} l22 -11 l22 11 l-22 11z" fill="#8B5E3C"/><path d="M${tx-18} ${ty-6} l18 -9 l18 9 l-18 9z" fill="#F4D35E"/>`,2)}); }
 
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
+    if(o.id!=='pen' && o.id!=='coop') addObst(o.c[0],o.c[1],o.w*0.42,o.w*0.24,-o.w*0.08);
     const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
     let s = (SKIN_PART[o.id] ? skinSprite(o.id, gx, gy, o.w, o.foot) : sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot}));
     if(o.id==='barn'){ // 風車葉片
@@ -246,8 +250,8 @@ function buildWorld(){
   });
 
   // 裝飾（萌獸星球素材）
-  const deco=(n,gx,gy,w,extra='')=>objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`});
-  const FC=HG(645,352); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
+  const deco=(n,gx,gy,w,extra='')=>(addObst(gx,gy,w*0.38,w*0.2,-w*0.06), objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`}));
+  const FC=HG(645,352); addObst(FC[0],FC[1],70,38,-12); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
   lab += labelPill(iso(...FC)[0], iso(...FC)[1]-150, '好友廣場', {bg:'#E3F6EA',fg:'#2E9660'});
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
@@ -299,18 +303,33 @@ function buildWorld(){
   ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
 
+/* 自由走動：整座島都能走，不踩建築與裝飾；偶爾從牧場門進出 */
+const ISL=[672*IS,335*IS,520*IS,240*IS];
+function walkable(gx,gy){ const [x,y]=iso(gx,gy);
+  if(((x-ISL[0])/ISL[2])**2+((y-ISL[1])/ISL[3])**2>1) return false;
+  for(const [ox,oy,rx,ry] of OBST) if(((x-ox)/rx)**2+((y-oy)/ry)**2<1) return false;
+  if(RANCH && gx>RANCH[0]-0.15 && gx<RANCH[0]+RANCH[2]+0.15 && gy>RANCH[1]-0.15 && gy<RANCH[1]+RANCH[3]+0.15) return false;
+  return true; }
+function clearLine(a,b){ const n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/0.25); for(let k=1;k<=n;k++){ if(!walkable(a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n)) return false; } return true; }
+function pickRoam(m){
+  if(RANCH && Math.random()<0.15){ const g=[RANCH[0]+RANCH[2]*0.32, RANCH[1]+RANCH[3]], out=[g[0],g[1]+0.9];
+    if(clearLine([m.x,m.y],out)){ m.route=[[g[0],g[1]-0.1],[g[0]+0.4,g[1]-1.6],[g[0]+2.6,g[1]-1.4],[g[0]+0.4,g[1]-1.6],[g[0],g[1]-0.1]]; return out; } }
+  for(let k=0;k<40;k++){ const a=Math.random()*Math.PI*2, r=1.5+Math.random()*5, g=[m.x+Math.cos(a)*r, m.y+Math.sin(a)*r];
+    if(walkable(g[0],g[1]) && clearLine([m.x,m.y],g)) return g; }
+  return [m.x,m.y]; }
 /* 農場主人的移動與動作 */
 function farmerStep(m, dt){
   let moving=false;
   if(m.wait>0){ m.wait-=dt; if(m.wait<=0){ setAct(m,null); if(m.task && m.task.started) m.task=null; } }
   else {
-    const goal = m.task ? m.task.pos : m.path[m.tgt];
+    if(!m.task && !m.goal) m.goal = (m.route && m.route.length) ? m.route.shift() : pickRoam(m);
+    const goal = m.task ? m.task.pos : m.goal;
     const dx=goal[0]-m.x, dy=goal[1]-m.y, dist=Math.hypot(dx,dy), step=(m.task?2.4:m.speed*(m.c?Math.max(.6,Math.min(1.3,m.c.spd)):1))*dt;
     if(dist<=step){ m.x=goal[0]; m.y=goal[1];
       if(m.task){ m.task.started=true; if(m.task.look){ const sd=(m.task.look[0]-m.x)-(m.task.look[1]-m.y); if(Math.abs(sd)>0.05) m.face=sd>0?1:-1; }
         setAct(m,m.task.act); m.wait=m.task.dur; emote(m,m.task.emo); }
-      else { m.tgt=(m.tgt+1)%m.path.length; m.wait=1+Math.random()*3;
-        const r=Math.random(); if(r<0.5) setAct(m, ['wave','stretch','look','wave'][Math.floor(Math.random()*4)]); }
+      else { m.goal=null; if(m.route && m.route.length){ m.wait=0.2+Math.random()*0.6; } else { m.wait=1+Math.random()*3;
+        const r=Math.random(); if(r<0.5) setAct(m, ['wave','stretch','look','wave'][Math.floor(Math.random()*4)]); } }
     } else { m.x+=dx/dist*step; m.y+=dy/dist*step; moving=true; const sdx=dx-dy; if(Math.abs(sdx)>0.01) m.face=sdx>0?1:-1; }
   }
   farmerPose(m, dt, moving);

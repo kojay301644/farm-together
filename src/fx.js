@@ -106,7 +106,7 @@ function dayNight(){ $('tint').style.background='transparent'; document.body.cla
 dayNight();
 
 /* ================= 頭像 ================= */
-const avSrc = n => `assets/av${n||11}.webp`;
+const avSrc = n => A("av"+(n||11));
 const avImg = (o, cls='avatar sm') => `<img class="${cls} avimg" src="${avSrc(o && o.avatar)}" alt="">`;
 function openAvatarPicker(){
   const cur = S.me.avatar||11;
@@ -121,6 +121,6 @@ function openAvatarPicker(){
   const list = ['home_island','backdrop','b_shop','b_farm','b_academy','bc_shop','b_fountain','b_sail','dc_flower','dc_lamp','dc_hay','dc_balloon','c_bunny1','n_friends','i_coin','i_gem','bg_forest','av11'];
   let n=0; const done=()=>{ n++; $('ldbar').style.width = Math.round(n/list.length*100)+'%'; if(n>=list.length) finish(); };
   let fin=false; const finish=()=>{ if(fin) return; fin=true; $('loader').classList.add('hide'); setTimeout(()=>$('loader').remove(), 600); };
-  list.forEach(k=>{ const im=new Image(); im.onload=im.onerror=done; im.src=`assets/${k}.webp`; });
+  list.forEach(k=>{ const im=new Image(); im.onload=im.onerror=done; im.src=A(k); });
   setTimeout(finish, 8000);
 })();

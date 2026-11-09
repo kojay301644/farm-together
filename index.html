@@ -316,6 +316,12 @@ body.lowfx .bird{display:none}
 .cur .icn{width:17px;height:17px}
 .hint{margin-top:5px;padding:5px 10px;font-size:12px;transition:opacity .5s,transform .5s}
 .hint.hide{opacity:0;transform:translateY(-8px);pointer-events:none}
+.setbtn{flex:none;width:36px;height:36px;border-radius:12px;border:0;background:#F3EBDD;display:grid;place-items:center;cursor:pointer;padding:0}
+.setbtn img{width:28px;height:28px;object-fit:contain}
+.admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
+.admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}
+.admrow input{font:inherit;font-weight:800;padding:5px 8px;border-radius:10px;border:2px solid #E6D2A8;width:100%;box-sizing:border-box}
+.admquick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 </style>
 </head>
 <body>
@@ -354,12 +360,13 @@ body.lowfx .bird{display:none}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794230867" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp" alt=""><span id="pgems">0</span></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794230867" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794230867" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794230867" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>
@@ -375,10 +382,11 @@ body.lowfx .bird{display:none}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794230867" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
+const BUILD="1794230867";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -531,7 +539,7 @@ const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
 const poly=(pts,f,extra='')=>`<polygon points="${P(pts)}" fill="${f}" ${extra}/>`;
 const dia=(x,y,w,d)=>[iso(x,y),iso(x+w,y),iso(x+w,y+d),iso(x,y+d)];
 let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
-const A = n => `assets/${n}.webp`;
+const A = n => `assets/${n}.webp?v=${typeof BUILD!=='undefined'?BUILD:''}`;
 
 /* 田地位置（格座標，3 排 × 6 塊） */
 const PS=1.45, PG=1.65;
@@ -624,6 +632,8 @@ const BUTTERFLY = c => `<g class="bfly"><ellipse cx="-4" cy="-2" rx="4.5" ry="3.
 /* ================= 組合地圖 ================= */
 let plotEls=[], plotSig=[], plotLabs=[];
 const movers=[];
+let OBST=[], RANCH=null;  // 不能踩的範圍（畫面座標橢圓）
+const addObst=(gx,gy,rx,ry,dy=0)=>{ const [x,y]=iso(gx,gy); OBST.push([x,y+dy,rx,ry]); };
 let farmerMover=null, farmerAv=null;
 /* 玩家角色＝萌獸（動作仿萌獸星球：腿部切片擺動、搖擺、漂浮、呼吸） */
 const CHR_RATIO={"bunny1":0.782,"bunny2":0.771,"bunny3":0.812,"mouse1":1.341,"mouse2":1.276,"mouse3":1.1,"mole1":0.882,"mole2":0.976,"mole3":0.976,"puffer1":1.0,"puffer2":0.982,"puffer3":0.965,"owl1":0.888,"owl2":0.841,"owl3":0.853,"lizard1":1.453,"lizard2":1.288,"lizard3":1.259,"deer1":0.747,"deer2":0.647,"deer3":0.712,"moth1":0.924,"moth2":0.988,"moth3":0.865,"armad1":1.112,"armad2":1.035,"armad3":0.971,"seal1":1.1,"seal2":1.059,"seal3":0.994,"marten1":1.006,"marten2":1.212,"marten3":1.276,"phoenix1":0.841,"phoenix2":0.947,"phoenix3":0.882,"fox1":1.018,"fox2":0.994,"fox3":1.0,"otter1":0.9,"otter2":0.865,"otter3":0.841,"penguin1":0.871,"penguin2":0.953,"penguin3":0.929,"pango1":1.188,"pango2":1.365,"pango3":1.147,"ferret1":0.971,"ferret2":1.053,"ferret3":1.012,"whale1":1.376,"whale2":1.182,"whale3":1.088,"bear1":0.965,"bear2":0.9,"bear3":0.935,"dragon1":0.941,"dragon2":0.935,"dragon3":0.947};
@@ -701,6 +711,7 @@ function farmerDo(i, kind){
 }
 
 function buildWorld(){
+  OBST=[];
   skinSig='';
   const W=$('world');
   W.setAttribute('viewBox',`${VX} ${VY} ${WW} ${WH}`);
@@ -745,11 +756,12 @@ function buildWorld(){
   // 牧場（農田左邊、島的下方中間）
   const RX=4.1, RY=11.85, RW=10.15, RD=3.0;  // 農田左下邊，長度跟農田切齊
   pen(RX,RY,RW,RD,'#E8D3A2','url(#pGrass)','front');
-  const GATE=[RX+RW*0.32, RY+RD];  // 牧場門（萌獸從這裡進出）
+  const GATE=[RX+RW*0.32, RY+RD]; RANCH=[RX,RY,RW,RD];  // 牧場門（萌獸從這裡進出）
   { const [tx,ty]=iso(RX+RW-0.7, RY+0.6); objs.push({depth:RX+RW+RY, svg: ol(`<path d="M${tx-22} ${ty-6} l22 -11 l22 11 l-22 11z" fill="#8B5E3C"/><path d="M${tx-18} ${ty-6} l18 -9 l18 9 l-18 9z" fill="#F4D35E"/>`,2)}); }
 
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
+    if(o.id!=='pen' && o.id!=='coop') addObst(o.c[0],o.c[1],o.w*0.42,o.w*0.24,-o.w*0.08);
     const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
     let s = (SKIN_PART[o.id] ? skinSprite(o.id, gx, gy, o.w, o.foot) : sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot}));
     if(o.id==='barn'){ // 風車葉片
@@ -765,8 +777,8 @@ function buildWorld(){
   });
 
   // 裝飾（萌獸星球素材）
-  const deco=(n,gx,gy,w,extra='')=>objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`});
-  const FC=HG(645,352); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
+  const deco=(n,gx,gy,w,extra='')=>(addObst(gx,gy,w*0.38,w*0.2,-w*0.06), objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`}));
+  const FC=HG(645,352); addObst(FC[0],FC[1],70,38,-12); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
   lab += labelPill(iso(...FC)[0], iso(...FC)[1]-150, '好友廣場', {bg:'#E3F6EA',fg:'#2E9660'});
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
@@ -818,18 +830,33 @@ function buildWorld(){
   ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
 
+/* 自由走動：整座島都能走，不踩建築與裝飾；偶爾從牧場門進出 */
+const ISL=[672*IS,335*IS,520*IS,240*IS];
+function walkable(gx,gy){ const [x,y]=iso(gx,gy);
+  if(((x-ISL[0])/ISL[2])**2+((y-ISL[1])/ISL[3])**2>1) return false;
+  for(const [ox,oy,rx,ry] of OBST) if(((x-ox)/rx)**2+((y-oy)/ry)**2<1) return false;
+  if(RANCH && gx>RANCH[0]-0.15 && gx<RANCH[0]+RANCH[2]+0.15 && gy>RANCH[1]-0.15 && gy<RANCH[1]+RANCH[3]+0.15) return false;
+  return true; }
+function clearLine(a,b){ const n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/0.25); for(let k=1;k<=n;k++){ if(!walkable(a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n)) return false; } return true; }
+function pickRoam(m){
+  if(RANCH && Math.random()<0.15){ const g=[RANCH[0]+RANCH[2]*0.32, RANCH[1]+RANCH[3]], out=[g[0],g[1]+0.9];
+    if(clearLine([m.x,m.y],out)){ m.route=[[g[0],g[1]-0.1],[g[0]+0.4,g[1]-1.6],[g[0]+2.6,g[1]-1.4],[g[0]+0.4,g[1]-1.6],[g[0],g[1]-0.1]]; return out; } }
+  for(let k=0;k<40;k++){ const a=Math.random()*Math.PI*2, r=1.5+Math.random()*5, g=[m.x+Math.cos(a)*r, m.y+Math.sin(a)*r];
+    if(walkable(g[0],g[1]) && clearLine([m.x,m.y],g)) return g; }
+  return [m.x,m.y]; }
 /* 農場主人的移動與動作 */
 function farmerStep(m, dt){
   let moving=false;
   if(m.wait>0){ m.wait-=dt; if(m.wait<=0){ setAct(m,null); if(m.task && m.task.started) m.task=null; } }
   else {
-    const goal = m.task ? m.task.pos : m.path[m.tgt];
+    if(!m.task && !m.goal) m.goal = (m.route && m.route.length) ? m.route.shift() : pickRoam(m);
+    const goal = m.task ? m.task.pos : m.goal;
     const dx=goal[0]-m.x, dy=goal[1]-m.y, dist=Math.hypot(dx,dy), step=(m.task?2.4:m.speed*(m.c?Math.max(.6,Math.min(1.3,m.c.spd)):1))*dt;
     if(dist<=step){ m.x=goal[0]; m.y=goal[1];
       if(m.task){ m.task.started=true; if(m.task.look){ const sd=(m.task.look[0]-m.x)-(m.task.look[1]-m.y); if(Math.abs(sd)>0.05) m.face=sd>0?1:-1; }
         setAct(m,m.task.act); m.wait=m.task.dur; emote(m,m.task.emo); }
-      else { m.tgt=(m.tgt+1)%m.path.length; m.wait=1+Math.random()*3;
-        const r=Math.random(); if(r<0.5) setAct(m, ['wave','stretch','look','wave'][Math.floor(Math.random()*4)]); }
+      else { m.goal=null; if(m.route && m.route.length){ m.wait=0.2+Math.random()*0.6; } else { m.wait=1+Math.random()*3;
+        const r=Math.random(); if(r<0.5) setAct(m, ['wave','stretch','look','wave'][Math.floor(Math.random()*4)]); } }
     } else { m.x+=dx/dist*step; m.y+=dy/dist*step; moving=true; const sdx=dx-dy; if(Math.abs(sdx)>0.01) m.face=sdx>0?1:-1; }
   }
   farmerPose(m, dt, moving);
@@ -1036,7 +1063,7 @@ function dayNight(){ $('tint').style.background='transparent'; document.body.cla
 dayNight();
 
 /* ================= 頭像 ================= */
-const avSrc = n => `assets/av${n||11}.webp`;
+const avSrc = n => A("av"+(n||11));
 const avImg = (o, cls='avatar sm') => `<img class="${cls} avimg" src="${avSrc(o && o.avatar)}" alt="">`;
 function openAvatarPicker(){
   const cur = S.me.avatar||11;
@@ -1051,7 +1078,7 @@ function openAvatarPicker(){
   const list = ['home_island','backdrop','b_shop','b_farm','b_academy','bc_shop','b_fountain','b_sail','dc_flower','dc_lamp','dc_hay','dc_balloon','c_bunny1','n_friends','i_coin','i_gem','bg_forest','av11'];
   let n=0; const done=()=>{ n++; $('ldbar').style.width = Math.round(n/list.length*100)+'%'; if(n>=list.length) finish(); };
   let fin=false; const finish=()=>{ if(fin) return; fin=true; $('loader').classList.add('hide'); setTimeout(()=>$('loader').remove(), 600); };
-  list.forEach(k=>{ const im=new Image(); im.onload=im.onerror=done; im.src=`assets/${k}.webp`; });
+  list.forEach(k=>{ const im=new Image(); im.onload=im.onerror=done; im.src=A(k); });
   setTimeout(finish, 8000);
 })();
 
@@ -1555,17 +1582,43 @@ async function openHome(){
       ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友廣場」加好友、拜訪好友農場</div>
     <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
     <div class="homebtns"><button class="btn o" id="hGem" style="background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">💎 鑽石商店</button><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
-    <div class="homebtns">${S.me.admin?'<a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">🛠️ 營運後台</a>':''}<button class="btn sub" id="logout">登出</button></div>
-    <div class="sec">設定</div>
-    <div class="seg" style="margin-top:6px"><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
-    <div style="text-align:center;margin-top:10px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`);
+    <div class="homebtns"><button class="btn sub" id="hSet">⚙️ 設定・登出</button></div>`);
   $('hGem').onclick = ()=>openGemShop();
   $('hAv').onclick = openAvatarPicker; bindBeastPanel();
-  $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openHome(); };
-  $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openHome(); };
-  $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openHome(); };
+  $('hSet').onclick = openSettings;
   $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
-  $('logout').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
+}
+/* ================= 設定頁 ================= */
+async function openSettings(){
+  const {data:{user}} = await sb.auth.getUser(); const me=S.me;
+  let body = `<div class="sec">帳號</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(me,'avatar')}<div style="font-weight:800;line-height:1.6">${esc(me.nickname)}・Lv${me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div></div>
+    <div class="homebtns"><button class="btn sub" id="sSwitch">🔄 切換帳號</button><button class="btn sub" id="sOut" style="background:#F2545B;color:#fff;box-shadow:0 3px 0 #C23A40">登出</button></div>
+    <div class="sec">遊戲設定</div>
+    <div class="seg" style="margin-top:6px"><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
+    <div class="homebtns"><button class="btn o" id="sHelp">📖 遊戲說明</button><button class="btn o" id="sA2hs">📱 加到桌面</button></div>`;
+  if(me.admin) body += `<div class="sec">🛠️ 管理員</div><div class="admbox">
+    <div class="admrow"><span>等級</span><input id="aLv" type="number" min="1" max="30" value="${me.lv}"><span>金幣</span><input id="aGold" type="number" min="0" value="${me.gold}"><span>鑽石</span><input id="aGems" type="number" min="0" value="${me.gems||0}"></div>
+    <div class="admquick"><button class="mini" data-q="lv">等級 30</button><button class="mini" data-q="gold">金幣 +10萬</button><button class="mini" data-q="gems">鑽石 +1000</button><button class="mini o" data-q="seeds">每種種子 +20</button></div>
+    <div class="homebtns"><button class="btn" id="aSave">儲存</button><a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">營運後台</a></div>
+    <div class="hint">只會改到你自己的帳號，每次修改都記錄在後台的操作紀錄</div></div>`;
+  body += `<div style="text-align:center;margin-top:12px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`;
+  modal('設定', body);
+  $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openSettings(); };
+  $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openSettings(); };
+  $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openSettings(); };
+  $('sHelp').onclick = openHelp; $('sA2hs').onclick = openA2HS;
+  $('sOut').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
+  $('sSwitch').onclick = async()=>{ closeModal(); await sb.auth.signOut(); toast('已登出，請用另一個帳號登入'); };
+  if(me.admin){
+    const save = async(lv,gold,gems)=>{ try{ const old=S.me.lv; applyState(await rpc('adm_self_set',{p_lv:lv,p_gold:gold,p_gems:gems})); refresh(); sfx('coin'); toast('已更新'); if(S.me.lv!==old) loadConfig(); openSettings(); }catch(e){ toast(e.message); } };
+    $('aSave').onclick = ()=>save(+$('aLv').value, +$('aGold').value, +$('aGems').value);
+    document.querySelectorAll('[data-q]').forEach(b=>b.onclick=async()=>{ const q=b.dataset.q;
+      if(q==='lv') return save(30, me.gold, me.gems||0);
+      if(q==='gold') return save(me.lv, me.gold+100000, me.gems||0);
+      if(q==='gems') return save(me.lv, me.gold, (me.gems||0)+1000);
+      try{ for(const c of CROPS) await rpc('adm_give',{p_id:me.id,p_crop:c.id,p_seeds:20,p_reason:'管理員自己測試'}); applyState(await rpc('farm_me')); refresh(); toast('每種種子 +20'); }catch(e){ toast(e.message); } });
+  }
 }
 const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
@@ -1874,6 +1927,7 @@ $('nickBtn').onclick = createNick;
 $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); });
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
+$('bSet').onclick = ()=>{ if(S) openSettings(); };
 $('avatar').onclick = ()=>{ if(S && mode==='home') openAvatarPicker(); };
 $('gemBox').onclick = ()=>{ if(S && mode==='home') openGemShop('pack'); };
 $('tutNext').onclick = ()=>tutNext();

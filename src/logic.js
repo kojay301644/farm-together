@@ -245,17 +245,43 @@ async function openHome(){
       ・作物缺水會長得比較慢，記得澆水<br>・雜草和蟲沒處理，收成會變少<br>・成熟後要快點收，好友可以來偷菜（最多偷走 4 成）<br>・到「好友廣場」加好友、拜訪好友農場</div>
     <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
     <div class="homebtns"><button class="btn o" id="hGem" style="background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">💎 鑽石商店</button><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
-    <div class="homebtns">${S.me.admin?'<a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">🛠️ 營運後台</a>':''}<button class="btn sub" id="logout">登出</button></div>
-    <div class="sec">設定</div>
-    <div class="seg" style="margin-top:6px"><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
-    <div style="text-align:center;margin-top:10px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`);
+    <div class="homebtns"><button class="btn sub" id="hSet">⚙️ 設定・登出</button></div>`);
   $('hGem').onclick = ()=>openGemShop();
   $('hAv').onclick = openAvatarPicker; bindBeastPanel();
-  $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openHome(); };
-  $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openHome(); };
-  $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openHome(); };
+  $('hSet').onclick = openSettings;
   $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
-  $('logout').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
+}
+/* ================= 設定頁 ================= */
+async function openSettings(){
+  const {data:{user}} = await sb.auth.getUser(); const me=S.me;
+  let body = `<div class="sec">帳號</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(me,'avatar')}<div style="font-weight:800;line-height:1.6">${esc(me.nickname)}・Lv${me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div></div>
+    <div class="homebtns"><button class="btn sub" id="sSwitch">🔄 切換帳號</button><button class="btn sub" id="sOut" style="background:#F2545B;color:#fff;box-shadow:0 3px 0 #C23A40">登出</button></div>
+    <div class="sec">遊戲設定</div>
+    <div class="seg" style="margin-top:6px"><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
+    <div class="homebtns"><button class="btn o" id="sHelp">📖 遊戲說明</button><button class="btn o" id="sA2hs">📱 加到桌面</button></div>`;
+  if(me.admin) body += `<div class="sec">🛠️ 管理員</div><div class="admbox">
+    <div class="admrow"><span>等級</span><input id="aLv" type="number" min="1" max="30" value="${me.lv}"><span>金幣</span><input id="aGold" type="number" min="0" value="${me.gold}"><span>鑽石</span><input id="aGems" type="number" min="0" value="${me.gems||0}"></div>
+    <div class="admquick"><button class="mini" data-q="lv">等級 30</button><button class="mini" data-q="gold">金幣 +10萬</button><button class="mini" data-q="gems">鑽石 +1000</button><button class="mini o" data-q="seeds">每種種子 +20</button></div>
+    <div class="homebtns"><button class="btn" id="aSave">儲存</button><a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">營運後台</a></div>
+    <div class="hint">只會改到你自己的帳號，每次修改都記錄在後台的操作紀錄</div></div>`;
+  body += `<div style="text-align:center;margin-top:12px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`;
+  modal('設定', body);
+  $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openSettings(); };
+  $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openSettings(); };
+  $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openSettings(); };
+  $('sHelp').onclick = openHelp; $('sA2hs').onclick = openA2HS;
+  $('sOut').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
+  $('sSwitch').onclick = async()=>{ closeModal(); await sb.auth.signOut(); toast('已登出，請用另一個帳號登入'); };
+  if(me.admin){
+    const save = async(lv,gold,gems)=>{ try{ const old=S.me.lv; applyState(await rpc('adm_self_set',{p_lv:lv,p_gold:gold,p_gems:gems})); refresh(); sfx('coin'); toast('已更新'); if(S.me.lv!==old) loadConfig(); openSettings(); }catch(e){ toast(e.message); } };
+    $('aSave').onclick = ()=>save(+$('aLv').value, +$('aGold').value, +$('aGems').value);
+    document.querySelectorAll('[data-q]').forEach(b=>b.onclick=async()=>{ const q=b.dataset.q;
+      if(q==='lv') return save(30, me.gold, me.gems||0);
+      if(q==='gold') return save(me.lv, me.gold+100000, me.gems||0);
+      if(q==='gems') return save(me.lv, me.gold, (me.gems||0)+1000);
+      try{ for(const c of CROPS) await rpc('adm_give',{p_id:me.id,p_crop:c.id,p_seeds:20,p_reason:'管理員自己測試'}); applyState(await rpc('farm_me')); refresh(); toast('每種種子 +20'); }catch(e){ toast(e.message); } });
+  }
 }
 const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
@@ -564,6 +590,7 @@ $('nickBtn').onclick = createNick;
 $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); });
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
+$('bSet').onclick = ()=>{ if(S) openSettings(); };
 $('avatar').onclick = ()=>{ if(S && mode==='home') openAvatarPicker(); };
 $('gemBox').onclick = ()=>{ if(S && mode==='home') openGemShop('pack'); };
 $('tutNext').onclick = ()=>tutNext();
