@@ -44,7 +44,9 @@ const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'bf'};
 const SKIN_NAME = {b:'原版', bb:'紅磚', bc:'糖果', bf:'森林', bi:'冰雪', bj:'翡翠', bl:'熔岩'};
 const skinImg = (k, st) => (st||SKIN_DEF[k]) + '_' + SKIN_PART[k];
 function skinSprite(k, gx, gy, w, foot){ const [x,y]=iso(gx,gy), img=skinImg(k), h=w*(SKIN_R[img]||1);
-  return `<image class="skin" data-sk="${k}" data-fy="${y}" data-w="${w}" data-foot="${foot}" href="${A(img)}" x="${(x-w/2).toFixed(1)}" y="${(y-h*foot).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"/>`; }
+  const im=`<image class="skin" data-sk="${k}" data-fy="${y}" data-w="${w}" data-foot="${foot}" href="${A(img)}" x="${(x-w/2).toFixed(1)}" y="${(y-h*foot).toFixed(1)}" width="${w}" height="${h.toFixed(1)}"/>`;
+  return SKIN_FLIP[k] ? `<g transform="translate(${2*x} 0) scale(-1 1)">${im}</g>` : im; }
+const SKIN_FLIP = {pen:true};  // 萌獸園左右翻轉（木塔在左）
 let skinSig='';
 function applySkins(on){ on=on||{}; const sig=JSON.stringify(on); if(sig===skinSig) return; skinSig=sig;
   document.querySelectorAll('#world image.skin').forEach(el=>{ const k=el.dataset.sk, img=skinImg(k, on[k]), w=+el.dataset.w, h=w*(SKIN_R[img]||1);
