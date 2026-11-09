@@ -174,7 +174,7 @@ async function pageCf(){
       <td><input class="num" id="g_${g.id}_lv" type="number" value="${g.lv}"></td><td><button class="btn" data-gid="${g.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>建築外觀</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；兩個都留空＝不能購買。</div>
     <table><tr><th>外觀</th><th>建築</th><th>名稱</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
-    ${(C.skins||[]).map(k=>`<tr><td><img src="assets/th_${k.style}_${({home:'academy',barn:'farm',shop:'shop',fountain:'fountain',pen:'play'})[k.bld]}.webp" style="width:40px;height:40px;object-fit:contain"></td><td>${({home:'我的家',barn:'穀倉',shop:'種子商店',fountain:'噴水池',pen:'萌獸園'})[k.bld]}</td>
+    ${(C.skins||[]).map(k=>`<tr><td><img src="assets/th_${k.style}_${({home:'academy',barn:'farm',shop:'shop',fountain:'fountain',pen:'play',decor:'forge'})[k.bld]}.webp" style="width:40px;height:40px;object-fit:contain"></td><td>${({home:'我的家',barn:'穀倉',shop:'種子商店',fountain:'噴水池',pen:'萌獸園',decor:'裝飾店'})[k.bld]}</td>
       <td><input id="k_${k.id}_name" value="${esc(k.name)}" style="width:6em"></td><td><input class="num" id="k_${k.id}_gold" type="number" value="${k.gold??''}"></td><td><input class="num" id="k_${k.id}_gems" type="number" value="${k.gems??''}"></td><td><button class="btn" data-kid="${k.id}">儲存</button></td></tr>`).join('')}</table></div>`);
   document.querySelectorAll('[data-sk]').forEach(b=>b.onclick=async()=>{ try{ await rpc('adm_setting_set',{p_key:b.dataset.sk,p_value:+$('s_'+b.dataset.sk).value}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-cid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.cid, v=f=>+$(`c_${id}_${f}`).value;

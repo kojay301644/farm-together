@@ -557,9 +557,9 @@ function sprite(name, gx, gy, w, opt={}){
   return `<image href="${A(name)}" x="${(x-w/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" ${opt.cls?`class="${opt.cls}"`:''}/>`;
 }
 /* 建築外觀（萌獸 7 種樣式） */
-const SKIN_R = {"b_play": 1.1599, "bb_play": 1.164, "bc_play": 1.203, "bf_play": 1.166, "bi_play": 1.1429, "bj_play": 1.1721, "bl_play": 1.1802, "b_academy": 1.0702, "bb_academy": 1.115, "bc_academy": 1.25, "bf_academy": 1.115, "bi_academy": 1.1918, "bj_academy": 1.113, "bl_academy": 1.115, "b_farm": 1.0357, "bb_farm": 1.0317, "bc_farm": 1.0793, "bf_farm": 1.0556, "bi_farm": 1.1327, "bj_farm": 1.0575, "bl_farm": 1.0575, "b_shop": 1.0997, "bb_shop": 1.1268, "bc_shop": 1.1615, "bf_shop": 1.115, "bi_shop": 1.1388, "bj_shop": 1.1189, "bl_shop": 1.1348, "b_fountain": 1.1679, "bb_fountain": 1.1532, "bc_fountain": 1.1228, "bf_fountain": 1.147, "bi_fountain": 1.1429, "bj_fountain": 1.1449, "bl_fountain": 1.1615, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
-const SKIN_PART = {home:'academy', barn:'farm', shop:'shop', fountain:'fountain', pen:'play'};
-const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'b'};
+const SKIN_R = {"b_forge": 1.1449, "bb_forge": 1.1307, "bc_forge": 1.1532, "bf_forge": 1.1287, "bi_forge": 1.149, "bj_forge": 1.1429, "bl_forge": 1.1327, "b_play": 1.1599, "bb_play": 1.164, "bc_play": 1.203, "bf_play": 1.166, "bi_play": 1.1429, "bj_play": 1.1721, "bl_play": 1.1802, "b_academy": 1.0702, "bb_academy": 1.115, "bc_academy": 1.25, "bf_academy": 1.115, "bi_academy": 1.1918, "bj_academy": 1.113, "bl_academy": 1.115, "b_farm": 1.0357, "bb_farm": 1.0317, "bc_farm": 1.0793, "bf_farm": 1.0556, "bi_farm": 1.1327, "bj_farm": 1.0575, "bl_farm": 1.0575, "b_shop": 1.0997, "bb_shop": 1.1268, "bc_shop": 1.1615, "bf_shop": 1.115, "bi_shop": 1.1388, "bj_shop": 1.1189, "bl_shop": 1.1348, "b_fountain": 1.1679, "bb_fountain": 1.1532, "bc_fountain": 1.1228, "bf_fountain": 1.147, "bi_fountain": 1.1429, "bj_fountain": 1.1449, "bl_fountain": 1.1615, "b_train": 1.0774, "bb_train": 1.1151, "bc_train": 1.0884, "bf_train": 1.119, "bi_train": 1.1348, "bj_train": 1.119, "bl_train": 1.1369, "b_play": 1.1599};
+const SKIN_PART = {home:'academy', barn:'farm', shop:'shop', fountain:'fountain', pen:'play', decor:'forge'};
+const SKIN_DEF = {home:'b', barn:'b', shop:'b', fountain:'b', pen:'b', decor:'b'};
 const SKIN_NAME = {b:'原版', bb:'紅磚', bc:'糖果', bf:'森林', bi:'冰雪', bj:'翡翠', bl:'熔岩'};
 const skinImg = (k, st) => (st||SKIN_DEF[k]) + '_' + SKIN_PART[k];
 function skinSprite(k, gx, gy, w, foot){ const [x,y]=iso(gx,gy), img=skinImg(k), h=w*(SKIN_R[img]||1);
@@ -800,7 +800,7 @@ function buildWorld(){
   const addMover=(html,o)=>{ const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML=`<g class="mvin">${html}</g>`; mv.appendChild(g); movers.push(Object.assign({el:g,wait:0,face:1},o)); };
   const pet=(n,w)=>{ const h=w*(RATIO[n]||1); return `<ellipse cx="0" cy="1" rx="${w*0.32}" ry="${w*0.1}" fill="rgba(0,0,0,.16)"/><g class="hop"><image href="${A(n)}" x="${-w/2}" y="${-h*0.96}" width="${w}" height="${h}"/></g>`; };
   // 農場主人（用頭像做的人物，自己家＝自己，拜訪＝好友）
-  const C0=HG(645,395), WP=[[645,395],[470,250],[645,395],[668,215],[645,395],[860,255],[645,395],[790,345],[860,370],[790,345],[645,395],[430,395],[645,395],[520,440],[645,395],[690,470]].map(([x,y])=>HG(x,y));
+  const C0=HG(645,425), WP=[[645,425],[560,425],[545,290],[600,240],[545,290],[560,425],[645,425],[730,425],[712,282],[690,240],[712,282],[730,425],[645,425],[650,470]].map(([x,y])=>HG(x,y));
   addMover('',{x:C0[0],y:C0[1],path:WP,tgt:1,speed:0.55,s:1.25,farmer:true});
   farmerMover=movers[movers.length-1]; farmerAv=null;
   for(let k=0;k<4;k++) addMover(CHICK,{x:RX+0.6+rnd()*(RW-1.2),y:RY+0.6+rnd()*(RD-1.0),chick:true,area:[RX+0.3,RY+0.3,RX+RW-0.3,RY+RD-0.3],speed:0.5,s:1.25,wait:rnd()*2});
@@ -1279,7 +1279,7 @@ function checkEvolve(){
 
 /* ================= 建築外觀商店 ================= */
 let SKINS = [], skinTab = 'home';
-const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'萌獸園'};
+const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'萌獸園', decor:'裝飾店'};
 function openSkinShop(t){
   if(mode==='visit') return toast('回到自己的農場才能換外觀');
   if(t) skinTab=t;
