@@ -236,6 +236,9 @@ async function pageCf(){
     <div class="card"><h2>每日簽到獎勵</h2><div class="muted" style="margin-bottom:8px">連續簽到第 1～7 天各送什麼，不送就留空或填 0。</div>
     <table><tr><th>天數</th><th>金幣</th><th>鑽石</th></tr>${[0,1,2,3,4,5,6].map(i=>{ const r=(SIGN[i]||{}); return `<tr data-signrow><td><b>第 ${i+1} 天</b></td><td><input class="num" id="sg_${i}_gold" type="number" value="${r.gold??''}"></td><td><input class="num" id="sg_${i}_gems" type="number" value="${r.gems??''}"></td></tr>`; }).join('')}
     <tr><td></td><td colspan="2"><button class="btn" data-sign="1">儲存簽到獎勵</button></td></tr></table></div>
+    <div class="card"><h2>成就</h2><div class="muted" style="margin-bottom:8px">目標數字達到就自動完成並發鑽石（每個成就每人只能拿一次）。</div>
+    <table><tr><th>分類</th><th>名稱</th><th>目標</th><th>鑽石</th><th></th></tr>
+    ${(C.achievements||[]).map(x=>`<tr><td>${esc(x.cat)}</td><td><input id="ac_${x.id}_name" value="${esc(x.name)}" style="width:13em"></td><td><input class="num" id="ac_${x.id}_target" type="number" value="${x.target}"></td><td><input class="num" id="ac_${x.id}_gems" type="number" value="${x.gems}"></td><td><button class="btn" data-acid="${x.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>寵物造型</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；兩個都留空＝不能購買。</div>
     <table><tr><th>造型</th><th>名稱</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.pet_skins||[]).map(k=>`<tr><td><img src="assets/ps_${k.beast}_${k.kind}.webp" style="width:40px;height:40px;object-fit:contain"></td><td><input id="ps_${k.id.replace('@','_')}_name" value="${esc(k.name)}" style="width:8em"></td><td><input class="num" id="ps_${k.id.replace('@','_')}_gold" type="number" value="${k.gold??''}"></td><td><input class="num" id="ps_${k.id.replace('@','_')}_gems" type="number" value="${k.gems??''}"></td><td><button class="btn" data-psid="${k.id}">儲存</button></td></tr>`).join('')}</table></div>`);
@@ -258,6 +261,8 @@ async function pageCf(){
     await rpc('adm_land_save',{p_idx:+i,p_lv:+$(`l_${i}_lv`).value,p_cost:+$(`l_${i}_cost`).value}); });
   document.querySelectorAll('[data-psid]').forEach(b=>b._save=async()=>{ const id=b.dataset.psid, k=id.replace('@','_'), v=f=>$(`ps_${k}_${f}`).value, n=f=>v(f)===''?null:+v(f);
     await rpc('adm_pskin_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems')}); });
+  document.querySelectorAll('[data-acid]').forEach(b=>b._save=async()=>{ const id=b.dataset.acid, v=f=>$(`ac_${id}_${f}`).value;
+    await rpc('adm_ach_save',{p_id:id,p_name:v('name'),p_target:+v('target'),p_gems:+v('gems')}); });
   document.querySelectorAll('[data-sign]').forEach(b=>b._save=async()=>{ const rw=[0,1,2,3,4,5,6].map(i=>{ const o={}, g=+$(`sg_${i}_gold`).value||0, m=+$(`sg_${i}_gems`).value||0; if(g>0) o.gold=g; if(m>0) o.gems=m; return o; });
     await rpc('adm_setting_put',{p_key:'sign_rw',p_value:rw}); });
   wireSaves();

@@ -295,6 +295,7 @@ async function openHome(){
   modal(`🏠 ${esc(S.me.nickname)}的家`, `
     <div class="sec">我的寵物夥伴</div>${beastPanelHTML()}
     <div class="sec">成就（拿鑽石）</div>${achHTML(S.me)}`);
+  if($('hAch')) $('hAch').onclick = ()=>openAchs();
   bindBeastPanel();
 }
 /* ================= 設定頁 ================= */
@@ -752,11 +753,23 @@ function openBin(){
 /* 每日登入鑽石 */
 function dailyToast(st){ if(st && st.daily){ sfx('lvup'); toast(`🎁 每日登入獎勵 💎${st.daily}`); st.daily=0; } }
 /* 成就 */
-const ACH_LIST=[['harvest100','收成 100 次',30,m=>[(m.stats||{}).harvest||0,100]],['harvest1000','收成 1000 次',100,m=>[(m.stats||{}).harvest||0,1000]],
-  ['steal50','偷菜 50 次',30,m=>[(m.stats||{}).steal||0,50]],['party9','開滿 9 隻寵物夥伴',50,m=>[partyOf(m).length,9]],['auto9','打造全自動農場（9 種裝備）',100,m=>[autoProgress(m).funcs,9]]];
-function achHTML(me){ return `<div class="achs">${ACH_LIST.map(([id,n,g,f])=>{ const [v,t]=f(me), done=(me.ach||{})[id];
-  return `<div class="ach${done?' done':''}"><b>${done?'🏆':'🎯'} ${n}</b><span>${done?'已完成':`${Math.min(v,t)}/${t}`}・💎${g}</span></div>`; }).join('')}</div>
-  <div class="rhint">每升 1 級送 💎${+(CFG_SET.lv_gems??20)}，每天第一次上線送 💎${+(CFG_SET.daily_gems??10)}</div>`; }
+function achHTML(me){ const n=Object.keys(me.ach||{}).length;
+  return `<button class="btn achbtn" id="hAch">🏆 查看全部成就 <small>已完成 ${n} 個</small></button>
+  <div class="rhint">種田、牧場、好友、偷菜、寵物、城鎮、簽到都有成就，完成自動送鑽石。每升 1 級送 💎${+(CFG_SET.lv_gems??20)}，每天第一次上線送 💎${+(CFG_SET.daily_gems??10)}</div>`; }
+let achCat = null;
+async function openAchs(cat){
+  modal('🏆 成就', `<div class="empty">讀取中…</div>`);
+  let L; try{ L = await rpc('farm_achs'); }catch(e){ return modal('🏆 成就', `<div class="empty">${esc(e.message)}</div>`); }
+  const cats=[...new Set(L.map(a=>a.cat))]; if(cat) achCat=cat; if(!cats.includes(achCat)) achCat=cats[0];
+  const done=L.filter(a=>a.done).length, gem=L.filter(a=>a.done).reduce((x,a)=>x+a.gems,0);
+  const tabs=`<div class="achtabs">${cats.map(c=>{ const cl=L.filter(a=>a.cat===c), d=cl.filter(a=>a.done).length;
+    return `<button data-ac="${esc(c)}" class="${c===achCat?'on':''}">${esc(c)}<small>${d}/${cl.length}</small></button>`; }).join('')}</div>`;
+  const rows=L.filter(a=>a.cat===achCat).sort((x,y)=>(x.done-y.done)).map(a=>{ const pct=Math.min(100, a.v/a.target*100);
+    return `<div class="ach2${a.done?' done':''}"><div class="a2t"><b>${a.done?'🏆':'🎯'} ${esc(a.name)}</b><span class="a2g">💎${a.gems}</span></div>
+      ${a.done?'<div class="a2d">已完成，鑽石已發放</div>':`<div class="a2bar"><i style="width:${pct.toFixed(1)}%"></i></div><div class="a2v">${(+a.v).toLocaleString()} / ${(+a.target).toLocaleString()}</div>`}</div>`; }).join('');
+  modal('🏆 成就', `<div class="achsum">已完成 <b>${done}</b> / ${L.length} 個・共拿到 💎${gem}</div>${tabs}${rows}`, [['← 回我的家','sub',()=>openHome()]]);
+  document.querySelectorAll('#md [data-ac]').forEach(b=>b.onclick=()=>openAchs(b.dataset.ac));
+}
 
 /* ================= 被偷提醒：有人偷你的菜，畫面上方跳紅色提醒＋復仇按鈕 ================= */
 let stealNew = 0, stealAlertT = 0;
