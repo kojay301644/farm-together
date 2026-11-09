@@ -345,12 +345,14 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .bcard.on{border-color:#3BB273;background:#E8F8EE}.bcard.dark{background:#FFFDF8;border-style:dashed}
 .kick{position:fixed;inset:0;z-index:400;background:rgba(30,24,18,.72);display:grid;place-items:center;padding:20px}
 .kbox{background:#fff;border:3px solid #4B3423;border-radius:22px;padding:22px 20px;max-width:360px;text-align:center}.kbox h3{margin:6px 0}.kbox p{font-weight:700;line-height:1.6;margin:8px 0}.kbox .mut{color:var(--ink2);font-size:13px}.kbox .btn{width:100%;margin-top:8px}
-.prow{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:4px 0 6px}
-.pslot{position:relative;aspect-ratio:1/1.25;border-radius:12px;background:#FFF8EC;border:2.5px solid #E6D9C3;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--ink2);text-align:center}
-.pslot img{width:92%;height:62%;object-fit:contain}.pslot.lead{border-color:#F4B740;background:#FFF6DB}.pslot.empty{border-style:dashed}.pslot.lock{background:#EEE8DD;color:#9A8C78}
-.pslot .crown{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:14px}
-.pslot .pg{width:26px;height:26px;border-radius:8px;border:2px solid #D9C39A;background:#fff;display:grid;place-items:center;padding:0;font-weight:900;color:#B08A55;font-size:15px;cursor:pointer}
-.pslot .pg img{width:20px;height:20px}
+.prow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 8px}
+.pslot{position:relative;min-height:128px;padding:8px 4px 6px;gap:4px;border-radius:12px;background:#FFF8EC;border:2.5px solid #E6D9C3;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--ink2);text-align:center}
+.pslot img.pb{width:80%;height:64px;object-fit:contain}.pslot.lead{border-color:#F4B740;background:#FFF6DB}.pslot.empty{border-style:dashed}.pslot.lock{background:#EEE8DD;color:#9A8C78}
+.pslot .crown{position:absolute;top:-12px;font-size:18px!important;left:50%;transform:translateX(-50%);font-size:14px}
+.pslot .pg{width:92%;display:flex;align-items:center;justify-content:center;gap:4px;border-radius:10px;border:2.5px dashed #F09A3E;background:#FFF1DC;padding:3px 4px;font:inherit;font-weight:900;color:#D9762A;font-size:12px;cursor:pointer}
+.pslot .pg i{font-style:normal;font-size:16px;line-height:1}
+.pslot .pg img{width:24px;height:24px;object-fit:contain}
+.pslot .pg.on{border:2.5px solid #3BB273;background:#E8F8EE;color:#2E9660}
 .snav{display:flex;flex-wrap:wrap;gap:5px;margin:-2px 0 8px}
 .snav button{flex:none;font:inherit;font-size:13px;font-weight:800;border:2px solid #E6D9C3;background:#FFF8EC;border-radius:12px;padding:6px 10px;color:var(--ink2);cursor:pointer}
 .snav button.on{background:#3BB273;border-color:#2E9660;color:#fff}

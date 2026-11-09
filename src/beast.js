@@ -14,7 +14,7 @@ function openBeastPark(t){
   if(parkTab==='mine'){
     const pt=partyOf(who), inP=sp=>pt.findIndex(p=>p.s===sp), cap=visit?6:(who.party_cap||1);
     body += `<div class="sec">${visit?'牠的夥伴':`我的夥伴（${pt.length}/${cap}）`}</div>` + partyRowHTML(who, !visit);
-    if(!visit) body += `<div class="rhint">👑 隊長會跑去幫你收成、澆水。每隻夥伴都能插一件裝備（點夥伴下面的＋），同種功能取最強的那件。</div>`;
+    if(!visit) body += `<div class="rhint">👑 隊長會跑去幫你收成、澆水。每隻夥伴都能插一件裝備（點橘色「＋裝備」），同種功能取最強的那件。</div>`;
     const list = BEASTS.filter(b=>own[b.id]!=null);
     body += `<div class="sec">全部萌獸</div><div class="bgrid">${list.map(b=>{ const k=inP(b.id);
       let btn='';
@@ -86,7 +86,7 @@ async function saveParty(pt, msg){
 function partyRowHTML(who, editable){
   const pt=partyOf(who), cap=editable ? (who.party_cap||1) : pt.length, lvs=partyLvs();
   return `<div class="prow">${[0,1,2,3,4,5].map(i=>{ const p=pt[i];
-    if(p){ const g=GEAR[p.g]; return `<div class="pslot${i===0?' lead':''}">${i===0?'<span class="crown">👑</span>':''}<img src="${chrSrc(p.s+'1')}" alt="">${editable?`<button class="pg" data-pg="${i}">${g?`<img src="${A(g.icon)}" alt="">`:'＋'}</button>`:(g?`<span class="pg"><img src="${A(g.icon)}" alt=""></span>`:'')}</div>`; }
+    if(p){ const g=GEAR[p.g]; return `<div class="pslot${i===0?' lead':''}">${i===0?'<span class="crown">👑</span>':''}<img class="pb" src="${chrSrc(p.s+'1')}" alt="">${editable?`<button class="pg${g?' on':''}" data-pg="${i}">${g?`<img src="${A(g.icon)}" alt="">`:'<i>＋</i>'}<span>${g?'裝備中':'裝備'}</span></button>`:(g?`<span class="pg on"><img src="${A(g.icon)}" alt=""><span>裝備</span></span>`:'')}</div>`; }
     if(i<cap) return `<div class="pslot empty">空位</div>`;
     return `<div class="pslot lock">🔒<br>Lv${lvs[i]}</div>`; }).join('')}</div>`;
 }

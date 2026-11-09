@@ -345,12 +345,14 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .bcard.on{border-color:#3BB273;background:#E8F8EE}.bcard.dark{background:#FFFDF8;border-style:dashed}
 .kick{position:fixed;inset:0;z-index:400;background:rgba(30,24,18,.72);display:grid;place-items:center;padding:20px}
 .kbox{background:#fff;border:3px solid #4B3423;border-radius:22px;padding:22px 20px;max-width:360px;text-align:center}.kbox h3{margin:6px 0}.kbox p{font-weight:700;line-height:1.6;margin:8px 0}.kbox .mut{color:var(--ink2);font-size:13px}.kbox .btn{width:100%;margin-top:8px}
-.prow{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:4px 0 6px}
-.pslot{position:relative;aspect-ratio:1/1.25;border-radius:12px;background:#FFF8EC;border:2.5px solid #E6D9C3;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--ink2);text-align:center}
-.pslot img{width:92%;height:62%;object-fit:contain}.pslot.lead{border-color:#F4B740;background:#FFF6DB}.pslot.empty{border-style:dashed}.pslot.lock{background:#EEE8DD;color:#9A8C78}
-.pslot .crown{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:14px}
-.pslot .pg{width:26px;height:26px;border-radius:8px;border:2px solid #D9C39A;background:#fff;display:grid;place-items:center;padding:0;font-weight:900;color:#B08A55;font-size:15px;cursor:pointer}
-.pslot .pg img{width:20px;height:20px}
+.prow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 8px}
+.pslot{position:relative;min-height:128px;padding:8px 4px 6px;gap:4px;border-radius:12px;background:#FFF8EC;border:2.5px solid #E6D9C3;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--ink2);text-align:center}
+.pslot img.pb{width:80%;height:64px;object-fit:contain}.pslot.lead{border-color:#F4B740;background:#FFF6DB}.pslot.empty{border-style:dashed}.pslot.lock{background:#EEE8DD;color:#9A8C78}
+.pslot .crown{position:absolute;top:-12px;font-size:18px!important;left:50%;transform:translateX(-50%);font-size:14px}
+.pslot .pg{width:92%;display:flex;align-items:center;justify-content:center;gap:4px;border-radius:10px;border:2.5px dashed #F09A3E;background:#FFF1DC;padding:3px 4px;font:inherit;font-weight:900;color:#D9762A;font-size:12px;cursor:pointer}
+.pslot .pg i{font-style:normal;font-size:16px;line-height:1}
+.pslot .pg img{width:24px;height:24px;object-fit:contain}
+.pslot .pg.on{border:2.5px solid #3BB273;background:#E8F8EE;color:#2E9660}
 .snav{display:flex;flex-wrap:wrap;gap:5px;margin:-2px 0 8px}
 .snav button{flex:none;font:inherit;font-size:13px;font-weight:800;border:2px solid #E6D9C3;background:#FFF8EC;border-radius:12px;padding:6px 10px;color:var(--ink2);cursor:pointer}
 .snav button.on{background:#3BB273;border-color:#2E9660;color:#fff}
@@ -398,13 +400,13 @@ body.lowfx #tfx{display:none}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794234969" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794235016" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794234969" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794234969" alt=""><span id="pgems">0</span></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794234969" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794235016" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794235016" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794235016" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>
@@ -420,11 +422,11 @@ body.lowfx #tfx{display:none}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794234969" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794235016" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794234969";
+const BUILD="1794235016";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1675,7 +1677,7 @@ function openBeastPark(t){
   if(parkTab==='mine'){
     const pt=partyOf(who), inP=sp=>pt.findIndex(p=>p.s===sp), cap=visit?6:(who.party_cap||1);
     body += `<div class="sec">${visit?'牠的夥伴':`我的夥伴（${pt.length}/${cap}）`}</div>` + partyRowHTML(who, !visit);
-    if(!visit) body += `<div class="rhint">👑 隊長會跑去幫你收成、澆水。每隻夥伴都能插一件裝備（點夥伴下面的＋），同種功能取最強的那件。</div>`;
+    if(!visit) body += `<div class="rhint">👑 隊長會跑去幫你收成、澆水。每隻夥伴都能插一件裝備（點橘色「＋裝備」），同種功能取最強的那件。</div>`;
     const list = BEASTS.filter(b=>own[b.id]!=null);
     body += `<div class="sec">全部萌獸</div><div class="bgrid">${list.map(b=>{ const k=inP(b.id);
       let btn='';
@@ -1747,7 +1749,7 @@ async function saveParty(pt, msg){
 function partyRowHTML(who, editable){
   const pt=partyOf(who), cap=editable ? (who.party_cap||1) : pt.length, lvs=partyLvs();
   return `<div class="prow">${[0,1,2,3,4,5].map(i=>{ const p=pt[i];
-    if(p){ const g=GEAR[p.g]; return `<div class="pslot${i===0?' lead':''}">${i===0?'<span class="crown">👑</span>':''}<img src="${chrSrc(p.s+'1')}" alt="">${editable?`<button class="pg" data-pg="${i}">${g?`<img src="${A(g.icon)}" alt="">`:'＋'}</button>`:(g?`<span class="pg"><img src="${A(g.icon)}" alt=""></span>`:'')}</div>`; }
+    if(p){ const g=GEAR[p.g]; return `<div class="pslot${i===0?' lead':''}">${i===0?'<span class="crown">👑</span>':''}<img class="pb" src="${chrSrc(p.s+'1')}" alt="">${editable?`<button class="pg${g?' on':''}" data-pg="${i}">${g?`<img src="${A(g.icon)}" alt="">`:'<i>＋</i>'}<span>${g?'裝備中':'裝備'}</span></button>`:(g?`<span class="pg on"><img src="${A(g.icon)}" alt=""><span>裝備</span></span>`:'')}</div>`; }
     if(i<cap) return `<div class="pslot empty">空位</div>`;
     return `<div class="pslot lock">🔒<br>Lv${lvs[i]}</div>`; }).join('')}</div>`;
 }
