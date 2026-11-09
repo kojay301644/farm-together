@@ -67,10 +67,7 @@ $f$;
   if position($s$update plots set state='dead', weeds=0, bugs=0, wet_until=null, ripe_at=null where owner=p_owner and idx=r.idx;$s$ in d) = 0 then raise exception '_tick 收成找不到'; end if;
   d := replace(d, $s$update plots set state='dead', weeds=0, bugs=0, wet_until=null, ripe_at=null where owner=p_owner and idx=r.idx;$s$,
     $s$update plots set state='empty', crop=null, grown=0, stolen=0, weeds=0, bugs=0, planted_at=null, wet_until=null, ripe_at=null where owner=p_owner and idx=r.idx;$s$);
-  d := replace(d, $a$  if _gv(op,'clear') > 0 then
-    update plots set state='empty', crop=null, grown=0, stolen=0, planted_at=null, ripe_at=null
-      where owner = p_owner and state = 'dead' and idx < _gv(op,'clear');
-  end if;$a$, $a$  perform _ranch_auto(p_owner);$a$);
+  d := regexp_replace(d, $r$if _gv\(op,'clear'\) > 0 then.*?end if;$r$, 'perform _ranch_auto(p_owner);');
   if position('_ranch_auto' in d) = 0 then raise exception '_tick clear 取代失敗'; end if;
   d := replace(d, $s$'你的萌獸'$s$, $s$'你的寵物'$s$);
   execute d;
