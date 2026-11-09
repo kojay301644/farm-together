@@ -11,7 +11,7 @@ function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
     scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
 function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
   if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
-const chrStage = lv => 3;  // 不進化：一律用第三階造型
+const chrStage = lv => 1;  // 不進化：一律第一階
 const chrSpecies = k => (/^([a-z]+)/.exec(k||'bunny')||[0,'bunny'])[1];
 const chrKey = (k, lv) => chrSpecies(k) + chrStage(lv||1);
 const chrName = key => { const c=chrInfo(key); return (CHR_NAMES[c.sp]||[])[c.st-1] || c.name; };
