@@ -28,7 +28,8 @@ const wetDur = c => Math.min(3600, Math.max(45, c.time*0.3));
 const L = (cx,cy,rx,ry,rot,f)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" transform="rotate(${rot} ${cx} ${cy})" fill="${f}"/>`;
 const UNRIPE = '#B6DB7A';
 
-function cropArt(c, st){
+function cropArt(c, st){ return olc(cropArt0(c, st)) + cropHL(c, st); }
+function cropArt0(c, st){
   if(st===0) return `<ellipse cx="60" cy="74" rx="14" ry="5" fill="#8B5A3A"/><circle cx="54" cy="72" r="2" fill="#F0DFAE"/><circle cx="61" cy="70" r="2" fill="#F0DFAE"/><circle cx="67" cy="73" r="2" fill="#F0DFAE"/>`;
   if(st===1) return `<rect x="58.5" y="62" width="3" height="12" rx="1.5" fill="#5DB54A"/>${L(53,62,8,4,-30,'#7CC85A')}${L(67,62,8,4,30,'#7CC85A')}`;
   if(st===2) return `<rect x="58" y="52" width="4" height="22" rx="2" fill="#5DB54A"/>${L(47,58,13,6,-30,'#6CC655')}${L(73,58,13,6,30,'#6CC655')}${L(52,48,10,5,-60,'#7CC85A')}${L(68,48,10,5,60,'#7CC85A')}`;
@@ -70,12 +71,26 @@ function cropArt(c, st){
         <rect x="58" y="${50+(1-k)*5}" width="5" height="6" rx="2" fill="#6B8E3A"/>`;
   }
 }
-const deadArt = `<path d="M60 76 Q58 60 64 50 Q70 44 74 50" stroke="#9C7A54" stroke-width="3.5" fill="none" stroke-linecap="round"/>${L(50,66,9,4,25,'#B89566')}${L(70,62,9,4,-35,'#A8865B')}${L(76,54,6,3,40,'#B89566')}`;
-const weedArt = (x,y)=>`<g transform="translate(${x} ${y}) scale(1.5)"><path d="M0 0 L-7 -12 L-2 -4 L0 -16 L2 -4 L8 -11 Z" fill="#2F7D32"/><path d="M-4 0 L-10 -6 L-2 0Z" fill="#3E9B3E"/></g>`;
-const bugArt  = (x,y)=>`<g transform="translate(${x} ${y}) scale(1.6)"><ellipse cx="0" cy="0" rx="6" ry="4.5" fill="#7A4F2A"/><circle cx="-6" cy="-1" r="3" fill="#4E331C"/><path d="M0 -4.5 V4.5" stroke="#4E331C" stroke-width="1"/><circle cx="-2.5" cy="-1.5" r="1.1" fill="#F4C27A"/><circle cx="2.5" cy="1.5" r="1.1" fill="#F4C27A"/><path d="M-8 -3 l-3 -3 M-8 0 l-4 -1" stroke="#4E331C" stroke-width="1"/></g>`;
+function olc(s){ return s.replace(/<(circle|ellipse|rect|polygon|path)\b([^>]*?)(\/?)>/g,(m,t,a,sl)=>(/stroke=|fill="none"|class="nool"|opacity=/.test(a)?m:`<${t}${a} stroke="#4B3423" stroke-width="2" stroke-linejoin="round"${sl}>`)); }
+// 作物高光（讓果實有光澤）
+function cropHL(c, st){
+  if(st<3) return '';
+  const k = st===4?1:0.75, hl=(x,y,r)=>`<ellipse class="nool" cx="${x}" cy="${y}" rx="${r}" ry="${r*0.7}" fill="#fff" opacity=".6"/>`;
+  if(c.type==='bush'){ return [[47,62],[71,63],[59,48],[58,68],[66,53]].map(([x,y])=>hl(x-2*k,y-2.5*k,1.8*k)).join(''); }
+  if(c.type==='ground') return hl(52,58+(1-k)*6,5*k);
+  if(c.type==='root') return hl(55,69,3*k);
+  if(c.type==='leafy') return hl(54,56,4*k);
+  if(c.type==='pine') return hl(55,62,3*k);
+  if(c.type==='stalk') return hl(65,34,2*k);
+  return '';
+}
+const deadArt = olc(`<path d="M60 76 Q58 60 64 50 Q70 44 74 50" stroke="#4B3423" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M60 76 Q58 60 64 50 Q70 44 74 50" stroke="#B08A5E" stroke-width="2.8" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="66" rx="9" ry="4" transform="rotate(25 50 66)" fill="#C9A577"/><ellipse cx="70" cy="62" rx="9" ry="4" transform="rotate(-35 70 62)" fill="#B89566"/><ellipse cx="76" cy="54" rx="6" ry="3" transform="rotate(40 76 54)" fill="#C9A577"/>`);
+const weedArt = (x,y)=>`<g transform="translate(${x} ${y}) scale(1.5)">${olc(`<path d="M0 0 L-7 -12 L-2 -4 L0 -16 L2 -4 L8 -11 Z" fill="#3E9B3E"/><path d="M-4 0 L-10 -6 L-2 0Z" fill="#55B04A"/>`).replace(/stroke-width="2"/g,'stroke-width="1.2"')}</g>`;
+const bugArt  = (x,y)=>`<g transform="translate(${x} ${y}) scale(1.5)">${[[-7,1,'#8BD35C'],[-3.5,0,'#9ADB6A'],[0,-1,'#8BD35C'],[3.5,-0.5,'#9ADB6A']].map(([a,b,c],k)=>`<circle class="seg" style="animation-delay:-${k*0.12}s" cx="${a}" cy="${b}" r="3.2" fill="${c}" stroke="#4B3423" stroke-width="1"/>`).join('')}<circle cx="7" cy="-2" r="4" fill="#9ADB6A" stroke="#4B3423" stroke-width="1"/><circle cx="8.2" cy="-2.8" r="1.1" fill="#3A3226"/><circle cx="6" cy="-3" r="1.1" fill="#3A3226"/><path d="M6 -6 l-1 -3 M8.5 -6 l1 -3" stroke="#4B3423" stroke-width="1" stroke-linecap="round"/><circle cx="8" cy="-0.5" r=".9" fill="#FF9AA2"/></g>`;
 const WEED_POS=[[24,86],[98,64],[30,62]], BUG_POS=[[86,84],[44,80],[80,62]];
 
 function stageOf(p){ const c=CROP[p.c]; const r=p.g/c.time; return r>=1?4: r<0.1?0: r<0.4?1: r<0.75?2:3; }
+
 function iconSVG(c){ return `<svg viewBox="10 14 100 72">${cropArt(c,4)}</svg>`; }
 
 const ICONS = {
@@ -87,6 +102,7 @@ const ICONS = {
   shovel:`<svg viewBox="0 0 32 32"><rect x="14.5" y="3" width="3" height="16" rx="1.5" fill="#C98B5E"/><rect x="11" y="2" width="10" height="3.5" rx="1.7" fill="#A86F45"/><path d="M10 18 h12 v4 a6 6 0 0 1 -12 0Z" fill="#9AA6B2"/><path d="M12 19.5 h8" stroke="#C5CED6" stroke-width="1.5"/></svg>`,
 };
 const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','除草'],['bug','除蟲'],['shovel','剷除']];
+for(const k in ICONS) ICONS[k] = olc(ICONS[k]).replace(/stroke-width="2"/g,'stroke-width="1.3"');
 
 /* ================= 工具函式 ================= */
 const $ = id=>document.getElementById(id);

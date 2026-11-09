@@ -1,3 +1,4 @@
+
 /* ================= 小鎮地圖：斜角座標 ================= */
 const TW=72, TH=36, OX=680, OY=96, WW=1360, WH=800;
 const PAD={t:120,b:150,l:40,r:40};
@@ -7,92 +8,81 @@ const up=(p,h)=>[p[0],p[1]-h];
 const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
 const poly=(pts,f,extra='')=>`<polygon points="${P(pts)}" fill="${f}" ${extra}/>`;
 const dia=(x,y,w,d)=>[iso(x,y),iso(x+w,y),iso(x+w,y+d),iso(x,y+d)];
-function fpt(P0,P1,u,v){ return [P0[0]+(P1[0]-P0[0])*u, P0[1]+(P1[1]-P0[1])*u - v]; }
-function fq(P0,P1,u0,u1,v0,v1,f,extra=''){ return poly([fpt(P0,P1,u0,v0),fpt(P0,P1,u1,v0),fpt(P0,P1,u1,v1),fpt(P0,P1,u0,v1)],f,extra); }
 let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return seed/2147483647; };
+const A = n => `assets/${n}.webp`;
 
-/* 田地位置（格座標，3×2） */
+/* 田地位置（格座標，3 排 × 6 塊） */
 const PS=1.45, PG=1.65;
 const PLOTS=Array.from({length:18},(_,i)=>[4.35+(i%6)*PG, 6.75+Math.floor(i/6)*PG]);
 const plotCenter=i=>iso(PLOTS[i][0]+PS/2, PLOTS[i][1]+PS/2);
 const FARM_C=[9.2,9.2];
 
 /* ================= 美術元件 ================= */
+const INK='#4B3423';
 function labelPill(x,y,text,opt={}){
-  const w = text.length*13+24;
-  const bg = opt.locked?'#D9D2C4':(opt.bg||'#FFFFFF');
+  const w = text.length*13+26;
+  const bg = opt.locked?'#E2DACB':(opt.bg||'#FFFFFF');
   const fg = opt.locked?'#7A6E5D':(opt.fg||'#3A3226');
   return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" style="pointer-events:none">
-    <rect x="${-w/2}" y="-13" width="${w}" height="26" rx="13" fill="${bg}" stroke="rgba(0,0,0,.08)" stroke-width="2"/>
-    <path d="M-5 12 L0 18 L5 12Z" fill="${bg}"/>
+    <rect x="${-w/2}" y="-13" width="${w}" height="26" rx="13" fill="${bg}" stroke="${INK}" stroke-width="2"/>
+    <path d="M-5 12.5 L0 18 L5 12.5" fill="${bg}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><rect x="-6" y="10" width="12" height="3" fill="${bg}"/>
     <text x="0" y="5" text-anchor="middle" font-size="13" font-weight="900" fill="${fg}" font-family="Noto Sans TC,sans-serif">${opt.locked?'🔒 ':''}${text}</text></g>`;
 }
-
-function building(o){
-  const A=iso(o.x,o.y),B=iso(o.x+o.w,o.y),C=iso(o.x+o.w,o.y+o.d),D=iso(o.x,o.y+o.d);
-  const h=o.h, rh=o.rh;
-  const R1=up(mid(A,D),h+rh), R2=up(mid(B,C),h+rh);
-  let s = `<ellipse cx="${mid(A,C)[0]}" cy="${mid(A,C)[1]+6}" rx="${(B[0]-D[0])/2+8}" ry="${(C[1]-A[1])/2+5}" fill="rgba(0,0,0,.12)"/>`;
-  s += poly([D,C,up(C,h),up(D,h)], o.wallL) + poly([C,B,up(B,h),up(C,h)], o.wallR);
-  s += `<path d="M${P([D,C,B])}" stroke="rgba(0,0,0,.12)" stroke-width="3" fill="none"/>`;
-  if(o.deco) s += o.deco(D,C,B,h);
-  s += poly([up(A,h),up(B,h),R2,R1], o.roofB);
-  s += poly([up(C,h),up(B,h),R2], o.wallR) + `<path d="M${P([up(C,h),R2,up(B,h)])}" stroke="${o.roofB}" stroke-width="4" fill="none" stroke-linejoin="round"/>`;
-  const e=4, Df=[up(D,h)[0]-e,up(D,h)[1]+e*0.5], Cf=[up(C,h)[0]+e*0.3,up(C,h)[1]+e];
-  s += poly([Df,Cf,R2,R1], o.roofF);
-  s += `<path d="M${P([Df,Cf])}" stroke="rgba(0,0,0,.18)" stroke-width="3"/>`;
-  for(let k=1;k<=3;k++){ const t=k/4; const p1=[Df[0]+(R1[0]-Df[0])*t, Df[1]+(R1[1]-Df[1])*t], p2=[Cf[0]+(R2[0]-Cf[0])*t, Cf[1]+(R2[1]-Cf[1])*t]; s+=`<path d="M${P([p1,p2])}" stroke="rgba(255,255,255,.18)" stroke-width="2"/>`; }
-  if(o.top) s += o.top(R1,R2);
-  const L = up(mid(R1,R2), 26);
-  return {svg:s, label:L, depth:o.x+o.w/2+o.y+o.d/2};
+// 圖片精靈：以格座標為底部中心
+function sprite(name, gx, gy, w, opt={}){
+  const [x,y]=iso(gx,gy), h=w*(opt.ratio||1);
+  const yy = y - h*(opt.foot ?? 0.82);
+  return `<image href="${A(name)}" x="${(x-w/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${w}" height="${h.toFixed(1)}" ${opt.cls?`class="${opt.cls}"`:''}/>`;
 }
+const RATIO = {b_shop:690/627, b_farm:522/504, b_academy:690/645, bc_shop:690/594, b_fountain:690/591, b_sail:1,
+  dc_flower:1, dc_lamp:1, dc_bench:1, dc_pond:1, dc_hay:1, dc_mail:1, dc_kennel:1, dc_lantree:1, dc_swing:1, dc_sakura:1, dc_picnic:1, dc_balloon:1,
+  bunny1:396/310, bear1:1, fox1:1, penguin1:1, otter1:1, mouse1:1};
 
+// 建築（萌獸星球素材），footprint 用來算前後順序與點擊
 const BLD = [
-  {id:'barn', name:'穀倉', x:1.3,y:1.2,w:3,d:2.8,h:52,rh:30, wallL:'#E2574C', wallR:'#C8453B', roofF:'#8B5E3C', roofB:'#6E4A2E',
-    deco:(D,C,B,h)=> fq(D,C,.28,.72,0,36,'#FFF3E0')+fq(D,C,.32,.68,0,32,'#B5413A')
-      +`<path d="M${P([fpt(D,C,.32,0),fpt(D,C,.68,32)])} M${P([fpt(D,C,.68,0),fpt(D,C,.32,32)])}" stroke="#FFF3E0" stroke-width="3"/>`
-      +fq(D,C,.42,.58,40,48,'#FFF3E0')+fq(C,B,.35,.65,18,32,'#FFF3E0')+fq(C,B,.39,.61,20,30,'#7A3B33')},
-  {id:'shop', name:'種子商店', x:6,y:1.6,w:2.8,d:2.5,h:42,rh:24, wallL:'#FFF8E7', wallR:'#EEDFC2', roofF:'#3BB273', roofB:'#2E9660',
-    deco:(D,C,B,h)=>{ let s=fq(D,C,.08,.46,6,26,'#9ED8FF')+fq(D,C,.1,.44,8,12,'#7CC85A')+fq(D,C,.58,.82,0,28,'#5A9E3E')+fq(D,C,.62,.78,2,24,'#7CC85A');
-      for(let k=0;k<6;k++) s+=fq(D,C,.04+k*.155,.04+(k+1)*.155,30,38,k%2?'#FFFFFF':'#FF8A8A');
-      s+=fq(C,B,.2,.8,20,32,'#FFE7A3'); return s; }},
-  {id:'home', name:'我的家', x:10.4,y:1.2,w:3,d:2.8,h:44,rh:30, wallL:'#FFF3E0', wallR:'#F0DCBD', roofF:'#FF8A3D', roofB:'#E0701F',
-    deco:(D,C,B,h)=> fq(D,C,.42,.58,0,26,'#C98B5E')+`<circle cx="${fpt(D,C,.54,13)[0]}" cy="${fpt(D,C,.54,13)[1]}" r="1.6" fill="#FFE066"/>`
-      +fq(D,C,.1,.3,14,30,'#9ED8FF')+fq(D,C,.7,.9,14,30,'#9ED8FF')+fq(D,C,.1,.3,12,15,'#C98B5E')+fq(D,C,.7,.9,12,15,'#C98B5E')
-      +fq(C,B,.35,.65,16,32,'#9ED8FF'),
-    top:(R1,R2)=>{ const p=[R1[0]+(R2[0]-R1[0])*.72, R1[1]+(R2[1]-R1[1])*.72+6]; return `<rect x="${p[0]-5}" y="${p[1]-16}" width="11" height="18" fill="#B5654A"/><rect x="${p[0]-6}" y="${p[1]-18}" width="13" height="4" fill="#8E4A35"/>
-      <circle class="smoke" cx="${p[0]+1}" cy="${p[1]-24}" r="5" fill="#fff" opacity=".7"/><circle class="smoke" style="animation-delay:1.5s" cx="${p[0]+4}" cy="${p[1]-26}" r="4" fill="#fff" opacity=".7"/>`; }},
-  {id:'decor', name:'裝飾店', x:0.4,y:10.1,w:2.4,d:2.2,h:36,rh:22, wallL:'#FFFFFF', wallR:'#ECE4EE', roofF:'#F78FB3', roofB:'#D86F94', locked:'裝飾店將在第四階段開放',
-    deco:(D,C,B,h)=> fq(D,C,.4,.62,0,22,'#F78FB3')+fq(D,C,.08,.32,10,24,'#FFD6E5')+fq(D,C,.72,.94,10,24,'#FFD6E5')+fq(C,B,.3,.7,14,26,'#FFD6E5')},
-  {id:'coop', name:'牧場', x:13.9,y:12.3,w:1.4,d:1.2,h:24,rh:14, wallL:'#FFE0A3', wallR:'#EFC982', roofF:'#E2574C', roofB:'#B5413A', locked:'牧場將在第四階段開放',
-    deco:(D,C,B,h)=> fq(D,C,.35,.65,0,14,'#8B5E3C')},
+  {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.8,2.6],  w:250, foot:0.80},
+  {id:'shop',  name:'種子商店', img:'b_shop',     c:[7.4,2.85], w:225, foot:0.80},
+  {id:'home',  name:'我的家',   img:'b_academy',  c:[11.9,2.6], w:235, foot:0.80},
+  {id:'decor', name:'裝飾店',   img:'bc_shop',    c:[1.6,11.2], w:180, foot:0.80, locked:'裝飾店將在第四階段開放'},
+  {id:'coop',  name:'牧場',     img:'dc_hay',     c:[11.6,13.0],w:84,  foot:0.78, locked:'牧場將在第四階段開放'},
 ];
 
-function tree(gx,gy,k=1){ const [x,y]=iso(gx,gy); return {depth:gx+gy, svg:`<g transform="translate(${x} ${y}) scale(${k})"><ellipse cx="0" cy="2" rx="17" ry="6.5" fill="rgba(0,0,0,.13)"/><rect x="-3.5" y="-22" width="7" height="24" rx="3" fill="#9C6B43"/><circle cx="0" cy="-36" r="19" fill="#4FA845"/><circle cx="-10" cy="-27" r="13" fill="#5DB54A"/><circle cx="10" cy="-29" r="14" fill="#5DB54A"/><circle cx="-5" cy="-43" r="8" fill="#7CC85A" opacity=".8"/></g>`}; }
-function bush(gx,gy,fc){ const [x,y]=iso(gx,gy); return {depth:gx+gy, svg:`<g transform="translate(${x} ${y})"><ellipse cx="0" cy="1" rx="14" ry="5" fill="rgba(0,0,0,.12)"/><circle cx="-7" cy="-6" r="8" fill="#5DB54A"/><circle cx="7" cy="-6" r="8" fill="#5DB54A"/><circle cx="0" cy="-11" r="9" fill="#6CC655"/>${fc?`<circle cx="-6" cy="-10" r="2.4" fill="${fc}"/><circle cx="5" cy="-13" r="2.4" fill="${fc}"/><circle cx="8" cy="-5" r="2.4" fill="${fc}"/><circle cx="-2" cy="-4" r="2.4" fill="${fc}"/>`:''}</g>`}; }
-function windmill(gx,gy){ const [x,y]=iso(gx,gy);
-  let bl=''; for(let a=0;a<360;a+=90) bl+=`<g transform="rotate(${a})"><rect x="-2.5" y="-40" width="5" height="40" fill="#A86F45"/><rect x="2.5" y="-38" width="12" height="28" fill="#FFFFFF" stroke="#E6D8C4" stroke-width="1.5"/></g>`;
-  return {depth:gx+gy, svg:`<g transform="translate(${x} ${y})"><ellipse cx="0" cy="2" rx="24" ry="8" fill="rgba(0,0,0,.12)"/><path d="M-17 0 L-10 -74 L10 -74 L17 0Z" fill="#FFF3E0"/><path d="M0 0 L10 -74 L17 0Z" fill="#EAD9BD"/><path d="M-13 -74 L0 -90 L13 -74Z" fill="#E2574C"/><rect x="-6" y="-20" width="12" height="20" rx="5" fill="#9C6B43"/><rect x="-4" y="-50" width="8" height="9" fill="#9ED8FF"/>
-    <g transform="translate(0 -72)"><g class="blades">${bl}<circle r="4.5" fill="#8B5E3C"/></g></g></g>`}; }
-function board(gx,gy){ const [x,y]=iso(gx,gy); return {depth:gx+gy, id:'board', svg:`<g transform="translate(${x} ${y})"><ellipse cx="0" cy="2" rx="26" ry="7" fill="rgba(0,0,0,.12)"/><rect x="-22" y="-38" width="5" height="40" fill="#9C6B43"/><rect x="17" y="-38" width="5" height="40" fill="#9C6B43"/><rect x="-26" y="-44" width="52" height="32" rx="4" fill="#C98B5E"/><rect x="-22" y="-40" width="44" height="24" rx="2" fill="#E8C49A"/>
-  <rect x="-18" y="-37" width="12" height="14" fill="#fff" transform="rotate(-5 -12 -30)"/><rect x="-2" y="-38" width="12" height="10" fill="#FFF6C9"/><rect x="11" y="-33" width="8" height="12" fill="#D9F2FF" transform="rotate(6 15 -27)"/><path d="M-30 -44 L0 -54 L30 -44Z" fill="#8B5E3C"/></g>`}; }
+// 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
+function ol(s, w=2, c=INK){
+  return s.replace(/<(circle|ellipse|rect|polygon|path)\b([^>]*?)(\/?)>/g, (m,tag,attrs,sl)=>{
+    if(/stroke=|fill="none"|rgba\(0,0,0|class="nool"|opacity=/.test(attrs)) return m;
+    return `<${tag}${attrs} stroke="${c}" stroke-width="${w}" stroke-linejoin="round"${sl}>`;
+  });
+}
+
+function tree(gx,gy,k=1){ const [x,y]=iso(gx,gy); const d=(-(gx*0.7+gy*0.3)%4).toFixed(2);
+  return {depth:gx+gy, svg:`<g transform="translate(${x} ${y}) scale(${k})"><ellipse cx="0" cy="2" rx="18" ry="7" fill="rgba(0,0,0,.15)"/>
+    ${ol(`<path d="M-4 2 L-3 -22 Q0 -26 3 -22 L4 2Z" fill="#9C6B43"/>`,2.2)}
+    <g class="tsway" style="animation-delay:${d}s">${ol(`<circle cx="-11" cy="-27" r="13" fill="#4FA845"/><circle cx="11" cy="-29" r="14" fill="#4FA845"/><circle cx="0" cy="-40" r="18" fill="#5DB54A"/>`,2.4,'#2F6B2A')}
+    <circle class="nool" cx="-6" cy="-46" r="7" fill="#8ED46B" opacity=".75"/><circle class="nool" cx="8" cy="-34" r="4" fill="#8ED46B" opacity=".6"/><circle class="nool" cx="-14" cy="-30" r="3.5" fill="#8ED46B" opacity=".6"/></g></g>`}; }
+function bush(gx,gy,fc){ const [x,y]=iso(gx,gy); return {depth:gx+gy, svg:`<g transform="translate(${x} ${y})"><ellipse cx="0" cy="1" rx="15" ry="5" fill="rgba(0,0,0,.14)"/>
+  ${ol(`<circle cx="-7" cy="-6" r="8" fill="#55AE45"/><circle cx="7" cy="-6" r="8" fill="#55AE45"/><circle cx="0" cy="-11" r="9" fill="#66C255"/>`,2,'#2F6B2A')}
+  ${fc?[[-6,-11],[5,-14],[8,-5],[-2,-4]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="2.6" fill="${fc}" stroke="${INK}" stroke-width="1"/>`).join(''):''}</g>`}; }
+function board(gx,gy){ const [x,y]=iso(gx,gy); return {depth:gx+gy, svg:`<g transform="translate(${x} ${y})"><ellipse cx="0" cy="2" rx="28" ry="8" fill="rgba(0,0,0,.14)"/>
+  ${ol(`<rect x="-22" y="-38" width="5" height="40" rx="2" fill="#9C6B43"/><rect x="17" y="-38" width="5" height="40" rx="2" fill="#9C6B43"/><rect x="-27" y="-46" width="54" height="34" rx="5" fill="#C98B5E"/><rect x="-22" y="-41" width="44" height="24" rx="3" fill="#EBC9A0"/>
+  <rect x="-18" y="-38" width="12" height="14" fill="#fff" transform="rotate(-5 -12 -30)"/><rect x="-2" y="-39" width="12" height="10" fill="#FFF6C9"/><rect x="11" y="-34" width="8" height="12" fill="#D9F2FF" transform="rotate(6 15 -27)"/><path d="M-31 -46 L0 -57 L31 -46Z" fill="#8B5E3C"/>`,2.2)}
+  <image href="${A('n_friends')}" x="-17" y="-80" width="34" height="34"/></g>`}; }
 
 function personSVG(o){
   const skin=o.skin||'#FFD7B5', pants=o.pants||'#4A6FA5';
-  return `<ellipse cx="0" cy="1" rx="9" ry="3.5" fill="rgba(0,0,0,.16)"/>
+  return ol(`<ellipse class="nool" cx="0" cy="1" rx="9" ry="3.5" fill="rgba(0,0,0,.18)"/>
   <rect class="lg1" x="-5" y="-11" width="4" height="11" rx="2" fill="${pants}"/><rect class="lg2" x="1" y="-11" width="4" height="11" rx="2" fill="${pants}"/>
   <g class="bd"><rect x="-7.5" y="-23" width="15" height="14" rx="5" fill="${o.shirt}"/>
-  ${o.apron?`<rect x="-5" y="-19" width="10" height="10" rx="2" fill="${o.apron}"/>`:''}
-  ${o.overall?`<rect x="-6" y="-17" width="12" height="8" rx="2" fill="${o.overall}"/><rect x="-5" y="-23" width="2" height="7" fill="${o.overall}"/><rect x="3" y="-23" width="2" height="7" fill="${o.overall}"/>`:''}
+  ${o.overall?`<rect x="-6" y="-17" width="12" height="8" rx="2" fill="${o.overall}"/>`:''}
   <circle cx="0" cy="-30" r="8.5" fill="${skin}"/>
   <path d="M-8.5 -29 Q-9 -41 0 -40 Q9 -41 8.5 -29 Q5 -35 -1 -35 Q-6 -35 -8.5 -29Z" fill="${o.hair}"/>
-  ${o.long?`<path d="M-8.5 -30 Q-10 -22 -6 -20 L-6 -30Z" fill="${o.hair}"/>`:''}
-  <circle cx="2.5" cy="-29" r="1.2" fill="#3A3226"/><circle cx="6.2" cy="-29" r="1.2" fill="#3A3226"/>
-  <circle cx="4.5" cy="-25.8" r="1.6" fill="#FF9AA2" opacity=".75"/>
+  <circle class="nool" cx="2.5" cy="-29" r="1.3" fill="#3A3226"/><circle class="nool" cx="6.2" cy="-29" r="1.3" fill="#3A3226"/>
+  <circle class="nool" cx="4.5" cy="-25.8" r="1.7" fill="#FF9AA2" opacity=".8"/>
   ${o.hat?`<ellipse cx="0" cy="-36" rx="14" ry="4" fill="#E8C766"/><path d="M-7.5 -36 Q-7 -46 0 -46 Q7 -46 7.5 -36Z" fill="#F2D57E"/><rect x="-7.5" y="-39" width="15" height="2.6" fill="#E2574C"/>`:''}
-  ${o.tool==='hoe'?`<path d="M-9 -20 L-14 -46" stroke="#A86F45" stroke-width="2.5" stroke-linecap="round"/><path d="M-14 -46 l-6 2" stroke="#9AA6B2" stroke-width="4" stroke-linecap="round"/>`:''}</g>`;
+  ${o.tool==='hoe'?`<path d="M-9 -20 L-14 -46" stroke="#A86F45" stroke-width="2.5" stroke-linecap="round"/><path d="M-14 -46 l-6 2" stroke="#9AA6B2" stroke-width="4" stroke-linecap="round"/>`:''}</g>`, 1.4);
 }
-const CHICK = `<ellipse cy="1" rx="6" ry="2" fill="rgba(0,0,0,.15)"/><path d="M-2 -1 v2.5 M2 -1 v2.5" stroke="#F0A030" stroke-width="1.5"/><g class="bd"><ellipse cx="0" cy="-6" rx="7.5" ry="5.5" fill="#fff"/><path d="M-7 -8 l-4 -3 l1 5z" fill="#F1ECE4"/><circle cx="5" cy="-11" r="3.8" fill="#fff"/><path d="M3.5 -14.5 q1 -2.5 2 0 q1 -2.5 2.2 0z" fill="#F2545B"/><path d="M8.6 -11.2 l3.2 1 l-3.2 1z" fill="#F0A030"/><circle cx="6.2" cy="-11.6" r=".9" fill="#333"/></g>`;
+const CHICK = ol(`<ellipse class="nool" cy="1" rx="6" ry="2" fill="rgba(0,0,0,.15)"/><path d="M-2 -1 v2.5 M2 -1 v2.5" stroke="#F0A030" stroke-width="1.5"/><g class="bd"><ellipse cx="0" cy="-6" rx="7.5" ry="5.5" fill="#fff"/><circle cx="5" cy="-11" r="3.8" fill="#fff"/><path d="M3.5 -14.5 q1 -2.5 2 0 q1 -2.5 2.2 0z" fill="#F2545B"/><path d="M8.6 -11.2 l3.2 1 l-3.2 1z" fill="#F0A030"/><circle class="nool" cx="6.2" cy="-11.6" r=".9" fill="#333"/></g>`, 1.2);
+const BUTTERFLY = c => `<g class="bfly"><ellipse cx="-4" cy="-2" rx="4.5" ry="3.5" fill="${c}" stroke="${INK}" stroke-width="1"/><ellipse cx="4" cy="-2" rx="4.5" ry="3.5" fill="${c}" stroke="${INK}" stroke-width="1"/><ellipse cx="-3" cy="2.5" rx="3" ry="2.5" fill="${c}" stroke="${INK}" stroke-width="1"/><ellipse cx="3" cy="2.5" rx="3" ry="2.5" fill="${c}" stroke="${INK}" stroke-width="1"/><rect x="-.8" y="-4" width="1.6" height="8" rx=".8" fill="${INK}"/></g>`;
 
 /* ================= 組合地圖 ================= */
 let plotEls=[], plotSig=[], plotLabs=[];
@@ -102,84 +92,119 @@ function buildWorld(){
   const W=$('world');
   W.setAttribute('viewBox',`0 0 ${WW} ${WH}`);
   seed=11;
-  let sea='', island='', ground='', objs=[], lab='', cloud='';
+  let defs='', sea='', island='', ground='', objs=[], lab='', cloud='';
+
+  defs = `<defs>
+    <linearGradient id="gGrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A5DB72"/><stop offset="1" stop-color="#7EC452"/></linearGradient>
+    <linearGradient id="gCliffL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C08A5A"/><stop offset="1" stop-color="#8E5E38"/></linearGradient>
+    <linearGradient id="gCliffR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A2703F"/><stop offset="1" stop-color="#704526"/></linearGradient>
+    <linearGradient id="gRiver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6FCBF2"/><stop offset="1" stop-color="#3FA6E0"/></linearGradient>
+    <radialGradient id="gGlow"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ADBF7"/><stop offset="1" stop-color="#6EC3EE"/></linearGradient>
+  </defs>`;
 
   // 海
-  sea += `<rect x="-200" y="-200" width="${WW+400}" height="${WH+400}" fill="#8FD3F4"/>`;
-  for(let k=0;k<26;k++){ const x=rnd()*WW, y=rnd()*WH; sea+=`<path class="wave" style="animation-delay:${(rnd()*3).toFixed(2)}s" d="M${x} ${y} q8 -5 16 0 t16 0" stroke="#C6EBFB" stroke-width="3" fill="none" stroke-linecap="round"/>`; }
+  sea += `<rect x="-200" y="-200" width="${WW+400}" height="${WH+400}" fill="url(#gSea)"/>`;
+  for(let k=0;k<30;k++){ const x=rnd()*WW, y=rnd()*WH; sea+=`<path class="wave" style="animation-delay:${(rnd()*3).toFixed(2)}s" d="M${x} ${y} q8 -5 16 0 t16 0" stroke="#D4F1FD" stroke-width="3" fill="none" stroke-linecap="round"/>`; }
 
   // 島
-  const I=dia(-1,-1,18,18), cl=40;
-  island += `<ellipse cx="${OX}" cy="${iso(17,17)[1]+cl-10}" rx="660" ry="40" fill="rgba(40,110,150,.25)"/>`;
-  island += poly([I[3],I[2],up(I[2],-cl),up(I[3],-cl*0.6)],'#B07A4F') + poly([I[2],I[1],up(I[1],-cl*0.6),up(I[2],-cl)],'#8F603D');
-  island += `<path d="M${P([up(I[3],-cl*0.3),up(I[2],-cl*0.55),up(I[1],-cl*0.3)])}" stroke="rgba(0,0,0,.12)" stroke-width="4" fill="none"/>`;
-  island += poly(I,'#8ACB5B') + `<path d="M${P([I[3],I[2],I[1]])}" stroke="#6DB548" stroke-width="7" fill="none" stroke-linejoin="round"/>`;
-  // 瀑布（河流流出島嶼）
+  const I=dia(-1,-1,18,18), cl=46;
+  island += `<ellipse cx="${OX}" cy="${iso(17,17)[1]+cl-6}" rx="680" ry="46" fill="rgba(30,100,150,.22)"/>`;
+  island += poly([I[3],I[2],up(I[2],-cl),up(I[3],-cl*0.6)],'url(#gCliffL)',`stroke="${INK}" stroke-width="3" stroke-linejoin="round"`)
+          + poly([I[2],I[1],up(I[1],-cl*0.6),up(I[2],-cl)],'url(#gCliffR)',`stroke="${INK}" stroke-width="3" stroke-linejoin="round"`);
+  for(const t of [0.35,0.65]) island += `<path d="M${P([up(I[3],-cl*0.6*t),up(I[2],-cl*t),up(I[1],-cl*0.6*t)])}" stroke="rgba(75,52,35,.35)" stroke-width="3" fill="none" stroke-dasharray="18 10"/>`;
+  for(let k=0;k<26;k++){ const t=rnd(), left=rnd()<0.5; const a=left?I[3]:I[2], b=left?I[2]:I[1]; const p=[a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t+8+rnd()*cl*0.45];
+    island += `<ellipse cx="${p[0]}" cy="${p[1]}" rx="${4+rnd()*5}" ry="${2.5+rnd()*2}" fill="${left?'#D7A574':'#B98454'}" stroke="rgba(75,52,35,.5)" stroke-width="1.2"/>`; }
+  island += poly(I,'url(#gGrass)') + `<path d="M${P([I[3],I[2],I[1]])}" stroke="#5E9A3A" stroke-width="8" fill="none" stroke-linejoin="round"/>`
+          + `<path d="M${P([I[0],I[1],I[2],I[3],I[0]])}" stroke="${INK}" stroke-width="3" fill="none" stroke-linejoin="round"/>`;
+  // 草地色塊
+  for(let k=0;k<40;k++){ const [x,y]=iso(rnd()*17-0.5, rnd()*17-0.5); island += `<ellipse cx="${x}" cy="${y}" rx="${30+rnd()*50}" ry="${12+rnd()*18}" fill="${rnd()<0.5?'#8FCD5E':'#B4E27F'}" opacity=".45"/>`; }
+  // 瀑布
   const wf1=iso(17,14.35), wf2=iso(17,15.25);
-  island += poly([wf1,wf2,up(wf2,-cl*0.9),up(wf1,-cl*0.9)],'#5BB8E8') + `<path class="flow" d="M${(wf1[0]+wf2[0])/2} ${(wf1[1]+wf2[1])/2} v${cl}" stroke="#E3F6FF" stroke-width="3"/>`;
+  island += poly([wf1,wf2,up(wf2,-cl*0.95),up(wf1,-cl*0.95)],'#5BB8E8',`stroke="${INK}" stroke-width="2.5"`) + `<path class="flow" d="M${(wf1[0]+wf2[0])/2} ${(wf1[1]+wf2[1])/2} v${cl}" stroke="#E3F6FF" stroke-width="3"/>`
+          + `<ellipse class="wave" cx="${(wf1[0]+wf2[0])/2+6}" cy="${(wf1[1]+wf2[1])/2+cl+4}" rx="20" ry="6" fill="#E3F6FF" opacity=".8"/>`;
 
-  // 草地點綴
-  for(let k=0;k<70;k++){ const gx=rnd()*17-0.5, gy=rnd()*17-0.5; const [x,y]=iso(gx,gy);
-    ground += rnd()<0.7 ? `<path d="M${x-4} ${y} l2 -6 l2 6 l2 -5 l2 5" stroke="#6DB548" stroke-width="1.6" fill="none"/>`
-      : `<circle cx="${x}" cy="${y}" r="2.6" fill="${['#FFE066','#FFFFFF','#FF9AA2'][k%3]}"/>`; }
+  // 草叢與小花
+  for(let k=0;k<90;k++){ const gx=rnd()*17-0.5, gy=rnd()*17-0.5; const [x,y]=iso(gx,gy);
+    ground += rnd()<0.65 ? `<path class="tuft" style="animation-delay:-${(rnd()*3).toFixed(2)}s" d="M${x-4} ${y} l2 -7 l2 7 l2 -6 l2 6" stroke="#4E9A3A" stroke-width="1.8" fill="none" stroke-linejoin="round"/>`
+      : `<g><circle cx="${x}" cy="${y-2}" r="2.8" fill="${['#FFE066','#FFFFFF','#FF9AA2','#B9A6FF'][k%4]}" stroke="${INK}" stroke-width="1"/><circle cx="${x}" cy="${y-2}" r="1" fill="#F0A030"/></g>`; }
 
-  // 小路
-  const path=(x,y,w,d)=>poly(dia(x,y,w,d),'#E8D3A2','stroke="#D8BE86" stroke-width="2"');
+  // 小路（沙土＋石板）
+  const path=(x,y,w,d)=>poly(dia(x,y,w,d),'#EAD5A3',`stroke="#B9965E" stroke-width="2.5" stroke-linejoin="round"`);
   ground += path(-1,5,18,1) + path(3,6,1,11) + path(7.2,4.1,0.8,0.9) + path(11.6,4,0.8,1) + path(2.6,4,0.8,1);
-  for(let k=0;k<30;k++){ const t=rnd(); const [x,y]= k<20? iso(-0.5+t*17, 5.2+rnd()*0.6) : iso(3.2+rnd()*0.6, 6.5+t*10); ground+=`<ellipse cx="${x}" cy="${y}" rx="3" ry="1.6" fill="#D2B47C"/>`; }
+  for(let x=-0.6;x<16.8;x+=0.62){ const [px,py]=iso(x+0.1*rnd(), 5.5+(rnd()-0.5)*0.35); ground+=`<ellipse cx="${px}" cy="${py}" rx="${7+rnd()*3}" ry="${3.5+rnd()*1.5}" fill="#D8C08C" stroke="#A88A57" stroke-width="1.3"/>`; }
+  for(let y=6.3;y<16.8;y+=0.62){ const [px,py]=iso(3.5+(rnd()-0.5)*0.35, y); ground+=`<ellipse cx="${px}" cy="${py}" rx="${7+rnd()*3}" ry="${3.5+rnd()*1.5}" fill="#D8C08C" stroke="#A88A57" stroke-width="1.3"/>`; }
 
   // 河
-  ground += poly(dia(-1,14.2,18,1.2),'#7FD0F0') + poly(dia(-1,14.35,18,0.9),'#5BB8E8');
-  ground += `<path class="flow" d="M${P([iso(-1,14.65),iso(17,14.65)])}" stroke="#E3F6FF" stroke-width="2.5" opacity=".8"/><path class="flow" style="animation-delay:-1s" d="M${P([iso(-1,14.95),iso(17,14.95)])}" stroke="#E3F6FF" stroke-width="2" opacity=".6"/>`;
+  ground += poly(dia(-1,14.15,18,1.3),'#9ADFF7',`stroke="${INK}" stroke-width="2.5"`) + poly(dia(-1,14.35,18,0.9),'url(#gRiver)');
+  ground += `<path class="flow" d="M${P([iso(-1,14.65),iso(17,14.65)])}" stroke="#E3F6FF" stroke-width="2.5" opacity=".85"/><path class="flow" style="animation-delay:-1s" d="M${P([iso(-1,14.95),iso(17,14.95)])}" stroke="#E3F6FF" stroke-width="2" opacity=".6"/>`;
+  for(let k=0;k<8;k++){ const [x,y]=iso(rnd()*17-0.5, 14.4+rnd()*0.8); ground+=`<ellipse class="wave" style="animation-delay:-${(rnd()*3).toFixed(1)}s" cx="${x}" cy="${y}" rx="5" ry="1.6" fill="#fff" opacity=".7"/>`; }
   // 橋
-  const bw=dia(2.75,13.9,1.5,1.8);
-  ground += poly(bw,'#C98B5E');
-  for(let k=1;k<6;k++){ ground+=`<path d="M${P([iso(2.75,13.9+k*0.3),iso(4.25,13.9+k*0.3)])}" stroke="#A86F45" stroke-width="2"/>`; }
-  ground += `<path d="M${P([up(iso(2.75,13.9),8),up(iso(2.75,15.7),8)])} M${P([up(iso(4.25,13.9),8),up(iso(4.25,15.7),8)])}" stroke="#8B5E3C" stroke-width="3"/>`;
+  ground += poly(dia(2.75,13.9,1.5,1.8),'#C98B5E',`stroke="${INK}" stroke-width="2.5"`);
+  for(let k=1;k<6;k++){ ground+=`<path d="M${P([iso(2.75,13.9+k*0.3),iso(4.25,13.9+k*0.3)])}" stroke="#8B5E3C" stroke-width="2"/>`; }
+  ground += `<path d="M${P([up(iso(2.75,13.9),9),up(iso(2.75,15.7),9)])} M${P([up(iso(4.25,13.9),9),up(iso(4.25,15.7),9)])}" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M${P([up(iso(2.75,13.9),9),up(iso(2.75,15.7),9)])} M${P([up(iso(4.25,13.9),9),up(iso(4.25,15.7),9)])}" stroke="#A86F45" stroke-width="2" stroke-linecap="round"/>`;
 
-  // 田區底
-  ground += poly(dia(4.1,6.5,10.15,5.35),'#9ACF6A','stroke="#7DB14C" stroke-width="3"');
-  // 牧場底與圍欄
+  // 田區底＋木圍欄
+  ground += poly(dia(4.1,6.5,10.15,5.35),'#97C964',`stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"`);
+  const fence=(x0,y0,x1,y1,col='#E8D3A2')=>{ let s=''; const n=Math.ceil(Math.hypot(x1-x0,y1-y0)/0.55);
+    const a=iso(x0,y0), b=iso(x1,y1); s+=`<path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="${col}" stroke-width="2.6" stroke-linecap="round"/>`;
+    for(let k=0;k<=n;k++){ const p=iso(x0+(x1-x0)*k/n, y0+(y1-y0)*k/n); s+=`<rect x="${p[0]-2.5}" y="${p[1]-21}" width="5" height="21" rx="2" fill="#F3E3BF" stroke="${INK}" stroke-width="1.5"/>`; } return s; };
+  ground += fence(4.1,6.5,14.25,6.5,'#D9B98A') + fence(4.1,6.5,4.1,11.85,'#D9B98A');
+  objs.push({depth:4.1+11.85+14.25+0.2, svg: fence(4.1,11.85,9.0,11.85,'#D9B98A')});
+
+  // 牧場
   const RX=9.4,RY=12.1,RW=6.2,RD=1.9;
-  ground += poly(dia(RX,RY,RW,RD),'#A7D46F');
-  const fence=(x0,y0,x1,y1)=>{ let s=''; const n=Math.ceil(Math.hypot(x1-x0,y1-y0)/0.55);
-    const a=iso(x0,y0), b=iso(x1,y1); s+=`<path d="M${P([up(a,9),up(b,9)])} M${P([up(a,16),up(b,16)])}" stroke="#E8D3A2" stroke-width="3"/>`;
-    for(let k=0;k<=n;k++){ const p=iso(x0+(x1-x0)*k/n, y0+(y1-y0)*k/n); s+=`<rect x="${p[0]-2}" y="${p[1]-20}" width="4" height="20" rx="1.5" fill="#F3E3BF"/>`; } return s; };
+  ground += poly(dia(RX,RY,RW,RD),'#B2DB7A',`stroke="${INK}" stroke-width="2"`);
   ground += fence(RX,RY,RX+RW,RY) + fence(RX,RY,RX,RY+RD);
   objs.push({depth:RX+RW+RY+RD+0.5, svg: fence(RX,RY+RD,RX+RW,RY+RD) + fence(RX+RW,RY,RX+RW,RY+RD)});
-  // 飼料槽
-  objs.push({depth:RX+1.2+RY+1, svg:(()=>{ const [x,y]=iso(RX+1.2,RY+1); return `<rect x="${x-14}" y="${y-8}" width="28" height="8" rx="3" fill="#A86F45"/><rect x="${x-12}" y="${y-8}" width="24" height="3" fill="#F2D57E"/>`; })()});
 
   // 建築
-  BLD.forEach(o=>{ const b=building(o);
-    objs.push({depth:b.depth, svg:`<g class="tap" data-b="${o.id}">${b.svg}</g>`});
-    lab += labelPill(b.label[0], b.label[1], o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
+  BLD.forEach(o=>{
+    const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
+    let s = `<ellipse cx="${iso(gx,gy)[0]}" cy="${iso(gx,gy)[1]+4}" rx="${o.w*0.42}" ry="${o.w*0.16}" fill="rgba(0,0,0,.14)"/>` + sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot});
+    if(o.id==='barn'){ // 風車葉片
+      const [x,y]=iso(gx,gy), top=y-h*o.foot; const cx=x-o.w*0.5+o.w*0.235, cy=top+h*0.2;
+      s += `<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})"><g class="blades"><image href="${A('b_sail')}" x="-55" y="-55" width="110" height="110"/></g></g>`;
+    }
+    if(o.id==='home'){ const [x,y]=iso(gx,gy), top=y-h*o.foot; s += `<circle class="smoke" cx="${x+o.w*0.24}" cy="${top+h*0.02}" r="6" fill="#fff" opacity=".75"/><circle class="smoke" style="animation-delay:1.5s" cx="${x+o.w*0.26}" cy="${top}" r="5" fill="#fff" opacity=".75"/>`; }
+    objs.push({depth:gx+gy, svg:`<g class="tap" data-b="${o.id}">${s}</g>`});
+    const [lx,ly]=iso(gx,gy);
+    lab += labelPill(lx, ly - h*o.foot + (o.id==='coop'?4:18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
   });
   const bd=board(1.6,7.4); objs.push({depth:bd.depth, svg:`<g class="tap" data-b="board">${bd.svg}</g>`});
-  lab += labelPill(iso(1.6,7.4)[0], iso(1.6,7.4)[1]-68, '好友布告欄', {bg:'#E3F6EA',fg:'#2E9660'});
-  const wm=windmill(16.2,7.6); objs.push(wm);
-  // 信箱
-  objs.push((()=>{ const [x,y]=iso(13.9,4.5); return {depth:18.4, svg:`<g transform="translate(${x} ${y})"><rect x="-1.5" y="-22" width="3" height="22" fill="#9C6B43"/><rect x="-8" y="-32" width="16" height="11" rx="5" fill="#3DA5F4"/><rect x="5" y="-36" width="2" height="8" fill="#F2545B"/></g>`}; })());
+  lab += labelPill(iso(1.6,7.4)[0], iso(1.6,7.4)[1]-92, '好友布告欄', {bg:'#E3F6EA',fg:'#2E9660'});
+
+  // 裝飾（萌獸星球素材）
+  const deco=(n,gx,gy,w,extra='')=>objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`});
+  const lamps=[[4.75,4.55],[9.75,4.6],[14.6,4.6],[2.4,10.0]];
+  lamps.forEach(([x,y])=>{ deco('dc_lamp',x,y,48); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
+  deco('dc_fountain'in RATIO?'dc_fountain':'b_fountain', 16.1, 5.5, 118);
+  deco('dc_bench', 13.0, 4.65, 62); deco('dc_mail', 14.0, 3.9, 44); deco('dc_kennel', 15.0, 2.6, 70);
+  deco('dc_flower', 2.4, 8.9, 64); deco('dc_flower', 9.6, 0.3, 58); deco('dc_pond', 7.4, 16.0, 96);
+  deco('dc_hay', 14.2, 12.9, 70); deco('dc_picnic', 14.8, 15.8, 76); deco('dc_balloon', -0.1, 9.3, 62, 'class="floaty"');
+  deco('dc_sakura', 16.2, 1.9, 96); deco('dc_swing', -0.4, 7.4, 86); deco('dc_lantree', 5.0, 15.9, 90);
 
   // 樹木與花叢
-  [[-0.4,3.4],[-0.5,7.6],[-0.3,13.2],[5,13.1],[7.6,13.3],[16,15.6],[13,16.2],[1.5,16.3],[7.5,16.4],[16.2,2.2],[15.6,-0.4],[4.9,-0.3],[9.4,-0.4],[-0.6,0.3],[16.6,11.2],[5.2,15.9]].forEach(([x,y],k)=>objs.push(tree(x,y,0.85+((k*37)%30)/100)));
-  [[9.7,4.5,'#FF9AA2'],[14.4,4.6,'#FFE066'],[4.9,4.5,null],[15.6,10.6,'#FFFFFF'],[2.3,8.8,'#FFE066'],[2.4,12.9,null]].forEach(([x,y,f])=>objs.push(bush(x,y,f)));
+  [[-0.4,3.4],[-0.3,13.2],[5,13.1],[7.6,13.3],[16,15.6],[13,16.2],[1.5,16.3],[15.6,-0.4],[4.9,-0.3],[9.4,-0.4],[-0.6,0.3],[16.6,11.2],[16.4,8.5]].forEach(([x,y],k)=>objs.push(tree(x,y,0.85+((k*37)%30)/100)));
+  [[9.7,4.5,'#FF9AA2'],[15.6,10.4,'#FFFFFF'],[2.4,12.9,null],[8.3,4.6,'#FFE066']].forEach(([x,y,f])=>objs.push(bush(x,y,f)));
 
   // 田地（可點）
-  PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i); objs.push({depth:PLOTS[i][0]+PLOTS[i][1]+PS, svg:`<g class="tap plot" data-p="${i}"><g class="pg"></g><g class="ps"></g></g>`}); });
+  PLOTS.forEach((_,i)=>{ objs.push({depth:PLOTS[i][0]+PLOTS[i][1]+PS, svg:`<g class="tap plot" data-p="${i}"><g class="pg"></g><g class="ps"></g></g>`}); });
 
-  // 固定人物
-  const stand=(gx,gy,o,flip)=>{ const [x,y]=iso(gx,gy); objs.push({depth:gx+gy, svg:`<g transform="translate(${x} ${y}) scale(${flip?-1.15:1.15} 1.15)">${personSVG(o)}</g>`}); };
+  // 農夫與商店老闆
+  const stand=(gx,gy,o,flip)=>{ const [x,y]=iso(gx,gy); objs.push({depth:gx+gy, svg:`<g transform="translate(${x} ${y}) scale(${flip?-1.2:1.2} 1.2)">${personSVG(o)}</g>`}); };
   stand(3.6,8.9,{shirt:'#FFFFFF',overall:'#3DA5F4',hair:'#5A3A22',hat:true,tool:'hoe'},false);
-  stand(7.45,4.6,{shirt:'#3BB273',apron:'#FFF3E0',hair:'#3A3226'},true);
+  stand(7.45,4.6,{shirt:'#3BB273',hair:'#3A3226'},true);
 
   objs.sort((a,b)=>a.depth-b.depth);
 
   // 雲
-  for(let k=0;k<4;k++){ const y=40+k*150+rnd()*60, d=50+rnd()*40, s=0.8+rnd()*0.7;
-    cloud+=`<g class="cloud" style="animation-duration:${d}s;animation-delay:${-rnd()*d}s"><g transform="translate(0 ${y}) scale(${s})" opacity=".85"><ellipse cx="0" cy="0" rx="40" ry="14" fill="#fff"/><ellipse cx="18" cy="-10" rx="22" ry="14" fill="#fff"/><ellipse cx="-14" cy="-6" rx="16" ry="11" fill="#fff"/></g></g>`; }
+  for(let k=0;k<4;k++){ const y=40+k*150+rnd()*60, d=55+rnd()*40, s=0.8+rnd()*0.7;
+    cloud+=`<g class="cloud" style="animation-duration:${d}s;animation-delay:${-rnd()*d}s"><g transform="translate(0 ${y}) scale(${s})" opacity=".8">${ol(`<ellipse cx="0" cy="0" rx="40" ry="14" fill="#fff"/><ellipse cx="18" cy="-10" rx="22" ry="14" fill="#fff"/><ellipse cx="-14" cy="-6" rx="16" ry="11" fill="#fff"/>`,2,'#BFDCEB')}</g></g>`; }
+  // 飛鳥
+  for(let k=0;k<2;k++) cloud += `<g class="bird" style="animation-delay:${-k*17}s"><g transform="translate(0 ${120+k*90})"><path d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path transform="translate(26 14) scale(.8)" d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/></g></g>`;
 
-  W.innerHTML = `<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="movers"></g><g id="labels">${lab}<g id="plabs"></g></g><g style="pointer-events:none">${cloud}</g>`;
+  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="movers"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
 
   // 田地元素與標籤
   plotEls=[]; plotSig=[]; plotLabs=[];
@@ -187,18 +212,21 @@ function buildWorld(){
   W.querySelectorAll('[data-p]').forEach(g=>{ const i=+g.dataset.p; plotEls[i]=g; plotSig[i]=''; g.addEventListener('click',()=>act(i)); });
   PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i);
     const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-44})`);
-    g.innerHTML=`<rect x="-38" y="-11" width="76" height="22" rx="10" fill="#fff" stroke="rgba(0,0,0,.08)" stroke-width="2"/><text x="0" y="2" text-anchor="middle" font-size="11" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-28" y="5" width="56" height="3" rx="1.5" fill="#EEE6D6"/><rect class="bf" x="-28" y="5" width="0" height="3" rx="1.5" fill="#7ED957"/>`;
+    g.innerHTML=`<rect x="-38" y="-11" width="76" height="22" rx="10" fill="#fff" stroke="${INK}" stroke-width="1.6"/><text x="0" y="2" text-anchor="middle" font-size="11" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-28" y="5" width="56" height="3" rx="1.5" fill="#EEE6D6"/><rect class="bf" x="-28" y="5" width="0" height="3" rx="1.5" fill="#7ED957"/>`;
     pl.appendChild(g); plotLabs[i]=g; });
   W.querySelectorAll('[data-b]').forEach(g=>g.addEventListener('click',()=>tapBuilding(g)));
 
-  // 會動的人物與小雞
+  // 會動的萌寵、小雞、蝴蝶
   movers.length=0;
   const mv=$('movers');
-  const addMover=(html,o)=>{ const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML=`<g>${html}</g>`; mv.appendChild(g); movers.push(Object.assign({el:g,inner:g.firstChild,wait:0,face:1},o)); };
-  addMover(personSVG({shirt:'#5DADE2',hair:'#6B4423',pants:'#3A5A8C'}),{x:2,y:5.5,path:[[0.2,5.5],[15.8,5.5]],tgt:1,speed:0.9,s:1.1});
-  addMover(personSVG({shirt:'#F78FB3',hair:'#2F2F2F',long:true,pants:'#7A6E9E'}),{x:12,y:5.6,path:[[15.6,5.6],[0.4,5.6]],tgt:1,speed:0.7,s:1.1});
-  addMover(personSVG({shirt:'#FFD23F',hair:'#8B5E3C',pants:'#5A7A3A'}),{x:3.5,y:9,path:[[3.5,6.3],[3.5,15]],tgt:1,speed:0.6,s:1.1});
-  for(let k=0;k<4;k++) addMover(CHICK,{x:RX+0.6+rnd()*(RW-1.2),y:RY+0.8+rnd()*(RD-1.4),chick:true,area:[RX+0.5,RY+1.6,RX+RW-0.5,RY+RD-0.4],speed:0.5,s:1.2,wait:rnd()*2});
+  const addMover=(html,o)=>{ const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML=`<g class="mvin">${html}</g>`; mv.appendChild(g); movers.push(Object.assign({el:g,wait:0,face:1},o)); };
+  const pet=(n,w)=>{ const h=w*(RATIO[n]||1); return `<ellipse cx="0" cy="1" rx="${w*0.32}" ry="${w*0.1}" fill="rgba(0,0,0,.16)"/><g class="hop"><image href="${A(n)}" x="${-w/2}" y="${-h*0.96}" width="${w}" height="${h}"/></g>`; };
+  addMover(pet('bunny1',42),{x:2,y:5.5,path:[[0.2,5.5],[15.2,5.5]],tgt:1,speed:0.75,s:1,petFace:1});
+  addMover(pet('fox1',44),{x:12,y:5.6,path:[[14.8,5.6],[0.4,5.6]],tgt:1,speed:0.6,s:1,petFace:-1});
+  addMover(pet('penguin1',40),{x:3.5,y:9,path:[[3.5,6.3],[3.5,13.6]],tgt:1,speed:0.45,s:1,petFace:-1});
+  addMover(pet('bear1',46),{x:6,y:4.7,path:[[5.2,4.75],[9.0,4.75]],tgt:0,speed:0.35,s:1,petFace:-1});
+  for(let k=0;k<4;k++) addMover(CHICK,{x:RX+0.6+rnd()*(RW-1.2),y:RY+0.6+rnd()*(RD-1.0),chick:true,area:[RX+0.4,RY+0.5,RX+RW-1.6,RY+RD-0.3],speed:0.5,s:1.25,wait:rnd()*2});
+  ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
 
 /* 移動動畫 */
@@ -206,20 +234,21 @@ let lastF=performance.now();
 function animate(now){
   const dt=Math.min(0.1,(now-lastF)/1000); lastF=now;
   for(const m of movers){
+    if(m.fly && LOWFX){ m.el.style.display='none'; continue; }
     let moving=false;
     if(m.wait>0){ m.wait-=dt; }
     else {
       if(!m.goal){
-        if(m.chick){ const a=m.area; m.goal=[a[0]+Math.random()*(a[2]-a[0]), a[1]+Math.random()*(a[3]-a[1])]; }
+        if(m.chick || m.fly){ const a=m.area; m.goal=[a[0]+Math.random()*(a[2]-a[0]), a[1]+Math.random()*(a[3]-a[1])]; }
         else { m.goal=m.path[m.tgt]; }
       }
       const dx=m.goal[0]-m.x, dy=m.goal[1]-m.y, dist=Math.hypot(dx,dy), step=m.speed*dt;
       if(dist<=step){ m.x=m.goal[0]; m.y=m.goal[1]; m.goal=null;
-        if(m.chick) m.wait=0.6+Math.random()*2.5; else { m.tgt=1-m.tgt; m.wait=1+Math.random()*3; } }
+        if(m.chick) m.wait=0.6+Math.random()*2.5; else if(m.fly) m.wait=Math.random()*0.6; else { m.tgt=1-m.tgt; m.wait=1+Math.random()*3; } }
       else { m.x+=dx/dist*step; m.y+=dy/dist*step; moving=true;
-        const sdx=(dx-dy); if(Math.abs(sdx)>0.01) m.face = sdx>0?1:-1; }
+        const sdx=(dx-dy); if(Math.abs(sdx)>0.01) m.face = (sdx>0?1:-1) * (m.petFace||1); }
     }
-    const [sx,sy]=iso(m.x,m.y);
+    let [sx,sy]=iso(m.x,m.y); if(m.fly) sy -= 30 + Math.sin(now/400 + m.x)*8;
     m.el.setAttribute('transform',`translate(${sx.toFixed(1)} ${sy.toFixed(1)}) scale(${m.face*m.s} ${m.s})`);
     if(m.moving!==moving){ m.moving=moving; m.el.classList.toggle('walk',moving); }
   }
@@ -230,32 +259,38 @@ function animate(now){
 const SPR=0.7;
 function plotGroundSVG(p,i){
   const [x,y]=PLOTS[i], pts=dia(x,y,PS,PS), B=pts[1], C=pts[2], D=pts[3];
-  let top='#A06F49', sl='#7E5638', sr='#6B4830';
-  if(p.s==='wild'){ top='#7DB14C'; sl='#8B5E3C'; sr='#76502F'; }
-  else if(p.s==='grow'){ if(isDry(p)){ top='#C08A5C'; } else { top='#7A4E33'; } }
-  let s = poly([D,C,[C[0],C[1]+7],[D[0],D[1]+7]],sl) + poly([C,B,[B[0],B[1]+7],[C[0],C[1]+7]],sr) + poly(pts,top);
-  if(p.s!=='wild') for(const k of [PS*0.25,PS*0.5,PS*0.75]) s+=`<path d="M${P([iso(x+0.15,y+k),iso(x+PS-0.15,y+k)])}" stroke="rgba(0,0,0,.12)" stroke-width="3" stroke-linecap="round"/>`;
-  if(p.s==='grow' && isDry(p)) s+=`<path d="M${P([iso(x+0.4,y+0.3),iso(x+0.6,y+0.5),iso(x+0.5,y+0.7)])} M${P([iso(x+1.3,y+1.2),iso(x+1.5,y+1.3)])}" stroke="#8C6040" stroke-width="1.6" fill="none"/>`;
+  let top='#9A6743', rim='#B98258', sl='#7A4E30', sr='#663F25';
+  if(p.s==='wild'){ top='#7DB14C'; rim='#93C763'; sl='#8B5E3C'; sr='#76502F'; }
+  else if(p.s==='grow'){ if(isDry(p)){ top='#C79563'; rim='#D8AA78'; } else { top='#6E4329'; rim='#845436'; } }
+  const k=7;
+  let s = poly([D,C,[C[0],C[1]+k],[D[0],D[1]+k]],sl,`stroke="${INK}" stroke-width="2"`) + poly([C,B,[B[0],B[1]+k],[C[0],C[1]+k]],sr,`stroke="${INK}" stroke-width="2"`)
+        + poly(pts,top,`stroke="${INK}" stroke-width="2.2" stroke-linejoin="round" class="soil"`);
+  const inner=dia(x+0.08,y+0.08,PS-0.16,PS-0.16); s += `<path d="M${P([inner[3],inner[0],inner[1]])}" stroke="${rim}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>`;
+  if(p.s!=='wild'){
+    for(const t of [0.28,0.52,0.76]) s+=`<path d="M${P([iso(x+0.14,y+PS*t),iso(x+PS-0.14,y+PS*t)])}" stroke="rgba(40,22,10,.28)" stroke-width="4" stroke-linecap="round"/><path d="M${P([iso(x+0.14,y+PS*t-0.06),iso(x+PS-0.14,y+PS*t-0.06)])}" stroke="${rim}" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>`;
+    const r=(i*13)%7; [[0.25,0.18],[1.1,0.4],[0.6,1.2],[1.25,1.15]].forEach(([a,b],k)=>{ if((k+r)%2) return; const [px,py]=iso(x+a,y+b); s+=`<ellipse cx="${px}" cy="${py}" rx="2.6" ry="1.6" fill="#C9B39A" stroke="${INK}" stroke-width=".8"/>`; });
+  }
+  if(p.s==='grow' && isDry(p)) s+=`<path d="M${P([iso(x+0.4,y+0.3),iso(x+0.6,y+0.5),iso(x+0.5,y+0.7)])} M${P([iso(x+1.0,y+0.95),iso(x+1.2,y+1.05),iso(x+1.15,y+1.25)])}" stroke="#8C6040" stroke-width="1.8" fill="none"/>`;
   return s;
 }
 function wildSign(i){ const l=LAND[i]; if(!l || mode==='visit' || !S) return '荒地'; return S.me.lv>=l.lv ? '可開墾' : `Lv${l.lv}`; }
 function plotSpriteSVG(p,i){
   let body='';
+  const dl = `style="animation-delay:-${((i*0.73)%3.2).toFixed(2)}s"`;
   if(p.s==='wild'){
-    body = `${weedArt(30,80)}${weedArt(90,70)}${weedArt(56,64)}<ellipse cx="76" cy="84" rx="8" ry="5" fill="#B5AFA3"/><ellipse cx="74" cy="82" rx="4" ry="2" fill="#CFCAC0"/>
-      <g transform="translate(36 24)"><rect x="22" y="14" width="4" height="26" fill="#B07A4F"/><rect x="0" y="0" width="48" height="20" rx="5" fill="#F3D9A8"/><text x="24" y="14.5" font-size="11" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">${wildSign(i)}</text></g>`;
+    body = `<g class="wsway" ${dl}>${weedArt(30,80)}${weedArt(90,70)}${weedArt(56,64)}</g><ellipse cx="76" cy="84" rx="8" ry="5" fill="#B5AFA3" stroke="${INK}" stroke-width="1.5"/><ellipse class="nool" cx="74" cy="82" rx="4" ry="2" fill="#D9D4CB"/>
+      <g transform="translate(36 22)"><rect x="22" y="14" width="5" height="28" rx="2" fill="#B07A4F" stroke="${INK}" stroke-width="1.6"/><rect x="0" y="0" width="50" height="21" rx="6" fill="#F3D9A8" stroke="${INK}" stroke-width="2"/><text x="25" y="15" font-size="11" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">${wildSign(i)}</text></g>`;
   } else if(p.s==='grow'){
     const st=stageOf(p);
-    body += `<g class="crop">${cropArt(CROP[p.c],st)}</g>`;
-    for(let k=0;k<p.w;k++) body += weedArt(...WEED_POS[k]);
-    for(let k=0;k<p.b;k++) body += bugArt(...BUG_POS[k]);
-    if(st===4) body += `<g class="spark" fill="#FFF"><path d="M100 22 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2z"/><path d="M18 30 l1.4 4 l4 1.4 l-4 1.4 l-1.4 4 l-1.4 -4 l-4 -1.4 l4 -1.4z"/></g>`;
-    if(isDry(p)) body += `<g transform="translate(98 26)"><path d="M0 0 Q-8 11 0 15 Q8 11 0 0Z" fill="#3DA5F4"/><path d="M-1 7 h2" stroke="#fff" stroke-width="1.5"/></g>`;
+    body += `<g class="crop${st===4?'':' sway'}" ${dl}>${cropArt(CROP[p.c],st)}</g>`;
+    for(let k=0;k<p.w;k++) body += `<g class="wsway" style="animation-delay:-${k*0.6}s">${weedArt(...WEED_POS[k])}</g>`;
+    for(let k=0;k<p.b;k++) body += `<g class="crawl" style="animation-delay:-${k*0.45}s">${bugArt(...BUG_POS[k])}</g>`;
+    if(st===4) body += `<g class="spark" fill="#FFF" stroke="${INK}" stroke-width="1"><path d="M100 22 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2z"/><path d="M18 30 l1.4 4 l4 1.4 l-4 1.4 l-1.4 4 l-1.4 -4 l-4 -1.4 l4 -1.4z"/></g>`;
+    if(isDry(p)) body += `<g class="drip" transform="translate(98 26)"><path d="M0 0 Q-8 11 0 15 Q8 11 0 0Z" fill="#3DA5F4" stroke="${INK}" stroke-width="1.5"/><path d="M-1 7 h2" stroke="#fff" stroke-width="1.5"/></g>`;
   } else if(p.s==='dead') body = deadArt;
   const [cx,cy]=plotCenter(i);
   return `<g transform="translate(${(cx-60*SPR).toFixed(1)} ${(cy-74*SPR).toFixed(1)}) scale(${SPR})">${body}</g>`;
 }
-
 /* ================= 地圖縮放與拖曳 ================= */
 const map=$('map'), world=$('world');
 let scale=1;

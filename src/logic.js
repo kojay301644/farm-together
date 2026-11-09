@@ -53,6 +53,7 @@ const leftSec = p => { const c=CROP[p.c]; return (c.time - p.g)/(p.dry?0.5:1); }
 
 /* ================= 回饋 ================= */
 function showLevelUp(){
+  fxConfetti();
   const lv = S.me.lv;
   const un = CROPS.filter(c=>c.lv===lv).map(c=>c.name);
   const w = LAND.filter(x=>x && x.lv===lv).length;
@@ -73,7 +74,7 @@ async function doAct(action, i, crop, n){
     applyState(r.state); refresh();
     if(r.lvup) setTimeout(showLevelUp, 400);
     return r;
-  }catch(e){ toast(e.message); return null; }
+  }catch(e){ sfx('err'); toast(e.message); return null; }
   finally{ ui.busy = false; }
 }
 
@@ -84,10 +85,10 @@ async function act(i){
   let r;
   if(tool==='hand'){
     if(p.s==='empty') return openSeedPicker(i);
-    if(p.s==='dead'){ r = await doAct('clear', i); if(r){ floatAt(el,'整地完成'); xpFloat(el,r.xp); } return; }
+    if(p.s==='dead'){ r = await doAct('clear', i); if(r){ fxDirt(i); floatAt(el,'整地完成'); xpFloat(el,r.xp); } return; }
     if(p.g >= c.time){
       r = await doAct('harvest', i);
-      if(r){ floatAt(el, `${c.name} +${r.amt}`, '#FFE066'); xpFloat(el, r.xp);
+      if(r){ fxHarvest(i, c, r.amt); floatAt(el, `${c.name} +${r.amt}`, '#FFE066'); xpFloat(el, r.xp);
         if(r.amt < c.yield) setTimeout(()=>toast(`雜草、蟲害或被偷，產量少了 ${c.yield-r.amt} 個`), 300); }
       return;
     }
@@ -102,26 +103,26 @@ async function act(i){
   if(tool==='water'){
     if(p.s!=='grow' || p.g>=c.time) return toast('這塊地不需要澆水');
     if(!p.dry) return toast('土壤還很濕潤，晚點再澆');
-    r = await doAct('water', i); if(r){ floatAt(el,'澆水！','#BDE6FF'); xpFloat(el,r.xp); } return;
+    r = await doAct('water', i); if(r){ fxWater(i); floatAt(el,'澆水！','#BDE6FF'); xpFloat(el,r.xp); } return;
   }
   if(tool==='weed'){
     if(p.s!=='grow' || !p.w) return toast('這裡沒有雜草');
-    r = await doAct('weed', i); if(r){ floatAt(el,'除草！'); xpFloat(el,r.xp); } return;
+    r = await doAct('weed', i); if(r){ fxPoof(i,'weed'); floatAt(el,'除草！'); xpFloat(el,r.xp); } return;
   }
   if(tool==='bug'){
     if(p.s!=='grow' || !p.b) return toast('這裡沒有蟲');
-    r = await doAct('bug', i); if(r){ floatAt(el,'除蟲！'); xpFloat(el,r.xp); } return;
+    r = await doAct('bug', i); if(r){ fxPoof(i,'bug'); floatAt(el,'除蟲！'); xpFloat(el,r.xp); } return;
   }
   if(tool==='shovel'){
-    if(p.s==='dead'){ r = await doAct('clear', i); if(r){ floatAt(el,'整地完成'); xpFloat(el,r.xp); } return; }
+    if(p.s==='dead'){ r = await doAct('clear', i); if(r){ fxDirt(i); floatAt(el,'整地完成'); xpFloat(el,r.xp); } return; }
     if(p.s==='grow') return modal('剷除作物', `<p style="font-weight:700">確定要剷除還沒收成的<b>${c.name}</b>嗎？種子不會退回。</p>`,
-      [['取消','sub',closeModal],['剷除','r',async()=>{ closeModal(); await doAct('dig', i); }]]);
+      [['取消','sub',closeModal],['剷除','r',async()=>{ closeModal(); if(await doAct('dig', i)) fxDirt(i); }]]);
     return toast('這塊地是空的');
   }
 }
 async function plant(i, id){
   const r = await doAct('plant', i, id);
-  if(r) floatAt(plotEls[i], `種下${CROP[id].name}`);
+  if(r){ fxSeed(i); floatAt(plotEls[i], `種下${CROP[id].name}`); }
 }
 function askTill(i){
   const w = LAND[i];
@@ -130,7 +131,7 @@ function askTill(i){
     [['取消','sub',closeModal],['開墾','o',async()=>{
       if(S.me.gold < w.cost) return toast('金幣不夠喔');
       closeModal(); const r = await doAct('till', i);
-      if(r){ floatAt(plotEls[i],'開墾成功！'); xpFloat(plotEls[i], r.xp); }
+      if(r){ fxDirt(i); fxPoof(i,'weed'); floatAt(plotEls[i],'開墾成功！'); xpFloat(plotEls[i], r.xp); }
     }]]);
 }
 
@@ -159,7 +160,11 @@ async function actVisit(i){
   try{
     const r = await rpc('farm_friend_act', {p_owner:V.owner.id, p_action:action, p_idx:i});
     applyState(r.state); applyVisit(r.visit); refresh();
-    if(action==='steal') floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066');
+    if(action==='steal'){ fxSteal(i, c); floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066'); }
+    else if(action==='help_water') fxWater(i);
+    else if(action.startsWith('help')) fxPoof(i, action==='help_bug'?'bug':'weed');
+    else fxSmoke(i);
+    if(action==='steal'){}
     else if(action.startsWith('help')) floatAt(el, action==='help_weed'?'幫忙除草！':action==='help_bug'?'幫忙除蟲！':'幫忙澆水！', action==='help_water'?'#BDE6FF':null);
     else floatAt(el, action==='prank_weed'?'放了一棵草 😈':'放了一隻蟲 😈', '#FFD6E5');
     xpFloat(el, r.xp);
@@ -198,7 +203,7 @@ function openShop(){
   $('md').querySelectorAll('[data-buy]').forEach(b=>b.onclick=async()=>{
     const c = CROP[b.dataset.buy], n = +b.dataset.n;
     const r = await doAct('buy', null, c.id, n);
-    if(r){ toast(`買了 ${n} 包${c.name}種子`); ui.seed = c.id; openShop(); }
+    if(r){ sfx('coin'); toast(`買了 ${n} 包${c.name}種子`); ui.seed = c.id; openShop(); }
   });
 }
 function openBag(){
@@ -216,10 +221,10 @@ function openBag(){
   body += sd.length ? sd.map(([id,n])=>{ const c=CROP[id];
     return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}種子</b> <span class="tag">×${n}</span><div>成熟 ${dur(c.time)}</div></div><button class="mini" data-use="${id}">拿來種</button></div>`; }).join('')
     : `<div class="empty">沒有種子</div>`;
-  modal('穀倉（倉庫）', body, cr.length?[[`一鍵全部賣出（${total} 金）`,'o',async()=>{ const r=await doAct('sell_all'); if(r){ toast(`全部賣出，獲得 ${r.amt} 金`); closeModal(); } }]]:null);
+  modal('穀倉（倉庫）', body, cr.length?[[`一鍵全部賣出（${total} 金）`,'o',async()=>{ const r=await doAct('sell_all'); if(r){ sfx('coin'); toast(`全部賣出，獲得 ${r.amt} 金`); closeModal(); } }]]:null);
   $('md').querySelectorAll('[data-sell]').forEach(b=>b.onclick=async()=>{
     const id=b.dataset.sell; const r = await doAct('sell', null, id);
-    if(r){ toast(`賣出 ${CROP[id].name}，獲得 ${r.amt} 金`); openBag(); }
+    if(r){ sfx('coin'); toast(`賣出 ${CROP[id].name}，獲得 ${r.amt} 金`); openBag(); }
   });
   $('md').querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{ ui.seed=b.dataset.use; setTool('seed'); closeModal(); toast(`點空地就能種下${CROP[ui.seed].name}`); });
 }
@@ -228,6 +233,7 @@ async function openHome(){
   const {data:{user}} = await sb.auth.getUser();
   modal('我的家', `
     <div class="sec">玩家</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
     <div class="sec">玩法小提醒</div>
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
@@ -235,8 +241,14 @@ async function openHome(){
     <div class="homebtns"><button class="btn" id="hHelp">📖 遊戲說明</button><button class="btn o" id="hA2hs">📱 加到桌面</button></div>
     <div class="homebtns"><button class="btn o" id="hGem" style="background:#7B6CF6;box-shadow:0 3px 0 #5B4ED6">💎 鑽石商店</button><button class="btn sub" id="hInv">💌 邀請朋友</button></div>
     <div class="homebtns">${S.me.admin?'<a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">🛠️ 營運後台</a>':''}<button class="btn sub" id="logout">登出</button></div>
+    <div class="sec">設定</div>
+    <div class="seg" style="margin-top:6px"><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
     <div style="text-align:center;margin-top:10px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`);
   $('hGem').onclick = ()=>openGemShop();
+  $('hAv').onclick = openAvatarPicker;
+  $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openHome(); };
+  $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openHome(); };
+  $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openHome(); };
   $('hHelp').onclick = openHelp; $('hA2hs').onclick = openA2HS; $('hInv').onclick = invite;
   $('logout').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
 }
@@ -265,7 +277,7 @@ async function openBoard(tab){
   let body = '';
   if(boardTab==='friends'){
     body = F.friends.length ? F.friends.map(f=>`<div class="row">
-        <div class="avatar sm">${esc(f.nickname.slice(0,1))}</div>
+        ${avImg(f)}
         <div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>
           <div>${f.ripe?`<span style="color:var(--orange-d)">🧺 有 ${f.ripe} 塊地可以偷</span>`:'目前沒有可偷的菜'}${f.issues?`・🐛 需要幫忙 ${f.issues}`:''}</div></div>
         <button class="mini ${f.ripe?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('')
@@ -275,19 +287,19 @@ async function openBoard(tab){
       <div style="display:flex;gap:8px;margin-top:6px"><input id="fnick" class="inp" maxlength="10" placeholder="輸入朋友的暱稱"><button class="mini" id="fsend" style="padding:0 16px">送出</button></div>
       <div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:6px">你的暱稱是「${esc(S.me.nickname)}」，把它告訴朋友吧</div>`;
     body += `<div class="sec">等你確認的邀請</div>` + (F.incoming.length ? F.incoming.map(f=>`<div class="row">
-        <div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span><div>想成為你的好友</div></div>
+        ${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span><div>想成為你的好友</div></div>
         <button class="mini" data-acc="${f.id}">接受</button><button class="mini sub" data-rej="${f.id}">拒絕</button></div>`).join('') : `<div class="empty" style="padding:10px 0">沒有新的邀請</div>`);
-    if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row"><div class="avatar sm">${esc(f.nickname.slice(0,1))}</div><div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
+    if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row">${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
   } else if(boardTab==='near'){
     body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（今天還能偷陌生人 <b style="color:var(--orange-d)">${S.me.steal_left}</b> 次）</div>`;
-    body += NB.length ? NB.map(f=>`<div class="row"><div class="avatar sm">${esc(f.nickname.slice(0,1))}</div>
+    body += NB.length ? NB.map(f=>`<div class="row">${avImg(f)}
         <div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}
           <div>${f.ripe?`<span style="color:var(--orange-d)">🧺 有 ${f.ripe} 塊地可以偷</span>`:'目前沒有可偷的菜'}</div></div>
         <button class="mini ${f.ripe?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('') + `<button class="btn sub" id="nbMore" style="width:100%;margin-top:8px">換一批</button>`
       : `<div class="empty">附近還沒有其他玩家種菜，<br>邀請朋友一起來玩吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
   } else if(boardTab==='rank'){
     const medal = r => r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
-    const row = (rk, x) => `<div class="row rk${x.me?' mine':''}"${x.me?'':` data-visit="${x.id}" style="cursor:pointer"`}><div class="rkn">${medal(rk)}</div><div class="avatar sm">${esc(x.nickname.slice(0,1))}</div>
+    const row = (rk, x) => `<div class="row rk${x.me?' mine':''}"${x.me?'':` data-visit="${x.id}" style="cursor:pointer"`}><div class="rkn">${medal(rk)}</div>${avImg(x)}
         <div class="tx"><b>${esc(x.nickname)}</b>${x.me?' <span class="tag">我</span>':''}<div>經驗 ${x.exp}</div></div><span class="tag" style="font-size:13px">Lv${x.lv}</span></div>`;
     body = `<div class="seg" style="margin:4px 0 6px"><button data-rs="f" class="${rankScope==='f'?'on':''}">好友排行</button><button data-rs="a" class="${rankScope==='a'?'on':''}">全服前 50 名</button></div>`;
     if(rankScope==='f') body += R.friends.map((x,k)=>row(k+1, x)).join('') + (R.friends.length<2?`<div class="empty" style="padding:10px 0">加更多好友一起比賽吧！</div>`:'');
@@ -393,12 +405,12 @@ function renderPlots(){
 function renderHUD(){
   if(!S) return;
   const me = S.me;
-  $('pname').textContent = me.nickname; $('avatar').textContent = me.nickname.slice(0,1);
-  $('plv').textContent = 'Lv'+me.lv; $('pgold').textContent = me.gold.toLocaleString();
+  $('pname').textContent = me.nickname; const avs = avSrc(me.avatar); if(!$('avatar').src.endsWith(avs)) $('avatar').src = avs;
+  $('plv').textContent = 'Lv'+me.lv; tweenNum($('pgold'), me.gold);
   const need = needExp(me.lv);
   $('pexp').style.width = (me.lv>=MAX_LV?100:Math.min(100, me.exp/need*100))+'%';
   $('pexpt').textContent = me.lv>=MAX_LV ? 'MAX' : `${me.exp}/${need}`;
-  $('pgems').textContent = (me.gems||0).toLocaleString();
+  tweenNum($('pgems'), me.gems||0);
   const n = Object.values(me.seeds).reduce((a,b)=>a+b,0);
   const bd = $('seedBadge'); if(bd){ bd.textContent=n; bd.style.display=n?'':'none'; }
   const pb = $('prankBadge'); if(pb){ pb.textContent=me.prank_left; }
@@ -542,6 +554,7 @@ $('nickBtn').onclick = createNick;
 $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); });
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
+$('avatar').onclick = ()=>{ if(S && mode==='home') openAvatarPicker(); };
 $('gemBox').onclick = ()=>{ if(S && mode==='home') openGemShop('pack'); };
 $('tutNext').onclick = ()=>tutNext();
 $('tutSkip').onclick = ()=>tutFinish();
