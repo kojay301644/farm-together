@@ -426,7 +426,7 @@ function renderHUD(){
     h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
     if(V.protected) h += '對方在<b>新手保護</b>中，不能偷菜和惡作劇';
     else h += (can ? `有 <b>${can}</b> 塊地可以偷！` : `惡作劇還剩 ${me.prank_left} 次`) + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次）`);
-    $('hint').innerHTML = `<span>🧺</span><span>${h}</span>`; return;
+    setHint(`<span>🧺</span><span>${h}</span>`); return;
   }
   if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
   else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，不處理會減少收成';
@@ -434,8 +434,11 @@ function renderHUD(){
   else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';
   else if(PL.some(p=>p.s==='empty')) h = n?'點<b>空地</b>選種子種下去吧':'沒有種子了，點<b>種子商店</b>買一些吧';
   else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
-  $('hint').innerHTML = `<span>🌱</span><span>${h}</span>`;
+  setHint(`<span>🌱</span><span>${h}</span>`);
 }
+/* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
+let hintLast='', hintT=null;
+function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
 function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } checkEvolve(); }catch(e){} }
 
 /* ================= 同步 ================= */

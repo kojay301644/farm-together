@@ -377,7 +377,9 @@ function layout(){
   const vw=innerWidth, vh=innerHeight;
   scale = vw<700 ? Math.max(vw/WW, 0.6) : Math.max(vw/WW, vh/WH, Math.min(vw/1300, vh/800));
   // 畫面比世界大時，用天空往外延伸補滿（不留空白）
-  VBW=Math.max(WW, vw/scale); VBH=Math.max(WH, vh/scale); VBX=VX-(VBW-WW)/2; VBY=VY-(VBH-WH)/2;
+  // 上下多留空間：最上面的建築可以拉到上方欄下面、最下面的可以拉到工具列上面
+  const padT=70/scale, padB=100/scale, H0=WH+padT+padB;
+  VBW=Math.max(WW, vw/scale); VBH=Math.max(H0, vh/scale); VBX=VX-(VBW-WW)/2; VBY=VY-padT-(VBH-H0)/2;
   world.setAttribute('viewBox',`${VBX} ${VBY} ${VBW} ${VBH}`);
   world.setAttribute('width',(VBW*scale).toFixed(0)); world.setAttribute('height',(VBH*scale).toFixed(0));
   world.style.margin='0';

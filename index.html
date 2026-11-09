@@ -305,6 +305,17 @@ body.lowfx .bird{display:none}
 .skgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
 .skcard{display:flex;flex-direction:column;align-items:center;gap:3px;background:#FFF8EC;border:2.5px solid #E6D9C3;border-radius:14px;padding:6px 4px 8px}
 .skcard img{width:100%;height:84px;object-fit:contain}.skcard b{font-size:13px}.skcard.on{border-color:#3BB273;background:#E8F8EE}
+/* 精簡上方欄 */
+.hud{padding:6px 8px 0}
+.top{padding:5px 8px;gap:8px;border-radius:16px}
+.top .avatar{width:34px;height:34px}
+.who .nm{font-size:13px;line-height:1.1}
+.lvrow{font-size:10px;gap:4px}.lvtag{padding:0 5px;font-size:11px}.bar{height:6px}
+.cur{flex-direction:row;gap:5px;align-items:center}
+.cur .gold{padding:2px 8px;font-size:13px}
+.cur .icn{width:17px;height:17px}
+.hint{margin-top:5px;padding:5px 10px;font-size:12px;transition:opacity .5s,transform .5s}
+.hint.hide{opacity:0;transform:translateY(-8px);pointer-events:none}
 </style>
 </head>
 <body>
@@ -885,7 +896,9 @@ function layout(){
   const vw=innerWidth, vh=innerHeight;
   scale = vw<700 ? Math.max(vw/WW, 0.6) : Math.max(vw/WW, vh/WH, Math.min(vw/1300, vh/800));
   // 畫面比世界大時，用天空往外延伸補滿（不留空白）
-  VBW=Math.max(WW, vw/scale); VBH=Math.max(WH, vh/scale); VBX=VX-(VBW-WW)/2; VBY=VY-(VBH-WH)/2;
+  // 上下多留空間：最上面的建築可以拉到上方欄下面、最下面的可以拉到工具列上面
+  const padT=70/scale, padB=100/scale, H0=WH+padT+padB;
+  VBW=Math.max(WW, vw/scale); VBH=Math.max(H0, vh/scale); VBX=VX-(VBW-WW)/2; VBY=VY-padT-(VBH-H0)/2;
   world.setAttribute('viewBox',`${VBX} ${VBY} ${VBW} ${VBH}`);
   world.setAttribute('width',(VBW*scale).toFixed(0)); world.setAttribute('height',(VBH*scale).toFixed(0));
   world.style.margin='0';
@@ -1711,7 +1724,7 @@ function renderHUD(){
     h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
     if(V.protected) h += '對方在<b>新手保護</b>中，不能偷菜和惡作劇';
     else h += (can ? `有 <b>${can}</b> 塊地可以偷！` : `惡作劇還剩 ${me.prank_left} 次`) + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次）`);
-    $('hint').innerHTML = `<span>🧺</span><span>${h}</span>`; return;
+    setHint(`<span>🧺</span><span>${h}</span>`); return;
   }
   if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
   else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，不處理會減少收成';
@@ -1719,8 +1732,11 @@ function renderHUD(){
   else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';
   else if(PL.some(p=>p.s==='empty')) h = n?'點<b>空地</b>選種子種下去吧':'沒有種子了，點<b>種子商店</b>買一些吧';
   else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
-  $('hint').innerHTML = `<span>🌱</span><span>${h}</span>`;
+  setHint(`<span>🌱</span><span>${h}</span>`);
 }
+/* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
+let hintLast='', hintT=null;
+function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
 function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } checkEvolve(); }catch(e){} }
 
 /* ================= 同步 ================= */
