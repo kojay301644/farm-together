@@ -104,7 +104,7 @@ const GEM_ITEMS = [
   {icon:'✨', name:'神奇肥料', gems:30, desc:'讓一塊田立刻成熟'},
   {icon:'🎃', name:'黃金南瓜種子', gems:50, desc:'會發光的稀有作物，賣價超高'},
   {icon:'🧑‍🌾', name:'小幫手（7 天）', gems:150, desc:'每天自動幫你澆水、除草一次'},
-  {icon:'🏡', name:'造型裝飾', gems:'80～300', desc:'房子、圍欄、農夫服裝（裝飾店開放後上架）'},
+  {icon:'🏡', name:'造型裝飾', gems:'80～300', desc:'房子、圍欄、農夫服裝（商店開放後上架）'},
 ];
 let gemTab = 'pack';
 function openGemShop(t){

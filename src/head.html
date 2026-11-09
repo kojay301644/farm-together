@@ -351,6 +351,15 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .pslot .crown{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:14px}
 .pslot .pg{width:26px;height:26px;border-radius:8px;border:2px solid #D9C39A;background:#fff;display:grid;place-items:center;padding:0;font-weight:900;color:#B08A55;font-size:15px;cursor:pointer}
 .pslot .pg img{width:20px;height:20px}
+.snav{display:flex;flex-wrap:wrap;gap:5px;margin:-2px 0 8px}
+.snav button{flex:none;font:inherit;font-size:13px;font-weight:800;border:2px solid #E6D9C3;background:#FFF8EC;border-radius:12px;padding:6px 10px;color:var(--ink2);cursor:pointer}
+.snav button.on{background:#3BB273;border-color:#2E9660;color:#fff}
+.tsw{width:100%;height:70px;border-radius:10px;display:grid;place-items:center;font-size:26px;border:2px solid rgba(75,52,35,.25)}
+#tfx{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+#tfx span{position:absolute;top:-30px;animation:tfall linear infinite;opacity:.85}
+@keyframes tfall{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(30px,55vh) rotate(180deg)}100%{transform:translate(-20px,110vh) rotate(360deg)}}
+body.lowfx #tfx{display:none}
+.twk{animation:twk 3s ease-in-out infinite}@keyframes twk{50%{opacity:.25}}
 </style>
 </head>
 <body>

@@ -178,6 +178,8 @@ async function pageCf(){
     <div class="card"><h2>萌獸價格</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填。</div>
     <table><tr><th>萌獸</th><th>解鎖等級</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.beasts||[]).map(b=>`<tr><td><b>${esc(b.name)}</b></td><td><input class="num" id="b_${b.id}_lv" type="number" value="${b.lv}"></td><td><input class="num" id="b_${b.id}_gold" type="number" value="${b.gold??''}"></td><td><input class="num" id="b_${b.id}_gems" type="number" value="${b.gems??''}"></td><td><button class="btn" data-bid="${b.id}">儲存</button></td></tr>`).join('')}</table></div>
+    <div class="card"><h2>城鎮色調</h2><table><tr><th>色調</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
+    ${(C.tones||[]).filter(t=>t.id!=='spring').map(t=>`<tr><td><b>${esc(t.name)}</b></td><td><input class="num" id="t_${t.id}_gold" type="number" value="${t.gold??''}"></td><td><input class="num" id="t_${t.id}_gems" type="number" value="${t.gems??''}"></td><td><button class="btn" data-tid="${t.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>建築外觀</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；兩個都留空＝不能購買。</div>
     <table><tr><th>外觀</th><th>建築</th><th>名稱</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.skins||[]).map(k=>`<tr><td><img src="assets/th_${k.style}_${({home:'academy',barn:'farm',shop:'shop',fountain:'fountain',pen:'play',decor:'forge'})[k.bld]}.webp" style="width:40px;height:40px;object-fit:contain"></td><td>${({home:'我的家',barn:'穀倉',shop:'種子商店',fountain:'噴水池',pen:'萌獸園',decor:'裝飾店'})[k.bld]}</td>
@@ -189,6 +191,8 @@ async function pageCf(){
     try{ await rpc('adm_animal_save',{p_id:id,p_lv:v('lv'),p_price:v('price'),p_feed:v('feed'),p_prod_sec:v('prod_sec'),p_yield:v('yield'),p_good_price:v('good_price'),p_exp:v('exp')}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-bid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.bid, v=f=>$(`b_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
     try{ await rpc('adm_beast_save',{p_id:id,p_gold:n('gold'),p_gems:n('gems'),p_lv:+v('lv')}); toast('已儲存'); }catch(e){ toast(e.message); } });
+  document.querySelectorAll('[data-tid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.tid, v=f=>$(`t_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
+    try{ await rpc('adm_tone_save',{p_id:id,p_gold:n('gold'),p_gems:n('gems')}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-kid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.kid, v=f=>$(`k_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);
     try{ await rpc('adm_skin_save',{p_id:id,p_name:v('name'),p_gold:n('gold'),p_gems:n('gems')}); toast('已儲存'); }catch(e){ toast(e.message); } });
   document.querySelectorAll('[data-gid]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.gid, v=f=>$(`g_${id}_${f}`).value, n=f=>v(f)===''?null:+v(f);

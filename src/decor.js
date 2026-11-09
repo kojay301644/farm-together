@@ -1,5 +1,5 @@
 
-/* ================= 裝飾店與自由擺放 ================= */
+/* ================= 商店與自由擺放 ================= */
 let DECOR = [], DEC = {}, DECOR_MAX = 40, OBST_FIXED = [], decorSig = '', EDIT = null;
 const DEC_R = {"balloon":1.249,"bench":0.83,"carousel":1.346,"crystal":0.978,"dragon":1.071,"flag":1.602,"flower":0.796,"gifts":0.924,"hay":0.898,"kennel":0.966,"lamp":1.969,"lantree":1.1,"mail":1.291,"mush":1.058,"picnic":0.713,"pond":0.819,"pumpkin":0.924,"rainbow":0.793,"sakura":1.109,"snowman":1.151,"statue":1.313,"swing":1.113,"torii":1.266,"xmas":1.131};
 function setDecorConfig(list, st){ if(list){ DECOR=list; DEC={}; list.forEach(d=>DEC[d.id]=d); } if(st && st.decor_max!=null) DECOR_MAX=+st.decor_max; }
@@ -34,11 +34,10 @@ function renderDecor(force){
 /* ---------- 商店 ---------- */
 let decorTab = 'shop';
 function openDecorShop(t){
-  if(mode==='visit') return toast('回到自己的農場才能逛裝飾店');
+  if(mode==='visit') return toast('回到自己的農場才能逛商店');
   if(t) decorTab=t;
   const me=S.me, inv=me.decor_inv||{}, placed={}; (me.decor_place||[]).forEach(d=>placed[d.i]=(placed[d.i]||0)+1);
-  const tabs=`<div class="tabs"><button data-dt="shop" class="${decorTab==='shop'?'on':''}">裝飾商店</button><button data-dt="mine" class="${decorTab==='mine'?'on':''}">我的裝飾</button></div>`;
-  let body = tabs;
+  let body = shopNav(decorTab==='shop'?'decor':'mine');
   if(decorTab==='shop'){
     body += DECOR.map(d=>{ const lock=me.lv<d.lv, n=inv[d.id]||0, cost=d.gold!=null?`${d.gold.toLocaleString()} 金`:`💎${d.gems}`;
       const poor = d.gold!=null ? me.gold<d.gold : (me.gems||0)<d.gems;
@@ -53,9 +52,8 @@ function openDecorShop(t){
       : `<div class="empty">還沒有裝飾，去商店買一些吧！</div>`;
   }
   body += `<div class="rhint" style="text-align:center;margin-top:8px">同一種加成裝飾只算一次・最多擺 ${DECOR_MAX} 個・好友來拜訪看得到</div>`;
-  modal(`裝飾店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`, body, [['🖐️ 擺放模式','o',()=>enterDecorEdit()]]);
-  const md=$('md');
-  md.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>openDecorShop(b.dataset.dt));
+  modal(shopTitle(), body, [['🖐️ 擺放模式','o',()=>enterDecorEdit()]]);
+  bindShopNav(); const md=$('md');
   md.querySelectorAll('[data-bd]').forEach(b=>b.onclick=async()=>{ const d=DEC[b.dataset.bd];
     try{ applyState(await rpc('farm_buy_decor',{p_id:d.id,p_n:1})); refresh(); sfx('coin');
       modal('買到了！', `<div style="text-align:center;padding:6px 0"><img src="${A('dc_'+d.id)}" style="width:110px;height:110px;object-fit:contain"><div style="font-weight:900;font-size:18px;margin-top:6px">${esc(d.name)}</div>${d.bonus?`<div style="color:#7B6CF6;font-weight:700">${bonusTxt(d)}</div>`:''}</div>`,

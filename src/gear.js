@@ -65,7 +65,7 @@ function openGearShop(t){
   const me=S.me, list=GEAR_LIST.filter(g=>gearShopTab==='gold' ? g.gold!=null : g.gems!=null);
   const tabs=`<div class="tabs"><button data-gs="gold" class="${gearShopTab==='gold'?'on':''}">金幣裝備</button><button data-gs="gem" class="${gearShopTab==='gem'?'on':''}">💎 高級裝備</button></div>`;
   const byF={}; list.forEach(g=>(byF[g.func]=byF[g.func]||[]).push(g));
-  let body=tabs;
+  let body=shopNav('gear')+tabs;
   Object.keys(GEAR_FUNC).forEach(f=>{ if(!byF[f]) return;
     body+=`<div class="sec">${GEAR_FUNC[f][1]} ${GEAR_FUNC[f][0]}</div>`;
     body+=byF[f].map(g=>{ const lock=g.gold!=null && me.lv<g.lv, cost=g.gold!=null?`${g.gold.toLocaleString()} 金`:`💎${g.gems}`;
@@ -73,7 +73,7 @@ function openGearShop(t){
       return `<div class="row" style="${lock?'opacity:.55':''}"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b>${n?` <span class="tag">已有 ${n}</span>`:''}<div>${gearDesc(g)}</div></div>
         ${lock?`<span class="lock">Lv${g.lv} 解鎖</span>`:`<button class="mini ${g.gems!=null?'gem':''}" data-bg="${g.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('');
   });
-  modal(`萌獸裝備商店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`, body);
+  modal(shopTitle(), body); bindShopNav();
   const md=$('md');
   md.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>openGearShop(b.dataset.gs));
   md.querySelectorAll('[data-bg]').forEach(b=>b.onclick=async()=>{ const g=GEAR[b.dataset.bg];
@@ -120,12 +120,12 @@ function openSkinShop(t){
   const me=S.me, owned=me.skins||{}, on=(me.skin_on||{})[skinTab]||SKIN_DEF[skinTab];
   const tabs=`<div class="tabs sktabs">${Object.keys(SKIN_BLD).map(k=>`<button data-skt="${k}" class="${skinTab===k?'on':''}">${SKIN_BLD[k]}</button>`).join('')}</div>`;
   const styles=[SKIN_DEF[skinTab], ...SKINS.filter(x=>x.bld===skinTab).map(x=>x.style)];
-  const body=tabs+`<div class="skgrid">${styles.map(st=>{ const def=st===SKIN_DEF[skinTab], k=SKINS.find(x=>x.bld===skinTab&&x.style===st), have=def||owned[skinTab+'_'+st], cur=st===on;
+  const body=shopNav('skin')+tabs+`<div class="skgrid">${styles.map(st=>{ const def=st===SKIN_DEF[skinTab], k=SKINS.find(x=>x.bld===skinTab&&x.style===st), have=def||owned[skinTab+'_'+st], cur=st===on;
     const price = k ? (k.gold!=null?`${k.gold.toLocaleString()} 金`:`💎${k.gems}`) : '';
     return `<div class="skcard${cur?' on':''}"><img src="${A('th_'+st+'_'+SKIN_PART[skinTab])}" alt=""><b>${def?'預設':(k?k.name:SKIN_NAME[st])}</b>
       ${cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-skuse="${def?'def':st}">套用</button>`:`<button class="mini ${k&&k.gems!=null?'gem':''}" data-skbuy="${k.id}" ${(k.gold!=null?me.gold<k.gold:(me.gems||0)<k.gems)?'disabled':''}>${price}</button>`}</div>`; }).join('')}</div>
     <div class="rhint" style="text-align:center;margin-top:8px">買過的外觀可以隨時免費切換，好友來拜訪也看得到</div>`;
-  modal(`建築外觀　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`, body);
+  modal(shopTitle(), body); bindShopNav();
   const md=$('md');
   md.querySelectorAll('[data-skt]').forEach(b=>b.onclick=()=>openSkinShop(b.dataset.skt));
   md.querySelectorAll('[data-skuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_skin',{p_bld:skinTab,p_style:b.dataset.skuse})); refresh(); sfx('coin'); openSkinShop(); }catch(e){ toast(e.message); } });

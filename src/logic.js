@@ -493,7 +493,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); } else if(S){ applySkins(S.me.skin_on); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -579,7 +579,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts); CFG_SET=c.settings||{};
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts); setToneConfig(c.tones); CFG_SET=c.settings||{};
   }catch(e){}
 }
 async function showNotices(){

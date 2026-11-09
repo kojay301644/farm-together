@@ -61,7 +61,7 @@ const BLD = [
   {id:'home',  name:'我的家',   img:'b_academy',  c:HG(668,128),  w:290, foot:0.80},
   {id:'shop',  name:'種子商店', img:'b_shop',     c:HG(366,200),  w:230, foot:0.80},
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
-  {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
+  {id:'decor', name:'商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
   {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
@@ -186,6 +186,7 @@ function farmerDo(i, kind){
 }
 
 function buildWorld(){
+  toneCur=null;
   OBST=[];
   skinSig='';
   const W=$('world');
@@ -208,6 +209,7 @@ function buildWorld(){
     <radialGradient id="gSun"><stop offset="0" stop-color="rgba(255,250,220,.95)"/><stop offset=".25" stop-color="rgba(255,240,180,.5)"/><stop offset="1" stop-color="rgba(255,240,180,0)"/></radialGradient></defs>`);
   sea += `<rect x="${VX-1500}" y="${VY-1500}" width="${WW+3000}" height="${WH+3000}" fill="url(#gSky)"/>`;
   // 遠景：用萌獸主頁圖四周的山、瀑布、浮島、森林拼成
+  sea += `<g id="starL"></g>`;
   sea += `<image href="${A('backdrop')}" x="-400" y="-300" width="2400" height="1400" preserveAspectRatio="none"/>`;
   // 萌獸主頁浮空島
   island += `<image href="${A('home_island')}" x="0" y="0" width="${IW}" height="${IH}"/>`;
@@ -278,7 +280,7 @@ function buildWorld(){
   // 飛鳥
   for(let k=0;k<2;k++) cloud += `<g class="bird" style="animation-delay:${-k*17}s"><g transform="translate(0 ${120+k*90})"><path d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path transform="translate(26 14) scale(.8)" d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/></g></g>`;
 
-  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="decorL"></g><g id="movers" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
+  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="decorL"></g><g id="movers" style="pointer-events:none"></g><g id="toneL" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
 
   OBST_FIXED=OBST.slice(); decorSig=''; bindDecorLayer();
   // 田地元素與標籤
