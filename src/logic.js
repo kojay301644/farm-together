@@ -545,6 +545,7 @@ function showScreen(which){
   $('loginCard').style.display = which==='login' ? '' : 'none';
   $('nickCard').style.display = which==='nick' ? '' : 'none';
   ['map','hud','dock'].forEach(k=>$(k).style.display = which==='game' ? '' : 'none');
+  document.body.classList.toggle('ingame', which==='game'); setTimeout(()=>{ try{ panSync(); }catch(e){} }, 300);
 }
 function setAuthMode(m){
   authMode = m;

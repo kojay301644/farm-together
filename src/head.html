@@ -329,6 +329,11 @@ body.lowfx .bird{display:none}
 .sgd .sgr{margin-top:4px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
 .sgd.now{border-color:#3BB273;box-shadow:0 0 0 3px rgba(59,178,115,.25)}
 .sgd.got{opacity:.6}.sgd.got i{position:absolute;right:6px;top:4px;color:#3BB273;font-style:normal;font-weight:900;font-size:18px}
+.tutring{position:fixed;z-index:29;transform:translate(-50%,-50%);border-radius:50%;border:4px solid #FFD43B;box-shadow:0 0 0 3px rgba(255,255,255,.7),0 0 24px 6px rgba(255,212,59,.75);pointer-events:none;animation:tring 1.1s ease-in-out infinite}
+@keyframes tring{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1}50%{transform:translate(-50%,-50%) scale(1.15);opacity:.7}}
+.pan{position:fixed;top:50%;z-index:19;width:40px;height:64px;margin-top:-32px;border:0;border-radius:16px;background:rgba(255,255,255,.82);color:#5A3E2B;font-size:40px;font-weight:900;line-height:1;display:none;align-items:center;justify-content:center;padding:0 0 6px;cursor:pointer;box-shadow:0 3px 0 rgba(75,52,35,.45);transition:opacity .25s}
+.pan.l{left:6px}.pan.r{right:6px}.pan.off{opacity:0;pointer-events:none}
+body.ingame .pan{display:flex}
 .avw{position:relative;flex:none}.aved{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;background:#FF9F43;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 0 #D67D22;pointer-events:none}
 .admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
 .admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}
@@ -452,7 +457,8 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 </div>
 
 <div class="tut" id="tut" style="display:none"><div class="tutin"><div id="tutText"></div><div class="tutbtns"><button class="mini sub" id="tutSkip">跳過教學</button><button class="mini o" id="tutNext">下一步</button></div></div></div>
-<div class="tutarrow" id="tutArrow" style="display:none">👇</div>
+<div class="tutring" id="tutRing" style="display:none"></div><div class="tutarrow" id="tutArrow" style="display:none">👇</div>
+<button class="pan l" id="panL" aria-label="往左看">‹</button><button class="pan r" id="panR" aria-label="往右看">›</button>
 <div class="ov" id="ov"><div class="md" id="md"></div></div>
 <div class="toast" id="toast"></div>
 <div id="tint"></div>

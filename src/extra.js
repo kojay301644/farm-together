@@ -32,25 +32,42 @@ const FEAT_TUTS = [
   {id:'shop', when:()=>S.me.lv>=5,
    text:'🏠 <b>建築商店</b>可以買裝飾擺在農場、換建築外觀和城鎮色調，把農場打扮成你喜歡的樣子', target:()=>bEl('shop')},
 ];
+/* 箭頭＋光圈指向目標；目標在地圖上就把畫面捲過去 */
+let tutFocused = null;
+function tutPoint(el){
+  const a=$('tutArrow'), ring=$('tutRing');
+  if(!el){ a.style.display='none'; ring.style.display='none'; return; }
+  const inMap = map.contains(el);
+  if(inMap && tutFocused!==el){
+    tutFocused = el;
+    const r0=el.getBoundingClientRect(), boxTop=$('tut').getBoundingClientRect().top || innerHeight-300;
+    const wantY = 150 + (boxTop-150)/2;
+    map.scrollBy({left: r0.left + r0.width/2 - innerWidth/2, top: r0.top + r0.height/2 - wantY, behavior:'smooth'});
+  }
+  const r=el.getBoundingClientRect();
+  const d=Math.max(56, Math.min(150, Math.max(r.width, r.height)*0.75)), cy=r.top+r.height/2;
+  const up = cy-d/2 < 110;   // 目標在最上面：箭頭改放下面往上指
+  a.textContent = up ? '👆' : '👇';
+  a.style.display=''; a.style.left=(r.left+r.width/2)+'px'; a.style.top=(up ? cy+d/2+44 : cy-d/2+10)+'px';
+  ring.style.display=''; ring.style.width=ring.style.height=d+'px'; ring.style.left=(r.left+r.width/2)+'px'; ring.style.top=(r.top+r.height/2)+'px';
+}
 let feat = null;   // 目前顯示中的新功能教學
 const featKey = id => 'ytzt_feat_' + (S && S.me.id) + '_' + id;
 const featSeen = id => { try{ return localStorage.getItem(featKey(id))==='1'; }catch(e){ return true; } };
-function featDone(){ if(feat){ try{ localStorage.setItem(featKey(feat.id),'1'); }catch(e){} } feat=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; }
+function featDone(){ if(feat){ try{ localStorage.setItem(featKey(feat.id),'1'); }catch(e){} } feat=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; $('tutRing').style.display='none'; }
 function featTick(){
   if(tut || !S || mode!=='home' || !tutDone()) return;
   if(document.querySelector('#ov.show')) return;
   if(!feat){ feat = FEAT_TUTS.find(f=>!featSeen(f.id) && (()=>{ try{ return f.when(); }catch(e){ return false; } })()) || null;
-    if(!feat) return;
+    if(!feat) return; tutFocused = null;
     $('tut').style.display=''; $('tutText').innerHTML=`<span class="tutn">新功能</span>${feat.text}`;
     $('tutNext').style.display=''; $('tutNext').textContent='知道了'; $('tutSkip').style.display='none'; }
-  const el = feat.target && feat.target(), a=$('tutArrow');
-  if(!el){ a.style.display='none'; return; }
-  const r=el.getBoundingClientRect(); a.style.display=''; a.style.left=(r.left+r.width/2)+'px'; a.style.top=Math.max(110, r.top + Math.min(r.height*0.45, 30))+'px';
+  tutPoint(feat.target && feat.target());
 }
 let tut = null;   // {step}
 const tutKey = () => 'ytzt_tut_' + (S && S.me.id);
 function tutDone(){ try{ return localStorage.getItem(tutKey())==='1'; }catch(e){ return false; } }
-function tutFinish(){ try{ localStorage.setItem(tutKey(),'1'); }catch(e){} tut=null; $('tut').style.display='none'; $('tutArrow').style.display='none';
+function tutFinish(){ try{ localStorage.setItem(tutKey(),'1'); }catch(e){} tut=null; $('tut').style.display='none'; $('tutArrow').style.display='none'; $('tutRing').style.display='none';
   // 已經開放的功能，不要一次跳一堆教學：老玩家直接標記為看過
   if(S && S.me.lv > 3) FEAT_TUTS.forEach(f=>{ try{ if(f.when()) localStorage.setItem(featKey(f.id),'1'); }catch(e){} }); }
 function tutMaybeStart(){
@@ -59,7 +76,7 @@ function tutMaybeStart(){
   tut = {step:0}; tutRender();
 }
 function tutRender(){
-  if(!tut) return;
+  if(!tut) return; tutFocused = null;
   const st = TUT_STEPS[tut.step];
   $('tut').style.display = ''; $('tutSkip').style.display = '';
   $('tutText').innerHTML = `<span class="tutn">${tut.step+1}/${TUT_STEPS.length}</span>${st.text}`;
@@ -69,16 +86,10 @@ function tutRender(){
 }
 function tutTick(){
   if(!tut){ featTick(); return; }
-  if(mode!=='home'){ if($('tutArrow')) $('tutArrow').style.display='none'; return; }
+  if(mode!=='home'){ if($('tutArrow')) $('tutArrow').style.display='none'; $('tutRing').style.display='none'; return; }
   const st = TUT_STEPS[tut.step];
   if(st.done && st.done() && !st.last){ tut.step++; return tutRender(); }
-  const el = st.target && st.target();
-  const a = $('tutArrow');
-  if(!el){ a.style.display='none'; return; }
-  const r = el.getBoundingClientRect();
-  a.style.display = '';
-  a.style.left = (r.left + r.width/2) + 'px';
-  a.style.top = Math.max(110, r.top + Math.min(r.height*0.45, 30)) + 'px';
+  tutPoint(st.target && st.target());
 }
 let tutSkipArm = 0;
 function tutSkip(){ // 按兩下才跳過，避免一按就整個教學沒了
@@ -177,3 +188,10 @@ function signMaybePop(){ // 每天第一次進遊戲自動跳出（教學進行�
   if(document.querySelector('#ov.show')) return;
   openSign();
 }
+
+/* 主畫面左右箭頭：一次往左／右看一段 */
+function panSync(){ const max=map.scrollWidth-map.clientWidth;
+  $('panL').classList.toggle('off', map.scrollLeft<=4); $('panR').classList.toggle('off', map.scrollLeft>=max-4); }
+$('panL').onclick=()=>{ map.scrollBy({left:-innerWidth*0.6, behavior:'smooth'}); sfx && sfx('tap'); };
+$('panR').onclick=()=>{ map.scrollBy({left: innerWidth*0.6, behavior:'smooth'}); sfx && sfx('tap'); };
+map.addEventListener('scroll', panSync, {passive:true}); addEventListener('resize', panSync); setTimeout(panSync, 1500);
