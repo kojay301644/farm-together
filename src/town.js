@@ -219,16 +219,20 @@ function buildWorld(){
   const pen=(x,y,w,d,col,base,gate)=>{ ground += poly(dia(x,y,w,d),base,`stroke="${INK}" stroke-width="2" stroke-linejoin="round"`);
     if(gate){ const g0=x+w/2-0.45, g1=x+w/2+0.45; ground += fence(x,y,g0,y,col) + fence(g1,y,x+w,y,col); } else ground += fence(x,y,x+w,y,col);
     ground += fence(x,y,x,y+d,col);
-    objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col)}); };
+    if(gate==='front'){ const g0=x+w*0.32-0.5, g1=x+w*0.32+0.5, a=iso(g0,y+d), b=iso(g1,y+d);
+      const post=p=>ol(`<rect x="${p[0]-4}" y="${p[1]-30}" width="8" height="30" rx="3" fill="#A86F45"/><circle cx="${p[0]}" cy="${p[1]-32}" r="5" fill="#F4D35E"/>`,1.8);
+      objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,g0,y+d,col) + fence(g1,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col) + post(a) + post(b)}); }
+    else objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col)}); };
   // 牧場（農田左邊、島的下方中間）
   const RX=4.1, RY=11.85, RW=10.15, RD=3.0;  // 農田左下邊，長度跟農田切齊
-  pen(RX,RY,RW,RD,'#E8D3A2','url(#pGrass)');
+  pen(RX,RY,RW,RD,'#E8D3A2','url(#pGrass)','front');
+  const GATE=[RX+RW*0.32, RY+RD];  // 牧場門（萌獸從這裡進出）
   { const [tx,ty]=iso(RX+RW-0.7, RY+0.6); objs.push({depth:RX+RW+RY, svg: ol(`<path d="M${tx-22} ${ty-6} l22 -11 l22 11 l-22 11z" fill="#8B5E3C"/><path d="M${tx-18} ${ty-6} l18 -9 l18 9 l-18 9z" fill="#F4D35E"/>`,2)}); }
 
   // 建築
   BLD.forEach(o=>{ if(o.skip) return;
     const [gx,gy]=o.c, h=o.w*(RATIO[o.img]||1);
-    let s = `<ellipse cx="${iso(gx,gy)[0]}" cy="${iso(gx,gy)[1]+4}" rx="${o.w*0.42}" ry="${o.w*0.16}" fill="rgba(0,0,0,.14)"/>` + (SKIN_PART[o.id] ? skinSprite(o.id, gx, gy, o.w, o.foot) : sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot}));
+    let s = (SKIN_PART[o.id] ? skinSprite(o.id, gx, gy, o.w, o.foot) : sprite(o.img, gx, gy, o.w, {ratio:RATIO[o.img], foot:o.foot}));
     if(o.id==='barn'){ // 風車葉片
       const [x,y]=iso(gx,gy), top=y-h*o.foot; const cx=x-o.w*0.5+o.w*0.235, cy=top+h*0.2;
       s += `<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})"><g class="blades"><image href="${A('b_sail')}" x="-55" y="-55" width="110" height="110"/></g></g>`;
@@ -281,7 +285,10 @@ function buildWorld(){
   const addMover=(html,o)=>{ const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML=`<g class="mvin">${html}</g>`; mv.appendChild(g); movers.push(Object.assign({el:g,wait:0,face:1},o)); };
   const pet=(n,w)=>{ const h=w*(RATIO[n]||1); return `<ellipse cx="0" cy="1" rx="${w*0.32}" ry="${w*0.1}" fill="rgba(0,0,0,.16)"/><g class="hop"><image href="${A(n)}" x="${-w/2}" y="${-h*0.96}" width="${w}" height="${h}"/></g>`; };
   // 農場主人（用頭像做的人物，自己家＝自己，拜訪＝好友）
-  const C0=HG(645,425), WP=[[645,425],[560,425],[545,290],[600,240],[545,290],[560,425],[645,425],[730,425],[712,282],[690,240],[712,282],[730,425],[645,425],[650,470]].map(([x,y])=>HG(x,y));
+  const H_=([x,y])=>HG(x,y), C0=HG(645,425);
+  const out=[GATE[0],GATE[1]+0.9], gin=[GATE[0],GATE[1]-0.1], inside=[GATE[0]+0.4,GATE[1]-1.6], inside2=[GATE[0]+2.6,GATE[1]-1.4];
+  const WP=[[645,425],[560,430],[420,265],[545,285],[600,235],[690,235],[745,285],[890,268],[760,300],[730,430],[650,480],[760,520]].map(H_)
+    .concat([out,gin,inside,inside2,inside,gin,out]).concat([[620,520],[690,500]].map(H_));
   addMover('',{x:C0[0],y:C0[1],path:WP,tgt:1,speed:0.55,s:1.25,farmer:true});
   farmerMover=movers[movers.length-1]; farmerAv=null;
   for(let k=0;k<4;k++) addMover(CHICK,{x:RX+0.6+rnd()*(RW-1.2),y:RY+0.6+rnd()*(RD-1.0),chick:true,area:[RX+0.3,RY+0.3,RX+RW-0.3,RY+RD-0.3],speed:0.5,s:1.25,wait:rnd()*2});
