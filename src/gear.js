@@ -5,8 +5,8 @@ const GEAR_FUNC = {plant:['自動播種','🌱'], water:['自動澆水','💧'],
   weed:['自動除草','🌿'], feed:['自動餵食','🥕'], clear:['自動餵食','🥕'], harvest:['自動收成','🧺'], swat:['自動拍蚊子','🦟'], scare:['稻草人','🎃']};
 const ROMAN = ['','I','II','III','IV'];
 function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
-  return ({plant:`空地自動種下你指定的種子（第 1～${v} 塊地）`, water:`土乾了自動澆水（第 1～${v} 塊地）`,
-    dog:`小偷來偷菜時 ${pc}% 被趕走`, bug:`蟲一出現 ${pc}% 自動除掉`, weed:`雜草一長出 ${pc}% 自動拔掉`,
+  return ({plant:`空地自動種下你指定的種子（第 1～${v} 塊地）`, water:`自動幫 ${v} 塊正在長的田保持濕潤（從前面的田開始）`,
+    dog:`小偷來偷菜時 ${pc}% 被趕走`, bug:`蟲一出現 ${pc}% 馬上除掉，沒除到每 ${+(CFG_SET.pest_retry_min??10)} 分鐘再試一次`, weed:`雜草一長出 ${pc}% 馬上拔掉，沒拔到每 ${+(CFG_SET.pest_retry_min??10)} 分鐘再試一次`,
     feed:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, clear:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, harvest:`作物和牧場產品好了 ${v} 分鐘後自動收，小偷來不及偷`,
     swat:`牧場的蚊子每 10 分鐘有 ${pc}% 被拍掉一隻`, scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
 function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
