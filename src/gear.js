@@ -73,7 +73,7 @@ function openGearShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   const me=S.me, funcs=[...new Set(GEAR_LIST.map(g=>g.func==='clear'?'feed':g.func))];
   petShopTab='gear';
-  let body=petShopTabs()+`<div class="rhint" style="margin-bottom:6px">每種裝備只能有 1 件。先買 I 階，之後升級會直接變成下一階（插在寵物身上的也會自動換新）。<br>🎁 自己動手收成有機會掉出 I／II 階裝備寶箱（成熟 1 小時以上的作物 ${Math.round((+(CFG_SET.gear_drop??0.01))*1000)/10}%，每天最多 ${+(CFG_SET.gear_drop_daily??3)} 個）。</div>`;
+  let body=petShopTabs()+`<div class="rhint" style="margin-bottom:6px">每種裝備只能有 1 件。先買 I 階，之後升級會直接變成下一階（插在寵物身上的也會自動換新）。<br>🎁 自己動手收成有機會掉出 I／II 階裝備寶箱（成熟 1 小時以上的作物 ${Math.round((+(CFG_SET.gear_drop??0.01))*1000)/10}%${+(CFG_SET.gear_drop_daily??0)>0?`，每天最多 ${+CFG_SET.gear_drop_daily} 個`:''}）。</div>`;
   funcs.forEach(f=>{ const tiers=GEAR_LIST.filter(g=>(g.func==='clear'?'feed':g.func)===f).sort((a,b)=>a.tier-b.tier); if(!tiers.length) return;
     const cur=gearOwned(me, tiers[0].func), next=cur ? tiers.find(g=>g.tier===cur.tier+1) : tiers[0], show=cur||tiers[0];
     const pips=tiers.map(g=>`<span class="tp${cur&&g.tier<=cur.tier?' on':''}">${ROMAN[g.tier]}</span>`).join('');
