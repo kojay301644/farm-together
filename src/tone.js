@@ -50,7 +50,10 @@ function toneImage(el){
 function toneAllImages(){
   const W=$('world'); if(!W) return;
   W.querySelectorAll('image').forEach(el=>{ const o=el.dataset.o, h=el.getAttribute('href')||'';
-    if(o && h!==o){ el.dataset.o=''; el.setAttribute('href',o); } toneImage(el); });
+    // 只有目前顯示的是「染過色的圖」才還原；若已被換成別的圖（例如換了建築外觀），以現在的圖為準，避免還原成舊外觀
+    if(o && h!==o && (h===el.dataset.th || h.startsWith('blob:'))){ el.dataset.o=''; el.dataset.th=''; el.setAttribute('href',o); }
+    else if(o && h!==o){ el.dataset.o=''; el.dataset.th=''; }
+    toneImage(el); });
 }
 let _toneObs=null;
 function watchToneImages(){
