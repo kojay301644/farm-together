@@ -102,17 +102,8 @@ function tweenNum(el, to){
 }
 
 /* ================= 日夜變化（依手機時間） ================= */
-function dayNight(){
-  let h = new Date().getHours() + new Date().getMinutes()/60;
-  const q = new URLSearchParams(location.search).get('hour'); if(q!==null) h = +q;
-  let tint='transparent', night=false;
-  if(h>=19 || h<5){ tint='rgba(52,62,140,.5)'; night=true; }
-  else if(h>=17){ tint='rgba(255,150,80,.28)'; night = h>=18.3; }
-  else if(h<7){ tint='rgba(255,190,160,.25)'; night = h<6; }
-  $('tint').style.background = tint;
-  document.body.classList.toggle('night', night);
-}
-dayNight(); setInterval(dayNight, 60000);
+function dayNight(){ $('tint').style.background='transparent'; document.body.classList.remove('night'); }  // 不分日夜：永遠白天
+dayNight();
 
 /* ================= 頭像 ================= */
 const avSrc = n => `assets/av${n||11}.webp`;
