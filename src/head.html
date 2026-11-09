@@ -356,11 +356,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .snav{display:flex;flex-wrap:wrap;gap:5px;margin:-2px 0 8px}
 .snav button{flex:none;font:inherit;font-size:13px;font-weight:800;border:2px solid #E6D9C3;background:#FFF8EC;border-radius:12px;padding:6px 10px;color:var(--ink2);cursor:pointer}
 .snav button.on{background:#3BB273;border-color:#2E9660;color:#fff}
-.tsw{width:100%;height:70px;border-radius:10px;display:grid;place-items:center;font-size:26px;border:2px solid rgba(75,52,35,.25)}
-#tfx{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.tsw{position:relative;overflow:hidden;width:100%;height:70px;border-radius:10px;display:grid;place-items:center;font-size:20px;border:2px solid rgba(75,52,35,.25)}.tsw img{position:absolute;left:50%;top:50%;width:150%;transform:translate(-50%,-46%)}.tsw span{position:absolute;right:4px;bottom:2px;z-index:2}
+#tfx{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:5}
 #tfx span{position:absolute;top:-30px;animation:tfall linear infinite;opacity:.85}
 @keyframes tfall{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(30px,55vh) rotate(180deg)}100%{transform:translate(-20px,110vh) rotate(360deg)}}
-body.lowfx #tfx{display:none}
+
 .twk{animation:twk 3s ease-in-out infinite}@keyframes twk{50%{opacity:.25}}
 </style>
 </head>
