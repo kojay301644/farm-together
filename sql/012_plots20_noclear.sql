@@ -240,7 +240,7 @@ begin
     end if;
   end if;
   -- 社交：偷菜、幫忙、惡作劇
-  if random() < case b.style when 'thief' then 0.6 when 'helper' then 0.15 else 0.3 end then
+  if random() < (case b.style when 'thief' then 0.6 when 'helper' then 0.15 else 0.3 end) then
     for r in select pl.owner, pl.idx from plots pl join crops c on c.id = pl.crop join players o on o.id = pl.owner
              where pl.owner <> b.id and pl.state = 'grow' and pl.grown >= c.grow_sec and pl.stolen < _cap(c, pl.weeds, pl.bugs) and not o.banned
                and (o.lv > _cfg('newbie_lv',3) or _is_friend(b.id, o.id))
@@ -258,13 +258,13 @@ begin
       exception when others then null; end;
     end loop;
   end if;
-  if random() < case b.style when 'helper' then 0.6 else 0.2 end then
+  if random() < (case b.style when 'helper' then 0.6 else 0.2 end) then
     for r in select pl.owner, pl.idx, pl.weeds, pl.bugs from plots pl
              where pl.owner <> b.id and pl.state = 'grow' and (pl.weeds > 0 or pl.bugs > 0) and _is_friend(b.id, pl.owner) order by random() limit 2 loop
       begin perform farm_friend_act(r.owner, case when r.weeds > 0 then 'help_weed' else 'help_bug' end, r.idx); exception when others then null; end;
     end loop;
   end if;
-  if random() < case b.style when 'thief' then 0.12 else 0.04 end then
+  if random() < (case b.style when 'thief' then 0.12 else 0.04 end) then
     for r in select pl.owner, pl.idx from plots pl join crops c on c.id = pl.crop join players o on o.id = pl.owner
              where pl.owner <> b.id and pl.state = 'grow' and pl.grown < c.grow_sec and o.lv > _cfg('newbie_lv',3) order by random() limit 1 loop
       begin perform farm_friend_act(r.owner, case when random() < 0.5 then 'prank_weed' else 'prank_bug' end, r.idx); exception when others then null; end;
