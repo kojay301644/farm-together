@@ -545,6 +545,24 @@ const BUTTERFLY = c => `<g class="bfly"><ellipse cx="-4" cy="-2" rx="4.5" ry="3.
 /* ================= 組合地圖 ================= */
 let plotEls=[], plotSig=[], plotLabs=[];
 const movers=[];
+let farmerMover=null, farmerAv=null;
+const AV_SHIRT=['#7F9625','#A39697','#7D4017','#BC6B3A','#F2C380','#E39C6C','#5C344A','#3D251B','#C08B69','#5C4320','#CF8F5E','#362727','#C14943','#77571B','#CD4365','#D2DAF2','#A82C15','#53455F','#352828','#A5815D','#E9A83C','#724154','#CC814D','#F4B07A','#E9B644','#A7B5C9','#A85E2F','#D6A039','#B8B6AE','#B3556C'];
+/* 大頭Q版人物：頭＝頭像圖 */
+function charSVG(av){
+  av = Math.min(30, Math.max(1, +av||11)); const sh = AV_SHIRT[av-1], id='avclip'+av;
+  return `<ellipse cx="0" cy="1" rx="14" ry="4.5" fill="rgba(0,0,0,.18)"/><g class="hop">
+    ${ol(`<rect x="-7.5" y="-15" width="6" height="15" rx="3" fill="#5A3E28"/><rect x="1.5" y="-15" width="6" height="15" rx="3" fill="#5A3E28"/>
+      <ellipse cx="-4.5" cy="-1" rx="5" ry="3" fill="#3B2A1E"/><ellipse cx="4.5" cy="-1" rx="5" ry="3" fill="#3B2A1E"/>
+      <path d="M-12 -12 Q-13 -34 0 -35 Q13 -34 12 -12 Q0 -8 -12 -12Z" fill="${sh}"/>
+      <ellipse cx="-13" cy="-22" rx="4" ry="7" fill="${sh}" transform="rotate(14 -13 -22)"/><ellipse cx="13" cy="-22" rx="4" ry="7" fill="${sh}" transform="rotate(-14 13 -22)"/>
+      <circle cx="-14.5" cy="-15" r="3.4" fill="#FBD7B5"/><circle cx="14.5" cy="-15" r="3.4" fill="#FBD7B5"/>`,2.2)}
+    <path d="M-6 -33 L0 -27 L6 -33" stroke="#fff" stroke-width="2.4" fill="none" opacity=".75"/>
+    <clipPath id="${id}"><circle cx="0" cy="-55" r="21"/></clipPath>
+    <circle cx="0" cy="-55" r="22.5" fill="#fff" stroke="${INK}" stroke-width="2.6"/>
+    <image href="${avSrc(av)}" x="-27" y="-84" width="54" height="54" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice"/>
+    <ellipse cx="-8" cy="-68" rx="6" ry="3" fill="#fff" opacity=".35" transform="rotate(-25 -8 -68)"/></g>`;
+}
+function setFarmer(av){ if(!farmerMover || farmerAv===av) return; farmerAv=av; farmerMover.el.firstChild.innerHTML = charSVG(av); }
 
 function buildWorld(){
   const W=$('world');
@@ -645,8 +663,6 @@ function buildWorld(){
 
   // 農夫與商店老闆
   const stand=(gx,gy,o,flip)=>{ const [x,y]=iso(gx,gy); objs.push({depth:gx+gy, svg:`<g transform="translate(${x} ${y}) scale(${flip?-1.2:1.2} 1.2)">${personSVG(o)}</g>`}); };
-  stand(3.6,8.9,{shirt:'#FFFFFF',overall:'#3DA5F4',hair:'#5A3A22',hat:true,tool:'hoe'},false);
-  stand(7.45,4.6,{shirt:'#3BB273',hair:'#3A3226'},true);
 
   objs.sort((a,b)=>a.depth-b.depth);
 
@@ -673,10 +689,9 @@ function buildWorld(){
   const mv=$('movers');
   const addMover=(html,o)=>{ const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML=`<g class="mvin">${html}</g>`; mv.appendChild(g); movers.push(Object.assign({el:g,wait:0,face:1},o)); };
   const pet=(n,w)=>{ const h=w*(RATIO[n]||1); return `<ellipse cx="0" cy="1" rx="${w*0.32}" ry="${w*0.1}" fill="rgba(0,0,0,.16)"/><g class="hop"><image href="${A(n)}" x="${-w/2}" y="${-h*0.96}" width="${w}" height="${h}"/></g>`; };
-  addMover(pet('bunny1',42),{x:2,y:5.5,path:[[0.2,5.5],[15.2,5.5]],tgt:1,speed:0.75,s:1,petFace:1});
-  addMover(pet('fox1',44),{x:12,y:5.6,path:[[14.8,5.6],[0.4,5.6]],tgt:1,speed:0.6,s:1,petFace:-1});
-  addMover(pet('penguin1',40),{x:3.5,y:9,path:[[3.5,6.3],[3.5,13.6]],tgt:1,speed:0.45,s:1,petFace:-1});
-  addMover(pet('bear1',46),{x:6,y:4.7,path:[[5.2,4.75],[9.0,4.75]],tgt:0,speed:0.35,s:1,petFace:-1});
+  // 農場主人（用頭像做的人物，自己家＝自己，拜訪＝好友）
+  addMover('',{x:3.5,y:9,path:[[3.5,6.4],[3.5,13.3],[3.5,5.5],[8.6,5.5],[12.6,5.6],[7.4,5.5],[3.5,5.6],[0.6,5.5],[3.5,5.6]],tgt:1,speed:0.55,s:1.25,farmer:true});
+  farmerMover=movers[movers.length-1]; farmerAv=null;
   for(let k=0;k<4;k++) addMover(CHICK,{x:RX+0.6+rnd()*(RW-1.2),y:RY+0.6+rnd()*(RD-1.0),chick:true,area:[RX+0.4,RY+0.5,RX+RW-1.6,RY+RD-0.3],speed:0.5,s:1.25,wait:rnd()*2});
   ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
@@ -696,7 +711,7 @@ function animate(now){
       }
       const dx=m.goal[0]-m.x, dy=m.goal[1]-m.y, dist=Math.hypot(dx,dy), step=m.speed*dt;
       if(dist<=step){ m.x=m.goal[0]; m.y=m.goal[1]; m.goal=null;
-        if(m.chick) m.wait=0.6+Math.random()*2.5; else if(m.fly) m.wait=Math.random()*0.6; else { m.tgt=1-m.tgt; m.wait=1+Math.random()*3; } }
+        if(m.chick) m.wait=0.6+Math.random()*2.5; else if(m.fly) m.wait=Math.random()*0.6; else { m.tgt=(m.tgt+1)%m.path.length; m.wait=(m.farmer?0.8:1)+Math.random()*3; } }
       else { m.x+=dx/dist*step; m.y+=dy/dist*step; moving=true;
         const sdx=(dx-dy); if(Math.abs(sdx)>0.01) m.face = (sdx>0?1:-1) * (m.petFace||1); }
     }
@@ -1451,7 +1466,7 @@ function renderHUD(){
   else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
   $('hint').innerHTML = `<span>🌱</span><span>${h}</span>`;
 }
-function refresh(){ renderPlots(); renderHUD(); }
+function refresh(){ renderPlots(); renderHUD(); try{ setFarmer(mode==='visit' && V ? (V.owner.avatar||11) : (S && S.me.avatar)||11); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;

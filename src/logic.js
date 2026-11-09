@@ -430,7 +430,7 @@ function renderHUD(){
   else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
   $('hint').innerHTML = `<span>🌱</span><span>${h}</span>`;
 }
-function refresh(){ renderPlots(); renderHUD(); }
+function refresh(){ renderPlots(); renderHUD(); try{ setFarmer(mode==='visit' && V ? (V.owner.avatar||11) : (S && S.me.avatar)||11); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
