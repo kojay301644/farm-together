@@ -19,9 +19,14 @@ const gearImg = (g, sz=40) => g ? `<img src="${A(g.icon)}" style="width:${sz}px;
 const gearTitle = g => `${g.name} ${ROMAN[g.tier]}`;
 
 /* 我的寵物面板（我的家裡） */
+const AUTO_FUNCS=['plant','water','harvest','feed','weed','bug','dog','scare'];
+function autoProgress(me){ const pt=partyOf(me), on=new Set(pt.map(p=>GEAR[p.g]&&GEAR[p.g].func).filter(Boolean).map(f=>f==='clear'?'feed':f));
+  return {pets:pt.length, funcs:AUTO_FUNCS.filter(f=>on.has(f)).length, missing:AUTO_FUNCS.filter(f=>!on.has(f))}; }
+function autoProgressHTML(me){ const a=autoProgress(me); if(a.pets>=8 && a.funcs>=8) return `<div class="autobar done">🎉 <b>全自動農場</b>完成！休息的時候農場也在幫你賺錢</div>`;
+  return `<div class="autobar"><b>🤖 全自動農場進度</b>：寵物 ${a.pets}/8・裝備 ${a.funcs}/8 種<br><small>開滿 8 隻寵物、插上 8 種不同功能的裝備（${a.missing.map(f=>GEAR_FUNC[f]?GEAR_FUNC[f][1]+GEAR_FUNC[f][0]:f).join('、')||'—'}），休息時間也在賺錢！</small></div>`; }
 function beastPanelHTML(){
   const me=S.me, pt=partyOf(me);
-  return partyRowHTML(me, true) + `<div class="rhint" style="text-align:center">夥伴 ${pt.length}/${me.party_cap||1} 隻・👑 第一隻是隊長・點寵物下方的格子可以插裝備</div>
+  return autoProgressHTML(me) + partyRowHTML(me, true) + `<div class="rhint" style="text-align:center">夥伴 ${pt.length}/${me.party_cap||1} 隻・👑 第一隻是隊長・點寵物下方的格子可以插裝備</div>
     <div class="homebtns"><button class="btn sub" id="hCh">🐾 換夥伴</button><button class="btn o" id="hBag">🎒 背包</button></div>`;
 }
 function bindBeastPanel(){ document.querySelectorAll('#md [data-pg]').forEach(b=>b.onclick=()=>openGearBag(+b.dataset.pg)); $('hCh').onclick=()=>openBeastPark('mine'); $('hBag').onclick=()=>openPack(); }

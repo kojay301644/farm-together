@@ -502,8 +502,9 @@ function renderHUD(){
   else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，不處理會減少收成';
   else if(PL.some(isDry)) h='有田地<b>缺水</b>了，澆水才能長得快';
   else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';
-  else if(PL.some(p=>p.s==='empty')) h = n?'點<b>空地</b>選種子種下去吧':'沒有種子了，點<b>種子商店</b>買一些吧';
-  else h='作物正在長大中…去<b>好友廣場</b>看看誰的菜可以偷';
+  else if(PL.some(p=>p.s==='empty')) h = n?'點<b>空地</b>選種子種下去吧':'沒有種子了，到<b>穀倉的種子商店</b>買一些吧';
+  else { const a=autoProgress(me);
+    h = (a.pets<8||a.funcs<8) ? `🤖 寵物 ${a.pets}/8・裝備 ${a.funcs}/8 種：開滿 8 隻寵物、插上 8 種裝備，打造<b>全自動農場</b>，休息時間也在賺錢！` : '作物正在長大中…去<b>好友廣場</b>看看誰的菜可以偷'; }
   setHint(`<span>🌱</span><span>${h}</span>`);
 }
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
