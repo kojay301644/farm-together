@@ -327,8 +327,8 @@ function buildWorld(){
   const pl=$('plabs');
   W.querySelectorAll('[data-p]').forEach(g=>{ const i=+g.dataset.p; plotEls[i]=g; plotSig[i]=''; g.addEventListener('click',()=>act(i)); });
   PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i);
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-44})`);
-    g.innerHTML=`<rect x="-38" y="-11" width="76" height="22" rx="10" fill="#fff" stroke="${INK}" stroke-width="1.6"/><text x="0" y="2" text-anchor="middle" font-size="11" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-28" y="5" width="56" height="3" rx="1.5" fill="#EEE6D6"/><rect class="bf" x="-28" y="5" width="0" height="3" rx="1.5" fill="#7ED957"/>`;
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-48})`);
+    g.innerHTML=`<rect x="-46" y="-15" width="92" height="30" rx="14" fill="#fff" stroke="${INK}" stroke-width="2"/><text x="0" y="3" text-anchor="middle" font-size="15" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-30" y="7" width="60" height="4" rx="2" fill="#EEE6D6"/><rect class="bf" x="-30" y="7" width="0" height="4" rx="2" fill="#7ED957"/>`;
     pl.appendChild(g); plotLabs[i]=g; });
   W.querySelectorAll('[data-b]').forEach(g=>g.addEventListener('click',()=>tapBuilding(g)));
 
@@ -455,7 +455,7 @@ function plotSpriteSVG(p,i){
   const dl = `style="animation-delay:-${((i*0.73)%3.2).toFixed(2)}s"`;
   if(p.s==='wild'){
     body = `<g class="wsway" ${dl}>${weedArt(30,80)}${weedArt(90,70)}${weedArt(56,64)}</g><ellipse cx="76" cy="84" rx="8" ry="5" fill="#B5AFA3" stroke="${INK}" stroke-width="1.5"/><ellipse class="nool" cx="74" cy="82" rx="4" ry="2" fill="#D9D4CB"/>
-      <g transform="translate(36 22)"><rect x="22" y="14" width="5" height="28" rx="2" fill="#B07A4F" stroke="${INK}" stroke-width="1.6"/><rect x="0" y="0" width="50" height="21" rx="6" fill="#F3D9A8" stroke="${INK}" stroke-width="2"/><text x="25" y="15" font-size="11" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">${wildSign(i)}</text></g>`;
+      <g transform="translate(36 22)"><rect x="22" y="18" width="6" height="28" rx="2" fill="#B07A4F" stroke="${INK}" stroke-width="1.8"/><rect x="-14" y="-10" width="78" height="34" rx="9" fill="#F3D9A8" stroke="${INK}" stroke-width="2.4"/><text x="25" y="14" font-size="21" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">${wildSign(i)}</text></g>`;
   } else if(p.s==='grow'){
     const st=stageOf(p);
     body += `<g class="crop${st===4?'':' sway'}" ${dl}>${cropArt(CROP[p.c],st)}</g>`;

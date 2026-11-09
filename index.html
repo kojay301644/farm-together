@@ -466,18 +466,18 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794250942" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794250992" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794250942" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794250942" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794250992" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794250992" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794250942" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794250992" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794250942" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794250992" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -493,11 +493,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794250942" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794250992" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794250942";
+const BUILD="1794250992";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -969,8 +969,8 @@ function buildWorld(){
   const pl=$('plabs');
   W.querySelectorAll('[data-p]').forEach(g=>{ const i=+g.dataset.p; plotEls[i]=g; plotSig[i]=''; g.addEventListener('click',()=>act(i)); });
   PLOTS.forEach((_,i)=>{ const [cx,cy]=plotCenter(i);
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-44})`);
-    g.innerHTML=`<rect x="-38" y="-11" width="76" height="22" rx="10" fill="#fff" stroke="${INK}" stroke-width="1.6"/><text x="0" y="2" text-anchor="middle" font-size="11" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-28" y="5" width="56" height="3" rx="1.5" fill="#EEE6D6"/><rect class="bf" x="-28" y="5" width="0" height="3" rx="1.5" fill="#7ED957"/>`;
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','plab'); g.setAttribute('transform',`translate(${cx} ${cy-48})`);
+    g.innerHTML=`<rect x="-46" y="-15" width="92" height="30" rx="14" fill="#fff" stroke="${INK}" stroke-width="2"/><text x="0" y="3" text-anchor="middle" font-size="15" font-weight="900" fill="#3A3226" font-family="Noto Sans TC,sans-serif"></text><rect class="bb" x="-30" y="7" width="60" height="4" rx="2" fill="#EEE6D6"/><rect class="bf" x="-30" y="7" width="0" height="4" rx="2" fill="#7ED957"/>`;
     pl.appendChild(g); plotLabs[i]=g; });
   W.querySelectorAll('[data-b]').forEach(g=>g.addEventListener('click',()=>tapBuilding(g)));
 
@@ -1097,7 +1097,7 @@ function plotSpriteSVG(p,i){
   const dl = `style="animation-delay:-${((i*0.73)%3.2).toFixed(2)}s"`;
   if(p.s==='wild'){
     body = `<g class="wsway" ${dl}>${weedArt(30,80)}${weedArt(90,70)}${weedArt(56,64)}</g><ellipse cx="76" cy="84" rx="8" ry="5" fill="#B5AFA3" stroke="${INK}" stroke-width="1.5"/><ellipse class="nool" cx="74" cy="82" rx="4" ry="2" fill="#D9D4CB"/>
-      <g transform="translate(36 22)"><rect x="22" y="14" width="5" height="28" rx="2" fill="#B07A4F" stroke="${INK}" stroke-width="1.6"/><rect x="0" y="0" width="50" height="21" rx="6" fill="#F3D9A8" stroke="${INK}" stroke-width="2"/><text x="25" y="15" font-size="11" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">${wildSign(i)}</text></g>`;
+      <g transform="translate(36 22)"><rect x="22" y="18" width="6" height="28" rx="2" fill="#B07A4F" stroke="${INK}" stroke-width="1.8"/><rect x="-14" y="-10" width="78" height="34" rx="9" fill="#F3D9A8" stroke="${INK}" stroke-width="2.4"/><text x="25" y="14" font-size="21" font-weight="900" text-anchor="middle" fill="#8A5A34" font-family="Noto Sans TC,sans-serif">${wildSign(i)}</text></g>`;
   } else if(p.s==='grow'){
     const st=stageOf(p);
     body += `<g class="crop${st===4?'':' sway'}" ${dl}>${cropArt(CROP[p.c],st)}</g>`;
@@ -2738,10 +2738,10 @@ function renderPlots(){
         } else { txt=`${c.name}可收成！`; bg='#FF9F43'; fg='#fff'; }
       } else { txt = `${c.name} ${fmtS(leftSec(p))}`; pct = p.g/c.time; if(p.dry) bg='#DDF0FF'; }
     }
-    if(t.textContent !== txt) t.textContent = txt;
-    r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('y', pct>=0?2:4);
+    if(t.textContent !== txt){ t.textContent = txt; const w=[...txt].reduce((a,ch)=>a+(ch.charCodeAt(0)>255?15:8.5),0)+20; r.setAttribute('width', w.toFixed(0)); r.setAttribute('x', (-w/2).toFixed(0)); }
+    r.setAttribute('fill', bg); t.setAttribute('fill', fg); t.setAttribute('y', pct>=0?2:5);
     bb.style.display = bf.style.display = pct>=0 ? '' : 'none';
-    if(pct>=0) bf.setAttribute('width', (56*pct).toFixed(1));
+    if(pct>=0) bf.setAttribute('width', (60*pct).toFixed(1));
   });
 }
 function renderHUD(){
