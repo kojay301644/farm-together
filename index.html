@@ -381,6 +381,7 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .tps{display:inline-flex;gap:2px;vertical-align:middle;margin-left:4px}.tp{display:inline-grid;place-items:center;min-width:20px;height:18px;padding:0 3px;border-radius:6px;background:#EEE8DD;color:#9A8C78;font-size:10px;font-weight:900}.tp.on{background:#F4B740;color:#fff}
 .gnext{color:#2E9660}.tprs{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}.tpr{font-size:10px;font-weight:800;color:#9A8C78;background:#F6F1E8;border-radius:6px;padding:1px 5px}.tpr.on{color:#B07A10;background:#FFF1D0;text-decoration:line-through}
 .row.gshop .mini{line-height:1.25;min-width:72px}
+.achs{display:grid;gap:5px;margin-top:4px}.ach{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;background:#FFF8EC;border:1.5px solid #EADBC2;font-size:13px}.ach span{font-size:12px;font-weight:800;color:var(--ink2);white-space:nowrap}.ach.done{background:#E8F8EE;border-color:#9ED9B7}
 </style>
 </head>
 <body>
@@ -419,13 +420,13 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794245208" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794246084" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794245208" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794245208" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794245208" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794246084" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794246084" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794246084" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
@@ -442,11 +443,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794245208" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794246084" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794245208";
+const BUILD="1794246084";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2306,6 +2307,7 @@ async function openHome(){
   const {data:{user}} = await sb.auth.getUser();
   modal(`🏠 ${esc(S.me.nickname)}的家`, `
     <div class="sec">我的寵物夥伴</div>${beastPanelHTML()}
+    <div class="sec">成就（拿鑽石）</div>${achHTML(S.me)}
     <div class="sec">玩家</div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
@@ -2531,8 +2533,9 @@ function renderHUD(){
       h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇還剩 ${me.prank_left} 次`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次）`); }
     setHint(`<span>🧺</span><span>${h}</span>`); return;
   }
-  const bn=binCount(me.bin);
-  if(bn>0) h=`🧺 <b>收集倉</b>有 ${bn} 個東西，記得點收集倉<b>收進穀倉</b>，避免被偷！`;
+  const bn=binCount(me.bin), hungry=(S.ranch||[]).filter(r=>!r.ra).map(r=>(ANI[r.k]||{}).feed||0), crops=Object.values(me.crops||{}).reduce((a,b)=>a+b,0);
+  if(hungry.length && crops < Math.min(...hungry) && bn>0) h=`🐔 穀倉的作物不夠餵牧場了！記得點<b>收集倉</b>把東西<b>收進穀倉</b>`;
+  else if(bn>0) h=`🧺 <b>收集倉</b>有 ${bn} 個東西，記得點收集倉<b>收進穀倉</b>，避免被偷！`;
   else if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
   else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，不處理會減少收成';
   else if(PL.some(isDry)) h='有田地<b>缺水</b>了，澆水才能長得快';
@@ -2554,7 +2557,7 @@ async function sync(){
   syncing = true;
   try{
     if(mode==='visit' && V) applyVisit(await rpc('farm_visit', {p_owner:V.owner.id}));
-    else { const st = await rpc('farm_me'); if(st) applyState(st); }
+    else { const st = await rpc('farm_me'); if(st){ applyState(st); dailyToast(st); } }
     refresh();
   }catch(e){ if(/還不是好友/.test(e.message)){ toast(e.message); goHome(); } }
   finally{ syncing = false; }
@@ -2622,7 +2625,7 @@ async function enterGame(){
   try{
     const st = await rpc('farm_me');
     if(!st){ showScreen('nick'); setTimeout(()=>$('nickIn').focus(), 50); return; }
-    startGame(st);
+    startGame(st); setTimeout(()=>dailyToast(st), 3500);
   }catch(e){ showScreen('login'); authMsg(e.message); if(/停權/.test(e.message)) sb.auth.signOut(); }
   finally{ entering = false; }
 }
@@ -2753,6 +2756,15 @@ function openBin(){
   modal('🧺 食物收集倉', `<div class="rhint" style="margin-bottom:6px">寵物自動收成的作物和牧場產品會先放在這裡（${n}/${cap}），要按「收進穀倉」才能賣。放在這裡的東西好友和鄰居可以來偷，記得常來收！滿了寵物就會先停止收成。</div>${binListHTML(b)}`,
     n ? [[`收進穀倉（${n} 個）`,'',async()=>{ try{ const r=await rpc('farm_bin_collect'); applyState(r.state); refresh(); sfx('coin'); toast(`收進穀倉 ${r.n} 個`); closeModal(); }catch(e){ toast(e.message); } }]] : null);
 }
+
+/* 每日登入鑽石 */
+function dailyToast(st){ if(st && st.daily){ sfx('lvup'); toast(`🎁 每日登入獎勵 💎${st.daily}`); st.daily=0; } }
+/* 成就 */
+const ACH_LIST=[['harvest100','收成 100 次',30,m=>[(m.stats||{}).harvest||0,100]],['harvest1000','收成 1000 次',100,m=>[(m.stats||{}).harvest||0,1000]],
+  ['steal50','偷菜 50 次',30,m=>[(m.stats||{}).steal||0,50]],['party9','開滿 9 隻寵物夥伴',50,m=>[partyOf(m).length,9]],['auto9','打造全自動農場（9 種裝備）',100,m=>[autoProgress(m).funcs,9]]];
+function achHTML(me){ return `<div class="achs">${ACH_LIST.map(([id,n,g,f])=>{ const [v,t]=f(me), done=(me.ach||{})[id];
+  return `<div class="ach${done?' done':''}"><b>${done?'🏆':'🎯'} ${n}</b><span>${done?'已完成':`${Math.min(v,t)}/${t}`}・💎${g}</span></div>`; }).join('')}</div>
+  <div class="rhint">每升 1 級送 💎${+(CFG_SET.lv_gems??20)}，每天第一次上線送 💎${+(CFG_SET.daily_gems??10)}</div>`; }
 
 </script>
 </body>

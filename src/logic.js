@@ -289,6 +289,7 @@ async function openHome(){
   const {data:{user}} = await sb.auth.getUser();
   modal(`🏠 ${esc(S.me.nickname)}的家`, `
     <div class="sec">我的寵物夥伴</div>${beastPanelHTML()}
+    <div class="sec">成就（拿鑽石）</div>${achHTML(S.me)}
     <div class="sec">玩家</div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
@@ -514,8 +515,9 @@ function renderHUD(){
       h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇還剩 ${me.prank_left} 次`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次）`); }
     setHint(`<span>🧺</span><span>${h}</span>`); return;
   }
-  const bn=binCount(me.bin);
-  if(bn>0) h=`🧺 <b>收集倉</b>有 ${bn} 個東西，記得點收集倉<b>收進穀倉</b>，避免被偷！`;
+  const bn=binCount(me.bin), hungry=(S.ranch||[]).filter(r=>!r.ra).map(r=>(ANI[r.k]||{}).feed||0), crops=Object.values(me.crops||{}).reduce((a,b)=>a+b,0);
+  if(hungry.length && crops < Math.min(...hungry) && bn>0) h=`🐔 穀倉的作物不夠餵牧場了！記得點<b>收集倉</b>把東西<b>收進穀倉</b>`;
+  else if(bn>0) h=`🧺 <b>收集倉</b>有 ${bn} 個東西，記得點收集倉<b>收進穀倉</b>，避免被偷！`;
   else if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
   else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，不處理會減少收成';
   else if(PL.some(isDry)) h='有田地<b>缺水</b>了，澆水才能長得快';
@@ -537,7 +539,7 @@ async function sync(){
   syncing = true;
   try{
     if(mode==='visit' && V) applyVisit(await rpc('farm_visit', {p_owner:V.owner.id}));
-    else { const st = await rpc('farm_me'); if(st) applyState(st); }
+    else { const st = await rpc('farm_me'); if(st){ applyState(st); dailyToast(st); } }
     refresh();
   }catch(e){ if(/還不是好友/.test(e.message)){ toast(e.message); goHome(); } }
   finally{ syncing = false; }
@@ -605,7 +607,7 @@ async function enterGame(){
   try{
     const st = await rpc('farm_me');
     if(!st){ showScreen('nick'); setTimeout(()=>$('nickIn').focus(), 50); return; }
-    startGame(st);
+    startGame(st); setTimeout(()=>dailyToast(st), 3500);
   }catch(e){ showScreen('login'); authMsg(e.message); if(/停權/.test(e.message)) sb.auth.signOut(); }
   finally{ entering = false; }
 }
@@ -736,3 +738,12 @@ function openBin(){
   modal('🧺 食物收集倉', `<div class="rhint" style="margin-bottom:6px">寵物自動收成的作物和牧場產品會先放在這裡（${n}/${cap}），要按「收進穀倉」才能賣。放在這裡的東西好友和鄰居可以來偷，記得常來收！滿了寵物就會先停止收成。</div>${binListHTML(b)}`,
     n ? [[`收進穀倉（${n} 個）`,'',async()=>{ try{ const r=await rpc('farm_bin_collect'); applyState(r.state); refresh(); sfx('coin'); toast(`收進穀倉 ${r.n} 個`); closeModal(); }catch(e){ toast(e.message); } }]] : null);
 }
+
+/* 每日登入鑽石 */
+function dailyToast(st){ if(st && st.daily){ sfx('lvup'); toast(`🎁 每日登入獎勵 💎${st.daily}`); st.daily=0; } }
+/* 成就 */
+const ACH_LIST=[['harvest100','收成 100 次',30,m=>[(m.stats||{}).harvest||0,100]],['harvest1000','收成 1000 次',100,m=>[(m.stats||{}).harvest||0,1000]],
+  ['steal50','偷菜 50 次',30,m=>[(m.stats||{}).steal||0,50]],['party9','開滿 9 隻寵物夥伴',50,m=>[partyOf(m).length,9]],['auto9','打造全自動農場（9 種裝備）',100,m=>[autoProgress(m).funcs,9]]];
+function achHTML(me){ return `<div class="achs">${ACH_LIST.map(([id,n,g,f])=>{ const [v,t]=f(me), done=(me.ach||{})[id];
+  return `<div class="ach${done?' done':''}"><b>${done?'🏆':'🎯'} ${n}</b><span>${done?'已完成':`${Math.min(v,t)}/${t}`}・💎${g}</span></div>`; }).join('')}</div>
+  <div class="rhint">每升 1 級送 💎${+(CFG_SET.lv_gems??20)}，每天第一次上線送 💎${+(CFG_SET.daily_gems??10)}</div>`; }
