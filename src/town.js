@@ -141,8 +141,8 @@ function charSVG(k){
 }
 function setFarmer(k, gid){ setMoverChar(farmerMover, k, gid); }
 function setMoverChar(m, k, gid){ const sig=k+'|'+((typeof GEAR!=='undefined'&&GEAR[gid])?gid:''); if(!m || m.sig===sig) return; m.sig=sig; m.el.firstChild.innerHTML=charSVG(k);
-  const g=(typeof GEAR!=='undefined')&&GEAR[gid]; if(g){ const c=chrInfo(k), n=48+c.st*9, sz=Math.round(n*.42), tgt=m.el.querySelector('.cp-t')||m.el.querySelector('.cp-root');
-    tgt.insertAdjacentHTML('beforeend',`<g class="gbadge"><circle cx="${n*.18}" cy="${-n*.42}" r="${sz*.55}" fill="#FFF8E6" stroke="#4B3423" stroke-width="1.8"/><image href="${A(g.icon)}" x="${n*.18-sz/2}" y="${-n*.42-sz/2}" width="${sz}" height="${sz}"/></g>`); }
+  const g=(typeof GEAR!=='undefined')&&GEAR[gid]; if(g){ const c=chrInfo(k), n=48+c.st*9, sz=Math.round(n*.26), bx=0, by=-n-sz*.35, tgt=m.el.querySelector('.cp-t')||m.el.querySelector('.cp-root');  // 小小一顆浮在寵物頭上，不擋臉
+    tgt.insertAdjacentHTML('beforeend',`<g class="gbadge"><circle cx="${bx}" cy="${by}" r="${sz*.58}" fill="#FFF8E6" stroke="#4B3423" stroke-width="1.4"/><image href="${A(g.icon)}" x="${bx-sz/2}" y="${by-sz/2}" width="${sz}" height="${sz}"/></g>`); }
   m.c=chrInfo(k); m.n=48+m.c.st*9; m.ph=0; m.anim=Math.random()*9; m.jump=0;
   m.parts={root:m.el.querySelector('.cp-root'), a:m.el.querySelector('.cp-a'), b:m.el.querySelector('.cp-b'), t:m.el.querySelector('.cp-t'), sh:m.el.querySelector('.cp-sh')}; }
 /* 每幀姿勢（照寵物的算法） */
