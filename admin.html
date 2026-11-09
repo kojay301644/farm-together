@@ -224,7 +224,7 @@ async function pageCf(){
     ${(C.beasts||[]).map(b=>`<tr><td><b>${esc(b.name)}</b></td><td><input class="num" id="b_${b.id}_lv" type="number" value="${b.lv}"></td><td><input class="num" id="b_${b.id}_gold" type="number" value="${b.gold??''}"></td><td><input class="num" id="b_${b.id}_gems" type="number" value="${b.gems??''}"></td><td><button class="btn" data-bid="${b.id}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>城鎮色調</h2><table><tr><th>色調</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.tones||[]).filter(t=>t.id!=='spring').map(t=>`<tr><td><b>${esc(t.name)}</b></td><td><input class="num" id="t_${t.id}_gold" type="number" value="${t.gold??''}"></td><td><input class="num" id="t_${t.id}_gems" type="number" value="${t.gems??''}"></td><td><button class="btn" data-tid="${t.id}">儲存</button></td></tr>`).join('')}</table></div>
-    <div class="card"><h2>裝飾商品</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；加成數值依裝飾種類（例如偷菜次數 +N）。</div>
+    <div class="card"><h2>裝飾商品</h2><div class="muted" style="margin-bottom:8px">金幣價和鑽石價擇一填；加成數值依裝飾種類（偷菜類＝偷菜體力上限 +N；惡作劇類＝每天惡作劇 +N）。</div>
     <table><tr><th>裝飾</th><th>名稱</th><th>解鎖等級</th><th>金幣價</th><th>鑽石價</th><th>加成數值</th><th></th></tr>
     ${(C.decor||[]).map(d=>`<tr><td><img src="assets/dc_${d.id}.webp" style="width:36px;height:36px;object-fit:contain"></td><td><input id="d_${d.id}_name" value="${esc(d.name)}" style="width:6em"></td>
       <td><input class="num" id="d_${d.id}_lv" type="number" value="${d.lv}"></td><td><input class="num" id="d_${d.id}_gold" type="number" value="${d.gold??''}"></td><td><input class="num" id="d_${d.id}_gems" type="number" value="${d.gems??''}"></td>

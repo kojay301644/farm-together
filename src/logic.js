@@ -377,7 +377,7 @@ async function openBoard(tab){
         <button class="mini" data-acc="${f.id}">接受</button><button class="mini sub" data-rej="${f.id}">拒絕</button></div>`).join('') : `<div class="empty" style="padding:10px 0">沒有新的邀請</div>`);
     if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row">${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
   } else if(boardTab==='near'){
-    body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（還能偷陌生人 <b style="color:var(--orange-d)">${S.me.steal_left}</b>${S.me.steal_max?' / '+S.me.steal_max:''} 次${stealRegenTxt(S.me)}）</div>`;
+    body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（偷陌生人要用偷菜體力：<b style="color:var(--orange-d)">⚡${S.me.steal_left}</b>${S.me.steal_max?' / '+S.me.steal_max:''}${stealRegenTxt(S.me)}）</div>`;
     body += NB.length ? NB.map(f=>`<div class="row">${avImg(f)}
         <div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}
           <div>${(f.ripe||f.bin)?`<span style="color:var(--orange-d)">${f.ripe?`🥕 有 ${f.ripe} 塊地可以偷`:''}${f.ripe&&f.bin?'・':''}${f.bin?'🧺 收集倉可以偷':''}</span>`:'目前沒有可偷的菜'}</div></div>
@@ -516,7 +516,7 @@ function renderHUD(){
     h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
     if(V.protected) h += '對方在<b>新手保護</b>中，不能偷菜和惡作劇';
     else { const vb=V.bin||{}, binOk=binCount(vb.items)>0 && !vb.mine && vb.left>0;
-      h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇還剩 ${me.prank_left} 次`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷陌生人還剩 ${me.steal_left} 次${stealRegenTxt(me)}）`); }
+      h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇還剩 ${me.prank_left} 次`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷菜體力 ⚡${me.steal_left}${me.steal_max?'/'+me.steal_max:''}${stealRegenTxt(me)}）`); }
     setHint(`<span>🧺</span><span>${h}</span>`); return;
   }
   const bn=binCount(me.bin), hungry=(S.ranch||[]).filter(r=>!r.ra).map(r=>(ANI[r.k]||{}).feed||0), crops=Object.values(me.crops||{}).reduce((a,b)=>a+b,0);
@@ -795,5 +795,5 @@ async function checkSteals(){
 setInterval(checkSteals, 30000); setTimeout(checkSteals, 6000);
 
 /* 偷陌生人次數：用掉後每 N 分鐘回 1 次 */
-function stealRegenTxt(me){ if(!me || !(+me.steal_regen>0)) return ''; if(me.steal_next==null) return `，每 ${+me.steal_regen} 分鐘回 1 次`;
-  const s=Math.max(0, me.steal_next - Math.floor((Date.now()-(me._stAt||Date.now()))/1000)); return `，${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 後回 1 次`; }
+function stealRegenTxt(me){ if(!me || !(+me.steal_regen>0)) return ''; if(me.steal_next==null) return `，每 ${+me.steal_regen} 分鐘回 1 點`;
+  const s=Math.max(0, me.steal_next - Math.floor((Date.now()-(me._stAt||Date.now()))/1000)); return `，${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 後回 1 點`; }
