@@ -30,7 +30,7 @@ function beastPanelHTML(){
     <div class="homebtns"><button class="btn sub" id="hCh">🐾 更換萌獸</button><button class="btn o" id="hGshop">🛒 買裝備</button></div>
     <div class="homebtns"><button class="btn" id="hSkin" style="background:#FF8FB1;box-shadow:0 3px 0 #D9628A">🏠 建築外觀</button></div>`;
 }
-function bindBeastPanel(){ $('hSkin').onclick=()=>openSkinShop(); $('hGear').onclick=openGearBag; $('hCh').onclick=openCharPicker; $('hGshop').onclick=()=>openGearShop(); }
+function bindBeastPanel(){ $('hSkin').onclick=()=>openSkinShop(); $('hGear').onclick=openGearBag; $('hCh').onclick=()=>openBeastPark('mine'); $('hGshop').onclick=()=>openGearShop(); }
 
 /* 裝備背包 */
 function openGearBag(){

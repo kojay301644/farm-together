@@ -339,6 +339,10 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .ebinv{display:flex;gap:6px;overflow-x:auto;padding:2px}
 .ebitem{position:relative;flex:none;width:54px;height:54px;border-radius:12px;border:2px solid #E6D9C3;background:#FFF8EC;padding:3px;cursor:pointer}
 .ebitem img{width:100%;height:100%;object-fit:contain}.ebitem span{position:absolute;right:-4px;top:-6px;background:#FF9F43;color:#fff;font-size:11px;font-weight:900;border-radius:9px;padding:0 5px;border:1.5px solid #4B3423}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.bcard{display:flex;flex-direction:column;align-items:center;gap:2px;background:#FFF8EC;border:2.5px solid #E6D9C3;border-radius:14px;padding:6px 4px 8px;text-align:center}
+.bcard img{width:100%;height:76px;object-fit:contain}.bcard b{font-size:13px}.bcard small{font-size:10px;font-weight:700;color:var(--ink2)}
+.bcard.on{border-color:#3BB273;background:#E8F8EE}.bcard.dark img{filter:brightness(0) opacity(.35)}
 </style>
 </head>
 <body>
@@ -377,13 +381,13 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794233484" alt="" style="cursor:pointer">
+    <img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794233820" alt="" style="cursor:pointer">
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794233484" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794233484" alt=""><span id="pgems">0</span></div></div>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794233484" alt=""></button>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794233820" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794233820" alt=""><span id="pgems">0</span></div></div>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794233820" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
 </div>
@@ -399,11 +403,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794233484" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794233820" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794233484";
+const BUILD="1794233820";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -606,7 +610,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
-  {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
+  {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
 
 // 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
@@ -764,11 +768,15 @@ function buildWorld(){
 
   // 圍欄草地（後兩邊畫在地面層，前兩邊依深度排序）
   const pen=(x,y,w,d,col,base,gate)=>{ ground += poly(dia(x,y,w,d),base,`stroke="${INK}" stroke-width="2" stroke-linejoin="round"`);
-    if(gate){ const g0=x+w/2-0.45, g1=x+w/2+0.45; ground += fence(x,y,g0,y,col) + fence(g1,y,x+w,y,col); } else ground += fence(x,y,x+w,y,col);
-    ground += fence(x,y,x,y+d,col);
+    // 靠農田那一邊要畫在田的前面，不然會被田擋住
+    objs.push({depth:x+w+y+0.05, svg: fence(x,y,x+w,y,col)});
+    objs.push({depth:x+y+d, svg: fence(x,y,x,y+d,col)});
     if(gate==='front'){ const g0=x+w*0.32-0.5, g1=x+w*0.32+0.5, a=iso(g0,y+d), b=iso(g1,y+d);
       const post=p=>ol(`<rect x="${p[0]-4}" y="${p[1]-30}" width="8" height="30" rx="3" fill="#A86F45"/><circle cx="${p[0]}" cy="${p[1]-32}" r="5" fill="#F4D35E"/>`,1.8);
-      objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,g0,y+d,col) + fence(g1,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col) + post(a) + post(b)}); }
+      // 關著的木門（兩片）
+      const gate=(p,q)=>{ const m=[(p[0]+q[0])/2,(p[1]+q[1])/2]; const leaf=(u,v)=>ol(`<polygon points="${u[0]},${u[1]-6} ${v[0]},${v[1]-6} ${v[0]},${v[1]-24} ${u[0]},${u[1]-24}" fill="#C98B5E"/>`,1.8)+`<path d="M${u[0]} ${u[1]-15} L${v[0]} ${v[1]-15} M${u[0]} ${u[1]-6} L${v[0]} ${v[1]-24}" stroke="#8B5E3C" stroke-width="2"/>`;
+        return leaf([p[0]+3,p[1]],[m[0]-1,m[1]]) + leaf([m[0]+1,m[1]],[q[0]-3,q[1]]); };
+      objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,g0,y+d,col) + fence(g1,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col) + gate(a,b) + post(a) + post(b)}); }
     else objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col)}); };
   // 牧場（農田左邊、島的下方中間）
   const RX=4.1, RY=11.85, RW=10.15, RD=3.0;  // 農田左下邊，長度跟農田切齊
@@ -842,6 +850,7 @@ function buildWorld(){
   addMover('',{x:C0[0],y:C0[1],path:WP,tgt:1,speed:0.55,s:1.25,farmer:true});
   farmerMover=movers[movers.length-1]; farmerAv=null;
   ranchMovers=[]; ranchSig='';
+  { const pc=BLD.find(b=>b.id==='pen').c; PARK=[pc[0]-0.2, pc[1]-0.6, 1.6]; parkMovers=[]; parkSig=''; }
   ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
 
@@ -854,8 +863,6 @@ function walkable(gx,gy){ const [x,y]=iso(gx,gy);
   return true; }
 function clearLine(a,b){ const n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/0.25); for(let k=1;k<=n;k++){ if(!walkable(a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n)) return false; } return true; }
 function pickRoam(m){
-  if(RANCH && Math.random()<0.15){ const g=[RANCH[0]+RANCH[2]*0.32, RANCH[1]+RANCH[3]], out=[g[0],g[1]+0.9];
-    if(clearLine([m.x,m.y],out)){ m.route=[[g[0],g[1]-0.1],[g[0]+0.4,g[1]-1.6],[g[0]+2.6,g[1]-1.4],[g[0]+0.4,g[1]-1.6],[g[0],g[1]-0.1]]; return out; } }
   for(let k=0;k<40;k++){ const a=Math.random()*Math.PI*2, r=1.5+Math.random()*5, g=[m.x+Math.cos(a)*r, m.y+Math.sin(a)*r];
     if(walkable(g[0],g[1]) && clearLine([m.x,m.y],g)) return g; }
   return [m.x,m.y]; }
@@ -1255,7 +1262,7 @@ function beastPanelHTML(){
     <div class="homebtns"><button class="btn sub" id="hCh">🐾 更換萌獸</button><button class="btn o" id="hGshop">🛒 買裝備</button></div>
     <div class="homebtns"><button class="btn" id="hSkin" style="background:#FF8FB1;box-shadow:0 3px 0 #D9628A">🏠 建築外觀</button></div>`;
 }
-function bindBeastPanel(){ $('hSkin').onclick=()=>openSkinShop(); $('hGear').onclick=openGearBag; $('hCh').onclick=openCharPicker; $('hGshop').onclick=()=>openGearShop(); }
+function bindBeastPanel(){ $('hSkin').onclick=()=>openSkinShop(); $('hGear').onclick=openGearBag; $('hCh').onclick=()=>openBeastPark('mine'); $('hGshop').onclick=()=>openGearShop(); }
 
 /* 裝備背包 */
 function openGearBag(){
@@ -1628,6 +1635,61 @@ function bindDecorLayer(){
   L.addEventListener('touchstart', e=>{ if(EDIT && e.target.closest('[data-di]')) e.preventDefault(); }, {passive:false});
   // 點空白處取消選取
   $('map').addEventListener('click', e=>{ if(EDIT && !e.target.closest('[data-di]') && EDIT.sel>=0){ EDIT.sel=-1; renderDecor(true); renderEditBar(); } });
+}
+
+/* ================= 萌獸園：我的萌獸＋圖鑑 ================= */
+let BEASTS = [], BST = {}, parkTab = 'mine';
+function setBeastConfig(list){ if(list){ BEASTS=list; BST={}; list.forEach(b=>BST[b.id]=b); } }
+const ownedBeasts = o => Object.keys((o && o.beasts) || {});
+const bName = sp => (CHR_NAMES[sp]||[])[0] || (BST[sp]||{}).name || sp;
+const fmtDate = ms => { if(!ms) return '一開始就在'; const d=new Date(+ms); return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} 加入`; };
+
+function openBeastPark(t){
+  if(t) parkTab=t;
+  const visit = mode==='visit' && V, who = visit ? V.owner : S.me, own = who.beasts || {}, partner = chrSpecies(who.chara);
+  const tabs = `<div class="tabs"><button data-pt="mine" class="${parkTab==='mine'?'on':''}">${visit?'牠的萌獸':'我的萌獸'}（${ownedBeasts(who).length}）</button><button data-pt="dex" class="${parkTab==='dex'?'on':''}">圖鑑 ${ownedBeasts(who).length}/${BEASTS.length}</button></div>`;
+  let body = tabs;
+  if(parkTab==='mine'){
+    const list = BEASTS.filter(b=>own[b.id]!=null);
+    body += `<div class="bgrid">${list.map(b=>{ const isP=b.id===partner;
+      return `<div class="bcard${isP?' on':''}"><img src="${chrSrc(b.id+'1')}" alt=""><b>${bName(b.id)}</b><small>${fmtDate(own[b.id])}</small>
+        ${isP?'<span class="tag" style="background:#E8F8EE;color:#2E9660">夥伴中</span>':visit?'<span class="tag">在萌獸園玩</span>':`<button class="mini" data-bp="${b.id}">設為夥伴</button>`}</div>`; }).join('')}</div>`;
+    if(!visit) body += `<div class="rhint" style="text-align:center;margin-top:8px">夥伴會跟著你在島上走、幫你做事，其他萌獸會在萌獸園裡玩</div>`;
+  } else {
+    body += `<div class="bgrid">${BEASTS.map(b=>{ const has=own[b.id]!=null, lock=!visit && S.me.lv<b.lv;
+      const cost = b.gold!=null ? `${b.gold.toLocaleString()} 金` : `💎${b.gems}`;
+      const poor = !visit && (b.gold!=null ? S.me.gold<b.gold : (S.me.gems||0)<b.gems);
+      return `<div class="bcard${has?'':' dark'}"><img src="${chrSrc(b.id+'1')}" alt=""><b>${has?bName(b.id):'？？？'}</b><small>${has?fmtDate(own[b.id]):(b.gems!=null?'稀有萌獸':'&nbsp;')}</small>
+        ${has?'<span class="tag" style="background:#E8F8EE;color:#2E9660">已擁有</span>':visit?'':lock?`<span class="lock">Lv${b.lv} 解鎖</span>`:`<button class="mini ${b.gems!=null?'gem':''}" data-bb="${b.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('')}</div>`;
+  }
+  modal(visit ? `${esc(V.owner.nickname)} 的萌獸園` : '萌獸園', body);
+  const md=$('md');
+  md.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>openBeastPark(b.dataset.pt));
+  md.querySelectorAll('[data-bp]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_chara',{p_c:b.dataset.bp+'1'})); refresh(); sfx('coin'); toast(`${bName(b.dataset.bp)} 成為你的夥伴！`); openBeastPark('mine'); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-bb]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.bb;
+    try{ applyState(await rpc('farm_buy_beast',{p_id:id})); refresh(); fxConfetti(); sfx('lvup');
+      modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">已經住進萌獸園了</div></div>`,
+        [['設為夥伴','',async()=>{ try{ applyState(await rpc('farm_set_chara',{p_c:id+'1'})); refresh(); closeModal(); toast(`${bName(id)} 成為你的夥伴！`); }catch(e){ toast(e.message); } }],['繼續看圖鑑','sub',()=>openBeastPark('dex')]]);
+    }catch(e){ toast(e.message); } });
+}
+
+/* 萌獸園裡玩的萌獸（不是夥伴的那些） */
+let parkMovers = [], parkSig = '', PARK = null;
+function syncParkMovers(){
+  if(!PARK) return;
+  const who = mode==='visit' && V ? V.owner : S && S.me; if(!who) return;
+  const partner = chrSpecies(who.chara), list = ownedBeasts(who).filter(sp=>sp!==partner && BST[sp]).slice(0, 12);
+  const sig = list.join(',') + (mode==='visit'); if(sig===parkSig) return; parkSig = sig;
+  const mv=$('movers'); if(!mv) return;
+  parkMovers.forEach(m=>{ m.el.remove(); const i=movers.indexOf(m); if(i>=0) movers.splice(i,1); }); parkMovers=[];
+  const [cx,cy,r]=PARK;
+  list.forEach(sp=>{ const k=sp+'1', n=50, w=n*(CHR_RATIO[k]||1);
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.innerHTML=`<g class="mvin"><ellipse cx="0" cy="0" rx="${w*0.3}" ry="${n*0.08}" fill="rgba(0,0,0,.2)"/><g class="hop"><image href="${chrSrc(k)}" x="${-w/2}" y="${-n}" width="${w}" height="${n}"/></g></g>`;
+    mv.appendChild(g);
+    const m={el:g, wait:Math.random()*3, face:1, x:cx+(Math.random()-0.5)*r, y:cy+(Math.random()-0.5)*r, chick:true, area:[cx-r,cy-r,cx+r,cy+r], speed:0.45, s:1, petFace:-1};
+    movers.push(m); parkMovers.push(m);
+  });
 }
 
 /* ================= 連線設定 ================= */
@@ -2020,6 +2082,7 @@ function tapBuilding(g){
   if(id==='home') return openHome();
   if(id==='coop') return openRanch();
   if(id==='decor') return openDecorShop();
+  if(id==='pen') return openBeastPark();
   const o = BLD.find(b=>b.id===id); if(o && o.locked) toast(o.locked);
 }
 
@@ -2101,7 +2164,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } syncRanchMovers(); renderDecor(); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ if(mode==='visit' && V){ setFarmer(chrKey(V.owner.chara, V.owner.lv), V.owner.equip); applySkins(V.owner.skin_on); } else if(S){ setFarmer(chrKey(S.me.chara, S.me.lv), S.me.equip); applySkins(S.me.skin_on); } syncRanchMovers(); syncParkMovers(); renderDecor(); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -2115,7 +2178,7 @@ async function sync(){
   }catch(e){ if(/還不是好友/.test(e.message)){ toast(e.message); goHome(); } }
   finally{ syncing = false; }
 }
-setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); try{ syncRanchMovers(); }catch(e){} } }, 1000);
+setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); try{ syncRanchMovers(); syncParkMovers(); }catch(e){} } }, 1000);
 setInterval(sync, 15000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sync(); });
 
@@ -2187,7 +2250,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings);
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts);
   }catch(e){}
 }
 async function showNotices(){

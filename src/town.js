@@ -63,7 +63,7 @@ const BLD = [
   {id:'barn',  name:'穀倉',     img:'b_farm',     c:[2.0,4.4],  w:380, foot:0.80},
   {id:'decor', name:'裝飾店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
-  {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58, locked:'萌獸園即將開放：之後多出來的萌獸會住在這裡'},
+  {id:'pen',   name:'萌獸園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
 
 // 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
@@ -221,11 +221,15 @@ function buildWorld(){
 
   // 圍欄草地（後兩邊畫在地面層，前兩邊依深度排序）
   const pen=(x,y,w,d,col,base,gate)=>{ ground += poly(dia(x,y,w,d),base,`stroke="${INK}" stroke-width="2" stroke-linejoin="round"`);
-    if(gate){ const g0=x+w/2-0.45, g1=x+w/2+0.45; ground += fence(x,y,g0,y,col) + fence(g1,y,x+w,y,col); } else ground += fence(x,y,x+w,y,col);
-    ground += fence(x,y,x,y+d,col);
+    // 靠農田那一邊要畫在田的前面，不然會被田擋住
+    objs.push({depth:x+w+y+0.05, svg: fence(x,y,x+w,y,col)});
+    objs.push({depth:x+y+d, svg: fence(x,y,x,y+d,col)});
     if(gate==='front'){ const g0=x+w*0.32-0.5, g1=x+w*0.32+0.5, a=iso(g0,y+d), b=iso(g1,y+d);
       const post=p=>ol(`<rect x="${p[0]-4}" y="${p[1]-30}" width="8" height="30" rx="3" fill="#A86F45"/><circle cx="${p[0]}" cy="${p[1]-32}" r="5" fill="#F4D35E"/>`,1.8);
-      objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,g0,y+d,col) + fence(g1,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col) + post(a) + post(b)}); }
+      // 關著的木門（兩片）
+      const gate=(p,q)=>{ const m=[(p[0]+q[0])/2,(p[1]+q[1])/2]; const leaf=(u,v)=>ol(`<polygon points="${u[0]},${u[1]-6} ${v[0]},${v[1]-6} ${v[0]},${v[1]-24} ${u[0]},${u[1]-24}" fill="#C98B5E"/>`,1.8)+`<path d="M${u[0]} ${u[1]-15} L${v[0]} ${v[1]-15} M${u[0]} ${u[1]-6} L${v[0]} ${v[1]-24}" stroke="#8B5E3C" stroke-width="2"/>`;
+        return leaf([p[0]+3,p[1]],[m[0]-1,m[1]]) + leaf([m[0]+1,m[1]],[q[0]-3,q[1]]); };
+      objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,g0,y+d,col) + fence(g1,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col) + gate(a,b) + post(a) + post(b)}); }
     else objs.push({depth:x+w+y+d+0.2, svg: fence(x,y+d,x+w,y+d,col) + fence(x+w,y,x+w,y+d,col)}); };
   // 牧場（農田左邊、島的下方中間）
   const RX=4.1, RY=11.85, RW=10.15, RD=3.0;  // 農田左下邊，長度跟農田切齊
@@ -299,6 +303,7 @@ function buildWorld(){
   addMover('',{x:C0[0],y:C0[1],path:WP,tgt:1,speed:0.55,s:1.25,farmer:true});
   farmerMover=movers[movers.length-1]; farmerAv=null;
   ranchMovers=[]; ranchSig='';
+  { const pc=BLD.find(b=>b.id==='pen').c; PARK=[pc[0]-0.2, pc[1]-0.6, 1.6]; parkMovers=[]; parkSig=''; }
   ['#FFD6E5','#FFE066','#BDE6FF'].forEach((c,k)=>addMover(BUTTERFLY(c),{x:5+k*3,y:8+k,fly:true,area:[3,6,15,12],speed:0.9,s:1.1,wait:rnd()}));
 }
 
@@ -311,8 +316,6 @@ function walkable(gx,gy){ const [x,y]=iso(gx,gy);
   return true; }
 function clearLine(a,b){ const n=Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/0.25); for(let k=1;k<=n;k++){ if(!walkable(a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n)) return false; } return true; }
 function pickRoam(m){
-  if(RANCH && Math.random()<0.15){ const g=[RANCH[0]+RANCH[2]*0.32, RANCH[1]+RANCH[3]], out=[g[0],g[1]+0.9];
-    if(clearLine([m.x,m.y],out)){ m.route=[[g[0],g[1]-0.1],[g[0]+0.4,g[1]-1.6],[g[0]+2.6,g[1]-1.4],[g[0]+0.4,g[1]-1.6],[g[0],g[1]-0.1]]; return out; } }
   for(let k=0;k<40;k++){ const a=Math.random()*Math.PI*2, r=1.5+Math.random()*5, g=[m.x+Math.cos(a)*r, m.y+Math.sin(a)*r];
     if(walkable(g[0],g[1]) && clearLine([m.x,m.y],g)) return g; }
   return [m.x,m.y]; }
