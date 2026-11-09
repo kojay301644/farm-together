@@ -233,7 +233,7 @@ async function openHome(){
   const {data:{user}} = await sb.auth.getUser();
   modal('我的家', `
     <div class="sec">玩家</div>
-    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button><button class="mini" id="hCh">更換角色</button></div>
     <div style="font-weight:700;line-height:1.8">${esc(S.me.nickname)}・Lv${S.me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div>
     <div class="sec">玩法小提醒</div>
     <div style="font-size:13px;font-weight:700;color:var(--ink2);line-height:1.8">
@@ -245,7 +245,7 @@ async function openHome(){
     <div class="seg" style="margin-top:6px"><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
     <div style="text-align:center;margin-top:10px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`);
   $('hGem').onclick = ()=>openGemShop();
-  $('hAv').onclick = openAvatarPicker;
+  $('hAv').onclick = openAvatarPicker; $('hCh').onclick = openCharPicker;
   $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openHome(); };
   $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openHome(); };
   $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openHome(); };
@@ -430,7 +430,7 @@ function renderHUD(){
   else h='作物正在長大中…去<b>好友布告欄</b>看看誰的菜可以偷';
   $('hint').innerHTML = `<span>🌱</span><span>${h}</span>`;
 }
-function refresh(){ renderPlots(); renderHUD(); try{ setFarmer(mode==='visit' && V ? (V.owner.avatar||11) : (S && S.me.avatar)||11); }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setFarmer(mode==='visit' && V ? (V.owner.chara||'bunny1') : (S && S.me.chara)||'bunny1'); }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;

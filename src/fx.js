@@ -127,7 +127,7 @@ function openAvatarPicker(){
 
 /* ================= 讀取畫面 ================= */
 (function preload(){
-  const list = ['b_shop','b_farm','b_academy','bc_shop','b_fountain','b_sail','dc_flower','dc_lamp','dc_bench','dc_pond','dc_hay','dc_mail','dc_kennel','dc_lantree','dc_swing','dc_sakura','dc_picnic','dc_balloon','bunny1','bear1','fox1','penguin1','n_friends','i_coin','i_gem','bg_forest','av11'];
+  const list = ['b_shop','b_farm','b_academy','bc_shop','b_fountain','b_sail','dc_flower','dc_lamp','dc_bench','dc_pond','dc_hay','dc_mail','dc_kennel','dc_lantree','dc_swing','dc_sakura','dc_picnic','dc_balloon','c_bunny1','n_friends','i_coin','i_gem','bg_forest','av11'];
   let n=0; const done=()=>{ n++; $('ldbar').style.width = Math.round(n/list.length*100)+'%'; if(n>=list.length) finish(); };
   let fin=false; const finish=()=>{ if(fin) return; fin=true; $('loader').classList.add('hide'); setTimeout(()=>$('loader').remove(), 600); };
   list.forEach(k=>{ const im=new Image(); im.onload=im.onerror=done; im.src=`assets/${k}.webp`; });

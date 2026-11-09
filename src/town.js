@@ -88,25 +88,60 @@ const BUTTERFLY = c => `<g class="bfly"><ellipse cx="-4" cy="-2" rx="4.5" ry="3.
 let plotEls=[], plotSig=[], plotLabs=[];
 const movers=[];
 let farmerMover=null, farmerAv=null;
-const AV_SHIRT=['#7F9625','#A39697','#7D4017','#BC6B3A','#F2C380','#E39C6C','#5C344A','#3D251B','#C08B69','#5C4320','#CF8F5E','#362727','#C14943','#77571B','#CD4365','#D2DAF2','#A82C15','#53455F','#352828','#A5815D','#E9A83C','#724154','#CC814D','#F4B07A','#E9B644','#A7B5C9','#A85E2F','#D6A039','#B8B6AE','#B3556C'];
-/* 大頭Q版人物：頭＝頭像圖 */
-function charSVG(av){
-  av = Math.min(30, Math.max(1, +av||11)); const sh = AV_SHIRT[av-1], id='avclip'+av, SK='#FBD7B5';
-  const leg=x=>ol(`<rect x="${x-3}" y="-15" width="6" height="14" rx="3" fill="#5A3E28"/><ellipse cx="${x}" cy="-1.5" rx="5" ry="3" fill="#3B2A1E"/>`,2.2);
-  const arm=x=>ol(`<ellipse cx="${x}" cy="-24.5" rx="4" ry="7.5" fill="${sh}"/><circle cx="${x}" cy="-16.5" r="3.4" fill="${SK}"/>`,2.2);
-  return `<ellipse cx="0" cy="1" rx="14" ry="4.5" fill="rgba(0,0,0,.18)"/><g class="hop"><g class="ch">
-    <g class="ch-lgL">${leg(-4.5)}</g><g class="ch-lgR">${leg(4.5)}</g>
-    <g class="ch-up">
-            ${ol(`<path d="M-11.5 -12 Q-13 -34 0 -35 Q13 -34 11.5 -12 Q0 -8 -11.5 -12Z" fill="${sh}"/>`,2.2)}
-      <path d="M-6 -33 L0 -27 L6 -33" stroke="#fff" stroke-width="2.4" fill="none" opacity=".75"/>
-      <g class="ch-hd">
-        <clipPath id="${id}"><circle cx="0" cy="-55" r="21"/></clipPath>
-        <circle cx="0" cy="-55" r="22.5" fill="#fff" stroke="${INK}" stroke-width="2.6"/>
-        <image href="${avSrc(av)}" x="-27" y="-84" width="54" height="54" clip-path="url(#${id})" preserveAspectRatio="xMidYMid slice"/>
-        <ellipse cx="-8" cy="-68" rx="6" ry="3" fill="#fff" opacity=".35" transform="rotate(-25 -8 -68)"/>
-      </g>
-      <g class="ch-arL">${arm(-13)}</g><g class="ch-arR">${arm(13)}</g>
-    </g></g></g>`;
+/* 玩家角色＝萌獸（動作仿萌獸星球：腿部切片擺動、搖擺、漂浮、呼吸） */
+const CHR_RATIO={"bunny1":0.782,"bunny2":0.771,"bunny3":0.812,"mouse1":1.341,"mouse2":1.276,"mouse3":1.1,"mole1":0.882,"mole2":0.976,"mole3":0.976,"puffer1":1.0,"puffer2":0.982,"puffer3":0.965,"owl1":0.888,"owl2":0.841,"owl3":0.853,"lizard1":1.453,"lizard2":1.288,"lizard3":1.259,"deer1":0.747,"deer2":0.647,"deer3":0.712,"moth1":0.924,"moth2":0.988,"moth3":0.865,"armad1":1.112,"armad2":1.035,"armad3":0.971,"seal1":1.1,"seal2":1.059,"seal3":0.994,"marten1":1.006,"marten2":1.212,"marten3":1.276,"phoenix1":0.841,"phoenix2":0.947,"phoenix3":0.882,"fox1":1.018,"fox2":0.994,"fox3":1.0,"otter1":0.9,"otter2":0.865,"otter3":0.841,"penguin1":0.871,"penguin2":0.953,"penguin3":0.929,"pango1":1.188,"pango2":1.365,"pango3":1.147,"ferret1":0.971,"ferret2":1.053,"ferret3":1.012,"whale1":1.376,"whale2":1.182,"whale3":1.088,"bear1":0.965,"bear2":0.9,"bear3":0.935,"dragon1":0.941,"dragon2":0.935,"dragon3":0.947};
+const CHR_NAMES={"bunny":["蘑菇兔","孢子兔","森菇賢者"],"mouse":["火花鼠","電光鼠","雷霆鼠"],"mole":["礦石鼴","礦工鼴","晶甲鼴王"],"puffer":["泡泡豚","珊瑚豚","鎧刺豚"],"owl":["雪絨鴞","霜羽鴞","冰冠鴞"],"lizard":["火蜥寶","熔岩蜥","岩漿蜥王"],"deer":["雷光鹿","雷角鹿","霆冠鹿王"],"moth":["花芽蝶","花仙蝶","虹彩花后"],"armad":["小鋼甲","鐵甲犰狳","鋼堡犰狳"],"seal":["雪球海豹","極光海豹","極光女王"],"marten":["影絨貂","影刺貂","雷影忍貂"],"phoenix":["火鳥雛","烈焰鳥","不死鳳凰"],"fox":["小焰狐","焰尾狐","炎陽狐王"],"otter":["泡泡獺","浪花獺","潮汐獺王"],"penguin":["雪糰企鵝","霜羽企鵝","冰冠企鵝帝"],"pango":["小石甲","滾石甲","山岳甲王"],"ferret":["靜電毛球","雷絨貂","雷霆貂"],"whale":["小鯨鈴","鳴鈴鯨","天籟鯨"],"bear":["苔苔熊","藤甲熊","古森熊王"],"dragon":["星晶龍寶","星晶龍","創星龍"]};
+const CHR_SP={bunny:['蘑菇兔',.9,'quad',.74,.5],mouse:['小鼠',1.3,'quad',.72,.5],mole:['鼴鼠',.6,'biped',.8,.48],puffer:['河豚',.6,'float'],
+  owl:['貓頭鷹',.6,'waddle'],lizard:['蜥蜴',1,'quad',.72,.5],deer:['小鹿',1.1,'quad',.62,.5],moth:['飛蛾',.8,'float'],armad:['犰狳',.55,'quad',.74,.5],
+  seal:['海豹',.5,'waddle'],marten:['貂',1.35,'quad',.7,.5],phoenix:['鳳凰',.9,'float'],fox:['狐狸',1.2,'quad',.7,.5],otter:['水獺',.8,'biped',.8,.48],
+  penguin:['企鵝',.65,'waddle'],pango:['穿山甲',.55,'quad',.7,.5],ferret:['雪貂',1.35,'quad',.68,.5],whale:['鯨魚',.75,'float'],bear:['熊',.6,'biped',.8,.48],dragon:['龍',.85,'quad',.74,.5]};
+const chrInfo=k=>{ const m=/^([a-z]+)([1-3])$/.exec(k||'')||[0,'bunny','1']; const sp=CHR_SP[m[1]]?m[1]:'bunny', d=CHR_SP[sp];
+  return {k:sp+m[2], sp, st:+m[2], name:d[0], spd:d[1], type:d[2], legY:d[3]||.8, mid:d[4]||.5}; };
+const chrSrc=k=>A('c_'+k);
+function charSVG(k){
+  const c=chrInfo(k), n=48+c.st*9, b=n*(CHR_RATIO[c.k]||1), src=chrSrc(c.k), id='ck'+c.k;
+  const img=clip=>`<image href="${src}" x="${-b/2}" y="${-n}" width="${b}" height="${n}"${clip?` clip-path="url(#${clip})"`:''}/>`;
+  let body;
+  if(c.type==='float'||c.type==='waddle') body=img();
+  else { const v=c.legY, m=c.mid;
+    body=`<clipPath id="${id}a"><rect x="${-b/2}" y="${-n+n*v}" width="${b*(m+.07)}" height="${n*(1-v)}"/></clipPath>
+      <clipPath id="${id}b"><rect x="${-b/2+b*(m-.07)}" y="${-n+n*v}" width="${b*(1-m+.07)}" height="${n*(1-v)}"/></clipPath>
+      <clipPath id="${id}t"><rect x="${-b/2}" y="${-n}" width="${b}" height="${n*(v+.09)}"/></clipPath>
+      <g class="cp-a">${img(id+'a')}</g><g class="cp-b">${img(id+'b')}</g><g class="cp-t">${img(id+'t')}</g>`; }
+  return `<ellipse class="cp-sh" cx="0" cy="0" rx="${b*.3}" ry="${n*.08}" fill="rgba(0,0,0,.2)"/><g class="cp-root">${body}</g>`;
+}
+function setFarmer(k){ if(!farmerMover || farmerAv===k) return; farmerAv=k; const m=farmerMover; m.el.firstChild.innerHTML=charSVG(k);
+  m.c=chrInfo(k); m.n=48+m.c.st*9; m.ph=0; m.anim=Math.random()*9; m.jump=0;
+  m.parts={root:m.el.querySelector('.cp-root'), a:m.el.querySelector('.cp-a'), b:m.el.querySelector('.cp-b'), t:m.el.querySelector('.cp-t'), sh:m.el.querySelector('.cp-sh')}; }
+/* 每幀姿勢（照萌獸的算法） */
+function farmerPose(m, dt, moving){
+  const P=m.parts; if(!P||!P.root) return; const c=m.c, n=m.n, act=m.act;
+  m.anim+=dt; if(moving) m.ph+=dt*c.spd*(m.task?14:9);
+  let f=0,u=1,p=1,h=0;
+  if(moving){ if(c.type==='waddle'){ h=Math.sin(m.ph)*.13; f=Math.abs(Math.sin(m.ph))*n*.03; }
+    else if(c.type==='float') h=Math.sin(m.ph)*.05;
+    else { const k=Math.cos(m.ph*2)*.012; p=1+k; u=1-k; } }
+  if(c.type==='float') f+=n*(.12+Math.sin(m.anim*2.2)*.04);
+  if(!moving){ const k=Math.sin(m.anim*2.6)*.025; u=1+k; p=1-k;
+    if(act==='work'||act==='water') h=Math.sin(m.anim*10)*.06;
+    if(act==='angry') h=Math.sin(m.anim*40)*.05;
+    if(act==='look') h=Math.sin(m.anim*2.5)*.1; }
+  if(!moving && (act==='cheer'||act==='wave'||act==='stretch')){ m.jump=(m.jump||0)+dt; if(m.jump>(act==='cheer'?.55:.9)) m.jump=0; } else m.jump=0;
+  if(m.jump>0 && m.jump<.45){ const k=Math.sin(m.jump/.45*Math.PI); f+=k*n*(act==='cheer'?.35:.18); p*=1+k*.08; u*=1-k*.05; }
+  P.root.setAttribute('transform',`translate(0 ${(-f).toFixed(2)}) rotate(${(h*57.3).toFixed(2)}) scale(${u.toFixed(3)} ${p.toFixed(3)})`);
+  P.sh.setAttribute('transform',`scale(${Math.max(.3,1-f/n*.6).toFixed(3)} 1)`);
+  if(P.a){ const E=c.type==='quad'?1:1.15, i=m.ph;
+    const leg=(el,kk,ph)=>{ const lift=moving?Math.max(0,kk)*n*.075*E:0, dx=moving?Math.cos(ph)*n*.045*E:0; el.setAttribute('transform',`translate(${dx.toFixed(2)} ${(-lift).toFixed(2)})`); };
+    leg(P.a,Math.sin(i),Math.sin(i)>0?i:i+Math.PI); leg(P.b,Math.sin(i+Math.PI),Math.sin(i+Math.PI)>0?i:i+Math.PI);
+    P.t.setAttribute('transform',`translate(0 ${moving?(-Math.abs(Math.cos(i))*n*.03).toFixed(2):0})`); }
+}
+function openCharPicker(){
+  const cur=(S.me.chara)||'bunny1';
+  modal('選擇角色', `<p class="mut" style="margin:0 0 8px">選一隻萌獸當你的農場角色，牠會在農場裡走來走去幫你做事</p><div class="chgrid">${Object.keys(CHR_SP).map(sp=>[1,2,3].map(st=>{ const k=sp+st;
+    return `<button class="chpick${k===cur?' on':''}" data-ch="${k}"><img src="${chrSrc(k)}" alt=""><span>${(CHR_NAMES[sp]||[])[st-1]||CHR_SP[sp][0]}</span></button>`; }).join('')).join('')}</div>`);
+  document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=async()=>{
+    try{ applyState(await rpc('farm_set_chara', {p_c:b.dataset.ch})); refresh(); sfx('coin'); toast('角色已更換'); closeModal(); }catch(e){ toast(e.message); }
+  });
 }
 /* 角色動作 */
 function setAct(m, a){ if(m.act===a) return; if(m.act) m.el.classList.remove('a-'+m.act); m.act=a; if(a) m.el.classList.add('a-'+a); }
@@ -264,7 +299,7 @@ function farmerStep(m, dt){
   if(m.wait>0){ m.wait-=dt; if(m.wait<=0){ setAct(m,null); if(m.task && m.task.started) m.task=null; } }
   else {
     const goal = m.task ? m.task.pos : m.path[m.tgt];
-    const dx=goal[0]-m.x, dy=goal[1]-m.y, dist=Math.hypot(dx,dy), step=(m.task?2.4:m.speed)*dt;
+    const dx=goal[0]-m.x, dy=goal[1]-m.y, dist=Math.hypot(dx,dy), step=(m.task?2.4:m.speed*(m.c?Math.max(.6,Math.min(1.3,m.c.spd)):1))*dt;
     if(dist<=step){ m.x=goal[0]; m.y=goal[1];
       if(m.task){ m.task.started=true; if(m.task.look){ const sd=(m.task.look[0]-m.x)-(m.task.look[1]-m.y); if(Math.abs(sd)>0.05) m.face=sd>0?1:-1; }
         setAct(m,m.task.act); m.wait=m.task.dur; emote(m,m.task.emo); }
@@ -272,6 +307,7 @@ function farmerStep(m, dt){
         const r=Math.random(); if(r<0.5) setAct(m, ['wave','stretch','look','wave'][Math.floor(Math.random()*4)]); }
     } else { m.x+=dx/dist*step; m.y+=dy/dist*step; moving=true; const sdx=dx-dy; if(Math.abs(sdx)>0.01) m.face=sdx>0?1:-1; }
   }
+  farmerPose(m, dt, moving);
   const [sx,sy]=iso(m.x,m.y);
   m.el.setAttribute('transform',`translate(${sx.toFixed(1)} ${sy.toFixed(1)}) scale(${m.face*m.s} ${m.s})`);
   if(m.moving!==moving){ m.moving=moving; m.el.classList.toggle('walk',moving); m.el.classList.toggle('run',moving && !!m.task); }
