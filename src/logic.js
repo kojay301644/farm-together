@@ -261,7 +261,7 @@ function openBag(){
 async function openHome(){
   if(mode==='visit') return toast('這是好友的家喔');
   const {data:{user}} = await sb.auth.getUser();
-  modal(`🏠 ${esc(S.me.nickname)}`, `
+  modal(`🏠 ${esc(S.me.nickname)}的家`, `
     <div class="sec">我的寵物夥伴</div>${beastPanelHTML()}
     <div class="sec">玩家</div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(S.me,'avatar')}<button class="mini" id="hAv">更換頭像</button></div>
@@ -622,7 +622,7 @@ $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
 $('bSet').onclick = ()=>{ if(S) openSettings(); };
 $('avatar').onclick = ()=>{ if(S && mode==='home') openAvatarPicker(); };
-$('gemBox').onclick = ()=>{ if(S && mode==='home') openGemShop('pack'); };
+$('gemBox').onclick = ()=>{ if(S) openTopup(); };
 $('tutNext').onclick = ()=>tutNext();
 $('tutSkip').onclick = ()=>tutFinish();
 

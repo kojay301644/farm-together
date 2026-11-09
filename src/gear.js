@@ -26,6 +26,18 @@ function beastPanelHTML(){
 }
 function bindBeastPanel(){ document.querySelectorAll('#md [data-pg]').forEach(b=>b.onclick=()=>openGearBag(+b.dataset.pg)); $('hCh').onclick=()=>openBeastPark('mine'); $('hBag').onclick=()=>openPack(); }
 
+/* 自動播種要種什麼、自動餵食要拿什麼餵 */
+function autoSeedHTML(){ const me=S.me;
+  const opts = CROPS.filter(c=>me.lv>=c.lv).map(c=>`<option value="${c.id}" ${me.auto_seed===c.id?'selected':''}>${c.name}（穀倉 ${me.seeds[c.id]||0} 包種子）</option>`).join('');
+  return `<div class="autoseed">🌱 自動播種要種：<select id="aSeed"><option value="">（不種）</option>${opts}</select></div><div class="rhint">用穀倉裡的種子，種子用完就停</div>`; }
+function autoFeedHTML(){ const me=S.me;
+  const opts = CROPS.filter(c=>(me.crops[c.id]||0)>0 || me.auto_feed===c.id).map(c=>`<option value="${c.id}" ${me.auto_feed===c.id?'selected':''}>${c.name}（穀倉 ${me.crops[c.id]||0} 個）</option>`).join('');
+  return `<div class="autoseed">🥕 餵動物要用：<select id="aFeed"><option value="">（自動挑最便宜的作物）</option>${opts}</select></div><div class="rhint">自己餵和自動餵食都會用這個；指定的作物不夠就不會餵</div>`; }
+function bindAutoSel(){
+  if($('aSeed')) $('aSeed').onchange=async e=>{ try{ applyState(await rpc('farm_set_auto_seed',{p_crop:e.target.value||null})); refresh(); toast(e.target.value?`會自動種${CROP[e.target.value].name}`:'不自動播種'); }catch(err){ toast(err.message); } };
+  if($('aFeed')) $('aFeed').onchange=async e=>{ try{ applyState(await rpc('farm_set_auto_feed',{p_crop:e.target.value||null})); refresh(); toast(e.target.value?`會用${CROP[e.target.value].name}餵動物`:'自動挑最便宜的作物來餵'); }catch(err){ toast(err.message); } };
+}
+
 /* 裝備背包 */
 function openGearBag(slot){
   slot=slot||0; const me=S.me, pt=JSON.parse(JSON.stringify(partyOf(me))), mem=pt[slot]||pt[0], own=Object.entries(me.gear||{}).filter(([id,n])=>n>0 && GEAR[id]).map(([id,n])=>[GEAR[id],n]).sort((a,b)=>GEAR_LIST.indexOf(a[0])-GEAR_LIST.indexOf(b[0]));
@@ -33,10 +45,8 @@ function openGearBag(slot){
   let body = `<div class="sec">${bName(mem.s)}${slot===0?'（👑隊長）':''}的裝備欄</div>`;
   body += cur ? `<div class="row gon"><div class="ic">${gearImg(cur,44)}</div><div class="tx"><b>${gearTitle(cur)}</b> <span class="tag">${GEAR_FUNC[cur.func][1]} ${GEAR_FUNC[cur.func][0]}</span><div>${gearDesc(cur)}</div></div><button class="mini o" data-uneq>卸下</button></div>`
     : `<div class="empty" style="padding:8px 0">還沒有插上裝備</div>`;
-  if(cur && cur.func==='plant'){
-    const opts = CROPS.filter(c=>me.lv>=c.lv).map(c=>`<option value="${c.id}" ${me.auto_seed===c.id?'selected':''}>${c.name}（背包 ${me.seeds[c.id]||0} 包）</option>`).join('');
-    body += `<div class="autoseed">🌱 自動種：<select id="aSeed"><option value="">（不種）</option>${opts}</select></div><div class="rhint">會用背包裡的種子，種子用完就停</div>`;
-  }
+  if(cur && cur.func==='plant') body += autoSeedHTML();
+  if(cur && (cur.func==='feed'||cur.func==='clear')) body += autoFeedHTML();
   body += `<div class="sec">背包裡的裝備</div>`;
   body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span><div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
       ${mem.g===g.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">裝備中</span>':`<button class="mini" data-eq="${g.id}">${(used[g.id]||0)>=n?'換過來':'插上'}</button>`}</div>`).join('')
@@ -48,7 +58,7 @@ function openGearBag(slot){
     if((used[id]||0)>=n){ for(let i=pt.length-1;i>=0;i--){ if(i!==slot && pt[i].g===id){ pt[i].g=null; break; } } }
     pt[slot].g=id; await saveParty(pt,'裝備好了！'); openGearBag(slot); });
   md.querySelectorAll('[data-uneq]').forEach(b=>b.onclick=async()=>{ pt[slot].g=null; await saveParty(pt); openGearBag(slot); });
-  if($('aSeed')) $('aSeed').onchange=async e=>{ try{ applyState(await rpc('farm_set_auto_seed',{p_crop:e.target.value||null})); refresh(); toast(e.target.value?`會自動種${CROP[e.target.value].name}`:'不自動播種'); }catch(err){ toast(err.message); } };
+  bindAutoSel();
 }
 
 /* 裝備商店：金幣（I、II 級）／鑽石（III、IV 級） */

@@ -25,7 +25,7 @@ const FARM_C=[9.2,9.2];
 const INK='#4B3423';
 let HOME_LBL=null, homeLblCur='';
 const homeLblName = () => (mode==='visit' && typeof V!=='undefined' && V) ? V.owner.nickname : (typeof S!=='undefined' && S && S.me ? S.me.nickname : '我的家');
-function setHomeLabel(){ const el=$('homeLbl'), n=homeLblName(); if(!el||!HOME_LBL||n===homeLblCur) return; homeLblCur=n; el.innerHTML=labelPill(HOME_LBL[0], HOME_LBL[1], '🏠 '+esc(n), {big:1}); }
+function setHomeLabel(){ const el=$('homeLbl'), n=homeLblName(); if(!el||!HOME_LBL||n===homeLblCur) return; homeLblCur=n; el.innerHTML=labelPill(HOME_LBL[0], HOME_LBL[1], '🏠 '+esc(n)+'的家', {big:1}); }
 function labelPill(x,y,text,opt={}){
   if(opt.big){ const w=[...text.replace(/&[a-z]+;/g,'x')].reduce((a,ch)=>a+(ch.charCodeAt(0)>255?18:10),0)+30, bg='#FF8A3D';
     return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" style="pointer-events:none"><g class="bob">
@@ -267,7 +267,7 @@ function buildWorld(){
       objs.push({depth:gx+gy, svg:`<g class="tap" data-b="pen"><g style="pointer-events:none">${s}</g><ellipse cx="${x.toFixed(1)}" cy="${(y-h*0.1).toFixed(1)}" rx="${(o.w*0.44).toFixed(1)}" ry="${(o.w*0.2).toFixed(1)}" fill="rgba(0,0,0,0)"/></g>`});
     } else objs.push({depth:gx+gy, svg:`<g class="tap" data-b="${o.id}">${s}</g>`});
     const [lx,ly]=iso(gx,gy);
-    if(o.id==='home'){ HOME_LBL=[lx, ly - h*0.12]; homeLblCur=homeLblName(); lab += `<g id="homeLbl">${labelPill(lx, ly - h*0.12, '🏠 '+esc(homeLblCur), {big:1})}</g>`; }  // 放在大門前面，不會被上方玩家欄擋住
+    if(o.id==='home'){ HOME_LBL=[lx, ly - h*0.12]; homeLblCur=homeLblName(); lab += `<g id="homeLbl">${labelPill(lx, ly - h*0.12, '🏠 '+esc(homeLblCur)+'的家', {big:1})}</g>`; }  // 放在大門前面，不會被上方玩家欄擋住
     else lab += labelPill(lx, ly - (o.id==='coop'?20:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
   });
 

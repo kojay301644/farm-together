@@ -12,7 +12,8 @@ function openPack(t){
     body += own.length ? own.map(([g,n])=>{ const on=(used[g.id]||[]).map(i=>bName(pt[i].s)).join('、');
       return `<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span>${on?` <span class="tag" style="background:#E8F8EE;color:#2E9660">${esc(on)} 裝備中</span>`:''}<div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div></div>`; }).join('')
       : `<div class="empty">還沒有裝備<br><small>可以在裝備商店買、收成時撿到寶箱，或升級領禮物</small></div>`;
-    body += `<div class="rhint" style="text-align:center;margin-top:8px">到「夥伴隊伍」點寵物下面的裝備格就能插上</div>`;
+    body += `<div class="sec">自動設定</div>` + autoSeedHTML() + autoFeedHTML();
+    body += `<div class="rhint" style="text-align:center;margin-top:8px">到「我的家」點寵物下面的裝備格就能插上</div>`;
   } else if(bagTab==='decor'){
     const inv=me.decor_inv||{}, placed={}; (me.decor_place||[]).forEach(d=>placed[d.i]=(placed[d.i]||0)+1);
     const own=DECOR.filter(d=>(inv[d.id]||0)>0);
@@ -38,6 +39,7 @@ function openPack(t){
   const md=$('md');
   md.querySelectorAll('[data-bag]').forEach(b=>b.onclick=()=>openPack(b.dataset.bag));
   md.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>enterDecorEdit(b.dataset.pd));
+  bindAutoSel();
   md.querySelectorAll('[data-sk]').forEach(b=>b.onclick=async()=>{ const [bld,st]=b.dataset.sk.split('|');
     try{ applyState(await rpc('farm_set_skin',{p_bld:bld,p_style:st})); refresh(); sfx('coin'); openPack(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-tu]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_tone',{p_id:b.dataset.tu})); refresh(); sfx('coin'); openPack(); }catch(e){ toast(e.message); } });
