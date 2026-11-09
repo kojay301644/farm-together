@@ -3,7 +3,7 @@
 const GAME_URL = 'https://kojay301644.github.io/farm-together/';
 const bEl = id => document.querySelector(`[data-b="${id}"]`);
 const TUT_STEPS = [
-  {text:'歡迎來到你的農場！先點一塊<b>空地</b>，選「白蘿蔔」種下去吧 🌱', target:()=>plotEls[S.plots.findIndex(p=>p.s==='empty'||p.s==='grow')], done:()=>S.plots.some(p=>p.s==='grow')},
+  {text:'歡迎來到你的農場！先點一塊<b>空地</b>，選「白蘿蔔」種下去吧 🌱', target:()=>plotEls[S.plots.findIndex(p=>p.s==='empty'||p.s==='grow')], done:()=>S.plots.some(p=>p.s==='grow'), next:true},
   {text:'下面是<b>工具列</b>：田裡缺水、長草或有蟲時，選對應的工具點田地。放著不管，收成會變少喔', target:()=>$('tools'), next:true},
   {text:'白蘿蔔大約 <b>2 分鐘</b>成熟。成熟後選「收成」點它，作物就會收進穀倉', target:()=>plotEls[S.plots.findIndex(p=>p.s==='grow')], done:()=>Object.values(S.me.crops||{}).some(n=>n>0), next:true},
   {text:'點<b>穀倉</b>可以把作物賣掉換金幣；穀倉裡的<b>種子商店</b>可以買更多、更高級的種子', target:()=>bEl('barn'), next:true},
@@ -45,7 +45,7 @@ function featTick(){
     $('tutNext').style.display=''; $('tutNext').textContent='知道了'; $('tutSkip').style.display='none'; }
   const el = feat.target && feat.target(), a=$('tutArrow');
   if(!el){ a.style.display='none'; return; }
-  const r=el.getBoundingClientRect(); a.style.display=''; a.style.left=(r.left+r.width/2)+'px'; a.style.top=Math.max(110, r.top-6)+'px';
+  const r=el.getBoundingClientRect(); a.style.display=''; a.style.left=(r.left+r.width/2)+'px'; a.style.top=Math.max(110, r.top + Math.min(r.height*0.45, 30))+'px';
 }
 let tut = null;   // {step}
 const tutKey = () => 'ytzt_tut_' + (S && S.me.id);
@@ -63,7 +63,7 @@ function tutRender(){
   const st = TUT_STEPS[tut.step];
   $('tut').style.display = ''; $('tutSkip').style.display = '';
   $('tutText').innerHTML = `<span class="tutn">${tut.step+1}/${TUT_STEPS.length}</span>${st.text}`;
-  $('tutNext').style.display = st.next ? '' : 'none';
+  $('tutNext').style.display = ''; $('tutSkip').textContent = '跳過教學'; tutSkipArm = 0;
   $('tutNext').textContent = st.last ? '開始玩！' : '下一步';
   tutTick();
 }
@@ -78,8 +78,14 @@ function tutTick(){
   const r = el.getBoundingClientRect();
   a.style.display = '';
   a.style.left = (r.left + r.width/2) + 'px';
-  a.style.top = Math.max(110, r.top - 6) + 'px';
+  a.style.top = Math.max(110, r.top + Math.min(r.height*0.45, 30)) + 'px';
 }
+let tutSkipArm = 0;
+function tutSkip(){ // 按兩下才跳過，避免一按就整個教學沒了
+  if(feat) return featDone();
+  if(Date.now() - tutSkipArm < 3000) return tutFinish();
+  tutSkipArm = Date.now(); $('tutSkip').textContent = '再按一次跳過';
+  setTimeout(()=>{ if($('tutSkip') && Date.now()-tutSkipArm>=2900) $('tutSkip').textContent='跳過教學'; }, 3000); }
 function tutNext(){ if(feat) return featDone(); if(!tut) return; if(TUT_STEPS[tut.step].last) return tutFinish(); tut.step++; tutRender(); }
 setInterval(tutTick, 500);
 addEventListener('scroll', tutTick, true);

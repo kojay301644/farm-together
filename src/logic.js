@@ -653,7 +653,7 @@ $('bGift').onclick = ()=>{ if(S) openGifts(false); };
 $('avatar').onclick = ()=>{ if(S && mode==='home') openAvatarPicker(); };
 $('gemBox').onclick = ()=>{ if(S) openTopup(); };
 $('tutNext').onclick = ()=>tutNext();
-$('tutSkip').onclick = ()=>tutFinish();
+$('tutSkip').onclick = ()=>tutSkip();
 
 sb.auth.onAuthStateChange((ev, session)=>{
   if(ev==='PASSWORD_RECOVERY'){ setTimeout(showResetPw, 300); }
