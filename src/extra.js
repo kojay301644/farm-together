@@ -130,7 +130,7 @@ function openHelp(){
     <h4>✍️ 每日簽到・🎁 禮物</h4>
     <p>每天點左邊的「簽到」領獎，連續 7 天第 7 天有大獎，中斷一天會從第 1 天重新開始。每天第一次上線、每升 1 級、完成成就都會送鑽石；上方 📬 禮物信箱可以領活動禮物。</p>
     <h4>🏆 排行榜</h4>
-    <p>依等級排名，同等級再比經驗。可以看好友排行和全服前 50 名。</p></div>`,
+    <p>在好友廣場的「排行」，有四種排行榜：🏆 等級（同等級比經驗）、💰 財富（金幣）、🏙️ 繁榮（寵物、寵物造型、建築外觀、城鎮色調、裝飾、裝備階數、開墾的田地越多越高）、🥕 偷菜（偷菜次數）。每種都可以看好友排行和全服前 50 名。</p></div>`,
     [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); FEAT_TUTS.forEach(f=>localStorage.removeItem(featKey(f.id))); }catch(e){} feat=null; tut={step:0}; tutRender(); }],['知道了','',closeModal]]);
 }
 function openA2HS(){

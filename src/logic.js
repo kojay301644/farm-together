@@ -331,7 +331,7 @@ async function openSettings(){
 const esc = s => String(s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
 /* ================= 好友廣場 ================= */
-let boardTab = 'friends', rankScope = 'f';
+let boardTab = 'friends', rankScope = 'f', rankKind = 'lv';
 function ago(ms){ const s=Math.max(0,(Date.now()+(S?S.off:0)-ms)/1000); if(s<60) return '剛剛'; if(s<3600) return `${Math.floor(s/60)} 分鐘前`; if(s<86400) return `${Math.floor(s/3600)} 小時前`; return `${Math.floor(s/86400)} 天前`; }
 const LOG_TXT = {help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了水`, steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
   prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`,
@@ -342,7 +342,7 @@ async function openBoard(tab){
   if(tab) boardTab = tab;
   modal('好友廣場', `<div class="empty">讀取中…</div>`);
   let F, logs, R, NB;
-  try{ [F, logs, R] = await Promise.all([rpc('farm_friends'), boardTab==='logs'?rpc('farm_logs_get'):[], boardTab==='rank'?rpc('farm_rank'):null]);
+  try{ [F, logs, R] = await Promise.all([rpc('farm_friends'), boardTab==='logs'?rpc('farm_logs_get'):[], boardTab==='rank'?(rankKind==='lv'?rpc('farm_rank'):rpc('farm_rank_by',{p_kind:rankKind})):null]);
     if(boardTab==='near') NB = await rpc('farm_neighbors'); }
   catch(e){ return modal('好友廣場', `<div class="empty">${esc(e.message)}</div>`); }
   const nIn = F.incoming.length;
@@ -377,9 +377,12 @@ async function openBoard(tab){
       : `<div class="empty">附近還沒有其他玩家種菜，<br>邀請朋友一起來玩吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
   } else if(boardTab==='rank'){
     const medal = r => r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
+    const val = x => rankKind==='gold' ? `💰 ${(+x.sc).toLocaleString()} 金` : rankKind==='pros' ? `🏙️ 繁榮度 ${(+x.sc).toLocaleString()}` : rankKind==='steal' ? `🥕 偷菜 ${(+x.sc).toLocaleString()} 次` : `Lv${x.lv}`;
     const row = (rk, x) => `<div class="row rk${x.me?' mine':''}"${x.me?'':` data-visit="${x.id}" style="cursor:pointer"`}><div class="rkn">${medal(rk)}</div>${avImg(x)}
-        <div class="tx"><b>${esc(x.nickname)}</b>${x.me?' <span class="tag">我</span>':''}<div>經驗 ${x.exp}</div></div><span class="tag" style="font-size:13px">Lv${x.lv}</span></div>`;
-    body = `<div class="seg" style="margin:4px 0 6px"><button data-rs="f" class="${rankScope==='f'?'on':''}">好友排行</button><button data-rs="a" class="${rankScope==='a'?'on':''}">全服前 50 名</button></div>`;
+        <div class="tx"><b>${esc(x.nickname)}</b>${x.me?' <span class="tag">我</span>':''}<div>${rankKind==='lv'?`經驗 ${x.exp}`:`Lv${x.lv}`}</div></div><span class="tag" style="font-size:13px">${val(x)}</span></div>`;
+    body = `<div class="seg rkk" style="margin:4px 0 6px">${[['lv','🏆 等級'],['gold','💰 財富'],['pros','🏙️ 繁榮'],['steal','🥕 偷菜']].map(([k,t])=>`<button data-rk="${k}" class="${rankKind===k?'on':''}">${t}</button>`).join('')}</div>`
+      + (rankKind==='pros' ? `<div class="rhint" style="margin-bottom:6px">繁榮度：寵物、寵物造型、建築外觀、城鎮色調、裝飾、裝備階數、開墾的田地越多越高</div>` : '');
+    body += `<div class="seg" style="margin:4px 0 6px"><button data-rs="f" class="${rankScope==='f'?'on':''}">好友排行</button><button data-rs="a" class="${rankScope==='a'?'on':''}">全服前 50 名</button></div>`;
     if(rankScope==='f') body += R.friends.map((x,k)=>row(k+1, x)).join('') + (R.friends.length<2?`<div class="empty" style="padding:10px 0">加更多好友一起比賽吧！</div>`:'');
     else body += R.top.map(x=>row(x.rk, x)).join('');
     body += `<div class="myrank">你在全服排第 <b>${R.my_rank}</b> 名（共 ${R.total} 位玩家）</div>`;
@@ -392,6 +395,7 @@ async function openBoard(tab){
   const md = $('md');
   md.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>openBoard(b.dataset.tab));
   md.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>{ rankScope=b.dataset.rs; openBoard('rank'); });
+  md.querySelectorAll('[data-rk]').forEach(b=>b.onclick=()=>{ rankKind=b.dataset.rk; openBoard('rank'); });
   if($('nbMore')) $('nbMore').onclick = ()=>openBoard('near');
   md.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>visit(b.dataset.visit));
   md.querySelectorAll('[data-acc]').forEach(b=>b.onclick=async()=>{ try{ toast(await rpc('farm_friend_respond',{p_from:b.dataset.acc,p_accept:true})); openBoard(); }catch(e){ toast(e.message); } });
