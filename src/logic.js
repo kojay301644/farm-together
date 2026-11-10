@@ -248,7 +248,11 @@ function bindBarnNav(){ document.querySelectorAll('[data-bn]').forEach(b=>b.oncl
 function openShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   const me = S.me;
-  const body = CROPS.map(c=>{
+  const rare = CROPS.filter(c=>c.rare).map(c=>`<div class="row rare"><div class="ic">${iconSVG(c)}</div>
+      <div class="tx"><b>✨ ${c.name}</b><span class="tag">💎${c.seed_gems}</span>${(me.seeds[c.id]||0)?` <span class="tag">有 ${me.seeds[c.id]}</span>`:''}
+      <div>成熟 ${dur(c.time)}・收成 ${c.yield}×${c.price} 金 = ${(c.yield*c.price).toLocaleString()} 金・經驗 ${c.exp}</div></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">${[1,5].map(n=>`<button class="mini gem" data-buy="${c.id}" data-n="${n}" ${(me.gems||0)<c.seed_gems*n?'disabled':''}>${n===1?'買1':'×'+n}</button>`).join(' ')}</div></div>`).join('');
+  const body = `<div class="sec">✨ 稀有種子（鑽石購買，會發光，賣價和經驗特別高）</div>` + rare + `<div class="sec">一般種子</div>` + CROPS.filter(c=>!c.rare).map(c=>{
     const locked = me.lv < c.lv;
     const btn = locked ? `<span class="lock">Lv${c.lv} 解鎖</span>`
       : [1,5,10].map(n=>`<button class="mini ${n===1?'':'o'}" data-buy="${c.id}" data-n="${n}" ${me.gold<c.seed*n?'disabled':''}>${n===1?'買1':'×'+n}</button>`).join(' ');
@@ -624,7 +628,7 @@ async function enterGame(){
 async function loadConfig(){
   try{
     const c = await rpc('farm_config');
-    c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
+    c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp, seed_gems:x.seed_gems}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
     setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts, c.pet_skins); setItemConfig(c.items); SPIN=c.spin||[]; COS=c.cosmetics||[]; setToneConfig(c.tones); CFG_SET=c.settings||{};
   }catch(e){}

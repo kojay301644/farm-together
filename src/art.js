@@ -15,6 +15,11 @@ const CROPS = [
   {id:'dragonfruit',name:'火龍果',lv:12,seed:650, time:50400, yield:14, price:65, exp:190, type:'bush',  color:'#E8338A', fruit:'dragon'},
   {id:'melon',     name:'哈密瓜', lv:13,seed:760, time:57600, yield:10, price:105,exp:220, type:'ground',color:'#D9E8A0', net:true},
   {id:'mango',     name:'芒果',   lv:14,seed:880, time:64800, yield:16, price:75, exp:255, type:'bush',  color:'#FFB02E', fruit:'long'},
+  // ✨ 稀有種子（鑽石買）
+  {id:'gapple',    name:'金蘋果',   lv:1, seed:0, seed_gems:5,  time:7200,  yield:10, price:120, exp:150, type:'bush',  color:'#FFC93C', fruit:'round', rare:true},
+  {id:'rcorn',     name:'彩虹玉米', lv:1, seed:0, seed_gems:10, time:14400, yield:12, price:200, exp:300, type:'stalk', color:'#FF7EB6', rare:true},
+  {id:'dberry',    name:'鑽石草莓', lv:1, seed:0, seed_gems:15, time:21600, yield:16, price:250, exp:450, type:'bush',  color:'#7FD8FF', fruit:'berry', rare:true},
+  {id:'swmelon',   name:'星星西瓜', lv:1, seed:0, seed_gems:20, time:28800, yield:10, price:600, exp:600, type:'ground',color:'#8E6CF0', stripe:true, rare:true},
 ];
 const CROP = Object.fromEntries(CROPS.map(c=>[c.id,c]));
 // 20 塊田的開墾條件（第 0～1 塊一開始就有），要跟伺服器的 land 表一致
@@ -74,6 +79,10 @@ function olc(s){ return s.replace(/<(circle|ellipse|rect|polygon|path)\b([^>]*?)
 // 作物高光（讓果實有光澤）
 function cropHL(c, st){
   if(st<3) return '';
+  if(c.rare) return cropHL0(c, st) + `<g class="nool rsp"><path d="M38 40 l2 -6 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2Z" fill="#FFF6A8"/><path d="M80 52 l1.5 -4.5 l1.5 4.5 l4.5 1.5 l-4.5 1.5 l-1.5 4.5 l-1.5 -4.5 l-4.5 -1.5Z" fill="#fff"/><path d="M62 28 l1.2 -3.6 l1.2 3.6 l3.6 1.2 l-3.6 1.2 l-1.2 3.6 l-1.2 -3.6 l-3.6 -1.2Z" fill="#FFE066"/></g>`;
+  return cropHL0(c, st);
+}
+function cropHL0(c, st){
   const k = st===4?1:0.75, hl=(x,y,r)=>`<ellipse class="nool" cx="${x}" cy="${y}" rx="${r}" ry="${r*0.7}" fill="#fff" opacity=".6"/>`;
   if(c.type==='bush'){ return [[47,62],[71,63],[59,48],[58,68],[66,53]].map(([x,y])=>hl(x-2*k,y-2.5*k,1.8*k)).join(''); }
   if(c.type==='ground') return hl(52,58+(1-k)*6,5*k);

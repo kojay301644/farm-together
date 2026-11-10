@@ -385,6 +385,9 @@ body.lowfx #map .bob, body.lowfx #map .cloud, body.lowfx #map [class*="spark"], 
 .ttl.big{font-size:13px;line-height:24px;padding:0 10px;margin:0}
 .nm .ttl{font-size:10px;line-height:15px}
 .cosprev{display:flex;justify-content:space-around;margin:8px 0 6px}.cosprev .cp{display:flex;flex-direction:column;align-items:center;gap:6px}.cosprev img{width:46px;height:46px}.cosprev small{font-weight:800;font-size:11px}
+.row.rare{background:linear-gradient(90deg,#FFF8DD,#F4EEFF);border-radius:12px}
+.rsp{animation:rsp 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes rsp{0%,100%{opacity:.3}50%{opacity:1}}
 .avw{position:relative;flex:none}.aved{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;background:#FF9F43;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 0 #D67D22;pointer-events:none}
 .admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
 .admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}
@@ -494,20 +497,20 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794276011" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794276086" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794276011" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794276011" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794276086" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794276086" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794276011" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794276086" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794276011" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794276011" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794276086" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794276086" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -523,11 +526,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794276011" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794276086" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794276011";
+const BUILD="1794276086";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -545,6 +548,11 @@ const CROPS = [
   {id:'dragonfruit',name:'火龍果',lv:12,seed:650, time:50400, yield:14, price:65, exp:190, type:'bush',  color:'#E8338A', fruit:'dragon'},
   {id:'melon',     name:'哈密瓜', lv:13,seed:760, time:57600, yield:10, price:105,exp:220, type:'ground',color:'#D9E8A0', net:true},
   {id:'mango',     name:'芒果',   lv:14,seed:880, time:64800, yield:16, price:75, exp:255, type:'bush',  color:'#FFB02E', fruit:'long'},
+  // ✨ 稀有種子（鑽石買）
+  {id:'gapple',    name:'金蘋果',   lv:1, seed:0, seed_gems:5,  time:7200,  yield:10, price:120, exp:150, type:'bush',  color:'#FFC93C', fruit:'round', rare:true},
+  {id:'rcorn',     name:'彩虹玉米', lv:1, seed:0, seed_gems:10, time:14400, yield:12, price:200, exp:300, type:'stalk', color:'#FF7EB6', rare:true},
+  {id:'dberry',    name:'鑽石草莓', lv:1, seed:0, seed_gems:15, time:21600, yield:16, price:250, exp:450, type:'bush',  color:'#7FD8FF', fruit:'berry', rare:true},
+  {id:'swmelon',   name:'星星西瓜', lv:1, seed:0, seed_gems:20, time:28800, yield:10, price:600, exp:600, type:'ground',color:'#8E6CF0', stripe:true, rare:true},
 ];
 const CROP = Object.fromEntries(CROPS.map(c=>[c.id,c]));
 // 20 塊田的開墾條件（第 0～1 塊一開始就有），要跟伺服器的 land 表一致
@@ -604,6 +612,10 @@ function olc(s){ return s.replace(/<(circle|ellipse|rect|polygon|path)\b([^>]*?)
 // 作物高光（讓果實有光澤）
 function cropHL(c, st){
   if(st<3) return '';
+  if(c.rare) return cropHL0(c, st) + `<g class="nool rsp"><path d="M38 40 l2 -6 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2Z" fill="#FFF6A8"/><path d="M80 52 l1.5 -4.5 l1.5 4.5 l4.5 1.5 l-4.5 1.5 l-1.5 4.5 l-1.5 -4.5 l-4.5 -1.5Z" fill="#fff"/><path d="M62 28 l1.2 -3.6 l1.2 3.6 l3.6 1.2 l-3.6 1.2 l-1.2 3.6 l-1.2 -3.6 l-3.6 -1.2Z" fill="#FFE066"/></g>`;
+  return cropHL0(c, st);
+}
+function cropHL0(c, st){
   const k = st===4?1:0.75, hl=(x,y,r)=>`<ellipse class="nool" cx="${x}" cy="${y}" rx="${r}" ry="${r*0.7}" fill="#fff" opacity=".6"/>`;
   if(c.type==='bush'){ return [[47,62],[71,63],[59,48],[58,68],[66,53]].map(([x,y])=>hl(x-2*k,y-2.5*k,1.8*k)).join(''); }
   if(c.type==='ground') return hl(52,58+(1-k)*6,5*k);
@@ -2690,7 +2702,11 @@ function bindBarnNav(){ document.querySelectorAll('[data-bn]').forEach(b=>b.oncl
 function openShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   const me = S.me;
-  const body = CROPS.map(c=>{
+  const rare = CROPS.filter(c=>c.rare).map(c=>`<div class="row rare"><div class="ic">${iconSVG(c)}</div>
+      <div class="tx"><b>✨ ${c.name}</b><span class="tag">💎${c.seed_gems}</span>${(me.seeds[c.id]||0)?` <span class="tag">有 ${me.seeds[c.id]}</span>`:''}
+      <div>成熟 ${dur(c.time)}・收成 ${c.yield}×${c.price} 金 = ${(c.yield*c.price).toLocaleString()} 金・經驗 ${c.exp}</div></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">${[1,5].map(n=>`<button class="mini gem" data-buy="${c.id}" data-n="${n}" ${(me.gems||0)<c.seed_gems*n?'disabled':''}>${n===1?'買1':'×'+n}</button>`).join(' ')}</div></div>`).join('');
+  const body = `<div class="sec">✨ 稀有種子（鑽石購買，會發光，賣價和經驗特別高）</div>` + rare + `<div class="sec">一般種子</div>` + CROPS.filter(c=>!c.rare).map(c=>{
     const locked = me.lv < c.lv;
     const btn = locked ? `<span class="lock">Lv${c.lv} 解鎖</span>`
       : [1,5,10].map(n=>`<button class="mini ${n===1?'':'o'}" data-buy="${c.id}" data-n="${n}" ${me.gold<c.seed*n?'disabled':''}>${n===1?'買1':'×'+n}</button>`).join(' ');
@@ -3066,7 +3082,7 @@ async function enterGame(){
 async function loadConfig(){
   try{
     const c = await rpc('farm_config');
-    c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
+    c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp, seed_gems:x.seed_gems}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
     setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts, c.pet_skins); setItemConfig(c.items); SPIN=c.spin||[]; COS=c.cosmetics||[]; setToneConfig(c.tones); CFG_SET=c.settings||{};
   }catch(e){}
