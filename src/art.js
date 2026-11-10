@@ -27,7 +27,7 @@ const LAND = [null,null,{lv:1,cost:50},{lv:1,cost:80},{lv:1,cost:100},{lv:2,cost
 const WILD = LAND;
 const MAX_LV = 30;
 const needExp = lv => 30*lv*lv;
-const wetDur = c => Math.min(3600, Math.max(45, c.time*0.3));
+const wetDur = c => Math.min(3600, Math.max(180, c.time*0.3));   // 跟伺服器一致
 /* ================= 美術（向量繪製） ================= */
 const L = (cx,cy,rx,ry,rot,f)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" transform="rotate(${rot} ${cx} ${cy})" fill="${f}"/>`;
 const UNRIPE = '#B6DB7A';

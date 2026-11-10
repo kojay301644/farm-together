@@ -117,18 +117,43 @@ function showLevelUp(){
 }
 function xpFloat(el, xp){ if(xp>0 && el) setTimeout(()=>floatAt(el, `+${xp} 經驗`, '#C8F7A0'), 160); }
 
+/* ================= 動作佇列：點了馬上有反應，伺服器在背景依序確認 ================= */
+let actPending=0, actChain=Promise.resolve(), actErr=false;
+function queueRpc(fn, args, onLast){
+  actPending++; ui.lastLocal=Date.now();
+  const p = actChain.then(()=>rpc(fn, args)).then(r=>({r}), e=>({e}));
+  actChain = p.then(()=>{});
+  return p.then(res=>{
+    actPending--; ui.lastLocal=Date.now();
+    if(res.e){ sfx('err'); toast(res.e.message); actErr=true; }
+    if(actPending===0){
+      if(actErr){ actErr=false; resyncNow(); }
+      else if(res.r && onLast) onLast(res.r);
+    }
+    return res.r || null;
+  });
+}
+async function resyncNow(){
+  try{ if(mode==='visit' && V) applyVisit(await rpc('farm_visit', {p_owner:V.owner.id}));
+       else { const st=await rpc('farm_me'); if(st) applyState(st); } refresh(); }catch(e){}
+}
+/* 先在畫面上改好（預測），伺服器回來再以伺服器為準 */
+const srvNow = () => Date.now() + ((mode==='visit' && V ? V.off : S.off) || 0);
+function optPlot(i, fn){
+  const src = mode==='visit' ? V : S, p = src && src.plots[i]; if(!p) return;
+  if(p.s==='grow' && p.c && CROP[p.c]){ const q=pred(p, src.off); p.g=q.g; p.t=srvNow(); }
+  fn(p, CROP[p.c]); try{ renderPlots(); renderHUD(); }catch(e){}
+}
+
 /* ================= 自己農場的動作 ================= */
-async function doAct(action, i, crop, n){
-  if(ui.busy) return null;
-  ui.busy = true; ui.lastLocal = Date.now();
-  try{
-    const r = await rpc('farm_act', {p_action:action, p_idx:(i==null?null:i), p_crop:crop||null, p_n:n||1});
-    applyState(r.state); refresh();
+async function doAct(action, i, crop, n, opt){
+  if(opt) opt();
+  const r = await queueRpc('farm_act', {p_action:action, p_idx:(i==null?null:i), p_crop:crop||null, p_n:n||1}, r=>{ applyState(r.state); refresh(); });
+  if(r){
     if(r.lvup) setTimeout(showLevelUp, 400);
     if(r.gift) setTimeout(()=>showGift(r.gift), r.lvup?1600:500);
-    return r;
-  }catch(e){ sfx('err'); toast(e.message); return null; }
-  finally{ ui.busy = false; }
+  }
+  return r;
 }
 
 async function act(i){
@@ -136,12 +161,15 @@ async function act(i){
   const p = curPlots()[i], el = plotEls[i], c = p.c && CROP[p.c], tool = ui.tool;
   if(p.s==='wild') return askTill(i);
   let r;
+  const clearIt = ()=>optPlot(i, q=>{ q.s='empty'; q.c=null; q.g=0; q.w=0; q.b=0; q.st=0; });
   if(tool==='hand'){
     if(p.s==='empty') return openSeedPicker(i);
-    if(p.s==='dead'){ r = await doAct('clear', i); if(r){ fxDirt(i); floatAt(el,'整地完成'); xpFloat(el,r.xp); } return; }
+    if(p.s==='dead'){ fxDirt(i); floatAt(el,'整地完成'); r = await doAct('clear', i, null, 1, clearIt); if(r) xpFloat(el,r.xp); return; }
     if(p.g >= c.time){
-      r = await doAct('harvest', i);
-      if(r){ fxHarvest(i, c, r.amt); floatAt(el, `${c.name} +${r.amt}`, '#FFE066'); xpFloat(el, r.xp);
+      const est = Math.max(1, Math.max(Math.ceil(c.yield*(+(CFG_SET.pest_floor??0.5))), c.yield-(p.w||0)-(p.b||0)) - (p.st||0));
+      fxHarvest(i, c, est);
+      r = await doAct('harvest', i, null, 1, ()=>{ S.me.crops[c.id]=(S.me.crops[c.id]||0)+est; clearIt(); });
+      if(r){ floatAt(el, `${c.name} +${r.amt}`, '#FFE066'); xpFloat(el, r.xp);
         if(r.amt < c.yield) setTimeout(()=>toast(`雜草、蟲害或被偷，產量少了 ${c.yield-r.amt} 個`), 300); }
       return;
     }
@@ -155,26 +183,35 @@ async function act(i){
   if(tool==='water'){
     if(p.s!=='grow' || p.g>=c.time) return toast('這塊地不需要澆水');
     if(!p.dry) return toast('土壤還很濕潤，晚點再澆');
-    r = await doAct('water', i); if(r){ fxWater(i); floatAt(el,'澆水！','#BDE6FF'); xpFloat(el,r.xp); } return;
+    fxWater(i); floatAt(el,'澆水！','#BDE6FF');
+    r = await doAct('water', i, null, 1, ()=>optPlot(i, (q,cc)=>{ q.wu = srvNow() + wetDur(cc)*1000; }));
+    if(r) xpFloat(el,r.xp); return;
   }
   if(tool==='weed'){
     if(p.s!=='grow' || !p.w) return toast('這裡沒有雜草');
-    r = await doAct('weed', i); if(r){ fxPoof(i,'weed'); floatAt(el,'除草！'); xpFloat(el,r.xp); } return;
+    fxPoof(i,'weed'); floatAt(el,'除草！');
+    r = await doAct('weed', i, null, 1, ()=>optPlot(i, q=>{ q.w=Math.max(0,(q.w||0)-1); }));
+    if(r) xpFloat(el,r.xp); return;
   }
   if(tool==='bug'){
     if(p.s!=='grow' || !p.b) return toast('這裡沒有蟲');
-    r = await doAct('bug', i); if(r){ fxPoof(i,'bug'); floatAt(el,'除蟲！'); xpFloat(el,r.xp); } return;
+    fxPoof(i,'bug'); floatAt(el,'除蟲！');
+    r = await doAct('bug', i, null, 1, ()=>optPlot(i, q=>{ q.b=Math.max(0,(q.b||0)-1); }));
+    if(r) xpFloat(el,r.xp); return;
   }
   if(tool==='shovel'){
-    if(p.s==='dead'){ r = await doAct('clear', i); if(r){ fxDirt(i); floatAt(el,'整地完成'); xpFloat(el,r.xp); } return; }
+    if(p.s==='dead'){ fxDirt(i); floatAt(el,'整地完成'); r = await doAct('clear', i, null, 1, clearIt); if(r) xpFloat(el,r.xp); return; }
     if(p.s==='grow') return modal('剷除作物', `<p style="font-weight:700">確定要剷除還沒收成的<b>${c.name}</b>嗎？種子不會退回。</p>`,
-      [['取消','sub',closeModal],['剷除','r',async()=>{ closeModal(); if(await doAct('dig', i)) fxDirt(i); }]]);
+      [['取消','sub',closeModal],['剷除','r',async()=>{ closeModal(); fxDirt(i); await doAct('dig', i, null, 1, clearIt); }]]);
     return toast('這塊地是空的');
   }
 }
 async function plant(i, id){
-  const r = await doAct('plant', i, id);
-  if(r){ fxSeed(i); floatAt(plotEls[i], `種下${CROP[id].name}`); }
+  const cc = CROP[id];
+  if(!(S.me.seeds[id] > 0)) return toast(`沒有${cc.name}的種子了`);
+  fxSeed(i); floatAt(plotEls[i], `種下${cc.name}`);
+  await doAct('plant', i, id, 1, ()=>{ S.me.seeds[id] = (S.me.seeds[id]||0) - 1;
+    optPlot(i, q=>{ const t=srvNow(); q.s='grow'; q.c=id; q.g=0; q.t=t; q.wu=t+wetDur(cc)*1000; q.w=0; q.b=0; q.st=0; q.mine=false; }); });
 }
 function askTill(i){
   const w = LAND[i];
@@ -182,50 +219,50 @@ function askTill(i){
   modal('開墾荒地', `<p style="font-weight:700;text-align:center">花 <b style="color:var(--orange-d)">${w.cost}</b> 金幣開墾這塊荒地？</p>`,
     [['取消','sub',closeModal],['開墾','o',async()=>{
       if(S.me.gold < w.cost) return toast('金幣不夠喔');
-      closeModal(); const r = await doAct('till', i);
-      if(r){ fxDirt(i); fxPoof(i,'weed'); floatAt(plotEls[i],'開墾成功！'); xpFloat(plotEls[i], r.xp); }
+      closeModal(); fxDirt(i); fxPoof(i,'weed'); floatAt(plotEls[i],'開墾成功！');
+      const r = await doAct('till', i, null, 1, ()=>{ S.me.gold -= w.cost; optPlot(i, q=>{ q.s='empty'; }); });
+      if(r) xpFloat(plotEls[i], r.xp);
     }]]);
 }
 
 /* ================= 好友農場的動作 ================= */
 async function actVisit(i){
-  if(ui.busy) return;
   const p = curPlots()[i], el = plotEls[i], c = p.c && CROP[p.c], t = ui.tool;
   const growing = p.s==='grow', ripe = growing && p.g >= c.time;
-  let action;
+  let action, opt;
   if(t==='steal'){
     if(!ripe) return toast(growing ? `${c.name}還沒成熟，約 ${fmt(leftSec(p))} 後` : '這塊地沒有可以偷的作物');
     if(p.mine) return toast('這塊地你已經偷過了');
     if(p.st >= p.cap) return toast('這塊地已經被偷光了，留點給主人吧');
-    action = 'steal';
-  } else if(t==='hwater'){ if(!growing || ripe) return toast('這塊地不需要澆水'); if(!p.dry) return toast('土壤還很濕潤'); action='help_water'; }
-  else if(t==='hweed'){ if(!growing || !p.w) return toast('這裡沒有雜草'); action='help_weed'; }
-  else if(t==='hbug'){ if(!growing || !p.b) return toast('這裡沒有蟲'); action='help_bug'; }
+    action = 'steal'; opt = q=>{ q.mine=true; };
+  } else if(t==='hwater'){ if(!growing || ripe) return toast('這塊地不需要澆水'); if(!p.dry) return toast('土壤還很濕潤'); action='help_water'; opt=(q,cc)=>{ q.wu=srvNow()+wetDur(cc)*1000; }; }
+  else if(t==='hweed'){ if(!growing || !p.w) return toast('這裡沒有雜草'); action='help_weed'; opt=q=>{ q.w=Math.max(0,(q.w||0)-1); }; }
+  else if(t==='hbug'){ if(!growing || !p.b) return toast('這裡沒有蟲'); action='help_bug'; opt=q=>{ q.b=Math.max(0,(q.b||0)-1); }; }
   else if(t==='pweed' || t==='pbug'){
     if(!growing || ripe) return toast('只能在還沒成熟的作物上惡作劇');
     if(S.me.prank_left < 1) return toast(`惡作劇體力用完了${S.me.prank_regen>0?`，每 ${S.me.prank_regen} 分鐘回 1 點`:''}`);
     if(t==='pweed' && p.w>=3) return toast('這裡的草已經夠多了');
     if(t==='pbug' && p.b>=3) return toast('這裡的蟲已經夠多了');
     action = t==='pweed' ? 'prank_weed' : 'prank_bug';
+    opt = q=>{ if(t==='pweed') q.w=(q.w||0)+1; else q.b=(q.b||0)+1; S.me.prank_left=Math.max(0,(S.me.prank_left||0)-1); };
   }
-  ui.busy = true;
-  try{
-    const r = await rpc('farm_friend_act', {p_owner:V.owner.id, p_action:action, p_idx:i});
-    applyState(r.state); applyVisit(r.visit); refresh();
-    if(r.ab==='dog'){ sfx('err'); vib(60); try{ farmerDo(i,'steal'); }catch(e){} floatAt(el, '被看門狗趕走了！🐶', '#FFD6E5'); }
-    else if(r.ab==='scare'){ sfx('err'); try{ farmerDo(i,'prank'); }catch(e){} floatAt(el, '被稻草人擋下了！🎃', '#FFD6E5'); }
-    else if(action==='steal'){ fxSteal(i, c); floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066'); }
-    else if(action==='help_water') fxWater(i);
-    else if(action.startsWith('help')) fxPoof(i, action==='help_bug'?'bug':'weed');
-    else fxSmoke(i);
-    if(action==='steal' || r.ab){}
-    else if(action.startsWith('help')) floatAt(el, action==='help_weed'?'幫忙除草！':action==='help_bug'?'幫忙除蟲！':'幫忙澆水！', action==='help_water'?'#BDE6FF':null);
-    else floatAt(el, action==='prank_weed'?'放了一棵草 😈':'放了一隻蟲 😈', '#FFD6E5');
-    xpFloat(el, r.xp);
-    if(r.lvup) setTimeout(showLevelUp, 400);
-    if(r.gift) setTimeout(()=>showGift(r.gift), r.lvup?1600:500);
-  }catch(e){ toast(e.message); }
-  finally{ ui.busy = false; }
+  // 先播動畫、改畫面
+  if(action==='steal'){ try{ farmerDo(i,'steal'); }catch(e){} sfx('steal'); }
+  else if(action==='help_water') fxWater(i);
+  else if(action.startsWith('help')) fxPoof(i, action==='help_bug'?'bug':'weed');
+  else fxSmoke(i);
+  if(action.startsWith('help')) floatAt(el, action==='help_weed'?'幫忙除草！':action==='help_bug'?'幫忙除蟲！':'幫忙澆水！', action==='help_water'?'#BDE6FF':null);
+  else if(action!=='steal') floatAt(el, action==='prank_weed'?'放了一棵草 😈':'放了一隻蟲 😈', '#FFD6E5');
+  optPlot(i, opt);
+  const owner = V.owner.id;
+  const r = await queueRpc('farm_friend_act', {p_owner:owner, p_action:action, p_idx:i}, r=>{ applyState(r.state); if(mode==='visit' && V && V.owner.id===owner){ applyVisit(r.visit); } refresh(); });
+  if(!r) return;
+  if(r.ab==='dog'){ sfx('err'); vib(60); floatAt(el, '被看門狗趕走了！🐶', '#FFD6E5'); }
+  else if(r.ab==='scare'){ sfx('err'); floatAt(el, '被稻草人擋下了！🎃', '#FFD6E5'); }
+  else if(action==='steal'){ fxSteal(i, c); floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066'); }
+  xpFloat(el, r.xp);
+  if(r.lvup) setTimeout(showLevelUp, 400);
+  if(r.gift) setTimeout(()=>showGift(r.gift), r.lvup?1600:500);
 }
 
 /* ================= 視窗：商店、倉庫、播種 ================= */
@@ -557,7 +594,7 @@ function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel
 /* ================= 同步 ================= */
 let syncing = false;
 async function sync(){
-  if(!S || syncing || document.hidden) return;
+  if(!S || syncing || document.hidden || actPending>0) return;
   syncing = true;
   try{
     if(mode==='visit' && V) applyVisit(await rpc('farm_visit', {p_owner:V.owner.id}));
