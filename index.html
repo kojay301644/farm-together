@@ -500,20 +500,20 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794277217" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794277391" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794277217" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794277217" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794277391" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794277391" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794277217" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794277391" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794277217" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794277217" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794277391" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794277391" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -529,11 +529,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794277217" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794277391" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794277217";
+const BUILD="1794277391";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1457,7 +1457,7 @@ function openHelp(){
     <p>每天點左邊的「簽到」領獎，連續 7 天第 7 天有大獎，中斷一天會從第 1 天重新開始。每天第一次上線、每升 1 級、完成成就都會送鑽石；上方 📬 禮物信箱可以領活動禮物。</p>
     <h4>🧪 道具</h4>
     <p>綜合商店的「🧪 道具」可以買道具，買了放在「背包 → 🧪 道具」，要用時按「使用」。有：⚡ 偷菜體力補滿（每天限買 3 個）、🌱 全田神奇肥料（每天限買 1 個）、🌟 豐收卡（收成 +50%）、📈 經驗加倍卡、🔍 探測器（找出最好偷的農場）、📢 大聲公（在跑馬燈說一句話）、🎉 派對（好友來拜訪可以領派對禮物）。正在生效的效果會顯示在畫面右上方。</p>
-    <p>用「收成」點還沒成熟的作物，可以用 💎 神奇肥料讓它立刻成熟，或用金幣肥料讓剩下的時間減半。</p>
+    <p>用「收成」點還沒成熟的作物，可以用金幣肥料讓剩下的時間減半。</p>
     <h4>🎟️ 每日轉盤</h4>
     <p>畫面左邊的「轉盤」每天可以免費轉 1 次，也能用鑽石或金幣多轉幾次。各獎品的機率寫在轉盤頁下面的「獎品機率」。</p>
     <h4>💌 送禮給好友</h4>
@@ -2367,7 +2367,7 @@ function openItemShop(){
     return `<div class="row"><div class="ic">${itemIcon(x)}</div><div class="tx"><b>${esc(x.name)}</b>${(me.items||{})[x.id]?` <span class="tag">有 ${(me.items||{})[x.id]} 個</span>`:''}
       <div>${esc(x.descr)}${x.buy_daily!=null?`（每天限買 ${x.buy_daily} 個，今天還能買 ${Math.max(0,left)} 個）`:''}${x.use_daily!=null?`（每天最多用 ${x.use_daily} 次）`:''}</div></div><div class="ibtns">${btns}</div></div>`; }).join('');
   modal(`綜合商店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`,
-    petShopTabs() + `<div class="rhint">買了會放進「背包 → 🧪 道具」，要用的時候再按「使用」。單塊田的肥料：用「收成」點還沒成熟的作物就能用。</div>` + rows);
+    petShopTabs() + `<div class="rhint">買了會放進「背包 → 🧪 道具」，要用的時候再按「使用」。單塊田的金幣肥料：用「收成」點還沒成熟的作物就能用。</div>` + rows);
   bindPetShopTabs();
   document.querySelectorAll('#md [data-ib]').forEach(b=>b.onclick=async()=>{ const x=ITEM[b.dataset.ib];
     try{ applyState(await rpc('farm_item_buy',{p_id:x.id,p_pay:b.dataset.pay,p_n:1})); refresh(); sfx('coin'); toast(`買了「${x.name}」，放在背包裡`); openItemShop(); }catch(e){ toast(e.message); } });
@@ -2408,13 +2408,12 @@ function showDetector(list){
 /* 單塊田的肥料：用收成點還沒成熟的作物 */
 function openFertPlot(i){
   const p=curPlots()[i], c=CROP[p.c], rem=Math.max(0, c.time - p.g), h=rem/3600;
-  const gem=Math.min(20, Math.max(2, Math.ceil(h)*2)), gold=Math.min(8000, Math.max(500, Math.ceil(h*500)));
+  const gold=Math.min(8000, Math.max(500, Math.ceil(h*500)));
   const issues=[p.w?`雜草×${p.w}`:'', p.b?`蟲×${p.b}`:'', p.dry?'缺水':''].filter(Boolean).join('、');
   modal(`${c.name}`, `<div style="text-align:center;font-weight:800;margin-bottom:8px">約 ${fmt(leftSec(p))} 後成熟${issues?`<div style="color:#D63B42;font-size:13px">${issues}</div>`:''}</div>
-    <div class="row"><div class="ic">${itemIcon({icon:'i_ore2'})}</div><div class="tx"><b>神奇肥料</b><div>立刻成熟</div></div><button class="mini gem" id="fGem" ${(S.me.gems||0)<gem?'disabled':''}>💎${gem}</button></div>
     <div class="row"><div class="ic">${itemIcon({icon:'i_sta'})}</div><div class="tx"><b>金幣肥料</b><div>剩下的時間減半</div></div><button class="mini" id="fGold" ${S.me.gold<gold?'disabled':''}>${gold.toLocaleString()} 金</button></div>`);
-  const go = async pay => { try{ const r=await rpc('farm_fert_plot',{p_idx:i,p_pay:pay}); applyState(r.state); refresh(); closeModal(); sfx('lvup'); floatAt(plotEls[i], pay==='gems'?'立刻成熟！':'加速！','#B8F5A0'); }catch(e){ toast(e.message); } };
-  $('fGem').onclick=()=>go('gems'); $('fGold').onclick=()=>go('gold');
+  const go = async pay => { try{ const r=await rpc('farm_fert_plot',{p_idx:i,p_pay:pay}); applyState(r.state); refresh(); closeModal(); sfx('lvup'); floatAt(plotEls[i], '加速！','#B8F5A0'); }catch(e){ toast(e.message); } };
+  $('fGold').onclick=()=>go('gold');
 }
 
 /* 畫面上方：正在生效的道具 */

@@ -18,7 +18,7 @@ function openItemShop(){
     return `<div class="row"><div class="ic">${itemIcon(x)}</div><div class="tx"><b>${esc(x.name)}</b>${(me.items||{})[x.id]?` <span class="tag">有 ${(me.items||{})[x.id]} 個</span>`:''}
       <div>${esc(x.descr)}${x.buy_daily!=null?`（每天限買 ${x.buy_daily} 個，今天還能買 ${Math.max(0,left)} 個）`:''}${x.use_daily!=null?`（每天最多用 ${x.use_daily} 次）`:''}</div></div><div class="ibtns">${btns}</div></div>`; }).join('');
   modal(`綜合商店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`,
-    petShopTabs() + `<div class="rhint">買了會放進「背包 → 🧪 道具」，要用的時候再按「使用」。單塊田的肥料：用「收成」點還沒成熟的作物就能用。</div>` + rows);
+    petShopTabs() + `<div class="rhint">買了會放進「背包 → 🧪 道具」，要用的時候再按「使用」。單塊田的金幣肥料：用「收成」點還沒成熟的作物就能用。</div>` + rows);
   bindPetShopTabs();
   document.querySelectorAll('#md [data-ib]').forEach(b=>b.onclick=async()=>{ const x=ITEM[b.dataset.ib];
     try{ applyState(await rpc('farm_item_buy',{p_id:x.id,p_pay:b.dataset.pay,p_n:1})); refresh(); sfx('coin'); toast(`買了「${x.name}」，放在背包裡`); openItemShop(); }catch(e){ toast(e.message); } });
@@ -59,13 +59,12 @@ function showDetector(list){
 /* 單塊田的肥料：用收成點還沒成熟的作物 */
 function openFertPlot(i){
   const p=curPlots()[i], c=CROP[p.c], rem=Math.max(0, c.time - p.g), h=rem/3600;
-  const gem=Math.min(20, Math.max(2, Math.ceil(h)*2)), gold=Math.min(8000, Math.max(500, Math.ceil(h*500)));
+  const gold=Math.min(8000, Math.max(500, Math.ceil(h*500)));
   const issues=[p.w?`雜草×${p.w}`:'', p.b?`蟲×${p.b}`:'', p.dry?'缺水':''].filter(Boolean).join('、');
   modal(`${c.name}`, `<div style="text-align:center;font-weight:800;margin-bottom:8px">約 ${fmt(leftSec(p))} 後成熟${issues?`<div style="color:#D63B42;font-size:13px">${issues}</div>`:''}</div>
-    <div class="row"><div class="ic">${itemIcon({icon:'i_ore2'})}</div><div class="tx"><b>神奇肥料</b><div>立刻成熟</div></div><button class="mini gem" id="fGem" ${(S.me.gems||0)<gem?'disabled':''}>💎${gem}</button></div>
     <div class="row"><div class="ic">${itemIcon({icon:'i_sta'})}</div><div class="tx"><b>金幣肥料</b><div>剩下的時間減半</div></div><button class="mini" id="fGold" ${S.me.gold<gold?'disabled':''}>${gold.toLocaleString()} 金</button></div>`);
-  const go = async pay => { try{ const r=await rpc('farm_fert_plot',{p_idx:i,p_pay:pay}); applyState(r.state); refresh(); closeModal(); sfx('lvup'); floatAt(plotEls[i], pay==='gems'?'立刻成熟！':'加速！','#B8F5A0'); }catch(e){ toast(e.message); } };
-  $('fGem').onclick=()=>go('gems'); $('fGold').onclick=()=>go('gold');
+  const go = async pay => { try{ const r=await rpc('farm_fert_plot',{p_idx:i,p_pay:pay}); applyState(r.state); refresh(); closeModal(); sfx('lvup'); floatAt(plotEls[i], '加速！','#B8F5A0'); }catch(e){ toast(e.message); } };
+  $('fGold').onclick=()=>go('gold');
 }
 
 /* 畫面上方：正在生效的道具 */
