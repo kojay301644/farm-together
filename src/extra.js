@@ -11,7 +11,7 @@ const TUT_STEPS = [
   {text:'<b>寵物園</b>可以買新寵物、讓牠們上場當夥伴。夥伴會在農場陪你，插上裝備還會<b>自動幫你做事</b>', target:()=>bEl('pen'), next:true},
   {text:'<b>綜合商店</b>賣寵物、寵物造型、寵物裝備和道具。裝備會自動播種、澆水、收成、除草、除蟲…插滿 9 種就是<b>全自動農場</b>，休息時間也在賺錢！', target:()=>bEl('decor'), next:true},
   {text:'上面的功能條：點<b>頭像</b>換頭像，📬 <b>禮物信箱</b>收獎勵，📖 <b>遊戲說明</b>，⚙️ 設定（可以開關🎵音樂）。左邊 ✍️ <b>每日簽到</b>（連續 7 天有大獎）和 🎟️ <b>每日轉盤</b>（每天免費轉 1 次）！', target:()=>$('bGift'), next:true},
-  {text:'最後，點中間的<b>好友廣場</b>用暱稱加好友、拜訪鄰居，成熟的菜可以偷喔！被偷或被惡作劇時，好友廣場會出現<b>紅點</b>，可以去「動態」看是誰還能<b>復仇</b>。祝你玩得開心 🎉', target:()=>bEl('board'), next:true, last:true},
+  {text:'最後，點中間的<b>好友廣場</b>用暱稱加好友、拜訪鄰居，成熟的菜可以偷喔！被偷或被惡作劇時，好友廣場會出現<b>紅點</b>，可以去「動態」看是誰還能<b>復仇</b>。按「開始玩！」還有一隻<b>寵物夥伴</b>送給你 🎁', target:()=>bEl('board'), next:true, last:true},
 ];
 /* 新功能開放時的一次性教學 */
 const FEAT_TUTS = [
@@ -101,7 +101,22 @@ function tutSkip(){ // 按兩下才跳過，避免一按就整個教學沒了
   if(Date.now() - tutSkipArm < 3000) return tutFinish();
   tutSkipArm = Date.now(); $('tutSkip').textContent = '再按一次跳過';
   setTimeout(()=>{ if($('tutSkip') && Date.now()-tutSkipArm>=2900) $('tutSkip').textContent='跳過教學'; }, 3000); }
-function tutNext(){ if(feat) return featDone(); if(!tut) return; if(TUT_STEPS[tut.step].last) return tutFinish(); tut.step++; tutRender(); }
+function tutNext(){ if(feat) return featDone(); if(!tut) return; if(TUT_STEPS[tut.step].last){ tutFinish(); return setTimeout(openTutPet, 300); } tut.step++; tutRender(); }
+/* 完成新手教學：3 隻隨機寵物挑 1 隻 */
+let tutPetPick = null;
+function openTutPet(){
+  if(!S || S.me.tut_pet || mode==='visit') return;
+  const own=S.me.beasts||{};
+  if(!tutPetPick) tutPetPick = BEASTS.filter(b=>b.gold!=null && own[b.id]==null).sort(()=>Math.random()-0.5).slice(0,3).map(b=>b.id);
+  if(!tutPetPick.length) return;
+  modal('🎉 完成新手教學！', `<div style="text-align:center;font-weight:800;margin-bottom:8px">送你一隻寵物夥伴，挑一隻帶回家吧！</div>
+    <div class="bgrid">${tutPetPick.map(id=>`<div class="bcard"><img src="${chrSrc(id+'1')}" alt=""><b>${bName(id)}</b><button class="mini o" data-tp="${id}">就是你了！</button></div>`).join('')}</div>
+    <div class="rhint" style="text-align:center">選好會住進寵物園，夥伴格有空位就直接上場；插上裝備就會自動幫你做事</div>`);
+  document.querySelectorAll('#md [data-tp]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.tp;
+    try{ applyState(await rpc('farm_tut_pet',{p_id:id})); refresh(); fxConfetti(); sfx('lvup'); tutPetPick=null;
+      modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">${partyOf(S.me).some(p=>p.s===id)?'已經上場當你的夥伴了':'已經住進寵物園了（夥伴格滿了，升級開放新格子就能讓牠上場）'}</div></div>`, [['太好了！','',closeModal]]);
+    }catch(e){ toast(e.message); } });
+}
 setInterval(tutTick, 500);
 addEventListener('scroll', tutTick, true);
 
