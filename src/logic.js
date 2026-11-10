@@ -248,11 +248,12 @@ function bindBarnNav(){ document.querySelectorAll('[data-bn]').forEach(b=>b.oncl
 function openShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   const me = S.me;
+  const rLim = +(CFG_SET.rare_seed_daily ?? 3), rLeft = Math.max(0, rLim - dailyN(me,'rare_seed'));
   const rare = CROPS.filter(c=>c.rare).map(c=>`<div class="row rare"><div class="ic">${iconSVG(c)}</div>
       <div class="tx"><b>✨ ${c.name}</b><span class="tag">💎${c.seed_gems}</span>${(me.seeds[c.id]||0)?` <span class="tag">有 ${me.seeds[c.id]}</span>`:''}
       <div>成熟 ${dur(c.time)}・收成 ${c.yield}×${c.price} 金 = ${(c.yield*c.price).toLocaleString()} 金・經驗 ${c.exp}</div></div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">${[1,5].map(n=>`<button class="mini gem" data-buy="${c.id}" data-n="${n}" ${(me.gems||0)<c.seed_gems*n?'disabled':''}>${n===1?'買1':'×'+n}</button>`).join(' ')}</div></div>`).join('');
-  const body = `<div class="sec">✨ 稀有種子（鑽石購買，會發光，賣價和經驗特別高）</div>` + rare + `<div class="sec">一般種子</div>` + CROPS.filter(c=>!c.rare).map(c=>{
+      <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">${[...new Set([1,Math.max(1,rLim)])].map(n=>`<button class="mini gem" data-buy="${c.id}" data-n="${n}" ${(me.gems||0)<c.seed_gems*n||n>rLeft?'disabled':''}>${n===1?'買1':'×'+n}</button>`).join(' ')}</div></div>`).join('');
+  const body = `<div class="sec">✨ 稀有種子（鑽石購買，4 種合計每天限買 ${rLim} 顆，今天還能買 ${rLeft} 顆）</div>` + rare + `<div class="sec">一般種子</div>` + CROPS.filter(c=>!c.rare).map(c=>{
     const locked = me.lv < c.lv;
     const btn = locked ? `<span class="lock">Lv${c.lv} 解鎖</span>`
       : [1,5,10].map(n=>`<button class="mini ${n===1?'':'o'}" data-buy="${c.id}" data-n="${n}" ${me.gold<c.seed*n?'disabled':''}>${n===1?'買1':'×'+n}</button>`).join(' ');

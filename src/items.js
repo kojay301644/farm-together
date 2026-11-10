@@ -4,13 +4,15 @@ function setItemConfig(list){ ITEMS = list||[]; ITEM = {}; ITEMS.forEach(x=>ITEM
 const itemIcon = (x, s=44) => !x ? '' : x.icon.startsWith('emoji:') ? `<span class="itemoji" style="font-size:${Math.round(s*0.72)}px;width:${s}px;height:${s}px">${x.icon.slice(6)}</span>` : `<img src="${A(x.icon)}" style="width:${s}px;height:${s}px;object-fit:contain" alt="">`;
 const BUFF_TXT = {shield:['🛡️','防盜罩'], harvest:['🌟','豐收 +50%'], exp:['📈','經驗 ×2'], party:['🎉','派對中']};
 const buffLeft = (me, k) => Math.max(0, Math.floor((+((me.buffs||{})[k]||0) - (Date.now() + (S?S.off:0)))/1000));
+const tpeToday = () => new Date(Date.now() + (S?S.off:0) + 8*3600e3).toISOString().slice(0,10);
+const dailyN = (me, k) => { const d=(me&&me.daily)||{}; return d.d===tpeToday() ? (+d[k]||0) : 0; };
 const hms = s => `${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 
 function openItemShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   petShopTab='item';
   const me=S.me, dly=me.daily||{};
-  const rows = ITEMS.map(x=>{ const left = x.buy_daily!=null ? x.buy_daily - (+dly['buy_'+x.id]||0) : null;
+  const rows = ITEMS.map(x=>{ const left = x.buy_daily!=null ? x.buy_daily - dailyN(me,'buy_'+x.id) : null;
     const btns = [x.gems!=null?`<button class="mini gem" data-ib="${x.id}" data-pay="gems" ${(me.gems||0)<x.gems||left===0?'disabled':''}>💎${x.gems}</button>`:'',
                   x.gold!=null?`<button class="mini" data-ib="${x.id}" data-pay="gold" ${me.gold<x.gold||left===0?'disabled':''}>${x.gold.toLocaleString()} 金</button>`:''].join('');
     return `<div class="row"><div class="ic">${itemIcon(x)}</div><div class="tx"><b>${esc(x.name)}</b>${(me.items||{})[x.id]?` <span class="tag">有 ${(me.items||{})[x.id]} 個</span>`:''}
