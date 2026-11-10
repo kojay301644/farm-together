@@ -19,7 +19,7 @@ function openBeastPark(t){
   if(parkTab==='mine'){
     const pt=partyOf(who), inP=sp=>pt.findIndex(p=>p.s===sp), cap=visit?6:(who.party_cap||1);
     body += `<div class="sec">${visit?'牠的夥伴':`我的夥伴（${pt.length}/${cap}）`}</div>` + partyRowHTML(who, !visit);
-    if(!visit) body += `<div class="rhint">👑 隊長會跑去幫你收成、澆水。每隻夥伴都能插一件裝備（點橘色「＋裝備」），同種功能取最強的那件。</div>`;
+    if(!visit) body += `<div class="rhint">👆 點下面任何一隻寵物就能換上場（格子滿了會問你要換掉誰，裝備會留給新上場的寵物）。👑 隊長會跑去幫你收成、澆水。</div>`;
     const list = BEASTS.filter(b=>own[b.id]!=null);
     body += `<div class="sec">全部寵物</div><div class="bgrid">${list.map(b=>{ const k=inP(b.id);
       let btn='';
@@ -27,7 +27,7 @@ function openBeastPark(t){
       else if(k===0) btn='<span class="tag" style="background:#FFF1DC;color:#C77A1E">👑 隊長</span>';
       else if(k>0) btn=`<div style="display:flex;gap:4px"><button class="mini o" data-lead="${b.id}">隊長</button><button class="mini sub" data-off="${b.id}">下場</button></div>`;
       else btn=`<button class="mini" data-on="${b.id}" ${pt.length>=cap?'disabled':''}>上場</button>`;
-      return `<div class="bcard${k>=0?' on':''}"><img src="${petSrc(b.id, who)}" alt=""${visit?'':` data-skin="${b.id}" style="cursor:pointer"`}>${visit?'':`<button class="skbtn" data-skin="${b.id}">🎨 換造型</button>`}<b>${bName(b.id)}</b><small>${fmtDate(own[b.id])}</small>${btn}</div>`; }).join('')}</div>`;
+      return `<div class="bcard${k>=0?' on':''}"${visit?'':` data-pick="${b.id}" style="cursor:pointer"`}><img src="${petSrc(b.id, who)}" alt="">${visit?'':`<button class="skbtn" data-skin="${b.id}">🎨 換造型</button>`}<b>${bName(b.id)}</b><small>${fmtDate(own[b.id])}</small>${btn}</div>`; }).join('')}</div>`;
   } else {
     body += `<div class="bgrid">${BEASTS.map(b=>{ const has=own[b.id]!=null, lock=!visit && S.me.lv<b.lv;
       const cost = b.gold!=null ? `${b.gold.toLocaleString()} 金` : `💎${b.gems}`;
@@ -43,12 +43,28 @@ function openBeastPark(t){
   md.querySelectorAll('[data-off]').forEach(b=>b.onclick=async()=>{ const pt=pt0().filter(p=>p.s!==b.dataset.off); await saveParty(pt, `${bName(b.dataset.off)} 回寵物園玩了`); openBeastPark('mine'); });
   md.querySelectorAll('[data-lead]').forEach(b=>b.onclick=async()=>{ const pt=pt0(), i=pt.findIndex(p=>p.s===b.dataset.lead); const [m]=pt.splice(i,1); pt.unshift(m); await saveParty(pt, `${bName(m.s)} 當上隊長！`); openBeastPark('mine'); });
   md.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>openGearBag(+b.dataset.pg));
-  md.querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>openPetSkin(b.dataset.skin, ()=>openBeastPark('mine')));
+  md.querySelectorAll('[data-skin]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openPetSkin(b.dataset.skin, ()=>openBeastPark('mine')); });
+  md.querySelectorAll('[data-pick] button').forEach(b=>b.addEventListener('click', e=>e.stopPropagation()));
+  md.querySelectorAll('[data-pick]').forEach(c=>c.onclick=()=>pickPal(c.dataset.pick));
   md.querySelectorAll('[data-bb]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.bb;
     try{ applyState(await rpc('farm_buy_beast',{p_id:id})); refresh(); fxConfetti(); sfx('lvup');
       modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">已經住進寵物園了</div></div>`,
         [['上場當夥伴','',async()=>{ const pt=JSON.parse(JSON.stringify(partyOf(S.me))); if(pt.length>=(S.me.party_cap||1)) return toast('夥伴格子滿了，先讓一隻下場'); pt.push({s:id,g:null}); await saveParty(pt, `${bName(id)} 上場了！`); closeModal(); }],['繼續看圖鑑','sub',()=>openBeastPark('dex')]]);
     }catch(e){ toast(e.message); } });
+}
+
+/* 點寵物就換：不在隊上→上場（滿了就選一隻換掉，裝備留給新寵物）；在隊上→當隊長／下場 */
+async function pickPal(sp){
+  const pt = JSON.parse(JSON.stringify(partyOf(S.me))), cap = S.me.party_cap||1, k = pt.findIndex(p=>p.s===sp);
+  if(k===0) return toast(`${bName(sp)} 已經是隊長了`);
+  if(k>0) return modal(bName(sp), `<div style="text-align:center"><img src="${petSrc(sp, S.me)}" style="width:110px;height:110px;object-fit:contain"></div>`,
+    [['👑 當隊長','o',async()=>{ const [m]=pt.splice(k,1); pt.unshift(m); await saveParty(pt, `${bName(sp)} 當上隊長！`); openBeastPark('mine'); }],
+     ['回寵物園','sub',async()=>{ pt.splice(k,1); await saveParty(pt, `${bName(sp)} 回寵物園玩了`); openBeastPark('mine'); }],
+     ['取消','sub',()=>openBeastPark('mine')]]);
+  if(pt.length < cap){ pt.push({s:sp, g:null}); await saveParty(pt, `${bName(sp)} 上場了！`); return openBeastPark('mine'); }
+  modal(`要讓 ${bName(sp)} 換掉誰？`, `<div class="rhint">換下來的寵物回寵物園，牠身上的裝備會留給 ${bName(sp)}</div><div class="bgrid">${pt.map((p,i)=>`<div class="bcard on" data-sw="${i}" style="cursor:pointer"><img src="${petSrc(p.s, S.me)}" alt=""><b>${i===0?'👑 ':''}${bName(p.s)}</b><small>${p.g && GEAR[p.g] ? GEAR_FUNC[GEAR[p.g].func][1]+' '+gearTitle(GEAR[p.g]) : '沒有裝備'}</small><button class="mini o">換掉牠</button></div>`).join('')}</div>`,
+    [['取消','sub',()=>openBeastPark('mine')]]);
+  document.querySelectorAll('#md [data-sw]').forEach(c=>c.onclick=async()=>{ const i=+c.dataset.sw, old=pt[i].s; pt[i] = {s:sp, g:pt[i].g}; await saveParty(pt, `${bName(sp)} 換上場，${bName(old)} 回寵物園玩了`); openBeastPark('mine'); });
 }
 
 /* 寵物園裡玩的寵物（不是夥伴的那些） */
