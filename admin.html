@@ -120,7 +120,7 @@ async function pagePl(q){
   $('qs').onclick = ()=>pagePl($('q').value.trim()); $('q').onkeydown = e=>{ if(e.key==='Enter') pagePl($('q').value.trim()); };
   const L = await rpc('adm_players', {q:q||''});
   $('plist').innerHTML = L.length ? `<table><tr><th>暱稱</th><th>Email</th><th>等級</th><th>金幣</th><th>鑽石</th><th>最後上線</th><th>狀態</th></tr>${L.map(p=>`<tr class="click" data-id="${p.id}">
-    <td><b>${esc(p.nickname)}</b></td><td>${esc(p.email)} <span class="tag">${p.provider==='google'?'Google':'Email'}</span></td><td>Lv${p.lv}</td><td>${p.gold}</td><td>${p.gems}</td><td>${ago(p.seen)}</td>
+    <td><b>${esc(p.nickname)}</b></td><td>${p.provider==='guest'?'—':esc(p.provider==='acct'?String(p.email||'').split('@')[0]:p.email)} <span class="tag">${({google:'Google',guest:'試玩',acct:'帳號'})[p.provider]||'Email'}</span></td><td>Lv${p.lv}</td><td>${p.gold}</td><td>${p.gems}</td><td>${ago(p.seen)}</td>
     <td>${p.banned?'<span class="tag r">停權</span>':'<span class="tag">正常</span>'}</td></tr>`).join('')}</table>` : '找不到玩家';
   document.querySelectorAll('[data-id]').forEach(r=>r.onclick=()=>showPlayer(r.dataset.id));
 }

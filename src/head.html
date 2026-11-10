@@ -282,6 +282,8 @@ body.lowfx .bird{display:none}
 .row.gon{background:#E8F8EE;border-radius:12px}
 #updBar{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:22px;border:3px solid #3A3226;background:#FFD84D;font:inherit;font-size:16px;font-weight:900;color:#3A3226;box-shadow:0 4px 0 #3A3226;cursor:pointer;animation:updPulse 1.2s ease-in-out infinite;white-space:nowrap}
 @keyframes updPulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
+.guestbox{margin:8px 0;padding:10px 12px;border-radius:14px;background:#FFF3D6;border:2px solid #F0B24A;font-size:13px;font-weight:700;line-height:1.6}
+.btn.try{font-size:18px;padding:13px 0;margin-bottom:4px}
 .pkinds{display:flex;flex-direction:column;gap:6px;margin:6px 0}.pk{display:flex;align-items:center;justify-content:space-between;font-weight:800;padding:4px 2px;border-bottom:1px dashed #E5D6B8}
 .autobtn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;margin-bottom:6px;border:2.5px solid #3A3226;border-radius:16px;background:linear-gradient(#FFF6DB,#FFE7B0);font:inherit;cursor:pointer;text-align:left}
 .autobtn b{font-size:16px;white-space:nowrap}.autobtn span{flex:1;font-size:17px;letter-spacing:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#7A6A55;font-weight:700}.autobtn i{font-style:normal;font-weight:900;font-size:20px}
@@ -486,8 +488,10 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
     </svg>
     <div class="logo">一起<span>種田</span>吧</div>
     <p>種菜、收成、和朋友一起偷菜</p>
+    <button class="btn o try" id="tryBtn" style="width:100%">⚡ 立即試玩（免註冊）</button>
+    <div class="or"><span>或建立帳號，換手機也能找回進度</span></div>
     <div class="seg" style="margin-bottom:12px"><button data-am="login" class="on">登入</button><button data-am="signup">註冊</button></div>
-    <input id="email" type="email" placeholder="Email" autocomplete="email">
+    <input id="email" type="text" placeholder="帳號或 Email" autocomplete="username" autocapitalize="off" spellcheck="false">
     <input id="pw" type="password" placeholder="密碼（至少 6 個字）" autocomplete="current-password">
     <input id="pw2" type="password" placeholder="再輸入一次密碼" autocomplete="new-password" style="display:none">
     <button class="btn" id="authBtn" style="width:100%">登入</button>

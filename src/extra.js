@@ -169,6 +169,8 @@ function openHelp(){
     <p>種子商店最上面的稀有種子要用鑽石買（4 種合計每天限買 3 顆），種下去會閃閃發光，收成的賣價特別高——但別人也可以偷喔！</p>
     <h4>🏅 成就</h4>
     <p>在「我的家」按「🏆 查看全部成就」。等級、種田、牧場、好友、偷菜、寵物、城鎮、簽到各有一系列成就，達成就自動送鑽石。</p>
+    <h4>⚡ 試玩與綁定帳號</h4>
+    <p>登入畫面按「⚡ 立即試玩」不用註冊就能玩。試玩中清除瀏覽器資料或換手機，進度就會不見，到「⚙️ 設定」按「🔒 綁定帳號」設定帳號密碼（或用 Google 綁定），進度、鑽石都會保留。試玩帳號不能儲值；30 天沒上線、等級還在 Lv3 以下的試玩帳號會自動清除。</p>
     <h4>🔔 通知</h4>
     <p>到「⚙️ 設定 → 🔔 通知」按「開啟通知」，就算沒開遊戲，作物成熟、被偷菜、被惡作劇、牧場可以收、收集倉堆太多、好友邀請、收到禮物、簽到提醒、好友開派對時都會通知你，每一種都可以單獨開關。同一種通知 30 分鐘內最多 1 則（期間的會合併），晚上 11 點到早上 8 點不推，正在玩的時候也不推。</p>
     <p><b>iPhone</b> 要先把遊戲「加到主畫面」，從主畫面的圖示打開才能開啟通知（iOS 16.4 以上）；Android 和電腦用 Chrome 就可以。</p>
@@ -211,7 +213,9 @@ const GEM_PACKS = [
 ];
 
 /* 儲值（右上鑽石旁的 +） */
-function openTopup(){
+async function openTopup(){
+  try{ const {data:{user}} = await sb.auth.getUser(); if(user && user.is_anonymous)
+    return modal('💎 儲值', `<div style="text-align:center;font-weight:800;line-height:1.8">試玩帳號不能儲值<br><small style="color:var(--ink2)">先綁定帳號，進度和買的東西才不會不見</small></div>`, [['之後再說','sub',closeModal],['🔒 綁定帳號','',()=>openBind()]]); }catch(e){}
   const me=S.me, now=Date.now()+(S.off||0), P=(window.PACKS||[]), got=me.packs||{};
   const newbieOk = !got.newbie && (+me.created||0) > now - 7*86400000, firstOk = !got.first, mLeft = me.month_until && +me.month_until>now ? Math.ceil((+me.month_until-now)/86400000) : 0;
   let body = `<div class="soon">💎 線上付款即將開放！目前想購買請聯絡客服，付款後會直接發到你的帳號</div>`;

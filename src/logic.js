@@ -9,8 +9,9 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:tr
 function zhErr(m){
   m = String(m||'');
   if(/Failed to fetch|NetworkError|Load failed/i.test(m)) return '連線失敗，請檢查網路後再試';
-  if(/Invalid login credentials/i.test(m)) return 'Email 或密碼錯誤';
-  if(/already registered|already been registered/i.test(m)) return '這個 Email 已經註冊過了，請直接登入';
+  if(/Invalid login credentials/i.test(m)) return '帳號或密碼錯誤';
+  if(/already registered|already been registered|already exists/i.test(m)) return '這個帳號已經有人使用了';
+  if(/anonymous/i.test(m) && /disabled|not enabled|not allowed/i.test(m)) return '伺服器還沒開啟免註冊試玩，請先建立帳號';
   if(/Email not confirmed/i.test(m)) return '還沒完成 Email 驗證，請到信箱點驗證連結';
   if(/at least 6 characters/i.test(m)) return '密碼至少要 6 個字';
   if(/rate limit|too many/i.test(m)) return '操作太頻繁了，請稍後再試';
@@ -312,7 +313,9 @@ async function openHome(){
 async function openSettings(){
   const {data:{user}} = await sb.auth.getUser(); const me=S.me;
   let body = `<div class="sec">帳號</div>
-    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(me,'avatar')}<div style="font-weight:800;line-height:1.6">${esc(me.nickname)}・Lv${me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(me,'avatar')}<div style="font-weight:800;line-height:1.6">${esc(me.nickname)}・Lv${me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(acctLabel(user))}</span></div></div>
+    ${user && user.is_anonymous ? `<div class="guestbox"><b>⚠️ 試玩中</b>：清除瀏覽器資料或換手機，進度就會不見。綁定帳號後進度、鑽石全部保留，也才能儲值。
+      <div class="homebtns"><button class="btn o" id="sBind">🔒 綁定帳號（保留進度）</button>${GOOGLE_ON?'<button class="btn sub" id="sBindG">用 Google 綁定</button>':''}</div></div>` : ''}
     <div class="homebtns"><button class="btn sub" id="sSwitch">🔄 切換帳號</button><button class="btn sub" id="sOut" style="background:#F2545B;color:#fff;box-shadow:0 3px 0 #C23A40">登出</button></div>
     <div class="sec">遊戲設定</div>
     <div class="seg" style="margin-top:6px"><button id="tBgm" class="${BGM_ON?'on':''}">🎵 音樂</button><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
@@ -334,7 +337,9 @@ async function openSettings(){
   $('sInv').onclick = invite; $('sA2hs').onclick = openA2HS;
   $('rGo').onclick = async()=>{ const c=$('rCode').value.trim(); if(!c) return toast('請輸入兌換碼');
     try{ const r=await rpc('farm_redeem',{p_code:c}); applyState(r.state); refresh(); sfx('lvup'); fxConfetti(); closeModal(); modal('🎁 兌換成功！', `<div class="rwbox">${rewardHTML(r.reward)}</div>`); if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } };
-  $('sOut').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
+  if($('sBind')) $('sBind').onclick = openBind;
+  if($('sBindG')) $('sBindG').onclick = async()=>{ const {error} = await sb.auth.linkIdentity({provider:'google', options:{redirectTo:SITE_URL}}); if(error) toast(/manual linking/i.test(error.message)?'伺服器還沒開啟 Google 綁定':zhErr(error.message)); };
+  $('sOut').onclick = async()=>{ if(user && user.is_anonymous && !confirm('試玩帳號登出後就找不回來了，確定要登出嗎？')) return; closeModal(); await sb.auth.signOut(); };
   $('sSwitch').onclick = async()=>{ closeModal(); await sb.auth.signOut(); toast('已登出，請用另一個帳號登入'); };
   if(me.admin){
     const save = async(lv,gold,gems)=>{ try{ const old=S.me.lv; applyState(await rpc('adm_self_set',{p_lv:lv,p_gold:gold,p_gems:gems})); refresh(); sfx('coin'); toast('已更新'); if(S.me.lv!==old) loadConfig(); openSettings(); }catch(e){ toast(e.message); } };
@@ -585,9 +590,21 @@ function setAuthMode(m){
 }
 function authMsg(t, ok){ const m=$('authMsg'); m.textContent=t; m.style.color = ok?'var(--green-d)':'var(--red)'; }
 
+/* 帳號密碼：沒有 @ 的帳號會對應成內部信箱（不會寄信） */
+const ACCT_DOMAIN = '@player.farm-together.app';
+const isAcctMail = e => String(e||'').toLowerCase().endsWith(ACCT_DOMAIN);
+function acctToEmail(v, signup){
+  v = String(v||'').trim();
+  if(v.includes('@')) return v;
+  const u = v.toLowerCase();
+  if(!/^[a-z0-9_]{4,16}$/.test(u)) return signup ? null : u + ACCT_DOMAIN;
+  return u + ACCT_DOMAIN;
+}
 async function doAuth(){
-  const email = $('email').value.trim(), pw = $('pw').value;
-  if(!email || !pw) return authMsg('請輸入 Email 和密碼');
+  const raw = $('email').value.trim(), pw = $('pw').value;
+  if(!raw || !pw) return authMsg('請輸入帳號（或 Email）和密碼');
+  const email = acctToEmail(raw, authMode==='signup');
+  if(!email) return authMsg('帳號要 4–16 個英文小寫、數字或底線');
   const btn = $('authBtn'); btn.disabled = true;
   try{
     if(authMode==='signup'){
@@ -595,8 +612,8 @@ async function doAuth(){
       if(pw !== $('pw2').value) return authMsg('兩次輸入的密碼不一樣');
       const {data, error} = await sb.auth.signUp({email, password:pw, options:{emailRedirectTo:SITE_URL}});
       if(error) return authMsg(zhErr(error.message));
-      if(data.user && data.user.identities && data.user.identities.length===0) return authMsg('這個 Email 已經註冊過了，請直接登入');
-      if(!data.session) return authMsg(`驗證信已寄到 ${email}，請點信中的連結完成註冊`, true);
+      if(data.user && data.user.identities && data.user.identities.length===0) return authMsg('這個帳號已經有人使用了，請直接登入');
+      if(!data.session) return authMsg(isAcctMail(email) ? '伺服器還沒開啟帳號密碼註冊，請先用試玩或 Google' : `驗證信已寄到 ${email}，請點信中的連結完成註冊`, !isAcctMail(email));
     } else {
       const {error} = await sb.auth.signInWithPassword({email, password:pw});
       if(error) return authMsg(zhErr(error.message));
@@ -606,6 +623,7 @@ async function doAuth(){
 async function forgotPw(){
   const email = $('email').value.trim();
   if(!email) return authMsg('請先在上面輸入你的 Email');
+  if(!email.includes('@')) return authMsg('用帳號註冊的沒有綁 Email，沒辦法寄信重設密碼，請聯絡客服');
   const {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo:SITE_URL});
   if(error) return authMsg(zhErr(error.message));
   authMsg(`重設密碼的信已寄到 ${email}`, true);
@@ -614,6 +632,22 @@ function showResetPw(){
   modal('設定新密碼', `<input id="npw" class="inp" type="password" placeholder="新密碼（至少 6 個字）" style="width:100%">`,
     [['確定','',async()=>{ const v=$('npw').value; if(v.length<6) return toast('密碼至少要 6 個字');
       const {error} = await sb.auth.updateUser({password:v}); if(error) return toast(zhErr(error.message)); closeModal(); toast('密碼已更新'); }]]);
+}
+/* 帳號顯示、試玩綁定 */
+function acctLabel(u){ if(!u) return ''; if(u.is_anonymous) return '試玩帳號（還沒綁定）'; const e=u.email||''; if(isAcctMail(e)) return '帳號：' + e.slice(0, -ACCT_DOMAIN.length); return e || 'Google 帳號'; }
+function openBind(){
+  modal('🔒 綁定帳號', `<div class="rhint">設定帳號和密碼，之後換手機用這組帳號登入就能找回進度。</div>
+    <input id="bdU" class="inp" placeholder="帳號（4–16 個英文小寫、數字或底線）" maxlength="16" autocapitalize="off" spellcheck="false" style="width:100%;margin-top:6px">
+    <input id="bdP" class="inp" type="password" placeholder="密碼（至少 6 個字）" style="width:100%;margin-top:6px">
+    <input id="bdP2" class="inp" type="password" placeholder="再輸入一次密碼" style="width:100%;margin-top:6px">`,
+    [['取消','sub',()=>openSettings()],['綁定','',async()=>{
+      const u=$('bdU').value.trim().toLowerCase(), p=$('bdP').value;
+      if(!/^[a-z0-9_]{4,16}$/.test(u)) return toast('帳號要 4–16 個英文小寫、數字或底線');
+      if(p.length<6) return toast('密碼至少要 6 個字'); if(p!==$('bdP2').value) return toast('兩次輸入的密碼不一樣');
+      const {data, error} = await sb.auth.updateUser({email:u+ACCT_DOMAIN, password:p});
+      if(error) return toast(zhErr(error.message));
+      if(!data.user || !isAcctMail(data.user.email)) return toast('伺服器還沒開啟帳號綁定，請稍後再試');
+      sfx('lvup'); fxConfetti(); toast('綁定成功！之後用「' + u + '」登入就能找回進度'); openSettings(); }]]);
 }
 async function createNick(){
   const v = $('nickIn').value.trim(); if(!v) return toast('請輸入暱稱');
@@ -662,6 +696,9 @@ function startGame(st){
 }
 
 $('authBtn').onclick = doAuth;
+$('tryBtn').onclick = async()=>{ const b=$('tryBtn'); b.disabled=true;
+  try{ const {error} = await sb.auth.signInAnonymously(); if(error) authMsg(zhErr(error.message)); }
+  finally{ b.disabled=false; } };
 $('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') doAuth(); });
 $('pw2').addEventListener('keydown', e=>{ if(e.key==='Enter') doAuth(); });
 document.querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>setAuthMode(b.dataset.am));

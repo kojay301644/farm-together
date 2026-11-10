@@ -282,6 +282,8 @@ body.lowfx .bird{display:none}
 .row.gon{background:#E8F8EE;border-radius:12px}
 #updBar{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:22px;border:3px solid #3A3226;background:#FFD84D;font:inherit;font-size:16px;font-weight:900;color:#3A3226;box-shadow:0 4px 0 #3A3226;cursor:pointer;animation:updPulse 1.2s ease-in-out infinite;white-space:nowrap}
 @keyframes updPulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
+.guestbox{margin:8px 0;padding:10px 12px;border-radius:14px;background:#FFF3D6;border:2px solid #F0B24A;font-size:13px;font-weight:700;line-height:1.6}
+.btn.try{font-size:18px;padding:13px 0;margin-bottom:4px}
 .pkinds{display:flex;flex-direction:column;gap:6px;margin:6px 0}.pk{display:flex;align-items:center;justify-content:space-between;font-weight:800;padding:4px 2px;border-bottom:1px dashed #E5D6B8}
 .autobtn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;margin-bottom:6px;border:2.5px solid #3A3226;border-radius:16px;background:linear-gradient(#FFF6DB,#FFE7B0);font:inherit;cursor:pointer;text-align:left}
 .autobtn b{font-size:16px;white-space:nowrap}.autobtn span{flex:1;font-size:17px;letter-spacing:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#7A6A55;font-weight:700}.autobtn i{font-style:normal;font-weight:900;font-size:20px}
@@ -486,8 +488,10 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
     </svg>
     <div class="logo">一起<span>種田</span>吧</div>
     <p>種菜、收成、和朋友一起偷菜</p>
+    <button class="btn o try" id="tryBtn" style="width:100%">⚡ 立即試玩（免註冊）</button>
+    <div class="or"><span>或建立帳號，換手機也能找回進度</span></div>
     <div class="seg" style="margin-bottom:12px"><button data-am="login" class="on">登入</button><button data-am="signup">註冊</button></div>
-    <input id="email" type="email" placeholder="Email" autocomplete="email">
+    <input id="email" type="text" placeholder="帳號或 Email" autocomplete="username" autocapitalize="off" spellcheck="false">
     <input id="pw" type="password" placeholder="密碼（至少 6 個字）" autocomplete="current-password">
     <input id="pw2" type="password" placeholder="再輸入一次密碼" autocomplete="new-password" style="display:none">
     <button class="btn" id="authBtn" style="width:100%">登入</button>
@@ -510,20 +514,20 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794294537" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794302509" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794294537" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794294537" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794302509" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794302509" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794294537" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794302509" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794294537" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794294537" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794302509" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794302509" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -539,11 +543,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794294537" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794302509" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794294537";
+const BUILD="1794302509";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1503,6 +1507,8 @@ function openHelp(){
     <p>種子商店最上面的稀有種子要用鑽石買（4 種合計每天限買 3 顆），種下去會閃閃發光，收成的賣價特別高——但別人也可以偷喔！</p>
     <h4>🏅 成就</h4>
     <p>在「我的家」按「🏆 查看全部成就」。等級、種田、牧場、好友、偷菜、寵物、城鎮、簽到各有一系列成就，達成就自動送鑽石。</p>
+    <h4>⚡ 試玩與綁定帳號</h4>
+    <p>登入畫面按「⚡ 立即試玩」不用註冊就能玩。試玩中清除瀏覽器資料或換手機，進度就會不見，到「⚙️ 設定」按「🔒 綁定帳號」設定帳號密碼（或用 Google 綁定），進度、鑽石都會保留。試玩帳號不能儲值；30 天沒上線、等級還在 Lv3 以下的試玩帳號會自動清除。</p>
     <h4>🔔 通知</h4>
     <p>到「⚙️ 設定 → 🔔 通知」按「開啟通知」，就算沒開遊戲，作物成熟、被偷菜、被惡作劇、牧場可以收、收集倉堆太多、好友邀請、收到禮物、簽到提醒、好友開派對時都會通知你，每一種都可以單獨開關。同一種通知 30 分鐘內最多 1 則（期間的會合併），晚上 11 點到早上 8 點不推，正在玩的時候也不推。</p>
     <p><b>iPhone</b> 要先把遊戲「加到主畫面」，從主畫面的圖示打開才能開啟通知（iOS 16.4 以上）；Android 和電腦用 Chrome 就可以。</p>
@@ -1545,7 +1551,9 @@ const GEM_PACKS = [
 ];
 
 /* 儲值（右上鑽石旁的 +） */
-function openTopup(){
+async function openTopup(){
+  try{ const {data:{user}} = await sb.auth.getUser(); if(user && user.is_anonymous)
+    return modal('💎 儲值', `<div style="text-align:center;font-weight:800;line-height:1.8">試玩帳號不能儲值<br><small style="color:var(--ink2)">先綁定帳號，進度和買的東西才不會不見</small></div>`, [['之後再說','sub',closeModal],['🔒 綁定帳號','',()=>openBind()]]); }catch(e){}
   const me=S.me, now=Date.now()+(S.off||0), P=(window.PACKS||[]), got=me.packs||{};
   const newbieOk = !got.newbie && (+me.created||0) > now - 7*86400000, firstOk = !got.first, mLeft = me.month_until && +me.month_until>now ? Math.ceil((+me.month_until-now)/86400000) : 0;
   let body = `<div class="soon">💎 線上付款即將開放！目前想購買請聯絡客服，付款後會直接發到你的帳號</div>`;
@@ -2666,8 +2674,9 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:tr
 function zhErr(m){
   m = String(m||'');
   if(/Failed to fetch|NetworkError|Load failed/i.test(m)) return '連線失敗，請檢查網路後再試';
-  if(/Invalid login credentials/i.test(m)) return 'Email 或密碼錯誤';
-  if(/already registered|already been registered/i.test(m)) return '這個 Email 已經註冊過了，請直接登入';
+  if(/Invalid login credentials/i.test(m)) return '帳號或密碼錯誤';
+  if(/already registered|already been registered|already exists/i.test(m)) return '這個帳號已經有人使用了';
+  if(/anonymous/i.test(m) && /disabled|not enabled|not allowed/i.test(m)) return '伺服器還沒開啟免註冊試玩，請先建立帳號';
   if(/Email not confirmed/i.test(m)) return '還沒完成 Email 驗證，請到信箱點驗證連結';
   if(/at least 6 characters/i.test(m)) return '密碼至少要 6 個字';
   if(/rate limit|too many/i.test(m)) return '操作太頻繁了，請稍後再試';
@@ -2969,7 +2978,9 @@ async function openHome(){
 async function openSettings(){
   const {data:{user}} = await sb.auth.getUser(); const me=S.me;
   let body = `<div class="sec">帳號</div>
-    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(me,'avatar')}<div style="font-weight:800;line-height:1.6">${esc(me.nickname)}・Lv${me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(user?.email||'')}</span></div></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:6px">${avImg(me,'avatar')}<div style="font-weight:800;line-height:1.6">${esc(me.nickname)}・Lv${me.lv}<br><span style="color:var(--ink2);font-size:13px">${esc(acctLabel(user))}</span></div></div>
+    ${user && user.is_anonymous ? `<div class="guestbox"><b>⚠️ 試玩中</b>：清除瀏覽器資料或換手機，進度就會不見。綁定帳號後進度、鑽石全部保留，也才能儲值。
+      <div class="homebtns"><button class="btn o" id="sBind">🔒 綁定帳號（保留進度）</button>${GOOGLE_ON?'<button class="btn sub" id="sBindG">用 Google 綁定</button>':''}</div></div>` : ''}
     <div class="homebtns"><button class="btn sub" id="sSwitch">🔄 切換帳號</button><button class="btn sub" id="sOut" style="background:#F2545B;color:#fff;box-shadow:0 3px 0 #C23A40">登出</button></div>
     <div class="sec">遊戲設定</div>
     <div class="seg" style="margin-top:6px"><button id="tBgm" class="${BGM_ON?'on':''}">🎵 音樂</button><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
@@ -2991,7 +3002,9 @@ async function openSettings(){
   $('sInv').onclick = invite; $('sA2hs').onclick = openA2HS;
   $('rGo').onclick = async()=>{ const c=$('rCode').value.trim(); if(!c) return toast('請輸入兌換碼');
     try{ const r=await rpc('farm_redeem',{p_code:c}); applyState(r.state); refresh(); sfx('lvup'); fxConfetti(); closeModal(); modal('🎁 兌換成功！', `<div class="rwbox">${rewardHTML(r.reward)}</div>`); if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } };
-  $('sOut').onclick = async()=>{ closeModal(); await sb.auth.signOut(); };
+  if($('sBind')) $('sBind').onclick = openBind;
+  if($('sBindG')) $('sBindG').onclick = async()=>{ const {error} = await sb.auth.linkIdentity({provider:'google', options:{redirectTo:SITE_URL}}); if(error) toast(/manual linking/i.test(error.message)?'伺服器還沒開啟 Google 綁定':zhErr(error.message)); };
+  $('sOut').onclick = async()=>{ if(user && user.is_anonymous && !confirm('試玩帳號登出後就找不回來了，確定要登出嗎？')) return; closeModal(); await sb.auth.signOut(); };
   $('sSwitch').onclick = async()=>{ closeModal(); await sb.auth.signOut(); toast('已登出，請用另一個帳號登入'); };
   if(me.admin){
     const save = async(lv,gold,gems)=>{ try{ const old=S.me.lv; applyState(await rpc('adm_self_set',{p_lv:lv,p_gold:gold,p_gems:gems})); refresh(); sfx('coin'); toast('已更新'); if(S.me.lv!==old) loadConfig(); openSettings(); }catch(e){ toast(e.message); } };
@@ -3242,9 +3255,21 @@ function setAuthMode(m){
 }
 function authMsg(t, ok){ const m=$('authMsg'); m.textContent=t; m.style.color = ok?'var(--green-d)':'var(--red)'; }
 
+/* 帳號密碼：沒有 @ 的帳號會對應成內部信箱（不會寄信） */
+const ACCT_DOMAIN = '@player.farm-together.app';
+const isAcctMail = e => String(e||'').toLowerCase().endsWith(ACCT_DOMAIN);
+function acctToEmail(v, signup){
+  v = String(v||'').trim();
+  if(v.includes('@')) return v;
+  const u = v.toLowerCase();
+  if(!/^[a-z0-9_]{4,16}$/.test(u)) return signup ? null : u + ACCT_DOMAIN;
+  return u + ACCT_DOMAIN;
+}
 async function doAuth(){
-  const email = $('email').value.trim(), pw = $('pw').value;
-  if(!email || !pw) return authMsg('請輸入 Email 和密碼');
+  const raw = $('email').value.trim(), pw = $('pw').value;
+  if(!raw || !pw) return authMsg('請輸入帳號（或 Email）和密碼');
+  const email = acctToEmail(raw, authMode==='signup');
+  if(!email) return authMsg('帳號要 4–16 個英文小寫、數字或底線');
   const btn = $('authBtn'); btn.disabled = true;
   try{
     if(authMode==='signup'){
@@ -3252,8 +3277,8 @@ async function doAuth(){
       if(pw !== $('pw2').value) return authMsg('兩次輸入的密碼不一樣');
       const {data, error} = await sb.auth.signUp({email, password:pw, options:{emailRedirectTo:SITE_URL}});
       if(error) return authMsg(zhErr(error.message));
-      if(data.user && data.user.identities && data.user.identities.length===0) return authMsg('這個 Email 已經註冊過了，請直接登入');
-      if(!data.session) return authMsg(`驗證信已寄到 ${email}，請點信中的連結完成註冊`, true);
+      if(data.user && data.user.identities && data.user.identities.length===0) return authMsg('這個帳號已經有人使用了，請直接登入');
+      if(!data.session) return authMsg(isAcctMail(email) ? '伺服器還沒開啟帳號密碼註冊，請先用試玩或 Google' : `驗證信已寄到 ${email}，請點信中的連結完成註冊`, !isAcctMail(email));
     } else {
       const {error} = await sb.auth.signInWithPassword({email, password:pw});
       if(error) return authMsg(zhErr(error.message));
@@ -3263,6 +3288,7 @@ async function doAuth(){
 async function forgotPw(){
   const email = $('email').value.trim();
   if(!email) return authMsg('請先在上面輸入你的 Email');
+  if(!email.includes('@')) return authMsg('用帳號註冊的沒有綁 Email，沒辦法寄信重設密碼，請聯絡客服');
   const {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo:SITE_URL});
   if(error) return authMsg(zhErr(error.message));
   authMsg(`重設密碼的信已寄到 ${email}`, true);
@@ -3271,6 +3297,22 @@ function showResetPw(){
   modal('設定新密碼', `<input id="npw" class="inp" type="password" placeholder="新密碼（至少 6 個字）" style="width:100%">`,
     [['確定','',async()=>{ const v=$('npw').value; if(v.length<6) return toast('密碼至少要 6 個字');
       const {error} = await sb.auth.updateUser({password:v}); if(error) return toast(zhErr(error.message)); closeModal(); toast('密碼已更新'); }]]);
+}
+/* 帳號顯示、試玩綁定 */
+function acctLabel(u){ if(!u) return ''; if(u.is_anonymous) return '試玩帳號（還沒綁定）'; const e=u.email||''; if(isAcctMail(e)) return '帳號：' + e.slice(0, -ACCT_DOMAIN.length); return e || 'Google 帳號'; }
+function openBind(){
+  modal('🔒 綁定帳號', `<div class="rhint">設定帳號和密碼，之後換手機用這組帳號登入就能找回進度。</div>
+    <input id="bdU" class="inp" placeholder="帳號（4–16 個英文小寫、數字或底線）" maxlength="16" autocapitalize="off" spellcheck="false" style="width:100%;margin-top:6px">
+    <input id="bdP" class="inp" type="password" placeholder="密碼（至少 6 個字）" style="width:100%;margin-top:6px">
+    <input id="bdP2" class="inp" type="password" placeholder="再輸入一次密碼" style="width:100%;margin-top:6px">`,
+    [['取消','sub',()=>openSettings()],['綁定','',async()=>{
+      const u=$('bdU').value.trim().toLowerCase(), p=$('bdP').value;
+      if(!/^[a-z0-9_]{4,16}$/.test(u)) return toast('帳號要 4–16 個英文小寫、數字或底線');
+      if(p.length<6) return toast('密碼至少要 6 個字'); if(p!==$('bdP2').value) return toast('兩次輸入的密碼不一樣');
+      const {data, error} = await sb.auth.updateUser({email:u+ACCT_DOMAIN, password:p});
+      if(error) return toast(zhErr(error.message));
+      if(!data.user || !isAcctMail(data.user.email)) return toast('伺服器還沒開啟帳號綁定，請稍後再試');
+      sfx('lvup'); fxConfetti(); toast('綁定成功！之後用「' + u + '」登入就能找回進度'); openSettings(); }]]);
 }
 async function createNick(){
   const v = $('nickIn').value.trim(); if(!v) return toast('請輸入暱稱');
@@ -3319,6 +3361,9 @@ function startGame(st){
 }
 
 $('authBtn').onclick = doAuth;
+$('tryBtn').onclick = async()=>{ const b=$('tryBtn'); b.disabled=true;
+  try{ const {error} = await sb.auth.signInAnonymously(); if(error) authMsg(zhErr(error.message)); }
+  finally{ b.disabled=false; } };
 $('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') doAuth(); });
 $('pw2').addEventListener('keydown', e=>{ if(e.key==='Enter') doAuth(); });
 document.querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>setAuthMode(b.dataset.am));
