@@ -7,7 +7,7 @@ const ROMAN = ['','I','II','III','IV'];
 function gearDesc(g){ const v=+g.val, pc=Math.round(v*100);
   return ({plant:`空地自動種下你指定的種子（第 1～${v} 塊地）`, water:`自動幫 ${v} 塊正在長的田保持濕潤（從前面的田開始）`,
     dog:`小偷來偷菜時 ${pc}% 被趕走`, bug:`蟲一出現 ${pc}% 馬上除掉，沒除到每 ${+(CFG_SET.pest_retry_min??10)} 分鐘再試一次`, weed:`雜草一長出 ${pc}% 馬上拔掉，沒拔到每 ${+(CFG_SET.pest_retry_min??10)} 分鐘再試一次`,
-    feed:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, clear:`牧場動物餓了自動拿倉庫作物餵（第 1～${v} 隻）`, harvest:`作物和牧場產品好了 ${v} 分鐘後自動收進收集倉`,
+    feed:`牧場動物餓了自動拿倉庫作物餵（最賺錢的 ${v} 隻優先，飼料不夠的先跳過）`, clear:`牧場動物餓了自動拿倉庫作物餵（最賺錢的 ${v} 隻優先，飼料不夠的先跳過）`, harvest:`作物和牧場產品好了 ${v} 分鐘後自動收進收集倉`,
     swat:`牧場的蚊子每 10 分鐘有 ${pc}% 被拍掉一隻`, scare:`別人惡作劇 ${pc}% 被擋下`})[g.func] || ''; }
 function setGearConfig(list, st, sk){ if(sk) SKINS=sk; GEAR_LIST = list||[]; GEAR = {}; GEAR_LIST.forEach(g=>GEAR[g.id]=g);
   if(st){ EVO = [+(st.evo_lv2 ?? 10), +(st.evo_lv3 ?? 20)]; } }
