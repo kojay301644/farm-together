@@ -483,6 +483,7 @@ function buildTools(){
   $('tools').innerHTML = list.map(([k,n])=>`<button class="tool" data-tool="${k}">${ICONS[k]}<span>${n}</span>${k==='seed'?'<span class="badge" id="seedBadge"></span>':''}${k==='pweed'?'<span class="badge" id="prankBadge"></span>':''}</button>`).join('');
   $('tools').querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{
     if(b.dataset.tool==='seed') return openSeedPicker(null);
+    if(b.dataset.tool==='bag') return openPack();
     setTool(b.dataset.tool);
   });
 }

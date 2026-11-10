@@ -102,6 +102,7 @@ function stageOf(p){ const c=CROP[p.c]; const r=p.g/c.time; return r>=1?4: r<0.1
 function iconSVG(c){ return `<svg viewBox="10 14 100 72">${cropArt(c,4)}</svg>`; }
 
 const ICONS = {
+  bag:`<svg viewBox="0 0 32 32"><path d="M12 9 V7 a4 4 0 0 1 8 0 V9" stroke="#8A5A33" stroke-width="2.4" fill="none"/><rect x="6" y="9" width="20" height="19" rx="5" fill="#E58B3A"/><rect x="6" y="9" width="20" height="7" rx="4" fill="#F2A65A"/><rect x="10" y="18" width="12" height="7" rx="2.5" fill="#C96F25"/><rect x="14.5" y="14" width="3" height="5" rx="1.2" fill="#FFD84D"/></svg>`,
   hand:`<svg viewBox="0 0 32 32"><path d="M6 13 h20 l-2.5 13 a2 2 0 0 1 -2 1.6 h-11 a2 2 0 0 1 -2 -1.6Z" fill="#E0A45E"/><path d="M8 17 h16 M9 21 h14" stroke="#C4843D" stroke-width="1.6"/><path d="M10 13 Q16 3 22 13" stroke="#C4843D" stroke-width="2.4" fill="none"/><circle cx="12" cy="11" r="3.2" fill="#F2545B"/><circle cx="19" cy="10" r="3.2" fill="#FF8A3D"/></svg>`,
   seed:`<svg viewBox="0 0 32 32"><path d="M9 10 Q7 26 10 28 h12 Q25 26 23 10Z" fill="#F3D9A8"/><path d="M9 10 h14 l-2 -4 h-10Z" fill="#E0BE82"/><path d="M12 8 h8" stroke="#B07A4F" stroke-width="2"/><ellipse cx="16" cy="19" rx="3.5" ry="5" fill="#6CC655"/><path d="M16 15 v8" stroke="#3E8E3A" stroke-width="1.2"/></svg>`,
   water:`<svg viewBox="0 0 32 32"><rect x="7" y="13" width="14" height="13" rx="3" fill="#3DA5F4"/><path d="M21 17 L29 11 L29 13.5 L22 20Z" fill="#2F8FD9"/><path d="M10 13 Q14 5 18 13" stroke="#2F8FD9" stroke-width="2.4" fill="none"/><circle cx="30" cy="16" r="1.3" fill="#9ED8FF"/><circle cx="28" cy="19" r="1.3" fill="#9ED8FF"/></svg>`,
@@ -109,7 +110,7 @@ const ICONS = {
   bug:`<svg viewBox="0 0 32 32"><rect x="10" y="12" width="11" height="15" rx="3" fill="#7ED957"/><rect x="12" y="7" width="7" height="6" rx="1.5" fill="#5DB54A"/><path d="M19 9 h6 v3 h-3" fill="#5DB54A"/><rect x="12" y="16" width="7" height="6" rx="1.5" fill="#fff"/><circle cx="27" cy="7" r="1.2" fill="#B5E8A0"/><circle cx="29" cy="11" r="1.2" fill="#B5E8A0"/><circle cx="26" cy="14" r="1.2" fill="#B5E8A0"/></svg>`,
   shovel:`<svg viewBox="0 0 32 32"><rect x="14.5" y="3" width="3" height="16" rx="1.5" fill="#C98B5E"/><rect x="11" y="2" width="10" height="3.5" rx="1.7" fill="#A86F45"/><path d="M10 18 h12 v4 a6 6 0 0 1 -12 0Z" fill="#9AA6B2"/><path d="M12 19.5 h8" stroke="#C5CED6" stroke-width="1.5"/></svg>`,
 };
-const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','除草'],['bug','除蟲'],['shovel','剷除']];
+const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','除草'],['bug','除蟲'],['shovel','剷除'],['bag','背包']];
 for(const k in ICONS) ICONS[k] = olc(ICONS[k]).replace(/stroke-width="2"/g,'stroke-width="1.3"');
 
 /* ================= 工具函式 ================= */
