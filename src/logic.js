@@ -97,7 +97,8 @@ function pred(p, off){
 }
 function isDry(p){ return !!p.dry; }
 function curPlots(){ const src = mode==='visit' ? V : S; return src.plots.map(p=>pred(p, src.off)); }
-const partyMul = () => { const ow = mode==='visit' && V ? V.owner : (S && S.me); const t = +((ow && ow.buffs || {}).party || 0); return t > Date.now() + ((mode==='visit'&&V?V.off:S&&S.off)||0) ? +(CFG_SET.party_grow ?? 1.2) : 1; };
+const partyMul = () => { const ow = mode==='visit' && V ? V.owner : (S && S.me), b = (ow && ow.buffs) || {}, now = Date.now() + ((mode==='visit'&&V?V.off:S&&S.off)||0);
+  return (+(b.party||0) > now ? +(CFG_SET.party_grow ?? 1.2) : 1) * (+(b.grow||0) > now ? +(CFG_SET.speed_grow ?? 2) : 1); };
 const pestMul = p => Math.max(1 - +(CFG_SET.pest_slow_max ?? 0.6), 1 - +(CFG_SET.pest_slow ?? 0.1) * ((p.w||0) + (p.b||0))) * partyMul();
 const leftSec = p => { const c=CROP[p.c]; return (c.time - p.g)/((p.dry?0.5:1) * pestMul(p)); };
 

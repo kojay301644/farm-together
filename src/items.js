@@ -2,7 +2,7 @@
 let ITEMS = [], ITEM = {};
 function setItemConfig(list){ ITEMS = list||[]; ITEM = {}; ITEMS.forEach(x=>ITEM[x.id]=x); }
 const itemIcon = (x, s=44) => !x ? '' : x.icon.startsWith('emoji:') ? `<span class="itemoji" style="font-size:${Math.round(s*0.72)}px;width:${s}px;height:${s}px">${x.icon.slice(6)}</span>` : `<img src="${A(x.icon)}" style="width:${s}px;height:${s}px;object-fit:contain" alt="">`;
-const BUFF_TXT = {shield:['🛡️','防盜罩'], harvest:['🌟','豐收 +50%'], exp:['📈','經驗 ×2'], party:['🎉','派對中・收成+30%']};
+const BUFF_TXT = {shield:['🛡️','防盜罩'], harvest:['🌟','豐收 +50%'], exp:['📈','經驗 ×2'], party:['🎉','派對中・收成+30%'], grow:['⏩','成長 ×2']};
 const buffLeft = (me, k) => Math.max(0, Math.floor((+((me.buffs||{})[k]||0) - (Date.now() + (S?S.off:0)))/1000));
 const tpeToday = () => new Date(Date.now() + (S?S.off:0) + 8*3600e3).toISOString().slice(0,10);
 const dailyN = (me, k) => { const d=(me&&me.daily)||{}; return d.d===tpeToday() ? (+d[k]||0) : 0; };
@@ -39,8 +39,8 @@ async function useItem(id, arg){
       [['取消','sub',()=>openPack('item')],['📢 送出','',()=>{ const t=$('shoutTxt').value.trim(); if(!t) return toast('請輸入內容'); useItem('shout', t); }]]);
     setTimeout(()=>$('shoutTxt') && $('shoutTxt').focus(), 100); return;
   }
-  if((id==='shield4'||id==='shield12'||id==='harvest'||id==='expx2'||id==='party') && arg==null){
-    const k={shield4:'shield',shield12:'shield',harvest:'harvest',expx2:'exp',party:'party'}[id], left=buffLeft(S.me,k);
+  if((id==='shield4'||id==='shield12'||id==='harvest'||id==='expx2'||id==='speed'||id==='party') && arg==null){
+    const k={shield4:'shield',shield12:'shield',harvest:'harvest',expx2:'exp',speed:'grow',party:'party'}[id], left=buffLeft(S.me,k);
     if(left>0 && id!=='party') return modal(x.name, `<p style="font-weight:700">${BUFF_TXT[k][0]} ${BUFF_TXT[k][1]}還有 ${hms(left)}，再用會把時間往後加。</p>`, [['取消','sub',()=>openPack('item')],['使用','',()=>useItem(id,'')]]);
   }
   try{
@@ -72,7 +72,7 @@ function renderBuffs(){
   const el=$('buffs'); if(!el || !S) return;
   const me = mode==='visit' && V ? null : S.me;
   let h='';
-  if(me) for(const k of ['shield','harvest','exp','party']){ const s=buffLeft(me,k); if(s>0) h+=`<span class="buff">${BUFF_TXT[k][0]} ${BUFF_TXT[k][1]} ${hms(s)}</span>`; }
+  if(me) for(const k of ['shield','harvest','exp','grow','party']){ const s=buffLeft(me,k); if(s>0) h+=`<span class="buff">${BUFF_TXT[k][0]} ${BUFF_TXT[k][1]} ${hms(s)}</span>`; }
   if(mode==='visit' && V && V.owner){ const o=V.owner, b=o.buffs||{}, now=Date.now()+(S.off||0);
     if(+b.shield>now) h+=`<span class="buff bad">🛡️ 對方開了防盜罩</span>`;
     if(+b.party>now) h+= o.party_got ? `<span class="buff">🎉 派對中（已領過）</span>` : `<button class="buff party" id="partyGo">🎉 派對中！領派對禮物</button>`; }

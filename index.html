@@ -510,20 +510,20 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794291982" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794294537" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794291982" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794291982" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794294537" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794294537" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794291982" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794294537" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794291982" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794291982" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794294537" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794294537" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -539,11 +539,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794291982" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794294537" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794291982";
+const BUILD="1794294537";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1491,7 +1491,7 @@ function openHelp(){
     <h4>✍️ 每日簽到・🎁 禮物</h4>
     <p>每天點左邊的「簽到」領獎，連續 7 天第 7 天有大獎，中斷一天會從第 1 天重新開始。每天第一次上線、每升 1 級、完成成就都會送鑽石；上方 📬 禮物信箱可以領活動禮物。</p>
     <h4>🧪 道具</h4>
-    <p>綜合商店的「🧪 道具」可以買道具，買了放在「背包 → 🧪 道具」，要用時按「使用」。有：⚡ 偷菜體力補滿（每天限買 1 個）、🌱 全田神奇肥料（每天限買 1 個）、🌟 豐收卡（收成 +50%）、📈 經驗加倍卡、🔍 探測器（找出最好偷的農場）、📢 大聲公（在跑馬燈說一句話）、🎉 派對（1 小時，開始時全服跑馬燈會幫你廣播；每位來拜訪的人可以領 ${+(CFG_SET.party_gold??300)} 金＋${+(CFG_SET.party_exp??20)} 經驗，每來一人你拿 ${+(CFG_SET.party_host_exp??50)} 經驗；派對期間你的收成 +${Math.round((+(CFG_SET.party_harvest??1.3)-1)*100)}%、作物長快 ${Math.round((+(CFG_SET.party_grow??1.2)-1)*100)}%）。正在生效的效果會顯示在畫面右上方。</p>
+    <p>綜合商店的「🧪 道具」可以買道具，買了放在「背包 → 🧪 道具」，要用時按「使用」。有：⚡ 偷菜體力補滿（每天限買 1 個）、🌱 全田神奇肥料（每天限買 1 個）、🌟 豐收卡（收成 +50%）、⏩ 成長加速卡（1 小時內作物長快 2 倍，每天限買 3 個）、📈 經驗加倍卡、🔍 探測器（找出最好偷的農場）、📢 大聲公（在跑馬燈說一句話）、🎉 派對（1 小時，開始時全服跑馬燈會幫你廣播；每位來拜訪的人可以領 ${+(CFG_SET.party_gold??300)} 金＋${+(CFG_SET.party_exp??20)} 經驗，每來一人你拿 ${+(CFG_SET.party_host_exp??50)} 經驗；派對期間你的收成 +${Math.round((+(CFG_SET.party_harvest??1.3)-1)*100)}%、作物長快 ${Math.round((+(CFG_SET.party_grow??1.2)-1)*100)}%）。正在生效的效果會顯示在畫面右上方。</p>
     <p>用「收成」點還沒成熟的作物，可以用金幣肥料讓剩下的時間減半。</p>
     <h4>🎟️ 每日轉盤</h4>
     <p>畫面左邊的「轉盤」每天可以免費轉 1 次，也能用鑽石或金幣多轉幾次。各獎品的機率寫在轉盤頁下面的「獎品機率」。</p>
@@ -2433,7 +2433,7 @@ function openPack(t){
 let ITEMS = [], ITEM = {};
 function setItemConfig(list){ ITEMS = list||[]; ITEM = {}; ITEMS.forEach(x=>ITEM[x.id]=x); }
 const itemIcon = (x, s=44) => !x ? '' : x.icon.startsWith('emoji:') ? `<span class="itemoji" style="font-size:${Math.round(s*0.72)}px;width:${s}px;height:${s}px">${x.icon.slice(6)}</span>` : `<img src="${A(x.icon)}" style="width:${s}px;height:${s}px;object-fit:contain" alt="">`;
-const BUFF_TXT = {shield:['🛡️','防盜罩'], harvest:['🌟','豐收 +50%'], exp:['📈','經驗 ×2'], party:['🎉','派對中・收成+30%']};
+const BUFF_TXT = {shield:['🛡️','防盜罩'], harvest:['🌟','豐收 +50%'], exp:['📈','經驗 ×2'], party:['🎉','派對中・收成+30%'], grow:['⏩','成長 ×2']};
 const buffLeft = (me, k) => Math.max(0, Math.floor((+((me.buffs||{})[k]||0) - (Date.now() + (S?S.off:0)))/1000));
 const tpeToday = () => new Date(Date.now() + (S?S.off:0) + 8*3600e3).toISOString().slice(0,10);
 const dailyN = (me, k) => { const d=(me&&me.daily)||{}; return d.d===tpeToday() ? (+d[k]||0) : 0; };
@@ -2470,8 +2470,8 @@ async function useItem(id, arg){
       [['取消','sub',()=>openPack('item')],['📢 送出','',()=>{ const t=$('shoutTxt').value.trim(); if(!t) return toast('請輸入內容'); useItem('shout', t); }]]);
     setTimeout(()=>$('shoutTxt') && $('shoutTxt').focus(), 100); return;
   }
-  if((id==='shield4'||id==='shield12'||id==='harvest'||id==='expx2'||id==='party') && arg==null){
-    const k={shield4:'shield',shield12:'shield',harvest:'harvest',expx2:'exp',party:'party'}[id], left=buffLeft(S.me,k);
+  if((id==='shield4'||id==='shield12'||id==='harvest'||id==='expx2'||id==='speed'||id==='party') && arg==null){
+    const k={shield4:'shield',shield12:'shield',harvest:'harvest',expx2:'exp',speed:'grow',party:'party'}[id], left=buffLeft(S.me,k);
     if(left>0 && id!=='party') return modal(x.name, `<p style="font-weight:700">${BUFF_TXT[k][0]} ${BUFF_TXT[k][1]}還有 ${hms(left)}，再用會把時間往後加。</p>`, [['取消','sub',()=>openPack('item')],['使用','',()=>useItem(id,'')]]);
   }
   try{
@@ -2503,7 +2503,7 @@ function renderBuffs(){
   const el=$('buffs'); if(!el || !S) return;
   const me = mode==='visit' && V ? null : S.me;
   let h='';
-  if(me) for(const k of ['shield','harvest','exp','party']){ const s=buffLeft(me,k); if(s>0) h+=`<span class="buff">${BUFF_TXT[k][0]} ${BUFF_TXT[k][1]} ${hms(s)}</span>`; }
+  if(me) for(const k of ['shield','harvest','exp','grow','party']){ const s=buffLeft(me,k); if(s>0) h+=`<span class="buff">${BUFF_TXT[k][0]} ${BUFF_TXT[k][1]} ${hms(s)}</span>`; }
   if(mode==='visit' && V && V.owner){ const o=V.owner, b=o.buffs||{}, now=Date.now()+(S.off||0);
     if(+b.shield>now) h+=`<span class="buff bad">🛡️ 對方開了防盜罩</span>`;
     if(+b.party>now) h+= o.party_got ? `<span class="buff">🎉 派對中（已領過）</span>` : `<button class="buff party" id="partyGo">🎉 派對中！領派對禮物</button>`; }
@@ -2754,7 +2754,8 @@ function pred(p, off){
 }
 function isDry(p){ return !!p.dry; }
 function curPlots(){ const src = mode==='visit' ? V : S; return src.plots.map(p=>pred(p, src.off)); }
-const partyMul = () => { const ow = mode==='visit' && V ? V.owner : (S && S.me); const t = +((ow && ow.buffs || {}).party || 0); return t > Date.now() + ((mode==='visit'&&V?V.off:S&&S.off)||0) ? +(CFG_SET.party_grow ?? 1.2) : 1; };
+const partyMul = () => { const ow = mode==='visit' && V ? V.owner : (S && S.me), b = (ow && ow.buffs) || {}, now = Date.now() + ((mode==='visit'&&V?V.off:S&&S.off)||0);
+  return (+(b.party||0) > now ? +(CFG_SET.party_grow ?? 1.2) : 1) * (+(b.grow||0) > now ? +(CFG_SET.speed_grow ?? 2) : 1); };
 const pestMul = p => Math.max(1 - +(CFG_SET.pest_slow_max ?? 0.6), 1 - +(CFG_SET.pest_slow ?? 0.1) * ((p.w||0) + (p.b||0))) * partyMul();
 const leftSec = p => { const c=CROP[p.c]; return (c.time - p.g)/((p.dry?0.5:1) * pestMul(p)); };
 
