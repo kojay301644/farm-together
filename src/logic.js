@@ -101,7 +101,16 @@ function curPlots(){ const src = mode==='visit' ? V : S; return src.plots.map(p=
 const partyMul = () => { const ow = mode==='visit' && V ? V.owner : (S && S.me), b = (ow && ow.buffs) || {}, now = Date.now() + ((mode==='visit'&&V?V.off:S&&S.off)||0);
   return (+(b.party||0) > now ? +(CFG_SET.party_grow ?? 1.2) : 1) * (+(b.grow||0) > now ? +(CFG_SET.speed_grow ?? 2) : 1); };
 const pestMul = p => Math.max(1 - +(CFG_SET.pest_slow_max ?? 0.6), 1 - +(CFG_SET.pest_slow ?? 0.1) * ((p.w||0) + (p.b||0))) * partyMul();
-const leftSec = p => { const c=CROP[p.c]; return (c.time - p.g)/((p.dry?0.5:1) * pestMul(p)); };
+/* 剩餘時間：加速卡、派對有到期時間，要分段算（到期後就回到正常速度，不會突然跳回去） */
+const leftSec = p => { const c=CROP[p.c];
+  const ow = mode==='visit' && V ? V.owner : (S && S.me), bf = (ow && ow.buffs) || {}, now = Date.now() + ((mode==='visit'&&V?V.off:S&&S.off)||0);
+  const base = (p.dry?0.5:1) * Math.max(1 - +(CFG_SET.pest_slow_max ?? 0.6), 1 - +(CFG_SET.pest_slow ?? 0.1) * ((p.w||0) + (p.b||0)));
+  const gEnd = +(bf.grow||0), pEnd = +(bf.party||0), gm = +(CFG_SET.speed_grow ?? 2), pm = +(CFG_SET.party_grow ?? 1.2);
+  const cuts = [gEnd, pEnd].filter(t=>t>now).sort((a,b)=>a-b);
+  let rem = c.time - p.g, t = now;
+  for(const end of cuts){ const sp = base * (gEnd>t?gm:1) * (pEnd>t?pm:1), seg = (end - t)/1000;
+    if(rem <= sp*seg) return (t - now)/1000 + rem/sp; rem -= sp*seg; t = end; }
+  return (t - now)/1000 + rem/base; };
 
 /* ================= 回饋 ================= */
 function showLevelUp(){
