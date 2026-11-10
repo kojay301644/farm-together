@@ -280,8 +280,8 @@ body.lowfx .bird{display:none}
 .gslot .plus{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#F1E4C8;font-size:22px;font-weight:900;color:#B08A55}
 .gslot span{display:flex;flex-direction:column;min-width:0}.gslot small{font-size:11px;font-weight:700;color:var(--ink2);line-height:1.35}
 .row.gon{background:#E8F8EE;border-radius:12px}
-.autobar{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;margin-bottom:6px;border:2.5px solid #3A3226;border-radius:16px;background:linear-gradient(#FFF6DB,#FFE7B0);font:inherit;cursor:pointer;text-align:left}
-.autobar b{font-size:16px;white-space:nowrap}.autobar span{flex:1;font-size:17px;letter-spacing:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#7A6A55;font-weight:700}.autobar span:not(:empty){}.autobar i{font-style:normal;font-weight:900;font-size:20px}
+.autobtn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;margin-bottom:6px;border:2.5px solid #3A3226;border-radius:16px;background:linear-gradient(#FFF6DB,#FFE7B0);font:inherit;cursor:pointer;text-align:left}
+.autobtn b{font-size:16px;white-space:nowrap}.autobtn span{flex:1;font-size:17px;letter-spacing:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#7A6A55;font-weight:700}.autobtn i{font-style:normal;font-weight:900;font-size:20px}
 .arow{border-bottom:1px dashed #E5D6B8;padding:8px 2px}.arow.off{opacity:.55}.ahd{display:flex;align-items:center;gap:8px}.aic{font-size:24px;width:32px;text-align:center}
 .atx{flex:1;min-width:0}.atx b{display:block}.atx small{display:block;color:#7A6A55;font-weight:700;line-height:1.35}.atx small img{width:18px;height:18px;object-fit:contain;vertical-align:-4px;margin-right:2px}
 .sw{position:relative;width:52px;height:30px;border-radius:15px;border:2.5px solid #3A3226;background:#D9D1C2;cursor:pointer;flex:none;padding:0}.sw i{position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;border:2px solid #3A3226;transition:left .15s}
@@ -507,20 +507,20 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794279035" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794279121" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794279035" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794279035" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794279121" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794279121" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794279035" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794279121" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794279035" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794279035" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794279121" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794279121" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -536,11 +536,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794279035" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794279121" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794279035";
+const BUILD="1794279121";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1753,7 +1753,7 @@ function autoInfo(me, key, funcs){ // 哪隻夥伴戴著、效果
 const autoOn = (me, key) => !((me.auto_off||{})[key]);
 function autoBarHTML(){ const me=S.me;
   const on = AUTO_ROWS.filter(([k,f])=>autoInfo(me,k,f) && autoOn(me,k)).map(([k])=>GEAR_FUNC[k][1]).join('');
-  return `<button class="autobar" id="hAuto"><b>⚙️ 自動農場設定</b><span>${on || '還沒有開啟的自動功能'}</span><i>›</i></button>`; }
+  return `<button class="autobtn" id="hAuto"><b>⚙️ 自動農場設定</b><span>${on || '還沒有開啟的自動功能'}</span><i>›</i></button>`; }
 function openAutoFarm(){
   if(mode==='visit') return;
   const me=S.me;

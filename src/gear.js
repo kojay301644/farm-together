@@ -195,7 +195,7 @@ function autoInfo(me, key, funcs){ // 哪隻夥伴戴著、效果
 const autoOn = (me, key) => !((me.auto_off||{})[key]);
 function autoBarHTML(){ const me=S.me;
   const on = AUTO_ROWS.filter(([k,f])=>autoInfo(me,k,f) && autoOn(me,k)).map(([k])=>GEAR_FUNC[k][1]).join('');
-  return `<button class="autobar" id="hAuto"><b>⚙️ 自動農場設定</b><span>${on || '還沒有開啟的自動功能'}</span><i>›</i></button>`; }
+  return `<button class="autobtn" id="hAuto"><b>⚙️ 自動農場設定</b><span>${on || '還沒有開啟的自動功能'}</span><i>›</i></button>`; }
 function openAutoFarm(){
   if(mode==='visit') return;
   const me=S.me;
