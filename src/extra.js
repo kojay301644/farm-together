@@ -131,6 +131,17 @@ function openHelp(){
     <p>寵物自動收成的作物、牧場產品會先放在收集倉，要自己點收集倉「收進穀倉」。還沒收走前，別人可以來偷（最多偷走 4 成），記得常收！</p>
     <h4>✍️ 每日簽到・🎁 禮物</h4>
     <p>每天點左邊的「簽到」領獎，連續 7 天第 7 天有大獎，中斷一天會從第 1 天重新開始。每天第一次上線、每升 1 級、完成成就都會送鑽石；上方 📬 禮物信箱可以領活動禮物。</p>
+    <h4>🧪 道具</h4>
+    <p>穀倉裡的「🧪 道具商店」可以買道具，買了放在「背包 → 🧪 道具」，要用時按「使用」。有：⚡ 偷菜體力補滿（每天限買 3 個）、🌱 全田神奇肥料、🛡️ 防盜罩（開著時別人偷不了你，每天最多開 2 次）、🌟 豐收卡（收成 +50%）、📈 經驗加倍卡、🔍 探測器（找出最好偷的農場）、📢 大聲公（在跑馬燈說一句話）、🎉 派對（好友來拜訪可以領派對禮物）。正在生效的效果會顯示在畫面右上方。</p>
+    <p>用「收成」點還沒成熟的作物，可以用 💎 神奇肥料讓它立刻成熟，或用金幣肥料讓剩下的時間減半。</p>
+    <h4>🎟️ 每日轉盤</h4>
+    <p>畫面左邊的「轉盤」每天可以免費轉 1 次，也能用鑽石或金幣多轉幾次。各獎品的機率寫在轉盤頁下面的「獎品機率」。</p>
+    <h4>💌 送禮給好友</h4>
+    <p>在好友廣場的好友旁邊按「💌 送禮」，可以送作物、種子、道具給好友（不能送金幣和鑽石），每天最多 ${+(CFG_SET.gift_daily??10)} 次，對方在禮物信箱領取。</p>
+    <h4>🏷️ 稱號・頭像框</h4>
+    <p>在「我的家」按「🏷️ 稱號・頭像框」。稱號會顯示在名字旁邊，頭像框會套在你的頭像上。有些稱號要完成成就才拿得到，而且永久有效。</p>
+    <h4>✨ 稀有種子</h4>
+    <p>種子商店最上面的稀有種子要用鑽石買，種下去會閃閃發光，收成的賣價和經驗都特別高——但別人也可以偷喔！</p>
     <h4>🏅 成就</h4>
     <p>在「我的家」按「🏆 查看全部成就」。等級、種田、牧場、好友、偷菜、寵物、城鎮、簽到各有一系列成就，達成就自動送鑽石。</p>
     <h4>🏆 排行榜</h4>
@@ -171,12 +182,17 @@ const GEM_PACKS = [
 
 /* 儲值（右上鑽石旁的 +） */
 function openTopup(){
-  let body = `<div class="soon">💎 儲值功能即將開放，敬請期待！</div>`;
-  body += `<div class="gemcard" style="background:#F7F5FF;margin-bottom:10px"><div class="bonus">首儲 ×2</div><div style="font-weight:900">🌟 農夫月卡　NT$150</div>
-    <div style="font-size:12px;font-weight:700;color:var(--ink2);margin-top:4px">立刻拿 💎300，30 天內每天登入再領 💎50（共 💎1,800）</div></div>`;
+  const me=S.me, now=Date.now()+(S.off||0), P=(window.PACKS||[]), got=me.packs||{};
+  const newbieOk = !got.newbie && (+me.created||0) > now - 7*86400000, firstOk = !got.first, mLeft = me.month_until && +me.month_until>now ? Math.ceil((+me.month_until-now)/86400000) : 0;
+  let body = `<div class="soon">💎 線上付款即將開放！目前想購買請聯絡客服，付款後會直接發到你的帳號</div>`;
+  const pk = id => P.find(x=>x.id===id) || {};
+  body += `<div class="gemcard pack" style="background:#F7F5FF"><div class="bonus">${mLeft?`剩 ${mLeft} 天`:'最划算'}</div><div style="font-weight:900">${esc(pk('month').name||'🗓️ 農夫月卡')}　NT$${pk('month').price_twd||150}</div>
+    <div class="pkd">${esc(pk('month').descr||'')}</div></div>`;
+  if(newbieOk) body += `<div class="gemcard pack" style="background:#EFFAF2"><div class="bonus">限時</div><div style="font-weight:900">${esc(pk('newbie').name)}　NT$${pk('newbie').price_twd}</div><div class="pkd">${esc(pk('newbie').descr)}</div></div>`;
+  if(firstOk) body += `<div class="gemcard pack" style="background:#FFF6E5"><div class="bonus">首儲</div><div style="font-weight:900">${esc(pk('first').name)}</div><div class="pkd">${esc(pk('first').descr)}</div></div>`;
   body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard"><div class="bonus">首儲 ×2</div><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`).join('')}</div>`;
   body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center">每個方案第一次購買，鑽石加倍送</div>`;
-  modal(`💎 儲值　<span style="font-size:14px;color:#5B4ED6">目前 💎 ${(S.me.gems||0).toLocaleString()}</span>`, body);
+  modal(`💎 儲值　<span style="font-size:14px;color:#5B4ED6">目前 💎 ${(me.gems||0).toLocaleString()}</span>`, body);
 }
 
 /* ================= 每日簽到（7 天一輪） ================= */

@@ -630,7 +630,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp, seed_gems:x.seed_gems}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts, c.pet_skins); setItemConfig(c.items); SPIN=c.spin||[]; COS=c.cosmetics||[]; setToneConfig(c.tones); CFG_SET=c.settings||{};
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts, c.pet_skins); setItemConfig(c.items); SPIN=c.spin||[]; COS=c.cosmetics||[]; window.PACKS=c.packs||[]; setToneConfig(c.tones); CFG_SET=c.settings||{};
   }catch(e){}
 }
 async function showNotices(){
