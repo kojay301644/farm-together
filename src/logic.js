@@ -90,14 +90,15 @@ function pred(p, off){
   if(p.g < c.time){
     const el = Math.max(0, (now - p.t)/1000);
     const wet = Math.min(el, Math.max(0, ((p.wu||p.t) - p.t)/1000));
-    q.g = Math.min(c.time, p.g + wet + (el-wet)*0.5);
+    q.g = Math.min(c.time, p.g + (wet + (el-wet)*0.5) * pestMul(p));
     q.dry = q.g < c.time && now > (p.wu||0);
   }
   return q;
 }
 function isDry(p){ return !!p.dry; }
 function curPlots(){ const src = mode==='visit' ? V : S; return src.plots.map(p=>pred(p, src.off)); }
-const leftSec = p => { const c=CROP[p.c]; return (c.time - p.g)/(p.dry?0.5:1); };
+const pestMul = p => Math.max(1 - +(CFG_SET.pest_slow_max ?? 0.6), 1 - +(CFG_SET.pest_slow ?? 0.1) * ((p.w||0) + (p.b||0)));
+const leftSec = p => { const c=CROP[p.c]; return (c.time - p.g)/((p.dry?0.5:1) * pestMul(p)); };
 
 /* ================= 回饋 ================= */
 function showLevelUp(){
