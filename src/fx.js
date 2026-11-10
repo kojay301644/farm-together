@@ -120,7 +120,13 @@ const avImg = (o, cls='avatar sm') => `<img class="${cls} avimg${o&&o.frame?' fr
 const ttlTag = o => o && o.title ? ` <span class="ttl">${esc(o.title)}</span>` : '';
 function openAvatarPicker(){
   const cur = S.me.avatar||11;
-  modal('選擇頭像', `<div class="avgrid">${Array.from({length:30},(_,k)=>`<img class="avpick${k+1===cur?' on':''}" data-av="${k+1}" src="${avSrc(k+1)}" alt="">`).join('')}</div>`);
+  const nc=+(S.me.nick_changes||0), rc=+((typeof CFG_SET!=='undefined'&&CFG_SET.rename_gems)??100);
+  modal('頭像・暱稱', `<div class="sec">✏️ 暱稱</div><div class="redeem nn"><input id="nnIn" maxlength="10" value="${esc(S.me.nickname)}" autocomplete="off"><button class="btn${nc>=1?' gem':''}" id="nnGo">${nc>=1?`💎${rc} 改名`:'免費改名'}</button></div>
+    <div class="rhint">${nc>=1?`第一次改名已經用過了，之後每次改名要 💎${rc}`:'第一次改名免費，之後每次要 💎'+rc}</div><div class="sec">🖼️ 頭像</div><div class="avgrid">${Array.from({length:30},(_,k)=>`<img class="avpick${k+1===cur?' on':''}" data-av="${k+1}" src="${avSrc(k+1)}" alt="">`).join('')}</div>`);
+  $('nnGo').onclick = async()=>{ const v=$('nnIn').value.trim(); if(!v) return toast('請輸入暱稱'); if(v===S.me.nickname) return toast('跟現在的暱稱一樣');
+    const go = async()=>{ try{ applyState(await rpc('farm_rename',{p_nick:v})); refresh(); sfx('lvup'); toast(`暱稱改成「${v}」了！`); closeModal(); }catch(e){ toast(e.message); } };
+    if(nc>=1) return modal('確定改名？', `<div style="text-align:center;font-weight:800;line-height:1.8">改成「${esc(v)}」<br>要花 💎${rc}</div>`, [['取消','sub',openAvatarPicker],[`💎${rc} 確定`,'',go]]);
+    go(); };
   document.querySelectorAll('[data-av]').forEach(b=>b.onclick=async()=>{
     try{ applyState(await rpc('farm_set_avatar', {p_n:+b.dataset.av})); refresh(); sfx('coin'); toast('頭像已更換'); closeModal(); }catch(e){ toast(e.message); }
   });

@@ -484,6 +484,7 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 
 #gemBox{cursor:pointer;pointer-events:auto}.gplus{display:inline-grid;place-items:center;width:18px;height:18px;margin-left:5px;border-radius:50%;background:#7B6CF6;color:#fff;font-style:normal;font-weight:900;font-size:15px;line-height:1;box-shadow:0 2px 0 #5B4ED6}
 .eqgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}.eqpick{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:2px solid rgba(75,52,35,.2);border-radius:12px;background:#FFF8EC;font-family:inherit;cursor:pointer}.eqpick:active{transform:scale(.97)}.eqpick img{width:52px;height:52px;object-fit:contain}.eqpick b{font-size:13px;color:var(--ink)}.eqpick small{font-size:10px;font-weight:700;color:var(--ink2)}
+.redeem.nn input{text-transform:none;letter-spacing:0}
 .redeem{display:flex;gap:8px;margin-top:6px}.redeem input{flex:1;min-width:0;padding:10px 12px;border:2px solid rgba(75,52,35,.25);border-radius:12px;font:inherit;font-weight:800;text-transform:uppercase}
 .gift{border:2px solid rgba(75,52,35,.15);border-radius:14px;padding:10px 12px;margin:8px 0;background:#FFF8EC}.gift p{margin:4px 0;font-size:13px;font-weight:700;color:var(--ink2)}.gift .btn{width:100%;margin-top:8px}
 .rwbox{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:4px}.rw{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:#fff;border:1.5px solid rgba(75,52,35,.15);font-size:13px;font-weight:800}.rw img{width:20px;height:20px;object-fit:contain}
@@ -524,7 +525,7 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
   </div>
   <div class="card" id="nickCard" style="display:none">
     <div class="logo" style="font-size:26px">幫自己取個名字</div>
-    <p>好友會用這個暱稱找到你（1～10 個字，之後不能改）</p>
+    <p>好友會用這個暱稱找到你（1～10 個字，之後點頭像可以改，第一次免費）</p>
     <input id="nickIn" maxlength="10" placeholder="輸入暱稱" autocomplete="off">
     <button class="btn" id="nickBtn" style="width:100%">開始種田</button>
     <button class="link" id="nickOut">換一個帳號</button>
@@ -535,21 +536,21 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794304284" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794304546" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794304284" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794304284" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794304546" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794304546" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794304284" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794304546" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794304284" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794304284" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794304546" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794304546" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -565,11 +566,11 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794304284" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794304546" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794304284";
+const BUILD="1794304546";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1345,7 +1346,13 @@ const avImg = (o, cls='avatar sm') => `<img class="${cls} avimg${o&&o.frame?' fr
 const ttlTag = o => o && o.title ? ` <span class="ttl">${esc(o.title)}</span>` : '';
 function openAvatarPicker(){
   const cur = S.me.avatar||11;
-  modal('選擇頭像', `<div class="avgrid">${Array.from({length:30},(_,k)=>`<img class="avpick${k+1===cur?' on':''}" data-av="${k+1}" src="${avSrc(k+1)}" alt="">`).join('')}</div>`);
+  const nc=+(S.me.nick_changes||0), rc=+((typeof CFG_SET!=='undefined'&&CFG_SET.rename_gems)??100);
+  modal('頭像・暱稱', `<div class="sec">✏️ 暱稱</div><div class="redeem nn"><input id="nnIn" maxlength="10" value="${esc(S.me.nickname)}" autocomplete="off"><button class="btn${nc>=1?' gem':''}" id="nnGo">${nc>=1?`💎${rc} 改名`:'免費改名'}</button></div>
+    <div class="rhint">${nc>=1?`第一次改名已經用過了，之後每次改名要 💎${rc}`:'第一次改名免費，之後每次要 💎'+rc}</div><div class="sec">🖼️ 頭像</div><div class="avgrid">${Array.from({length:30},(_,k)=>`<img class="avpick${k+1===cur?' on':''}" data-av="${k+1}" src="${avSrc(k+1)}" alt="">`).join('')}</div>`);
+  $('nnGo').onclick = async()=>{ const v=$('nnIn').value.trim(); if(!v) return toast('請輸入暱稱'); if(v===S.me.nickname) return toast('跟現在的暱稱一樣');
+    const go = async()=>{ try{ applyState(await rpc('farm_rename',{p_nick:v})); refresh(); sfx('lvup'); toast(`暱稱改成「${v}」了！`); closeModal(); }catch(e){ toast(e.message); } };
+    if(nc>=1) return modal('確定改名？', `<div style="text-align:center;font-weight:800;line-height:1.8">改成「${esc(v)}」<br>要花 💎${rc}</div>`, [['取消','sub',openAvatarPicker],[`💎${rc} 確定`,'',go]]);
+    go(); };
   document.querySelectorAll('[data-av]').forEach(b=>b.onclick=async()=>{
     try{ applyState(await rpc('farm_set_avatar', {p_n:+b.dataset.av})); refresh(); sfx('coin'); toast('頭像已更換'); closeModal(); }catch(e){ toast(e.message); }
   });
