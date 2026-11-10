@@ -2,7 +2,7 @@
 let ITEMS = [], ITEM = {};
 function setItemConfig(list){ ITEMS = list||[]; ITEM = {}; ITEMS.forEach(x=>ITEM[x.id]=x); }
 const itemIcon = (x, s=44) => !x ? '' : x.icon.startsWith('emoji:') ? `<span class="itemoji" style="font-size:${Math.round(s*0.72)}px;width:${s}px;height:${s}px">${x.icon.slice(6)}</span>` : `<img src="${A(x.icon)}" style="width:${s}px;height:${s}px;object-fit:contain" alt="">`;
-const BUFF_TXT = {shield:['🛡️','防盜罩'], harvest:['🌟','豐收 +50%'], exp:['📈','經驗 ×2'], party:['🎉','派對中']};
+const BUFF_TXT = {shield:['🛡️','防盜罩'], harvest:['🌟','豐收 +50%'], exp:['📈','經驗 ×2'], party:['🎉','派對中・收成+30%']};
 const buffLeft = (me, k) => Math.max(0, Math.floor((+((me.buffs||{})[k]||0) - (Date.now() + (S?S.off:0)))/1000));
 const tpeToday = () => new Date(Date.now() + (S?S.off:0) + 8*3600e3).toISOString().slice(0,10);
 const dailyN = (me, k) => { const d=(me&&me.daily)||{}; return d.d===tpeToday() ? (+d[k]||0) : 0; };
