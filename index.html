@@ -536,21 +536,21 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794305181" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794308567" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794305181" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794305181" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794308567" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794308567" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794305181" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794308567" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794305181" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794305181" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794308567" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794308567" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -566,11 +566,11 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794305181" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794308567" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794305181";
+const BUILD="1794308567";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1906,6 +1906,7 @@ function openRanch(){
       if(st==='hungry') btns+=`<button class="mini" data-ra="feed" data-s="${r.slot}" ${cropCount(me)<a.feed?'disabled':''}>餵食</button>`;
       if(st==='ready') btns+=`<button class="mini o" data-ra="collect" data-s="${r.slot}">收成</button>`;
       if(r.f) btns+=`<button class="mini sub" data-ra="swat" data-s="${r.slot}">拍蚊子 🦟${r.f}</button>`;
+      btns+=`<button class="mini sub" data-rsell="${r.slot}">💰 賣掉</button>`;
     } else {
       if(st==='ready' && !r.mine && r.st<r.cap && !V.protected) btns+=`<button class="mini o" data-rf="steal" data-s="${r.slot}">偷</button>`;
       if(st==='ready' && r.mine) btns+=`<span class="tag">已偷過</span>`;
@@ -1929,6 +1930,19 @@ function openRanch(){
   md.querySelectorAll('[data-ra]').forEach(b=>b.onclick=()=>ranchAct(b.dataset.ra, +b.dataset.s));
   md.querySelectorAll('[data-buyani]').forEach(b=>b.onclick=()=>ranchAct('buy', null, b.dataset.buyani));
   md.querySelectorAll('[data-rf]').forEach(b=>b.onclick=()=>ranchFriend(b.dataset.rf, +b.dataset.s));
+  md.querySelectorAll('[data-rsell]').forEach(b=>b.onclick=()=>sellAnimal(+b.dataset.rsell));
+}
+/* 賣掉動物：退原價一半，格子空出來 */
+function sellAnimal(slot){
+  const r=(S.ranch||[]).find(x=>x.slot===slot); if(!r) return; const a=ANI[r.k]||{name:r.k,price:0}, st=aniState(r,S.off);
+  const refund=Math.floor((a.price||0) * +(CFG_SET.ranch_sell_ratio ?? 0.5));
+  const warn = st==='busy' ? `<div style="color:#D63B42;font-size:13px;margin-top:6px">⚠️ 牠還在生產中，賣掉的話這一輪的${a.good_name||'產品'}就沒了</div>`
+    : st==='ready' ? `<div style="color:#2E9660;font-size:13px;margin-top:6px">牠的${a.good_name||'產品'}已經好了，會先幫你收進倉庫</div>` : '';
+  modal(`賣掉${a.name}？`, `<div style="text-align:center;font-weight:800;line-height:1.8"><div class="ic ani" style="margin:0 auto;width:80px;height:70px"><svg viewBox="-14 -24 30 28">${ANI_ART[r.k]||CHICK}</svg></div>退回 <b>${refund.toLocaleString()} 金</b>（原價的一半），格子空出來就能買別的動物${warn}</div>`,
+    [['取消','sub',()=>openRanch()],[`💰 賣掉（+${refund.toLocaleString()} 金）`,'',async()=>{
+      try{ const res=await rpc('farm_ranch_sell',{p_slot:slot}); applyState(res.state); refresh(); sfx('coin');
+        toast(`賣掉${a.name}，拿回 ${res.refund.toLocaleString()} 金${res.got?`，順便收了 ${res.got} 個${a.good_name}`:''}`); openRanch(); }
+      catch(e){ toast(/farm_ranch_sell|function|schema cache/i.test(e.message)?'這個功能還在準備中，請稍後再試':e.message); } }]]);
 }
 async function ranchAct(action, slot, kind){
   if(ui.busy) return; ui.busy=true; ui.lastLocal=Date.now();

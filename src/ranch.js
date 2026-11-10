@@ -66,6 +66,7 @@ function openRanch(){
       if(st==='hungry') btns+=`<button class="mini" data-ra="feed" data-s="${r.slot}" ${cropCount(me)<a.feed?'disabled':''}>餵食</button>`;
       if(st==='ready') btns+=`<button class="mini o" data-ra="collect" data-s="${r.slot}">收成</button>`;
       if(r.f) btns+=`<button class="mini sub" data-ra="swat" data-s="${r.slot}">拍蚊子 🦟${r.f}</button>`;
+      btns+=`<button class="mini sub" data-rsell="${r.slot}">💰 賣掉</button>`;
     } else {
       if(st==='ready' && !r.mine && r.st<r.cap && !V.protected) btns+=`<button class="mini o" data-rf="steal" data-s="${r.slot}">偷</button>`;
       if(st==='ready' && r.mine) btns+=`<span class="tag">已偷過</span>`;
@@ -89,6 +90,19 @@ function openRanch(){
   md.querySelectorAll('[data-ra]').forEach(b=>b.onclick=()=>ranchAct(b.dataset.ra, +b.dataset.s));
   md.querySelectorAll('[data-buyani]').forEach(b=>b.onclick=()=>ranchAct('buy', null, b.dataset.buyani));
   md.querySelectorAll('[data-rf]').forEach(b=>b.onclick=()=>ranchFriend(b.dataset.rf, +b.dataset.s));
+  md.querySelectorAll('[data-rsell]').forEach(b=>b.onclick=()=>sellAnimal(+b.dataset.rsell));
+}
+/* 賣掉動物：退原價一半，格子空出來 */
+function sellAnimal(slot){
+  const r=(S.ranch||[]).find(x=>x.slot===slot); if(!r) return; const a=ANI[r.k]||{name:r.k,price:0}, st=aniState(r,S.off);
+  const refund=Math.floor((a.price||0) * +(CFG_SET.ranch_sell_ratio ?? 0.5));
+  const warn = st==='busy' ? `<div style="color:#D63B42;font-size:13px;margin-top:6px">⚠️ 牠還在生產中，賣掉的話這一輪的${a.good_name||'產品'}就沒了</div>`
+    : st==='ready' ? `<div style="color:#2E9660;font-size:13px;margin-top:6px">牠的${a.good_name||'產品'}已經好了，會先幫你收進倉庫</div>` : '';
+  modal(`賣掉${a.name}？`, `<div style="text-align:center;font-weight:800;line-height:1.8"><div class="ic ani" style="margin:0 auto;width:80px;height:70px"><svg viewBox="-14 -24 30 28">${ANI_ART[r.k]||CHICK}</svg></div>退回 <b>${refund.toLocaleString()} 金</b>（原價的一半），格子空出來就能買別的動物${warn}</div>`,
+    [['取消','sub',()=>openRanch()],[`💰 賣掉（+${refund.toLocaleString()} 金）`,'',async()=>{
+      try{ const res=await rpc('farm_ranch_sell',{p_slot:slot}); applyState(res.state); refresh(); sfx('coin');
+        toast(`賣掉${a.name}，拿回 ${res.refund.toLocaleString()} 金${res.got?`，順便收了 ${res.got} 個${a.good_name}`:''}`); openRanch(); }
+      catch(e){ toast(/farm_ranch_sell|function|schema cache/i.test(e.message)?'這個功能還在準備中，請稍後再試':e.message); } }]]);
 }
 async function ranchAct(action, slot, kind){
   if(ui.busy) return; ui.busy=true; ui.lastLocal=Date.now();
