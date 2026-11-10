@@ -60,7 +60,7 @@ function openGearBag(slot){
   body += `<div class="sec">背包裡的裝備</div>`;
   body += own.length ? own.map(([g,n])=>`<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span> ${gearWearTag(g.id, slot)}<div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div>
       ${mem.g===g.id?'<span class="tag" style="background:#E8F8EE;color:#2E9660">裝備中</span>':`<button class="mini" data-eq="${g.id}">${(used[g.id]||0)>=n?'換過來':'插上'}</button>`}</div>`).join('')
-    : `<div class="empty">還沒有裝備<br><small>可以在寵物商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
+    : `<div class="empty">還沒有裝備<br><small>可以在綜合商店買、收成時撿到寶箱，或升到 Lv5／10／15／20 領禮物</small></div>`;
   modal('寵物裝備', body, [['🛒 買裝備','o',()=>openGearShop()]]);
   const md=$('md');
   md.querySelectorAll('[data-eq]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.eq, n=(me.gear||{})[id]||0;
@@ -89,7 +89,7 @@ function openGearShop(){
     body+=`<div class="row gshop"><div class="ic">${gearImg(show,44)}</div><div class="tx"><b>${GEAR_FUNC[f][1]} ${GEAR_FUNC[f][0]}</b> <span class="tps">${pips}</span>
       <div>${cur?`目前 ${esc(gearTitle(cur))}：${gearDesc(cur)}`:'還沒有'}</div>${cur?`<div style="margin-top:3px">${gearWearTag(cur.id)}</div>`:''}${next?`<div class="gnext">下一階 ${esc(gearTitle(next))}：${gearDesc(next)}</div>`:''}<div class="tprs">${prices}</div></div>${btn}</div>`;
   });
-  modal(`寵物商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`, body);
+  modal(`綜合商店　<span style="font-size:14px;color:var(--ink2)">${S.me.gold.toLocaleString()} 金・💎${(S.me.gems||0).toLocaleString()}</span>`, body);
   const md=$('md'); bindPetShopTabs();
   md.querySelectorAll('[data-bg]').forEach(b=>b.onclick=async()=>{ const g=GEAR[b.dataset.bg], upgrade=g.tier>1;
     try{ applyState(await rpc('farm_buy_gear',{p_id:g.id})); refresh(); sfx(upgrade?'lvup':'coin');

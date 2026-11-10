@@ -11,7 +11,7 @@ function openPack(t){
     const own=Object.entries(me.gear||{}).filter(([id,n])=>n>0&&GEAR[id]).map(([id,n])=>[GEAR[id],n]).sort((a,b)=>GEAR_LIST.indexOf(a[0])-GEAR_LIST.indexOf(b[0]));
     body += own.length ? own.map(([g,n])=>{ const on=(used[g.id]||[]).map(i=>bName(pt[i].s)).join('、');
       return `<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span> ${gearWearTag(g.id)}<div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div></div>`; }).join('')
-      : `<div class="empty">還沒有裝備<br><small>可以在寵物商店買、收成時撿到寶箱，或升級領禮物</small></div>`;
+      : `<div class="empty">還沒有裝備<br><small>可以在綜合商店買、收成時撿到寶箱，或升級領禮物</small></div>`;
     body += `<div class="sec">自動設定</div>` + autoSeedHTML() + autoFeedHTML();
     body += `<div class="rhint" style="text-align:center;margin-top:8px">到「我的家」點寵物下面的裝備格就能插上</div>`;
   } else if(bagTab==='item'){
@@ -37,7 +37,7 @@ function openPack(t){
       return `<div class="skcard${t.id===cur?' on':''}"><div class="tsw" data-tpv="${t.id}" style="background:linear-gradient(${fx.sky[0]},${fx.sky[1]} 60%,${fx.sky[2]})"><img alt="" src="${A('home_island')}"><span>${TONE_ICON[fx.fx]||'🌼'}</span></div><b>${esc(t.name)}</b>
         ${t.id===cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':`<button class="mini" data-tu="${t.id}">套用</button>`}</div>`; }).join('')}</div>`;
   }
-  modal('🎒 背包', body, [[bagTab==='gear'?'🛒 去寵物商店':bagTab==='item'?'🛒 去道具商店':'🛒 去建築商店','o',()=>bagTab==='item'?openItemShop():openShopTab(bagTab==='gear'?'gear':bagTab)]]);
+  modal('🎒 背包', body, [[bagTab==='gear'?'🛒 去綜合商店':bagTab==='item'?'🛒 去綜合商店':'🛒 去建築商店','o',()=>bagTab==='item'?openItemShop():openShopTab(bagTab==='gear'?'gear':bagTab)]]);
   const md=$('md');
   md.querySelectorAll('[data-bag]').forEach(b=>b.onclick=()=>openPack(b.dataset.bag));
   md.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>enterDecorEdit(b.dataset.pd));

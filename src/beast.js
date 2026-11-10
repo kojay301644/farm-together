@@ -113,15 +113,16 @@ function openPetSkin(sp, back){
   md.querySelectorAll('[data-bsk]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_pskin',{p_id:b.dataset.bsk})); refresh(); sfx('lvup'); fxConfetti(); toast('新造型換上了！'); openPetSkin(sp, back); }catch(e){ toast(e.message); } });
 }
 
-/* 寵物商店：裝備／寵物／寵物造型 */
+/* 綜合商店：裝備／寵物／寵物造型／道具 */
 let petShopTab = 'gear';
-function petShopTabs(){ return `<div class="tabs"><button data-pst="gear" class="${petShopTab==='gear'?'on':''}">🛡️ 裝備</button><button data-pst="pet" class="${petShopTab==='pet'?'on':''}">🐾 寵物</button><button data-pst="skin" class="${petShopTab==='skin'?'on':''}">🎨 寵物造型</button></div>`; }
+function petShopTabs(){ return `<div class="tabs"><button data-pst="gear" class="${petShopTab==='gear'?'on':''}">🛡️ 裝備</button><button data-pst="pet" class="${petShopTab==='pet'?'on':''}">🐾 寵物</button><button data-pst="skin" class="${petShopTab==='skin'?'on':''}">🎨 寵物造型</button><button data-pst="item" class="${petShopTab==='item'?'on':''}">🧪 道具</button></div>`; }
 function bindPetShopTabs(){ document.querySelectorAll('#md [data-pst]').forEach(b=>b.onclick=()=>openPetShop(b.dataset.pst)); }
 function openPetShop(t){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   if(t) petShopTab=t;
   if(petShopTab==='gear') return openGearShop();
-  const me=S.me, title=`寵物商店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`;
+  if(petShopTab==='item') return openItemShop();
+  const me=S.me, title=`綜合商店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`;
   if(petShopTab==='pet'){
     const own=me.beasts||{};
     const body = petShopTabs() + `<div class="bgrid">${BEASTS.map(b=>{ const has=own[b.id]!=null, lock=me.lv<b.lv;

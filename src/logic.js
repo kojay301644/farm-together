@@ -243,7 +243,7 @@ function openSeedPicker(i){
     if(i!=null && SEED_KEEP) toast(`連續播種：接著點空地就能一直種${CROP[ui.seed].name}`);
   });
 }
-const barnNav = cur => `<div class="snav"><button data-bn="bag" class="${cur==='bag'?'on':''}">📦 倉庫</button><button data-bn="seed" class="${cur==='seed'?'on':''}">🌱 種子商店</button><button data-bn="item" class="${cur==='item'?'on':''}">🧪 道具商店</button></div>`;
+const barnNav = cur => `<div class="snav"><button data-bn="bag" class="${cur==='bag'?'on':''}">📦 倉庫</button><button data-bn="seed" class="${cur==='seed'?'on':''}">🌱 種子商店</button></div>`;
 function bindBarnNav(){ document.querySelectorAll('[data-bn]').forEach(b=>b.onclick=()=> b.dataset.bn==='seed' ? openShop() : b.dataset.bn==='item' ? openItemShop() : openBag()); }
 function openShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');

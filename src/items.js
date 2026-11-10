@@ -8,15 +8,16 @@ const hms = s => `${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padStart
 
 function openItemShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
+  petShopTab='item';
   const me=S.me, dly=me.daily||{};
   const rows = ITEMS.map(x=>{ const left = x.buy_daily!=null ? x.buy_daily - (+dly['buy_'+x.id]||0) : null;
     const btns = [x.gems!=null?`<button class="mini gem" data-ib="${x.id}" data-pay="gems" ${(me.gems||0)<x.gems||left===0?'disabled':''}>💎${x.gems}</button>`:'',
                   x.gold!=null?`<button class="mini" data-ib="${x.id}" data-pay="gold" ${me.gold<x.gold||left===0?'disabled':''}>${x.gold.toLocaleString()} 金</button>`:''].join('');
     return `<div class="row"><div class="ic">${itemIcon(x)}</div><div class="tx"><b>${esc(x.name)}</b>${(me.items||{})[x.id]?` <span class="tag">有 ${(me.items||{})[x.id]} 個</span>`:''}
       <div>${esc(x.descr)}${x.buy_daily!=null?`（每天限買 ${x.buy_daily} 個，今天還能買 ${Math.max(0,left)} 個）`:''}${x.use_daily!=null?`（每天最多用 ${x.use_daily} 次）`:''}</div></div><div class="ibtns">${btns}</div></div>`; }).join('');
-  modal(`穀倉　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`,
-    barnNav('item') + `<div class="rhint">買了會放進「背包 → 🧪 道具」，要用的時候再按「使用」。單塊田的肥料：用「收成」點還沒成熟的作物就能用。</div>` + rows);
-  bindBarnNav();
+  modal(`綜合商店　<span style="font-size:14px;color:var(--ink2)">${me.gold.toLocaleString()} 金・💎${(me.gems||0).toLocaleString()}</span>`,
+    petShopTabs() + `<div class="rhint">買了會放進「背包 → 🧪 道具」，要用的時候再按「使用」。單塊田的肥料：用「收成」點還沒成熟的作物就能用。</div>` + rows);
+  bindPetShopTabs();
   document.querySelectorAll('#md [data-ib]').forEach(b=>b.onclick=async()=>{ const x=ITEM[b.dataset.ib];
     try{ applyState(await rpc('farm_item_buy',{p_id:x.id,p_pay:b.dataset.pay,p_n:1})); refresh(); sfx('coin'); toast(`買了「${x.name}」，放在背包裡`); openItemShop(); }catch(e){ toast(e.message); } });
 }
@@ -24,7 +25,7 @@ function openItemShop(){
 function itemBagHTML(){
   const me=S.me, own=ITEMS.filter(x=>(me.items||{})[x.id]>0);
   return own.length ? own.map(x=>`<div class="row"><div class="ic">${itemIcon(x)}</div><div class="tx"><b>${esc(x.name)}</b> <span class="tag">×${me.items[x.id]}</span><div>${esc(x.descr)}</div></div><button class="mini o" data-iu="${x.id}">使用</button></div>`).join('')
-    : `<div class="empty">還沒有道具<br><small>到穀倉的「🧪 道具商店」買</small></div>`;
+    : `<div class="empty">還沒有道具<br><small>到綜合商店的「🧪 道具」買</small></div>`;
 }
 function bindItemBag(){ document.querySelectorAll('#md [data-iu]').forEach(b=>b.onclick=()=>useItem(b.dataset.iu)); }
 
