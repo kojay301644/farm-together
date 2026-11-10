@@ -555,7 +555,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = $('bBag').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -714,6 +714,7 @@ $('nickBtn').onclick = createNick;
 $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); });
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
+$('bBag').onclick = ()=>{ if(S && mode!=='visit') openPack(); };
 $('bSet').onclick = ()=>{ if(S) openSettings(); };
 $('bHelp').onclick = ()=>{ if(S) openHelp(); };
 $('bSign').onclick = ()=>openSign();
@@ -744,7 +745,8 @@ async function loadTicker(){
   try{ const on=+((CFG_SET||{}).ticker_on ?? 1)!==0, L=on?await rpc('farm_ticker'):[], ev=eventInfo(); const sig=(ev||'')+L.map(e=>e.t+e.a).join();
     if(sig===tkLast) return; tkLast=sig; tkItems=L;
     const el=$('tk'); if(!el) return;
-    const parts=(ev?[ev]:[]).concat(L.map(tkText).filter(Boolean));
+    shoutSet(L.filter(e=>e.k==='shout'));
+    const parts=(ev?[ev]:[]).concat(L.filter(e=>e.k!=='shout').map(tkText).filter(Boolean));
     el.innerHTML = parts.join('<span class="sep">｜</span>');
     $('ticker').classList.toggle('off', !parts.length);
     tkW=el.scrollWidth; tkX=$('ticker').clientWidth;
@@ -757,6 +759,29 @@ function tkLoop(now){ requestAnimationFrame(tkLoop); const el=$('tk'); if(!el||!
   tkX -= ((typeof LOWFX!=='undefined'&&LOWFX) ? 0.6 : 0.9) * k; if(tkX < -tkW) tkX = $('ticker').clientWidth;
   el.style.transform=`translateX(${tkX.toFixed(1)}px)`; }
 requestAnimationFrame(tkLoop);
+
+/* ================= 大聲公：獨立的金色跑馬燈，一則一則輪流跑 ================= */
+let sbList=[], sbIdx=0, sbX=0, sbW=0, sbSeen=new Set(), sbT=0;
+function shoutSet(list){
+  const bar=$('shoutBar'); if(!bar) return;
+  const fresh = list.some(e=>!sbSeen.has(e.t+'|'+e.a));
+  list.forEach(e=>sbSeen.add(e.t+'|'+e.a));
+  const same = list.length===sbList.length && list.every((e,i)=>sbList[i] && sbList[i].t===e.t && sbList[i].a===e.a);
+  sbList = list;
+  bar.classList.toggle('off', !list.length);
+  if(!list.length){ sbW=0; return; }
+  if(fresh){ bar.classList.remove('pop'); void bar.offsetWidth; bar.classList.add('pop'); sbIdx = list.length-1; sbShow(); }
+  else if(!same){ sbIdx = Math.min(sbIdx, list.length-1); sbShow(); }
+}
+function sbShow(){ const e=sbList[sbIdx]; if(!e) return; const el=$('sbTx');
+  el.innerHTML = `<b>${esc(e.a)}</b>：${esc(e.m||'')}`; sbW = el.scrollWidth; sbX = el.parentNode.clientWidth; }
+function sbLoop(now){ requestAnimationFrame(sbLoop); const el=$('sbTx'); if(!el||!sbW||!sbList.length) return;
+  if(PAUSED() || now-sbT < 1000/FPS_CAP()-2){ if(PAUSED()) sbT=now; return; }
+  const k=Math.min(4,(now-(sbT||now))/16.7); sbT=now;
+  sbX -= ((typeof LOWFX!=='undefined'&&LOWFX) ? 0.8 : 1.2) * k;
+  if(sbX < -sbW){ sbIdx = (sbIdx+1) % sbList.length; sbShow(); }
+  el.style.transform=`translate(${sbX.toFixed(1)}px,-50%)`; }
+requestAnimationFrame(sbLoop);
 setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 45000);
 
 /* ================= 禮物信箱、獎勵顯示、活動 ================= */

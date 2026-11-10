@@ -86,6 +86,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .tool.on{background:#E3F6EA;color:var(--green-d);box-shadow:inset 0 0 0 2px var(--green)}
 .tool .badge{position:absolute;top:2px;right:4px;background:var(--orange);color:#fff;border-radius:8px;font-size:10px;padding:0 5px}
 .home{max-width:720px;margin:0 auto 8px;display:flex;justify-content:flex-end;pointer-events:none}
+.home .bagbtn{margin-right:auto;background:linear-gradient(#FFB45E,#F28B2E);color:#fff;border:2.5px solid #3A3226;box-shadow:0 3px 0 #3A3226;font-size:14px;padding:6px 14px}
 .home button{pointer-events:auto;background:#fff;border-radius:16px;padding:7px 12px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px}
 
 /* 視窗 */
@@ -458,6 +459,25 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .ticker{margin:6px auto 0;max-width:560px;height:24px;overflow:hidden;position:relative;pointer-events:none;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
 .ticker:empty,.ticker.off{display:none}
+/* 大聲公：獨立的金色跑馬燈 */
+.shoutbar{position:relative;margin:6px auto 0;max-width:540px;width:calc(100% - 24px);height:34px;border-radius:18px;pointer-events:none;overflow:hidden;
+  background:linear-gradient(90deg,#FF7A1A,#FFB628 30%,#FFE066 50%,#FFB628 70%,#FF7A1A);background-size:200% 100%;animation:sbbg 4s linear infinite,sbglow 1.6s ease-in-out infinite;
+  border:2.5px solid #7A3B0A;box-shadow:0 0 0 2px #FFE9A8 inset,0 3px 0 #7A3B0A,0 0 14px rgba(255,170,40,.9)}
+.shoutbar.off{display:none}
+.shoutbar.pop{animation:sbbg 4s linear infinite,sbpop .7s cubic-bezier(.3,1.6,.5,1)}
+.sbic{position:absolute;left:4px;top:50%;transform:translateY(-50%);z-index:3;width:28px;height:28px;border-radius:50%;background:#C2410C;border:2px solid #FFE9A8;display:flex;align-items:center;justify-content:center;font-size:15px;animation:sbic 1s ease-in-out infinite}
+.sbwin{position:absolute;left:36px;right:8px;top:0;bottom:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.sbtx{position:absolute;white-space:nowrap;top:50%;left:0;transform:translate(0,-50%);font-size:15px;font-weight:900;color:#5A1F00;text-shadow:0 1px 0 #FFF4C2,0 0 6px rgba(255,255,255,.8);will-change:transform}
+.sbtx b{color:#B91C1C;text-shadow:0 1px 0 #FFF4C2}
+.sbshine{position:absolute;top:0;bottom:0;width:60px;left:-80px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);animation:sbshine 2.6s ease-in-out infinite;z-index:2}
+.sbsp{position:absolute;color:#fff;font-size:11px;z-index:2;text-shadow:0 0 6px #fff;animation:twk 1.4s ease-in-out infinite}
+.sbsp.s1{left:34%;top:1px}.sbsp.s2{left:62%;bottom:1px;animation-delay:.5s}.sbsp.s3{right:14px;top:3px;animation-delay:.9s}
+@keyframes sbbg{to{background-position:-200% 0}}
+@keyframes sbglow{50%{box-shadow:0 0 0 2px #FFE9A8 inset,0 3px 0 #7A3B0A,0 0 24px rgba(255,200,60,1)}}
+@keyframes sbpop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes sbic{50%{transform:translateY(-50%) rotate(-14deg) scale(1.12)}}
+@keyframes sbshine{0%{left:-80px}60%,100%{left:110%}}
+body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{animation:none}
 .tk{position:absolute;white-space:nowrap;top:2px;left:0;font-size:13px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 6px rgba(0,0,0,.35);will-change:transform}
 .tk b{color:#FFE27A}.tk .sep{opacity:.6;margin:0 14px}
 
@@ -525,13 +545,14 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
+  <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
   <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
   <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
-  <div class="home"><button id="bHome">🌾 回到農田</button></div>
+  <div class="home"><button id="bBag" class="bagbtn">🎒 背包</button><button id="bHome">🌾 回到農田</button></div>
   <div class="dock-in"><div class="tools" id="tools"></div></div>
 </div>
 

@@ -110,7 +110,7 @@ const ICONS = {
   bug:`<svg viewBox="0 0 32 32"><rect x="10" y="12" width="11" height="15" rx="3" fill="#7ED957"/><rect x="12" y="7" width="7" height="6" rx="1.5" fill="#5DB54A"/><path d="M19 9 h6 v3 h-3" fill="#5DB54A"/><rect x="12" y="16" width="7" height="6" rx="1.5" fill="#fff"/><circle cx="27" cy="7" r="1.2" fill="#B5E8A0"/><circle cx="29" cy="11" r="1.2" fill="#B5E8A0"/><circle cx="26" cy="14" r="1.2" fill="#B5E8A0"/></svg>`,
   shovel:`<svg viewBox="0 0 32 32"><rect x="14.5" y="3" width="3" height="16" rx="1.5" fill="#C98B5E"/><rect x="11" y="2" width="10" height="3.5" rx="1.7" fill="#A86F45"/><path d="M10 18 h12 v4 a6 6 0 0 1 -12 0Z" fill="#9AA6B2"/><path d="M12 19.5 h8" stroke="#C5CED6" stroke-width="1.5"/></svg>`,
 };
-const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','除草'],['bug','除蟲'],['shovel','剷除'],['bag','背包']];
+const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','除草'],['bug','除蟲'],['shovel','剷除']];
 for(const k in ICONS) ICONS[k] = olc(ICONS[k]).replace(/stroke-width="2"/g,'stroke-width="1.3"');
 
 /* ================= 工具函式 ================= */

@@ -86,6 +86,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .tool.on{background:#E3F6EA;color:var(--green-d);box-shadow:inset 0 0 0 2px var(--green)}
 .tool .badge{position:absolute;top:2px;right:4px;background:var(--orange);color:#fff;border-radius:8px;font-size:10px;padding:0 5px}
 .home{max-width:720px;margin:0 auto 8px;display:flex;justify-content:flex-end;pointer-events:none}
+.home .bagbtn{margin-right:auto;background:linear-gradient(#FFB45E,#F28B2E);color:#fff;border:2.5px solid #3A3226;box-shadow:0 3px 0 #3A3226;font-size:14px;padding:6px 14px}
 .home button{pointer-events:auto;background:#fff;border-radius:16px;padding:7px 12px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px}
 
 /* 視窗 */
@@ -458,6 +459,25 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 .ticker{margin:6px auto 0;max-width:560px;height:24px;overflow:hidden;position:relative;pointer-events:none;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
 .ticker:empty,.ticker.off{display:none}
+/* 大聲公：獨立的金色跑馬燈 */
+.shoutbar{position:relative;margin:6px auto 0;max-width:540px;width:calc(100% - 24px);height:34px;border-radius:18px;pointer-events:none;overflow:hidden;
+  background:linear-gradient(90deg,#FF7A1A,#FFB628 30%,#FFE066 50%,#FFB628 70%,#FF7A1A);background-size:200% 100%;animation:sbbg 4s linear infinite,sbglow 1.6s ease-in-out infinite;
+  border:2.5px solid #7A3B0A;box-shadow:0 0 0 2px #FFE9A8 inset,0 3px 0 #7A3B0A,0 0 14px rgba(255,170,40,.9)}
+.shoutbar.off{display:none}
+.shoutbar.pop{animation:sbbg 4s linear infinite,sbpop .7s cubic-bezier(.3,1.6,.5,1)}
+.sbic{position:absolute;left:4px;top:50%;transform:translateY(-50%);z-index:3;width:28px;height:28px;border-radius:50%;background:#C2410C;border:2px solid #FFE9A8;display:flex;align-items:center;justify-content:center;font-size:15px;animation:sbic 1s ease-in-out infinite}
+.sbwin{position:absolute;left:36px;right:8px;top:0;bottom:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.sbtx{position:absolute;white-space:nowrap;top:50%;left:0;transform:translate(0,-50%);font-size:15px;font-weight:900;color:#5A1F00;text-shadow:0 1px 0 #FFF4C2,0 0 6px rgba(255,255,255,.8);will-change:transform}
+.sbtx b{color:#B91C1C;text-shadow:0 1px 0 #FFF4C2}
+.sbshine{position:absolute;top:0;bottom:0;width:60px;left:-80px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);animation:sbshine 2.6s ease-in-out infinite;z-index:2}
+.sbsp{position:absolute;color:#fff;font-size:11px;z-index:2;text-shadow:0 0 6px #fff;animation:twk 1.4s ease-in-out infinite}
+.sbsp.s1{left:34%;top:1px}.sbsp.s2{left:62%;bottom:1px;animation-delay:.5s}.sbsp.s3{right:14px;top:3px;animation-delay:.9s}
+@keyframes sbbg{to{background-position:-200% 0}}
+@keyframes sbglow{50%{box-shadow:0 0 0 2px #FFE9A8 inset,0 3px 0 #7A3B0A,0 0 24px rgba(255,200,60,1)}}
+@keyframes sbpop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes sbic{50%{transform:translateY(-50%) rotate(-14deg) scale(1.12)}}
+@keyframes sbshine{0%{left:-80px}60%,100%{left:110%}}
+body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{animation:none}
 .tk{position:absolute;white-space:nowrap;top:2px;left:0;font-size:13px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 6px rgba(0,0,0,.35);will-change:transform}
 .tk b{color:#FFE27A}.tk .sep{opacity:.6;margin:0 14px}
 
@@ -514,24 +534,25 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794303395" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794303497" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794303395" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794303395" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794303497" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794303497" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794303395" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794303497" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
+  <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794303395" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794303395" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794303497" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794303497" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
-  <div class="home"><button id="bHome">🌾 回到農田</button></div>
+  <div class="home"><button id="bBag" class="bagbtn">🎒 背包</button><button id="bHome">🌾 回到農田</button></div>
   <div class="dock-in"><div class="tools" id="tools"></div></div>
 </div>
 
@@ -543,11 +564,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794303395" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794303497" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794303395";
+const BUILD="1794303497";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -660,7 +681,7 @@ const ICONS = {
   bug:`<svg viewBox="0 0 32 32"><rect x="10" y="12" width="11" height="15" rx="3" fill="#7ED957"/><rect x="12" y="7" width="7" height="6" rx="1.5" fill="#5DB54A"/><path d="M19 9 h6 v3 h-3" fill="#5DB54A"/><rect x="12" y="16" width="7" height="6" rx="1.5" fill="#fff"/><circle cx="27" cy="7" r="1.2" fill="#B5E8A0"/><circle cx="29" cy="11" r="1.2" fill="#B5E8A0"/><circle cx="26" cy="14" r="1.2" fill="#B5E8A0"/></svg>`,
   shovel:`<svg viewBox="0 0 32 32"><rect x="14.5" y="3" width="3" height="16" rx="1.5" fill="#C98B5E"/><rect x="11" y="2" width="10" height="3.5" rx="1.7" fill="#A86F45"/><path d="M10 18 h12 v4 a6 6 0 0 1 -12 0Z" fill="#9AA6B2"/><path d="M12 19.5 h8" stroke="#C5CED6" stroke-width="1.5"/></svg>`,
 };
-const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','除草'],['bug','除蟲'],['shovel','剷除'],['bag','背包']];
+const TOOLS = [['hand','收成'],['seed','播種'],['water','澆水'],['weed','除草'],['bug','除蟲'],['shovel','剷除']];
 for(const k in ICONS) ICONS[k] = olc(ICONS[k]).replace(/stroke-width="2"/g,'stroke-width="1.3"');
 
 /* ================= 工具函式 ================= */
@@ -3221,7 +3242,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = $('bBag').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -3380,6 +3401,7 @@ $('nickBtn').onclick = createNick;
 $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); });
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
+$('bBag').onclick = ()=>{ if(S && mode!=='visit') openPack(); };
 $('bSet').onclick = ()=>{ if(S) openSettings(); };
 $('bHelp').onclick = ()=>{ if(S) openHelp(); };
 $('bSign').onclick = ()=>openSign();
@@ -3410,7 +3432,8 @@ async function loadTicker(){
   try{ const on=+((CFG_SET||{}).ticker_on ?? 1)!==0, L=on?await rpc('farm_ticker'):[], ev=eventInfo(); const sig=(ev||'')+L.map(e=>e.t+e.a).join();
     if(sig===tkLast) return; tkLast=sig; tkItems=L;
     const el=$('tk'); if(!el) return;
-    const parts=(ev?[ev]:[]).concat(L.map(tkText).filter(Boolean));
+    shoutSet(L.filter(e=>e.k==='shout'));
+    const parts=(ev?[ev]:[]).concat(L.filter(e=>e.k!=='shout').map(tkText).filter(Boolean));
     el.innerHTML = parts.join('<span class="sep">｜</span>');
     $('ticker').classList.toggle('off', !parts.length);
     tkW=el.scrollWidth; tkX=$('ticker').clientWidth;
@@ -3423,6 +3446,29 @@ function tkLoop(now){ requestAnimationFrame(tkLoop); const el=$('tk'); if(!el||!
   tkX -= ((typeof LOWFX!=='undefined'&&LOWFX) ? 0.6 : 0.9) * k; if(tkX < -tkW) tkX = $('ticker').clientWidth;
   el.style.transform=`translateX(${tkX.toFixed(1)}px)`; }
 requestAnimationFrame(tkLoop);
+
+/* ================= 大聲公：獨立的金色跑馬燈，一則一則輪流跑 ================= */
+let sbList=[], sbIdx=0, sbX=0, sbW=0, sbSeen=new Set(), sbT=0;
+function shoutSet(list){
+  const bar=$('shoutBar'); if(!bar) return;
+  const fresh = list.some(e=>!sbSeen.has(e.t+'|'+e.a));
+  list.forEach(e=>sbSeen.add(e.t+'|'+e.a));
+  const same = list.length===sbList.length && list.every((e,i)=>sbList[i] && sbList[i].t===e.t && sbList[i].a===e.a);
+  sbList = list;
+  bar.classList.toggle('off', !list.length);
+  if(!list.length){ sbW=0; return; }
+  if(fresh){ bar.classList.remove('pop'); void bar.offsetWidth; bar.classList.add('pop'); sbIdx = list.length-1; sbShow(); }
+  else if(!same){ sbIdx = Math.min(sbIdx, list.length-1); sbShow(); }
+}
+function sbShow(){ const e=sbList[sbIdx]; if(!e) return; const el=$('sbTx');
+  el.innerHTML = `<b>${esc(e.a)}</b>：${esc(e.m||'')}`; sbW = el.scrollWidth; sbX = el.parentNode.clientWidth; }
+function sbLoop(now){ requestAnimationFrame(sbLoop); const el=$('sbTx'); if(!el||!sbW||!sbList.length) return;
+  if(PAUSED() || now-sbT < 1000/FPS_CAP()-2){ if(PAUSED()) sbT=now; return; }
+  const k=Math.min(4,(now-(sbT||now))/16.7); sbT=now;
+  sbX -= ((typeof LOWFX!=='undefined'&&LOWFX) ? 0.8 : 1.2) * k;
+  if(sbX < -sbW){ sbIdx = (sbIdx+1) % sbList.length; sbShow(); }
+  el.style.transform=`translate(${sbX.toFixed(1)}px,-50%)`; }
+requestAnimationFrame(sbLoop);
 setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 45000);
 
 /* ================= 禮物信箱、獎勵顯示、活動 ================= */
