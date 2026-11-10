@@ -198,7 +198,7 @@ const autoOn = (me, key) => !((me.auto_off||{})[key]);
 function autoBarHTML(){ const me=S.me;
   const on = AUTO_ROWS.filter(([k,f])=>autoInfo(me,k,f) && autoOn(me,k)).map(([k])=>GEAR_FUNC[k][1]).join('');
   return `<button class="autobtn" id="hAuto"><b>⚙️ 自動農場設定</b><span>${on || '還沒有開啟的自動功能'}</span><i>›</i></button>`; }
-function openAutoFarm(){
+function openAutoFarm(back){
   if(mode==='visit') return;
   const me=S.me;
   const rows = AUTO_ROWS.map(([k,f])=>{ const inf=autoInfo(me,k,f), on=autoOn(me,k), [name,ic]=GEAR_FUNC[k];
@@ -206,8 +206,8 @@ function openAutoFarm(){
     const extra = inf && on ? (k==='plant' ? autoSeedHTML() : k==='feed' ? autoFeedHTML() : '') : '';
     return `<div class="arow${inf?'':' off'}"><div class="ahd"><span class="aic">${ic}</span><div class="atx"><b>${name}</b><small>${who}</small></div>
       ${inf?`<button class="sw${on?' on':''}" data-asw="${k}" aria-label="${name}"><i></i></button>`:''}</div>${extra}</div>`; }).join('');
-  modal('⚙️ 自動農場設定', `<div class="rhint">裝備戴在夥伴身上才會運作；關掉的功能離線時也不會做（例如想自己收成拿寶箱，就把自動收成關掉）。</div>${rows}`, [['← 回我的家','sub',()=>openHome()]]);
+  modal('⚙️ 自動農場設定', `<div class="rhint">裝備戴在夥伴身上才會運作；關掉的功能離線時也不會做（例如想自己收成拿寶箱，就把自動收成關掉）。</div>${rows}`, [back ? ['← 返回','sub',back] : ['← 回我的家','sub',()=>openHome()]]);
   document.querySelectorAll('#md [data-asw]').forEach(b=>b.onclick=async()=>{ const k=b.dataset.asw, off=autoOn(S.me,k);
-    try{ applyState(await rpc('farm_set_auto_off',{p_func:k,p_off:off})); refresh(); sfx('coin'); toast(`${GEAR_FUNC[k][0]}：${off?'關閉':'開啟'}`); openAutoFarm(); }catch(e){ toast(e.message); } });
+    try{ applyState(await rpc('farm_set_auto_off',{p_func:k,p_off:off})); refresh(); sfx('coin'); toast(`${GEAR_FUNC[k][0]}：${off?'關閉':'開啟'}`); openAutoFarm(back); }catch(e){ toast(e.message); } });
   bindAutoSel();
 }

@@ -18,6 +18,7 @@ function openBeastPark(t){
   let body = tabs;
   if(parkTab==='mine'){
     const pt=partyOf(who), inP=sp=>pt.findIndex(p=>p.s===sp), cap=visit?6:(who.party_cap||1);
+    if(!visit) body += autoBarHTML();
     body += `<div class="sec">${visit?'牠的夥伴':`我的夥伴（${pt.length}/${cap}）`}</div>` + partyRowHTML(who, !visit);
     if(!visit) body += `<div class="rhint">👆 點下面任何一隻寵物就能換上場（格子滿了會問你要換掉誰，裝備會留給新上場的寵物）。👑 隊長會跑去幫你收成、澆水。</div>`;
     const list = BEASTS.filter(b=>own[b.id]!=null);
@@ -38,6 +39,7 @@ function openBeastPark(t){
   modal(visit ? `${esc(V.owner.nickname)} 的寵物園` : '寵物園', body);
   const md=$('md');
   md.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>openBeastPark(b.dataset.pt));
+  if($('hAuto')) $('hAuto').onclick = ()=>openAutoFarm(()=>openBeastPark('mine'));
   const pt0 = () => JSON.parse(JSON.stringify(partyOf(S.me)));
   md.querySelectorAll('[data-on]').forEach(b=>b.onclick=async()=>{ const pt=pt0(); pt.push({s:b.dataset.on,g:null}); await saveParty(pt, `${bName(b.dataset.on)} 上場了！`); openBeastPark('mine'); });
   md.querySelectorAll('[data-off]').forEach(b=>b.onclick=async()=>{ const pt=pt0().filter(p=>p.s!==b.dataset.off); await saveParty(pt, `${bName(b.dataset.off)} 回寵物園玩了`); openBeastPark('mine'); });
