@@ -138,8 +138,10 @@ function openCos(t){
     ? `<div class="cosprev">${list.map(c=>`<div class="cp"><img class="avatar avimg fr ${c.id}" src="${avSrc(me.avatar)}" alt=""><small>${esc(c.name)}</small></div>`).join('')}</div>` : '';
   const rows = list.map(c=>{ const has=ok(c.id), on = cosTab==='title' ? me.title_on===c.id : me.frame_on===c.id;
     const face = cosTab==='frame' ? `<img class="avatar avimg fr ${c.id}" src="${avSrc(me.avatar)}" alt="" style="width:40px;height:40px">` : `<span class="ttl big">${esc(c.name)}</span>`;
-    const act = has ? (on ? `<button class="mini sub" data-cun="${c.id}">卸下</button>` : `<button class="mini" data-con="${c.id}">使用</button>`) + (c.gems!=null?`<button class="mini gem" data-cb="${c.id}" ${(me.gems||0)<c.gems?'disabled':''}>續 💎${c.gems}</button>`:'')
-      : c.gems!=null ? `<button class="mini gem" data-cb="${c.id}" ${(me.gems||0)<c.gems?'disabled':''}>💎${c.gems}・${c.days} 天</button>` : `<span class="lock">完成成就取得</span>`;
+    const buyable = c.gold!=null || c.gems!=null, poor = c.gold!=null ? me.gold<c.gold : (me.gems||0)<c.gems;
+    const price = c.gold!=null ? `${c.gold.toLocaleString()} 金` : `💎${c.gems}`, cls = c.gold!=null ? 'mini' : 'mini gem';
+    const act = has ? (on ? `<button class="mini sub" data-cun="${c.id}">卸下</button>` : `<button class="mini" data-con="${c.id}">使用</button>`) + (buyable?`<button class="${cls}" data-cb="${c.id}" ${poor?'disabled':''}>續 ${price}</button>`:'')
+      : buyable ? `<button class="${cls}" data-cb="${c.id}" ${poor?'disabled':''}>${price}・${c.days} 天</button>` : `<span class="lock">完成成就取得</span>`;
     return `<div class="row${on?' scur':''}"><div class="ic">${face}</div><div class="tx"><b>${esc(c.name)}</b>${on?' <span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':''}
       <div>${has?leftTxt(c.id):c.ach?`成就：${esc(c.ach)}`:''}</div></div><div class="ibtns">${act}</div></div>`; }).join('');
   modal('🏷️ 稱號・頭像框', `<div class="snav"><button data-ct="title" class="${cosTab==='title'?'on':''}">🏷️ 稱號</button><button data-ct="frame" class="${cosTab==='frame'?'on':''}">🖼️ 頭像框</button></div>

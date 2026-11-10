@@ -500,20 +500,20 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794277391" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794277963" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794277391" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794277391" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794277963" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794277963" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794277391" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794277963" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794277391" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794277391" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794277963" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794277963" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -529,11 +529,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794277391" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794277963" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794277391";
+const BUILD="1794277963";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2487,8 +2487,10 @@ function openCos(t){
     ? `<div class="cosprev">${list.map(c=>`<div class="cp"><img class="avatar avimg fr ${c.id}" src="${avSrc(me.avatar)}" alt=""><small>${esc(c.name)}</small></div>`).join('')}</div>` : '';
   const rows = list.map(c=>{ const has=ok(c.id), on = cosTab==='title' ? me.title_on===c.id : me.frame_on===c.id;
     const face = cosTab==='frame' ? `<img class="avatar avimg fr ${c.id}" src="${avSrc(me.avatar)}" alt="" style="width:40px;height:40px">` : `<span class="ttl big">${esc(c.name)}</span>`;
-    const act = has ? (on ? `<button class="mini sub" data-cun="${c.id}">卸下</button>` : `<button class="mini" data-con="${c.id}">使用</button>`) + (c.gems!=null?`<button class="mini gem" data-cb="${c.id}" ${(me.gems||0)<c.gems?'disabled':''}>續 💎${c.gems}</button>`:'')
-      : c.gems!=null ? `<button class="mini gem" data-cb="${c.id}" ${(me.gems||0)<c.gems?'disabled':''}>💎${c.gems}・${c.days} 天</button>` : `<span class="lock">完成成就取得</span>`;
+    const buyable = c.gold!=null || c.gems!=null, poor = c.gold!=null ? me.gold<c.gold : (me.gems||0)<c.gems;
+    const price = c.gold!=null ? `${c.gold.toLocaleString()} 金` : `💎${c.gems}`, cls = c.gold!=null ? 'mini' : 'mini gem';
+    const act = has ? (on ? `<button class="mini sub" data-cun="${c.id}">卸下</button>` : `<button class="mini" data-con="${c.id}">使用</button>`) + (buyable?`<button class="${cls}" data-cb="${c.id}" ${poor?'disabled':''}>續 ${price}</button>`:'')
+      : buyable ? `<button class="${cls}" data-cb="${c.id}" ${poor?'disabled':''}>${price}・${c.days} 天</button>` : `<span class="lock">完成成就取得</span>`;
     return `<div class="row${on?' scur':''}"><div class="ic">${face}</div><div class="tx"><b>${esc(c.name)}</b>${on?' <span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':''}
       <div>${has?leftTxt(c.id):c.ach?`成就：${esc(c.ach)}`:''}</div></div><div class="ibtns">${act}</div></div>`; }).join('');
   modal('🏷️ 稱號・頭像框', `<div class="snav"><button data-ct="title" class="${cosTab==='title'?'on':''}">🏷️ 稱號</button><button data-ct="frame" class="${cosTab==='frame'?'on':''}">🖼️ 頭像框</button></div>
