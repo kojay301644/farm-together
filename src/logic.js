@@ -296,12 +296,13 @@ function openBag(){
 async function openHome(){
   if(mode==='visit') return toast('這是好友的家喔');
   const {data:{user}} = await sb.auth.getUser();
-  modal(`🏠 ${esc(S.me.nickname)}的家`, `
+  modal(`🏠 ${esc(S.me.nickname)}的家`, `${autoBarHTML()}
     <div class="sec">我的寵物夥伴</div>${beastPanelHTML()}
     <div class="sec">成就（拿鑽石）</div>${achHTML(S.me)}
     <button class="btn sub" id="hCos" style="width:100%;margin-top:6px">🏷️ 稱號・頭像框</button>`);
   if($('hAch')) $('hAch').onclick = ()=>openAchs();
   if($('hCos')) $('hCos').onclick = ()=>openCos();
+  if($('hAuto')) $('hAuto').onclick = ()=>openAutoFarm();
   bindBeastPanel();
 }
 /* ================= 設定頁 ================= */
