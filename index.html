@@ -86,7 +86,8 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .tool.on{background:#E3F6EA;color:var(--green-d);box-shadow:inset 0 0 0 2px var(--green)}
 .tool .badge{position:absolute;top:2px;right:4px;background:var(--orange);color:#fff;border-radius:8px;font-size:10px;padding:0 5px}
 .home{max-width:720px;margin:0 auto 8px;display:flex;justify-content:flex-end;pointer-events:none}
-.home .bagbtn{margin-right:auto;background:linear-gradient(#FFB45E,#F28B2E);color:#fff;border:2.5px solid #3A3226;box-shadow:0 3px 0 #3A3226;font-size:14px;padding:6px 14px}
+.home .bagbtn.pal{margin-right:auto;margin-left:6px;background:linear-gradient(#7ED957,#3FAE5A)}
+.home .bagbtn{background:linear-gradient(#FFB45E,#F28B2E);color:#fff;border:2.5px solid #3A3226;box-shadow:0 3px 0 #3A3226;font-size:14px;padding:6px 14px}
 .home button{pointer-events:auto;background:#fff;border-radius:16px;padding:7px 12px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px}
 
 /* 視窗 */
@@ -534,25 +535,25 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794303497" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794303624" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794303497" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794303497" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794303624" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794303624" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794303497" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794303624" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794303497" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794303497" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794303624" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794303624" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
-  <div class="home"><button id="bBag" class="bagbtn">🎒 背包</button><button id="bHome">🌾 回到農田</button></div>
+  <div class="home"><button id="bBag" class="bagbtn">🎒 背包</button><button id="bPals" class="bagbtn pal">🐾 我的夥伴</button><button id="bHome">🌾 回到農田</button></div>
   <div class="dock-in"><div class="tools" id="tools"></div></div>
 </div>
 
@@ -564,11 +565,11 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794303497" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794303624" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794303497";
+const BUILD="1794303624";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3242,7 +3243,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = $('bBag').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -3402,6 +3403,7 @@ $('nickIn').addEventListener('keydown', e=>{ if(e.key==='Enter') createNick(); }
 $('nickOut').onclick = ()=>sb.auth.signOut();
 $('bHome').onclick = goHome;
 $('bBag').onclick = ()=>{ if(S && mode!=='visit') openPack(); };
+$('bPals').onclick = ()=>{ if(S && mode!=='visit') openBeastPark('mine'); };
 $('bSet').onclick = ()=>{ if(S) openSettings(); };
 $('bHelp').onclick = ()=>{ if(S) openHelp(); };
 $('bSign').onclick = ()=>openSign();

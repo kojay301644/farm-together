@@ -86,7 +86,8 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 .tool.on{background:#E3F6EA;color:var(--green-d);box-shadow:inset 0 0 0 2px var(--green)}
 .tool .badge{position:absolute;top:2px;right:4px;background:var(--orange);color:#fff;border-radius:8px;font-size:10px;padding:0 5px}
 .home{max-width:720px;margin:0 auto 8px;display:flex;justify-content:flex-end;pointer-events:none}
-.home .bagbtn{margin-right:auto;background:linear-gradient(#FFB45E,#F28B2E);color:#fff;border:2.5px solid #3A3226;box-shadow:0 3px 0 #3A3226;font-size:14px;padding:6px 14px}
+.home .bagbtn.pal{margin-right:auto;margin-left:6px;background:linear-gradient(#7ED957,#3FAE5A)}
+.home .bagbtn{background:linear-gradient(#FFB45E,#F28B2E);color:#fff;border:2.5px solid #3A3226;box-shadow:0 3px 0 #3A3226;font-size:14px;padding:6px 14px}
 .home button{pointer-events:auto;background:#fff;border-radius:16px;padding:7px 12px;font-weight:900;font-size:13px;box-shadow:0 3px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px}
 
 /* 視窗 */
@@ -552,7 +553,7 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 </div>
 
 <div class="dock" id="dock" style="display:none">
-  <div class="home"><button id="bBag" class="bagbtn">🎒 背包</button><button id="bHome">🌾 回到農田</button></div>
+  <div class="home"><button id="bBag" class="bagbtn">🎒 背包</button><button id="bPals" class="bagbtn pal">🐾 我的夥伴</button><button id="bHome">🌾 回到農田</button></div>
   <div class="dock-in"><div class="tools" id="tools"></div></div>
 </div>
 
