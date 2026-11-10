@@ -12,8 +12,8 @@ function openPack(t){
     body += own.length ? own.map(([g,n])=>{ const on=(used[g.id]||[]).map(i=>bName(pt[i].s)).join('、');
       return `<div class="row"><div class="ic">${gearImg(g,44)}</div><div class="tx"><b>${gearTitle(g)}</b> <span class="tag">×${n}</span> ${gearWearTag(g.id)}<div>${GEAR_FUNC[g.func][1]} ${GEAR_FUNC[g.func][0]}：${gearDesc(g)}</div></div></div>`; }).join('')
       : `<div class="empty">還沒有裝備<br><small>可以在綜合商店買、收成時撿到寶箱，或升級領禮物</small></div>`;
-    body += `<div class="rhint" style="text-align:center">自動播種、餵食等設定在「我的家 → ⚙️ 自動農場設定」</div>`;
-    body += `<div class="rhint" style="text-align:center;margin-top:8px">到「我的家」點寵物下面的裝備格就能插上</div>`;
+    body += `<div class="rhint" style="text-align:center">自動播種、餵食等設定在「🐾 我的夥伴 → ⚙️ 自動農場設定」</div>`;
+    body += `<div class="rhint" style="text-align:center;margin-top:8px">到「🐾 我的夥伴」點寵物下面的裝備格就能插上</div>`;
   } else if(bagTab==='item'){
     body += itemBagHTML();
   } else if(bagTab==='decor'){

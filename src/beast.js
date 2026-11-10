@@ -18,7 +18,7 @@ function openBeastPark(t){
   let body = tabs;
   if(parkTab==='mine'){
     const pt=partyOf(who), inP=sp=>pt.findIndex(p=>p.s===sp), cap=visit?6:(who.party_cap||1);
-    if(!visit) body += autoBarHTML();
+    if(!visit) body += autoBarHTML() + autoProgressHTML(who);
     body += `<div class="sec">${visit?'牠的夥伴':`我的夥伴（${pt.length}/${cap}）`}</div>` + partyRowHTML(who, !visit);
     if(!visit) body += `<div class="rhint">👆 點下面任何一隻寵物就能換上場（格子滿了會問你要換掉誰，裝備會留給新上場的寵物）。👑 隊長會跑去幫你收成、澆水。</div>`;
     const list = BEASTS.filter(b=>own[b.id]!=null);

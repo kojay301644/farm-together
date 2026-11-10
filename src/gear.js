@@ -186,7 +186,7 @@ setInterval(()=>checkUpdate(false), 60000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkUpdate(true); });
 setTimeout(()=>checkUpdate(false), 3000);
 
-/* ================= 自動農場設定（我的家最上面） ================= */
+/* ================= 自動農場設定（我的夥伴最上面） ================= */
 const AUTO_ROWS = [['plant',['plant']],['water',['water']],['harvest',['harvest']],['weed',['weed']],['bug',['bug']],['feed',['feed','clear']],['swat',['swat']],['dog',['dog']],['scare',['scare']]];
 function autoInfo(me, key, funcs){ // 哪隻夥伴戴著、效果
   const list = partyOf(me).map(p=>({p,g:GEAR[p.g]})).filter(x=>x.g && funcs.includes(x.g.func));
@@ -206,7 +206,7 @@ function openAutoFarm(back){
     const extra = inf && on ? (k==='plant' ? autoSeedHTML() : k==='feed' ? autoFeedHTML() : '') : '';
     return `<div class="arow${inf?'':' off'}"><div class="ahd"><span class="aic">${ic}</span><div class="atx"><b>${name}</b><small>${who}</small></div>
       ${inf?`<button class="sw${on?' on':''}" data-asw="${k}" aria-label="${name}"><i></i></button>`:''}</div>${extra}</div>`; }).join('');
-  modal('⚙️ 自動農場設定', `<div class="rhint">裝備戴在夥伴身上才會運作；關掉的功能離線時也不會做（例如想自己收成拿寶箱，就把自動收成關掉）。</div>${rows}`, [back ? ['← 返回','sub',back] : ['← 回我的家','sub',()=>openHome()]]);
+  modal('⚙️ 自動農場設定', `<div class="rhint">裝備戴在夥伴身上才會運作；關掉的功能離線時也不會做（例如想自己收成拿寶箱，就把自動收成關掉）。</div>${rows}`, [back ? ['← 返回','sub',back] : ['← 回我的夥伴','sub',()=>openBeastPark('mine')]]);
   document.querySelectorAll('#md [data-asw]').forEach(b=>b.onclick=async()=>{ const k=b.dataset.asw, off=autoOn(S.me,k);
     try{ applyState(await rpc('farm_set_auto_off',{p_func:k,p_off:off})); refresh(); sfx('coin'); toast(`${GEAR_FUNC[k][0]}：${off?'關閉':'開啟'}`); openAutoFarm(back); }catch(e){ toast(e.message); } });
   bindAutoSel();
