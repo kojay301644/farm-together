@@ -124,3 +124,27 @@ function openSpin(hl){
   };
   $('spFree').onclick=()=>go('free'); $('spGem').onclick=()=>go('gems'); $('spGold').onclick=()=>go('gold');
 }
+
+/* ================= 稱號・頭像框 ================= */
+let COS = [], cosTab = 'title';
+function openCos(t){
+  if(t) cosTab=t; const me=S.me, own=me.cos||{}, now=Date.now()+(S.off||0);
+  const ok = id => own[id]!=null && (+own[id]===0 || +own[id]>now);
+  const leftTxt = id => +own[id]===0 ? '永久' : `剩 ${Math.max(1,Math.ceil((+own[id]-now)/86400000))} 天`;
+  const list = COS.filter(c=>c.kind===cosTab);
+  const prev = cosTab==='frame'
+    ? `<div class="cosprev">${list.map(c=>`<div class="cp"><img class="avatar avimg fr ${c.id}" src="${avSrc(me.avatar)}" alt=""><small>${esc(c.name)}</small></div>`).join('')}</div>` : '';
+  const rows = list.map(c=>{ const has=ok(c.id), on = cosTab==='title' ? me.title_on===c.id : me.frame_on===c.id;
+    const face = cosTab==='frame' ? `<img class="avatar avimg fr ${c.id}" src="${avSrc(me.avatar)}" alt="" style="width:40px;height:40px">` : `<span class="ttl big">${esc(c.name)}</span>`;
+    const act = has ? (on ? `<button class="mini sub" data-cun="${c.id}">卸下</button>` : `<button class="mini" data-con="${c.id}">使用</button>`) + (c.gems!=null?`<button class="mini gem" data-cb="${c.id}" ${(me.gems||0)<c.gems?'disabled':''}>續 💎${c.gems}</button>`:'')
+      : c.gems!=null ? `<button class="mini gem" data-cb="${c.id}" ${(me.gems||0)<c.gems?'disabled':''}>💎${c.gems}・${c.days} 天</button>` : `<span class="lock">完成成就取得</span>`;
+    return `<div class="row${on?' scur':''}"><div class="ic">${face}</div><div class="tx"><b>${esc(c.name)}</b>${on?' <span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':''}
+      <div>${has?leftTxt(c.id):c.ach?`成就：${esc(c.ach)}`:''}</div></div><div class="ibtns">${act}</div></div>`; }).join('');
+  modal('🏷️ 稱號・頭像框', `<div class="snav"><button data-ct="title" class="${cosTab==='title'?'on':''}">🏷️ 稱號</button><button data-ct="frame" class="${cosTab==='frame'?'on':''}">🖼️ 頭像框</button></div>
+    <div class="rhint">${cosTab==='title'?'稱號會顯示在名字旁邊（好友、鄰居、排行榜、拜訪時都看得到）。有些稱號要完成成就才拿得到，永久有效':'頭像框會顯示在你所有的頭像上'}</div>${prev}${rows}`, [['← 回我的家','sub',()=>openHome()]]);
+  const md=$('md');
+  md.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>openCos(b.dataset.ct));
+  md.querySelectorAll('[data-cb]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_cos_buy',{p_id:b.dataset.cb})); refresh(); sfx('lvup'); toast('買好了，已經換上！'); openCos(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-con]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_cos_set',{p_kind:cosTab,p_id:b.dataset.con})); refresh(); sfx('coin'); openCos(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-cun]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_cos_set',{p_kind:cosTab,p_id:null})); refresh(); openCos(); }catch(e){ toast(e.message); } });
+}

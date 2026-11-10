@@ -376,6 +376,15 @@ body.lowfx #map .bob, body.lowfx #map .cloud, body.lowfx #map [class*="spark"], 
 .spc b{font-size:12px}.spc.on{border-color:#FFB547;background:#FFF1C9;transform:scale(1.06);box-shadow:0 0 0 3px rgba(255,181,71,.35)}
 .spbtns{display:flex;flex-direction:column;gap:8px;margin-top:12px}.btn.gem{background:#7B6CF6;box-shadow:0 4px 0 #5747D4}
 .odds{margin-top:10px;font-size:13px}.odds summary{font-weight:900;cursor:pointer;color:var(--ink2)}.odds table{width:100%;margin-top:6px;border-collapse:collapse}.odds td{padding:3px 6px;border-bottom:1px solid #EFE6D6}.odds td:last-child{text-align:right;font-weight:800}
+/* 頭像框（萌獸星球） */
+.avimg.fr{border-radius:50%}
+.fr.f1{box-shadow:0 0 0 3px #c4824e}.fr.f2{box-shadow:0 0 0 3px #c8d4e8,0 0 0 5px #8a98ad}.fr.f3{box-shadow:0 0 0 3px #ffd84a,0 0 0 5px #c08a10,0 0 10px #ffd84a}
+.fr.f4{box-shadow:0 0 0 3px #8ad0ff,0 0 0 5px #3a7aff,0 0 14px #4a8cff;animation:frg 2s ease-in-out infinite}.fr.f5{box-shadow:0 0 0 3px #ffe27a,0 0 0 6px #a95cff,0 0 18px #c87aff;animation:frg 1.6s ease-in-out infinite}
+@keyframes frg{50%{filter:brightness(1.15)}}
+.ttl{display:inline-block;margin-left:4px;padding:0 7px;border-radius:999px;font-size:11px;font-weight:900;color:#fff;background:linear-gradient(90deg,#FF9F43,#F2545B);vertical-align:middle;line-height:18px}
+.ttl.big{font-size:13px;line-height:24px;padding:0 10px;margin:0}
+.nm .ttl{font-size:10px;line-height:15px}
+.cosprev{display:flex;justify-content:space-around;margin:8px 0 6px}.cosprev .cp{display:flex;flex-direction:column;align-items:center;gap:6px}.cosprev img{width:46px;height:46px}.cosprev small{font-weight:800;font-size:11px}
 .avw{position:relative;flex:none}.aved{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;background:#FF9F43;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 0 #D67D22;pointer-events:none}
 .admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
 .admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}
@@ -485,20 +494,20 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794275823" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794276011" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794275823" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794275823" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794276011" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794276011" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794275823" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794276011" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794275823" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794275823" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794276011" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794276011" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -514,11 +523,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794275823" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794276011" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794275823";
+const BUILD="1794276011";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -963,6 +972,8 @@ function buildWorld(){
   const deco=(n,gx,gy,w,extra='')=>(addObst(gx,gy,w*0.38,w*0.2,-w*0.06), objs.push({depth:gx+gy, svg:`<g ${extra}>${sprite(n,gx,gy,w,{ratio:RATIO[n],foot:0.8})}</g>`}));
   const FC=HG(645,352); addObst(FC[0],FC[1],80,70,-40); objs.push({depth:FC[0]+FC[1], svg:`<g class="tap" data-b="board">${skinSprite('fountain', FC[0], FC[1], 150, 0.8)}</g>`});
   lab += labelPill(iso(...FC)[0], iso(...FC)[1]-150, '好友廣場', {bg:'#E3F6EA',fg:'#2E9660'});
+  { const bx=iso(...FC)[0] + 4*9.5 + 16, by=iso(...FC)[1]-150-16;   // 好友廣場紅點：被偷、被惡作劇時亮
+    lab += `<g id="boardDot" style="display:none;pointer-events:none" transform="translate(${bx.toFixed(1)} ${by.toFixed(1)})"><circle r="12" fill="#F2545B" stroke="#fff" stroke-width="3"/><text id="boardDotN" y="5" text-anchor="middle" font-size="14" font-weight="900" fill="#fff" font-family="Noto Sans TC,sans-serif">!</text></g>`; }
   [[560,318],[730,318],[560,378],[730,378]].map(([x,y])=>HG(x,y)).forEach(([x,y])=>{ deco('dc_lamp',x,y,46); const [px,py]=iso(x,y); objs.push({depth:x+y+0.01, svg:`<circle class="lampglow" cx="${px}" cy="${py-34}" r="30" fill="url(#gGlow)"/>`}); });
   deco('dc_flower', ...HG(505,262), 58); deco('dc_flower', ...HG(845,300), 52); deco('dc_balloon', ...HG(545,470), 64, 'class="floaty"');
   // 島下方空地的裝飾
@@ -1276,7 +1287,8 @@ dayNight();
 
 /* ================= 頭像 ================= */
 const avSrc = n => A("av"+(n||11));
-const avImg = (o, cls='avatar sm') => `<img class="${cls} avimg" src="${avSrc(o && o.avatar)}" alt="">`;
+const avImg = (o, cls='avatar sm') => `<img class="${cls} avimg${o&&o.frame?' fr '+o.frame:''}" src="${avSrc(o && o.avatar)}" alt="">`;
+const ttlTag = o => o && o.title ? ` <span class="ttl">${esc(o.title)}</span>` : '';
 function openAvatarPicker(){
   const cur = S.me.avatar||11;
   modal('選擇頭像', `<div class="avgrid">${Array.from({length:30},(_,k)=>`<img class="avpick${k+1===cur?' on':''}" data-av="${k+1}" src="${avSrc(k+1)}" alt="">`).join('')}</div>`);
@@ -2405,6 +2417,30 @@ function openSpin(hl){
   $('spFree').onclick=()=>go('free'); $('spGem').onclick=()=>go('gems'); $('spGold').onclick=()=>go('gold');
 }
 
+/* ================= 稱號・頭像框 ================= */
+let COS = [], cosTab = 'title';
+function openCos(t){
+  if(t) cosTab=t; const me=S.me, own=me.cos||{}, now=Date.now()+(S.off||0);
+  const ok = id => own[id]!=null && (+own[id]===0 || +own[id]>now);
+  const leftTxt = id => +own[id]===0 ? '永久' : `剩 ${Math.max(1,Math.ceil((+own[id]-now)/86400000))} 天`;
+  const list = COS.filter(c=>c.kind===cosTab);
+  const prev = cosTab==='frame'
+    ? `<div class="cosprev">${list.map(c=>`<div class="cp"><img class="avatar avimg fr ${c.id}" src="${avSrc(me.avatar)}" alt=""><small>${esc(c.name)}</small></div>`).join('')}</div>` : '';
+  const rows = list.map(c=>{ const has=ok(c.id), on = cosTab==='title' ? me.title_on===c.id : me.frame_on===c.id;
+    const face = cosTab==='frame' ? `<img class="avatar avimg fr ${c.id}" src="${avSrc(me.avatar)}" alt="" style="width:40px;height:40px">` : `<span class="ttl big">${esc(c.name)}</span>`;
+    const act = has ? (on ? `<button class="mini sub" data-cun="${c.id}">卸下</button>` : `<button class="mini" data-con="${c.id}">使用</button>`) + (c.gems!=null?`<button class="mini gem" data-cb="${c.id}" ${(me.gems||0)<c.gems?'disabled':''}>續 💎${c.gems}</button>`:'')
+      : c.gems!=null ? `<button class="mini gem" data-cb="${c.id}" ${(me.gems||0)<c.gems?'disabled':''}>💎${c.gems}・${c.days} 天</button>` : `<span class="lock">完成成就取得</span>`;
+    return `<div class="row${on?' scur':''}"><div class="ic">${face}</div><div class="tx"><b>${esc(c.name)}</b>${on?' <span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':''}
+      <div>${has?leftTxt(c.id):c.ach?`成就：${esc(c.ach)}`:''}</div></div><div class="ibtns">${act}</div></div>`; }).join('');
+  modal('🏷️ 稱號・頭像框', `<div class="snav"><button data-ct="title" class="${cosTab==='title'?'on':''}">🏷️ 稱號</button><button data-ct="frame" class="${cosTab==='frame'?'on':''}">🖼️ 頭像框</button></div>
+    <div class="rhint">${cosTab==='title'?'稱號會顯示在名字旁邊（好友、鄰居、排行榜、拜訪時都看得到）。有些稱號要完成成就才拿得到，永久有效':'頭像框會顯示在你所有的頭像上'}</div>${prev}${rows}`, [['← 回我的家','sub',()=>openHome()]]);
+  const md=$('md');
+  md.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>openCos(b.dataset.ct));
+  md.querySelectorAll('[data-cb]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_cos_buy',{p_id:b.dataset.cb})); refresh(); sfx('lvup'); toast('買好了，已經換上！'); openCos(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-con]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_cos_set',{p_kind:cosTab,p_id:b.dataset.con})); refresh(); sfx('coin'); openCos(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-cun]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_cos_set',{p_kind:cosTab,p_id:null})); refresh(); openCos(); }catch(e){ toast(e.message); } });
+}
+
 /* ================= 連線設定 ================= */
 const SB_URL = 'https://qnxnuyfvkrvhnaewvrik.supabase.co';
 const SB_KEY = 'sb_publishable_nX97hqqEgiGRwKQMOz56ow_uvMEAdht';
@@ -2699,8 +2735,10 @@ async function openHome(){
   const {data:{user}} = await sb.auth.getUser();
   modal(`🏠 ${esc(S.me.nickname)}的家`, `
     <div class="sec">我的寵物夥伴</div>${beastPanelHTML()}
-    <div class="sec">成就（拿鑽石）</div>${achHTML(S.me)}`);
+    <div class="sec">成就（拿鑽石）</div>${achHTML(S.me)}
+    <button class="btn sub" id="hCos" style="width:100%;margin-top:6px">🏷️ 稱號・頭像框</button>`);
   if($('hAch')) $('hAch').onclick = ()=>openAchs();
+  if($('hCos')) $('hCos').onclick = ()=>openCos();
   bindBeastPanel();
 }
 /* ================= 設定頁 ================= */
@@ -2770,7 +2808,7 @@ async function openBoard(tab){
   if(boardTab==='friends'){
     body = F.friends.length ? F.friends.map(f=>`<div class="row">
         ${avImg(f)}
-        <div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>
+        <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>
           <div>${(f.ripe||f.bin)?`<span style="color:var(--orange-d)">${f.ripe?`🥕 有 ${f.ripe} 塊地可以偷`:''}${f.ripe&&f.bin?'・':''}${f.bin?'🧺 收集倉可以偷':''}</span>`:'目前沒有可偷的菜'}${f.issues?`・🐛 需要幫忙 ${f.issues}`:''}</div></div>
         <div class="ibtns"><button class="mini ${(f.ripe||f.bin)?'o':''}" data-visit="${f.id}">拜訪</button><button class="mini sub" data-gift="${f.id}" data-gn="${esc(f.nickname)}">💌 送禮</button></div></div>`).join('')
       : `<div class="empty">還沒有好友，<br>到「加好友」輸入朋友的暱稱吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
@@ -2779,13 +2817,13 @@ async function openBoard(tab){
       <div style="display:flex;gap:8px;margin-top:6px"><input id="fnick" class="inp" maxlength="10" placeholder="輸入朋友的暱稱"><button class="mini" id="fsend" style="padding:0 16px">送出</button></div>
       <div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:6px">你的暱稱是「${esc(S.me.nickname)}」，把它告訴朋友吧</div>`;
     body += `<div class="sec">等你確認的邀請</div>` + (F.incoming.length ? F.incoming.map(f=>`<div class="row">
-        ${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span><div>想成為你的好友</div></div>
+        ${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span><div>想成為你的好友</div></div>
         <button class="mini" data-acc="${f.id}">接受</button><button class="mini sub" data-rej="${f.id}">拒絕</button></div>`).join('') : `<div class="empty" style="padding:10px 0">沒有新的邀請</div>`);
     if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row">${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
   } else if(boardTab==='near'){
     body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（偷陌生人要用偷菜體力：<b style="color:var(--orange-d)">⚡${S.me.steal_left}</b>${S.me.steal_max?' / '+S.me.steal_max:''}${stealRegenTxt(S.me)}）</div>`;
     body += NB.length ? NB.map(f=>`<div class="row">${avImg(f)}
-        <div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}
+        <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}
           <div>${(f.ripe||f.bin)?`<span style="color:var(--orange-d)">${f.ripe?`🥕 有 ${f.ripe} 塊地可以偷`:''}${f.ripe&&f.bin?'・':''}${f.bin?'🧺 收集倉可以偷':''}</span>`:'目前沒有可偷的菜'}</div></div>
         <button class="mini ${(f.ripe||f.bin)?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('') + `<button class="btn sub" id="nbMore" style="width:100%;margin-top:8px">換一批</button>`
       : `<div class="empty">附近還沒有其他玩家種菜，<br>邀請朋友一起來玩吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
@@ -2793,7 +2831,7 @@ async function openBoard(tab){
     const medal = r => r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
     const val = x => rankKind==='gold' ? `💰 ${(+x.sc).toLocaleString()} 金` : rankKind==='pros' ? `🏙️ 繁榮度 ${(+x.sc).toLocaleString()}` : rankKind==='steal' ? `🥕 ${(+x.sc).toLocaleString()} 金・${(+x.n||0)} 次` : `Lv${x.lv}`;
     const row = (rk, x) => `<div class="row rk${x.me?' mine':''}"${x.me?'':` data-visit="${x.id}" style="cursor:pointer"`}><div class="rkn">${medal(rk)}</div>${avImg(x)}
-        <div class="tx"><b>${esc(x.nickname)}</b>${x.me?' <span class="tag">我</span>':''}<div>${rankKind==='lv'?`經驗 ${x.exp}`:`Lv${x.lv}`}</div></div><span class="tag" style="font-size:13px">${val(x)}</span></div>`;
+        <div class="tx"><b>${esc(x.nickname)}</b>${ttlTag(x)}${x.me?' <span class="tag">我</span>':''}<div>${rankKind==='lv'?`經驗 ${x.exp}`:`Lv${x.lv}`}</div></div><span class="tag" style="font-size:13px">${val(x)}</span></div>`;
     body = `<div class="seg rkk" style="margin:4px 0 6px">${[['lv','🏆 等級'],['gold','💰 財富'],['pros','🏙️ 繁榮'],['steal','🥕 偷菜']].map(([k,t])=>`<button data-rk="${k}" class="${rankKind===k?'on':''}">${t}</button>`).join('')}</div>`
       + (rankKind==='pros' ? `<div class="rhint" style="margin-bottom:6px">繁榮度：寵物、寵物造型、建築外觀、城鎮色調、裝飾、裝備階數、開墾的田地越多越高</div>` : rankKind==='steal' ? `<div class="rhint" style="margin-bottom:6px">比偷到的東西總價值（田地、收集倉、牧場都算），一樣多再比偷的次數</div>` : '');
     body += `<div class="seg" style="margin:4px 0 6px"><button data-rs="f" class="${rankScope==='f'?'on':''}">好友排行</button><button data-rs="a" class="${rankScope==='a'?'on':''}">全服前 50 名</button></div>`;
@@ -2910,7 +2948,7 @@ function renderPlots(){
 function renderHUD(){
   if(!S) return;
   const me = S.me;
-  $('pname').textContent = me.nickname; const avs = avSrc(me.avatar); if(!$('avatar').src.endsWith(avs)) $('avatar').src = avs;
+  { const nh=esc(me.nickname)+ttlTag(me); if($('pname').innerHTML!==nh) $('pname').innerHTML=nh; } const avs = avSrc(me.avatar); if(!$('avatar').src.endsWith(avs)) $('avatar').src = avs; $('avatar').className='avatar avimg'+(me.frame?' fr '+me.frame:'');
   $('plv').textContent = 'Lv'+me.lv; tweenNum($('pgold'), me.gold);
   const need = needExp(me.lv);
   $('pexp').style.width = (me.lv>=MAX_LV?100:Math.min(100, me.exp/need*100))+'%';
@@ -2922,7 +2960,7 @@ function renderHUD(){
   const PL = curPlots(); let h;
   if(mode==='visit'){
     const can = PL.filter(p=>p.s==='grow' && p.g>=CROP[p.c].time && !p.mine && p.st<p.cap).length;
-    h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
+    h = `你在 <b>${esc(V.owner.nickname)}</b>${ttlTag(V.owner)}（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
     if(V.protected) h += '對方在<b>新手保護</b>中，不能偷菜和惡作劇';
     else { const vb=V.bin||{}, binOk=binCount(vb.items)>0 && !vb.mine && vb.left>0;
       h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇體力 😈${me.prank_left}${me.prank_max?'/'+me.prank_max:''}${regenTxt(me,'prank')}`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷菜體力 ⚡${me.steal_left}${me.steal_max?'/'+me.steal_max:''}${stealRegenTxt(me)}）`); }
@@ -3030,7 +3068,7 @@ async function loadConfig(){
     const c = await rpc('farm_config');
     c.crops.forEach(x=>{ const k = CROP[x.id]; if(k) Object.assign(k, {lv:x.lv, seed:x.seed, time:x.time, yield:x.yield, price:x.price, exp:x.exp}); });
     c.land.forEach(l=>{ LAND[l.idx] = {lv:l.lv, cost:l.cost}; });
-    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts, c.pet_skins); setItemConfig(c.items); SPIN=c.spin||[]; setToneConfig(c.tones); CFG_SET=c.settings||{};
+    setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts, c.pet_skins); setItemConfig(c.items); SPIN=c.spin||[]; COS=c.cosmetics||[]; setToneConfig(c.tones); CFG_SET=c.settings||{};
   }catch(e){}
 }
 async function showNotices(){
@@ -3183,21 +3221,25 @@ async function openAchs(cat){
 }
 
 /* ================= 被偷提醒：有人偷你的菜，畫面上方跳紅色提醒＋復仇按鈕 ================= */
-let stealNew = 0, stealAlertT = 0;
+let stealNew = 0, stealAlertT = 0, stealAlerted = 0;
 const stealKey = () => 'ytzt_stealseen_' + (S && S.me.id);
-function stealSeen(logs){ const t=Math.max(0, ...(logs||[]).map(l=>+l.at||0)); try{ if(t) localStorage.setItem(stealKey(), String(t)); }catch(e){} stealNew=0; setStealBadge(); }
-function setStealBadge(){ const lb=document.querySelector('[data-b="board"]'); if(lb) lb.classList.toggle('stolen', stealNew>0); }
+function stealSeen(logs){ const t=Math.max(0, ...(logs||[]).map(l=>+l.at||0)); try{ if(t) localStorage.setItem(stealKey(), String(t)); }catch(e){} stealAlerted=Math.max(stealAlerted,t); stealNew=0; setStealBadge(); }
+function setStealBadge(){ const lb=document.querySelector('[data-b="board"]'); if(lb) lb.classList.toggle('stolen', stealNew>0);
+  const d=$('boardDot'); if(d){ d.style.display = stealNew>0 && mode!=='visit' ? '' : 'none'; const t=$('boardDotN'); if(t) t.textContent = stealNew>9?'9+':String(stealNew||'!'); } }
 async function checkSteals(){
   if(!S || mode!=='home' || document.hidden) return;
   let logs; try{ logs = await rpc('farm_logs_get'); }catch(e){ return; }
   let seen=0; try{ seen=+localStorage.getItem(stealKey())||0; }catch(e){}
   if(!seen){ stealSeen(logs); return; }   // 第一次：不跳舊的
-  const fresh = logs.filter(l=>(l.kind==='steal'||l.kind==='r_steal') && +l.at>seen && l.aid!==S.me.id);
+  const BADK = {steal:1, r_steal:1, prank_weed:1, prank_bug:1, r_prank:1};
+  const fresh = logs.filter(l=>BADK[l.kind] && +l.at>seen && l.aid!==S.me.id);
   stealNew = fresh.length; setStealBadge();
-  if(!fresh.length) return;
-  const l = fresh[0], more = fresh.length>1 ? `（還有 ${fresh.length-1} 筆）` : '';
+  const newer = fresh.filter(l=>+l.at>stealAlerted);   // 紅點一直留到打開動態；跳出提醒只跳新的
+  if(!newer.length) return;
+  stealAlerted = Math.max(stealAlerted, ...newer.map(x=>+x.at));
+  const l = newer[0], more = newer.length>1 ? `（還有 ${newer.length-1} 筆）` : '', isPrank = !(l.kind==='steal'||l.kind==='r_steal');
   const el = $('stealAlert');
-  el.innerHTML = `<div class="sa-in"><span class="sa-ic">🦹</span><div class="sa-tx"><b>${esc(l.who||'有人')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}！${more}</div><button class="mini revenge" id="saGo">😤 復仇</button><button class="sa-x" id="saX">✕</button></div>`;
+  el.innerHTML = `<div class="sa-in"><span class="sa-ic">${isPrank?'😈':'🦹'}</span><div class="sa-tx"><b>${esc(l.who||'有人')}</b> ${(LOG_TXT[l.kind]||(()=>''))(l)}！${more}</div><button class="mini revenge" id="saGo">😤 復仇</button><button class="sa-x" id="saX">✕</button></div>`;
   el.classList.add('show'); sfx && sfx('err'); vib && vib([60,40,60]);
   $('saGo').onclick = ()=>{ el.classList.remove('show'); try{ localStorage.setItem(stealKey(), String(Math.max(...fresh.map(x=>+x.at)))); }catch(e){} stealNew=0; setStealBadge(); visit(l.aid); };
   $('saX').onclick = ()=>{ el.classList.remove('show'); };

@@ -116,7 +116,8 @@ dayNight();
 
 /* ================= 頭像 ================= */
 const avSrc = n => A("av"+(n||11));
-const avImg = (o, cls='avatar sm') => `<img class="${cls} avimg" src="${avSrc(o && o.avatar)}" alt="">`;
+const avImg = (o, cls='avatar sm') => `<img class="${cls} avimg${o&&o.frame?' fr '+o.frame:''}" src="${avSrc(o && o.avatar)}" alt="">`;
+const ttlTag = o => o && o.title ? ` <span class="ttl">${esc(o.title)}</span>` : '';
 function openAvatarPicker(){
   const cur = S.me.avatar||11;
   modal('選擇頭像', `<div class="avgrid">${Array.from({length:30},(_,k)=>`<img class="avpick${k+1===cur?' on':''}" data-av="${k+1}" src="${avSrc(k+1)}" alt="">`).join('')}</div>`);
