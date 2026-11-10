@@ -200,7 +200,7 @@ async function actVisit(i){
   else if(t==='hbug'){ if(!growing || !p.b) return toast('這裡沒有蟲'); action='help_bug'; }
   else if(t==='pweed' || t==='pbug'){
     if(!growing || ripe) return toast('只能在還沒成熟的作物上惡作劇');
-    if(S.me.prank_left < 1) return toast('今天的惡作劇次數用完了');
+    if(S.me.prank_left < 1) return toast(`惡作劇體力用完了${S.me.prank_regen>0?`，每 ${S.me.prank_regen} 分鐘回 1 點`:''}`);
     if(t==='pweed' && p.w>=3) return toast('這裡的草已經夠多了');
     if(t==='pbug' && p.b>=3) return toast('這裡的蟲已經夠多了');
     action = t==='pweed' ? 'prank_weed' : 'prank_bug';
@@ -518,7 +518,7 @@ function renderHUD(){
     h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
     if(V.protected) h += '對方在<b>新手保護</b>中，不能偷菜和惡作劇';
     else { const vb=V.bin||{}, binOk=binCount(vb.items)>0 && !vb.mine && vb.left>0;
-      h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇還剩 ${me.prank_left} 次`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷菜體力 ⚡${me.steal_left}${me.steal_max?'/'+me.steal_max:''}${stealRegenTxt(me)}）`); }
+      h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇體力 😈${me.prank_left}${me.prank_max?'/'+me.prank_max:''}${regenTxt(me,'prank')}`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷菜體力 ⚡${me.steal_left}${me.steal_max?'/'+me.steal_max:''}${stealRegenTxt(me)}）`); }
     setHint(`<span>🧺</span><span>${h}</span>`); return;
   }
   const bn=binCount(me.bin), hungry=(S.ranch||[]).filter(r=>!r.ra).map(r=>(ANI[r.k]||{}).feed||0), crops=Object.values(me.crops||{}).reduce((a,b)=>a+b,0);
@@ -797,5 +797,6 @@ async function checkSteals(){
 setInterval(checkSteals, 30000); setTimeout(checkSteals, 6000);
 
 /* 偷陌生人次數：用掉後每 N 分鐘回 1 次 */
-function stealRegenTxt(me){ if(!me || !(+me.steal_regen>0)) return ''; if(me.steal_next==null) return `，每 ${+me.steal_regen} 分鐘回 1 點`;
-  const s=Math.max(0, me.steal_next - Math.floor((Date.now()-(me._stAt||Date.now()))/1000)); return `，${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 後回 1 點`; }
+function regenTxt(me, k){ if(!me || !(+me[k+'_regen']>0)) return ''; if(me[k+'_next']==null) return `，每 ${+me[k+'_regen']} 分鐘回 1 點`;
+  const s=Math.max(0, me[k+'_next'] - Math.floor((Date.now()-(me._stAt||Date.now()))/1000)); return `，${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 後回 1 點`; }
+const stealRegenTxt = me => regenTxt(me, 'steal');

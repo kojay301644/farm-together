@@ -4,7 +4,7 @@ let DECOR = [], DEC = {}, DECOR_MAX = 40, OBST_FIXED = [], decorSig = '', EDIT =
 const DEC_R = {"balloon":1.249,"bench":0.83,"carousel":1.346,"crystal":0.978,"dragon":1.071,"flag":1.602,"flower":0.796,"gifts":0.924,"hay":0.898,"kennel":0.966,"lamp":1.969,"lantree":1.1,"mail":1.291,"mush":1.058,"picnic":0.713,"pond":0.819,"pumpkin":0.924,"rainbow":0.793,"sakura":1.109,"snowman":1.151,"statue":1.313,"swing":1.113,"torii":1.266,"xmas":1.131};
 function setDecorConfig(list, st){ if(list){ DECOR=list; DEC={}; list.forEach(d=>DEC[d.id]=d); } if(st && st.decor_max!=null) DECOR_MAX=+st.decor_max; }
 const decW = id => (DEC[id] && DEC[id].w) || 70;
-const bonusTxt = d => !d || !d.bonus ? '' : d.bonus==='prank' ? `擺出來：每天惡作劇 +${d.bonus_val}` : `擺出來：偷菜體力上限 +${d.bonus_val}`;
+const bonusTxt = d => !d || !d.bonus ? '' : d.bonus==='prank' ? `擺出來：惡作劇體力上限 +${d.bonus_val}` : `擺出來：偷菜體力上限 +${d.bonus_val}`;
 
 /* 位置能不能擺：在島上、不壓到建築、田、牧場 */
 function decorOK(gx, gy){

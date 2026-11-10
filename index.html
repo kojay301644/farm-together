@@ -476,18 +476,18 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794256076" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794273638" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794256076" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794256076" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794273638" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794273638" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794256076" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794273638" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794256076" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794273638" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -503,11 +503,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794256076" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794273638" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794256076";
+const BUILD="1794273638";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1399,7 +1399,7 @@ function openHelp(){
     <p>在好友廣場用暱稱加好友，就能拜訪對方農場：</p>
     <ul><li><b>偷菜</b>：成熟的作物每塊地每人只能偷一次，每塊地最多被偷走 4 成，主人一定拿得到 6 成</li>
     <li><b>幫忙</b>：幫好友除草除蟲可以拿經驗</li>
-    <li><b>惡作劇</b>：在好友還沒成熟的作物放草放蟲，每天 10 次</li>
+    <li><b>惡作劇</b>：在別人還沒成熟的作物放草、放蟲，或在牧場放蚊子，每次用 1 點 😈惡作劇體力。上限 ${+(CFG_SET.prank_daily??10)} 點，用掉後每 ${+(CFG_SET.prank_regen_min??10)} 分鐘回 1 點，每天凌晨補滿</li>
     <li><b>偷陌生人</b>：在「鄰居」可以偷不是好友的玩家（偷好友不用體力）。每偷一次用 1 點 ⚡偷菜體力，上限 ${+(CFG_SET.stranger_steal_daily??30)} 點，用掉後每 ${+(CFG_SET.steal_regen_min??10)} 分鐘回 1 點，每天凌晨補滿；擺出鳥居、龍雕像等裝飾可以提高體力上限</li></ul>
     <p>作物成熟後要快點收，不然會被好友偷走喔！誰偷了你的菜，都會記在「動態」裡。</p>
     <h4>🐔 牧場</h4>
@@ -1797,7 +1797,7 @@ let DECOR = [], DEC = {}, DECOR_MAX = 40, OBST_FIXED = [], decorSig = '', EDIT =
 const DEC_R = {"balloon":1.249,"bench":0.83,"carousel":1.346,"crystal":0.978,"dragon":1.071,"flag":1.602,"flower":0.796,"gifts":0.924,"hay":0.898,"kennel":0.966,"lamp":1.969,"lantree":1.1,"mail":1.291,"mush":1.058,"picnic":0.713,"pond":0.819,"pumpkin":0.924,"rainbow":0.793,"sakura":1.109,"snowman":1.151,"statue":1.313,"swing":1.113,"torii":1.266,"xmas":1.131};
 function setDecorConfig(list, st){ if(list){ DECOR=list; DEC={}; list.forEach(d=>DEC[d.id]=d); } if(st && st.decor_max!=null) DECOR_MAX=+st.decor_max; }
 const decW = id => (DEC[id] && DEC[id].w) || 70;
-const bonusTxt = d => !d || !d.bonus ? '' : d.bonus==='prank' ? `擺出來：每天惡作劇 +${d.bonus_val}` : `擺出來：偷菜體力上限 +${d.bonus_val}`;
+const bonusTxt = d => !d || !d.bonus ? '' : d.bonus==='prank' ? `擺出來：惡作劇體力上限 +${d.bonus_val}` : `擺出來：偷菜體力上限 +${d.bonus_val}`;
 
 /* 位置能不能擺：在島上、不壓到建築、田、牧場 */
 function decorOK(gx, gy){
@@ -2467,7 +2467,7 @@ async function actVisit(i){
   else if(t==='hbug'){ if(!growing || !p.b) return toast('這裡沒有蟲'); action='help_bug'; }
   else if(t==='pweed' || t==='pbug'){
     if(!growing || ripe) return toast('只能在還沒成熟的作物上惡作劇');
-    if(S.me.prank_left < 1) return toast('今天的惡作劇次數用完了');
+    if(S.me.prank_left < 1) return toast(`惡作劇體力用完了${S.me.prank_regen>0?`，每 ${S.me.prank_regen} 分鐘回 1 點`:''}`);
     if(t==='pweed' && p.w>=3) return toast('這裡的草已經夠多了');
     if(t==='pbug' && p.b>=3) return toast('這裡的蟲已經夠多了');
     action = t==='pweed' ? 'prank_weed' : 'prank_bug';
@@ -2785,7 +2785,7 @@ function renderHUD(){
     h = `你在 <b>${esc(V.owner.nickname)}</b>（Lv${V.owner.lv}${V.friend?'・好友':''}）的農場・`;
     if(V.protected) h += '對方在<b>新手保護</b>中，不能偷菜和惡作劇';
     else { const vb=V.bin||{}, binOk=binCount(vb.items)>0 && !vb.mine && vb.left>0;
-      h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇還剩 ${me.prank_left} 次`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷菜體力 ⚡${me.steal_left}${me.steal_max?'/'+me.steal_max:''}${stealRegenTxt(me)}）`); }
+      h += (can ? `有 <b>${can}</b> 塊地可以偷！` : binOk ? '' : `惡作劇體力 😈${me.prank_left}${me.prank_max?'/'+me.prank_max:''}${regenTxt(me,'prank')}`) + (binOk ? `<b>收集倉</b>也可以偷！` : '') + (V.friend ? '' : `（偷菜體力 ⚡${me.steal_left}${me.steal_max?'/'+me.steal_max:''}${stealRegenTxt(me)}）`); }
     setHint(`<span>🧺</span><span>${h}</span>`); return;
   }
   const bn=binCount(me.bin), hungry=(S.ranch||[]).filter(r=>!r.ra).map(r=>(ANI[r.k]||{}).feed||0), crops=Object.values(me.crops||{}).reduce((a,b)=>a+b,0);
@@ -3064,8 +3064,9 @@ async function checkSteals(){
 setInterval(checkSteals, 30000); setTimeout(checkSteals, 6000);
 
 /* 偷陌生人次數：用掉後每 N 分鐘回 1 次 */
-function stealRegenTxt(me){ if(!me || !(+me.steal_regen>0)) return ''; if(me.steal_next==null) return `，每 ${+me.steal_regen} 分鐘回 1 點`;
-  const s=Math.max(0, me.steal_next - Math.floor((Date.now()-(me._stAt||Date.now()))/1000)); return `，${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 後回 1 點`; }
+function regenTxt(me, k){ if(!me || !(+me[k+'_regen']>0)) return ''; if(me[k+'_next']==null) return `，每 ${+me[k+'_regen']} 分鐘回 1 點`;
+  const s=Math.max(0, me[k+'_next'] - Math.floor((Date.now()-(me._stAt||Date.now()))/1000)); return `，${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 後回 1 點`; }
+const stealRegenTxt = me => regenTxt(me, 'steal');
 
 </script>
 </body>
