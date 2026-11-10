@@ -49,7 +49,7 @@ async function useItem(id, arg){
   }catch(e){ toast(e.message); }
 }
 function showDetector(list){
-  modal('🔍 探測結果', list.length ? `<div class="rhint">現在可以偷最多的農場（估計值，有開防盜罩的不會出現）</div>` + list.map((f,i)=>`<div class="row"><div class="rkn">${['🥇','🥈','🥉','4','5'][i]}</div>${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}<div>${f.ripe?`${f.ripe} 塊地成熟`:'收集倉有東西'}・約 ${(+f.val).toLocaleString()} 金</div></div><button class="mini o" data-visit="${f.id}">去偷！</button></div>`).join('')
+  modal('🔍 探測結果', list.length ? `<div class="rhint">現在可以偷最多的農場（估計值）</div>` + list.map((f,i)=>`<div class="row"><div class="rkn">${['🥇','🥈','🥉','4','5'][i]}</div>${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b> <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}<div>${f.ripe?`${f.ripe} 塊地成熟`:'收集倉有東西'}・約 ${(+f.val).toLocaleString()} 金</div></div><button class="mini o" data-visit="${f.id}">去偷！</button></div>`).join('')
     : `<div class="empty">現在沒有找到可以偷的農場，晚點再試試</div>`);
   document.querySelectorAll('#md [data-visit]').forEach(b=>b.onclick=()=>{ closeModal(); visit(b.dataset.visit); });
 }
