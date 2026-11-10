@@ -32,10 +32,16 @@ function syncRanchMovers(){
   list.forEach((r,k)=>{ const a=ANI[r.k]; const st=aniState(r,off);
     const bub = st==='ready' ? `<g class="abub"><circle cx="0" cy="-30" r="8.5" fill="#fff" stroke="${INK}" stroke-width="1.4"/><text x="0" y="-26.5" text-anchor="middle" font-size="10">${GOOD_ICON[a&&a.good]||'⭐'}</text></g>`
       : st==='hungry' ? `<g class="abub"><circle cx="0" cy="-30" r="8.5" fill="#FFF6DB" stroke="${INK}" stroke-width="1.4"/><text x="0" y="-26.5" text-anchor="middle" font-size="9">🌾</text></g>` : '';
-    const fl = r.f ? `<text class="afly" x="-6" y="-20" font-size="8">🦟</text>` : '';
+    const mine = mode!=='visit';
+    const fl = r.f ? `<g class="afly${mine?' big':''}"><text x="-6" y="-20" font-size="${mine?13:8}">🦟</text>${r.f>1?`<text x="4" y="-24" font-size="${mine?11:7}">🦟</text>`:''}</g>` : '';
     const g=document.createElementNS('http://www.w3.org/2000/svg','g');
     g.innerHTML=`<g class="mvin">${ANI_ART[r.k]||CHICK}</g>`;
     const tag=document.createElementNS('http://www.w3.org/2000/svg','g'); tag.innerHTML=bub+fl; tag.setAttribute('class','atag');
+    if(r.f && mine){ // 自己的動物有蚊子：直接點動物就拍
+      g.style.pointerEvents='auto'; g.style.cursor='pointer';
+      g.insertAdjacentHTML('afterbegin','<circle cx="0" cy="-12" r="16" fill="rgba(0,0,0,0)"/>');
+      g.addEventListener('click',e=>{ e.stopPropagation(); swatAni(r.slot, g); });
+    }
     mv.appendChild(g);
     const m={el:g, tag, wait:Math.random()*2, face:1, x:X+0.6+Math.random()*(W-1.2), y:Y+0.5+Math.random()*(D-1), chick:true, area:[X+0.4,Y+0.4,X+W-0.4,Y+D-0.4], speed:st==='hungry'?0.25:0.45, s:1.6, ani:true};
     g.appendChild(tag); movers.push(m); ranchMovers.push(m);
@@ -102,6 +108,23 @@ async function ranchAct(action, slot, kind){
   }catch(e){ sfx('err'); toast(e.message); }
   finally{ ui.busy=false; }
 }
+async function swatAni(slot, el){
+  if(ui.busy) return; ui.busy=true; ui.lastLocal=Date.now();
+  const b=el.getBoundingClientRect(), x=b.left+b.width/2, y=b.top+b.height*0.3;
+  try{
+    const r = await rpc('farm_ranch_act', {p_action:'swat', p_slot:slot, p_kind:null});
+    sfx('poof'); vib(20); spawn('<span style="font-size:30px">💥</span>', x-15, y-20, 'grab', 600);
+    for(let k=0;k<(LOWFX?3:6);k++){ const a=Math.random()*Math.PI*2, d=18+Math.random()*14; spawn('✦', x, y, 'star', 600, `--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d*0.7}px`); }
+    floatAt(el, '拍掉蚊子！');
+    applyState(r.state); refresh();
+    if(r.xp) xpFloat(el, r.xp);
+    if(r.lvup) setTimeout(showLevelUp, 400);
+    if(r.gift) setTimeout(()=>showGift(r.gift), r.lvup?1600:500);
+  }catch(e){ sfx('err'); toast(e.message); }
+  finally{ ui.busy=false; }
+}
+function setCoopDot(){ const d=$('coopDot'); if(!d) return; const n = mode!=='visit' && S ? (S.ranch||[]).reduce((a,r)=>a+(r.f||0),0) : 0;
+  d.style.display = n>0 ? '' : 'none'; const t=$('coopDotN'); if(t) t.textContent = n>9?'9+':String(n); }
 async function ranchFriend(action, slot){
   if(ui.busy) return; ui.busy=true;
   try{

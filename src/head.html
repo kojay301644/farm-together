@@ -395,6 +395,8 @@ body.lowfx #map .bob, body.lowfx #map .cloud, body.lowfx #map [class*="spark"], 
 .admrow input{font:inherit;font-weight:800;padding:5px 8px;border-radius:10px;border:2px solid #E6D2A8;width:100%;box-sizing:border-box}
 .admquick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .ic.ani svg{width:46px;height:44px}
+.afly.big{animation:buzz .5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes buzz{0%,100%{transform:translate(0,0) rotate(-8deg)}50%{transform:translate(2px,-3px) rotate(8deg)}}
 .atag text{font-family:'Apple Color Emoji','Segoe UI Emoji',sans-serif}
 .abub{animation:floaty 2s ease-in-out infinite}
 .rhint{font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:6px;line-height:1.5}

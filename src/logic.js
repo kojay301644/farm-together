@@ -543,7 +543,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -557,7 +557,7 @@ async function sync(){
   }catch(e){ if(/還不是好友/.test(e.message)){ toast(e.message); goHome(); } }
   finally{ syncing = false; }
 }
-setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); try{ syncRanchMovers(); syncParkMovers(); }catch(e){} } }, 1000);
+setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); try{ syncRanchMovers(); setCoopDot(); syncParkMovers(); }catch(e){} } }, 1000);
 setInterval(sync, 15000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sync(); });
 

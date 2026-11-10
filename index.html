@@ -395,6 +395,8 @@ body.lowfx #map .bob, body.lowfx #map .cloud, body.lowfx #map [class*="spark"], 
 .admrow input{font:inherit;font-weight:800;padding:5px 8px;border-radius:10px;border:2px solid #E6D2A8;width:100%;box-sizing:border-box}
 .admquick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .ic.ani svg{width:46px;height:44px}
+.afly.big{animation:buzz .5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes buzz{0%,100%{transform:translate(0,0) rotate(-8deg)}50%{transform:translate(2px,-3px) rotate(8deg)}}
 .atag text{font-family:'Apple Color Emoji','Segoe UI Emoji',sans-serif}
 .abub{animation:floaty 2s ease-in-out infinite}
 .rhint{font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:6px;line-height:1.5}
@@ -498,20 +500,20 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794276382" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794276830" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794276382" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794276382" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794276830" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794276830" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794276382" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794276830" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794276382" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794276382" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794276830" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794276830" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -527,11 +529,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794276382" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794276830" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794276382";
+const BUILD="1794276830";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -979,6 +981,8 @@ function buildWorld(){
     if(o.id==='home'){ HOME_LBL=[lx, ly - h*0.12]; homeLblCur=homeLblName(); lab += `<g id="homeLbl">${labelPill(lx, ly - h*0.12, '🏠 '+esc(homeLblCur)+'的家', {big:1})}</g>`; }  // 放在大門前面，不會被上方玩家欄擋住
     else if(o.id==='bin'){ BIN_LBL=[lx, ly-h*o.foot-18]; lab += `<g id="binLbl">${labelPill(lx, ly-h*o.foot-18, binLblText(), {bg:'#FFF1DC'})}</g>`; }
     else lab += labelPill(lx, ly - (o.id==='coop'?20:o.id==='barn'?h*0.42:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
+    if(o.id==='coop'){ const bx=lx + ([...o.name].length*19+30)/2 + 4, by=ly-20-16;   // 牧場紅點：自己的動物有蚊子時亮
+      lab += `<g id="coopDot" style="display:none;pointer-events:none" transform="translate(${bx.toFixed(1)} ${by.toFixed(1)})"><circle r="12" fill="#F2545B" stroke="#fff" stroke-width="3"/><text id="coopDotN" y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="Noto Sans TC,sans-serif">1</text></g>`; }
   });
 
   // 裝飾（萌獸星球素材）
@@ -1748,10 +1752,16 @@ function syncRanchMovers(){
   list.forEach((r,k)=>{ const a=ANI[r.k]; const st=aniState(r,off);
     const bub = st==='ready' ? `<g class="abub"><circle cx="0" cy="-30" r="8.5" fill="#fff" stroke="${INK}" stroke-width="1.4"/><text x="0" y="-26.5" text-anchor="middle" font-size="10">${GOOD_ICON[a&&a.good]||'⭐'}</text></g>`
       : st==='hungry' ? `<g class="abub"><circle cx="0" cy="-30" r="8.5" fill="#FFF6DB" stroke="${INK}" stroke-width="1.4"/><text x="0" y="-26.5" text-anchor="middle" font-size="9">🌾</text></g>` : '';
-    const fl = r.f ? `<text class="afly" x="-6" y="-20" font-size="8">🦟</text>` : '';
+    const mine = mode!=='visit';
+    const fl = r.f ? `<g class="afly${mine?' big':''}"><text x="-6" y="-20" font-size="${mine?13:8}">🦟</text>${r.f>1?`<text x="4" y="-24" font-size="${mine?11:7}">🦟</text>`:''}</g>` : '';
     const g=document.createElementNS('http://www.w3.org/2000/svg','g');
     g.innerHTML=`<g class="mvin">${ANI_ART[r.k]||CHICK}</g>`;
     const tag=document.createElementNS('http://www.w3.org/2000/svg','g'); tag.innerHTML=bub+fl; tag.setAttribute('class','atag');
+    if(r.f && mine){ // 自己的動物有蚊子：直接點動物就拍
+      g.style.pointerEvents='auto'; g.style.cursor='pointer';
+      g.insertAdjacentHTML('afterbegin','<circle cx="0" cy="-12" r="16" fill="rgba(0,0,0,0)"/>');
+      g.addEventListener('click',e=>{ e.stopPropagation(); swatAni(r.slot, g); });
+    }
     mv.appendChild(g);
     const m={el:g, tag, wait:Math.random()*2, face:1, x:X+0.6+Math.random()*(W-1.2), y:Y+0.5+Math.random()*(D-1), chick:true, area:[X+0.4,Y+0.4,X+W-0.4,Y+D-0.4], speed:st==='hungry'?0.25:0.45, s:1.6, ani:true};
     g.appendChild(tag); movers.push(m); ranchMovers.push(m);
@@ -1818,6 +1828,23 @@ async function ranchAct(action, slot, kind){
   }catch(e){ sfx('err'); toast(e.message); }
   finally{ ui.busy=false; }
 }
+async function swatAni(slot, el){
+  if(ui.busy) return; ui.busy=true; ui.lastLocal=Date.now();
+  const b=el.getBoundingClientRect(), x=b.left+b.width/2, y=b.top+b.height*0.3;
+  try{
+    const r = await rpc('farm_ranch_act', {p_action:'swat', p_slot:slot, p_kind:null});
+    sfx('poof'); vib(20); spawn('<span style="font-size:30px">💥</span>', x-15, y-20, 'grab', 600);
+    for(let k=0;k<(LOWFX?3:6);k++){ const a=Math.random()*Math.PI*2, d=18+Math.random()*14; spawn('✦', x, y, 'star', 600, `--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d*0.7}px`); }
+    floatAt(el, '拍掉蚊子！');
+    applyState(r.state); refresh();
+    if(r.xp) xpFloat(el, r.xp);
+    if(r.lvup) setTimeout(showLevelUp, 400);
+    if(r.gift) setTimeout(()=>showGift(r.gift), r.lvup?1600:500);
+  }catch(e){ sfx('err'); toast(e.message); }
+  finally{ ui.busy=false; }
+}
+function setCoopDot(){ const d=$('coopDot'); if(!d) return; const n = mode!=='visit' && S ? (S.ranch||[]).reduce((a,r)=>a+(r.f||0),0) : 0;
+  d.style.display = n>0 ? '' : 'none'; const t=$('coopDotN'); if(t) t.textContent = n>9?'9+':String(n); }
 async function ranchFriend(action, slot){
   if(ui.busy) return; ui.busy=true;
   try{
@@ -3016,7 +3043,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -3030,7 +3057,7 @@ async function sync(){
   }catch(e){ if(/還不是好友/.test(e.message)){ toast(e.message); goHome(); } }
   finally{ syncing = false; }
 }
-setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); try{ syncRanchMovers(); syncParkMovers(); }catch(e){} } }, 1000);
+setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); try{ syncRanchMovers(); setCoopDot(); syncParkMovers(); }catch(e){} } }, 1000);
 setInterval(sync, 15000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sync(); });
 
