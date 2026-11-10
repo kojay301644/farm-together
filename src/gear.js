@@ -168,21 +168,23 @@ function openSkinShop(t){
   md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
 }
 
-/* ================= 自動更新：發現新版就重新載入 ================= */
-async function checkUpdate(){
+/* ================= 自動更新：發現新版就提示玩家更新 ================= */
+let newBuild = null;
+function goUpdate(){ const u=new URL(location.href); u.searchParams.set('v', newBuild||Date.now()); location.replace(u.toString()); }
+async function checkUpdate(fromWake){
   try{
     const t = await (await fetch('index.html?u='+Date.now(), {cache:'no-store'})).text();
     const v = (t.match(/const BUILD="(\d+)"/)||[])[1];
-    if(v && v!==BUILD){
-      if(document.querySelector('#ov.show') || (typeof ui!=='undefined' && ui.busy)) return;  // 不打斷正在做的事
-      toast('有新版本，更新中…');
-      setTimeout(()=>{ const u=new URL(location.href); u.searchParams.set('v', v); location.replace(u.toString()); }, 800);
-    }
+    if(!v || v===BUILD) return;
+    newBuild = v;
+    // 剛切回遊戲、沒有開視窗、沒在操作：直接換新版
+    if(fromWake && !document.querySelector('#ov.show') && !(typeof ui!=='undefined' && ui.busy)) return goUpdate();
+    if(!$('updBar')){ const d=document.createElement('button'); d.id='updBar'; d.innerHTML='✨ 有新版本！點這裡更新'; d.onclick=goUpdate; document.body.appendChild(d); }
   }catch(e){}
 }
-setInterval(checkUpdate, 60000);
-document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkUpdate(); });
-setTimeout(checkUpdate, 3000);
+setInterval(()=>checkUpdate(false), 60000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkUpdate(true); });
+setTimeout(()=>checkUpdate(false), 3000);
 
 /* ================= 自動農場設定（我的家最上面） ================= */
 const AUTO_ROWS = [['plant',['plant']],['water',['water']],['harvest',['harvest']],['weed',['weed']],['bug',['bug']],['feed',['feed','clear']],['swat',['swat']],['dog',['dog']],['scare',['scare']]];

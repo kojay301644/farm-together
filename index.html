@@ -280,6 +280,8 @@ body.lowfx .bird{display:none}
 .gslot .plus{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#F1E4C8;font-size:22px;font-weight:900;color:#B08A55}
 .gslot span{display:flex;flex-direction:column;min-width:0}.gslot small{font-size:11px;font-weight:700;color:var(--ink2);line-height:1.35}
 .row.gon{background:#E8F8EE;border-radius:12px}
+#updBar{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:22px;border:3px solid #3A3226;background:#FFD84D;font:inherit;font-size:16px;font-weight:900;color:#3A3226;box-shadow:0 4px 0 #3A3226;cursor:pointer;animation:updPulse 1.2s ease-in-out infinite;white-space:nowrap}
+@keyframes updPulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
 .autobtn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;margin-bottom:6px;border:2.5px solid #3A3226;border-radius:16px;background:linear-gradient(#FFF6DB,#FFE7B0);font:inherit;cursor:pointer;text-align:left}
 .autobtn b{font-size:16px;white-space:nowrap}.autobtn span{flex:1;font-size:17px;letter-spacing:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#7A6A55;font-weight:700}.autobtn i{font-style:normal;font-weight:900;font-size:20px}
 .arow{border-bottom:1px dashed #E5D6B8;padding:8px 2px}.arow.off{opacity:.55}.ahd{display:flex;align-items:center;gap:8px}.aic{font-size:24px;width:32px;text-align:center}
@@ -507,20 +509,20 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794279121" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794280510" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794279121" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794279121" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794280510" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794280510" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794279121" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794280510" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794279121" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794279121" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794280510" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794280510" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -536,11 +538,11 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794279121" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794280510" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794279121";
+const BUILD="1794280510";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1726,21 +1728,23 @@ function openSkinShop(t){
   md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
 }
 
-/* ================= 自動更新：發現新版就重新載入 ================= */
-async function checkUpdate(){
+/* ================= 自動更新：發現新版就提示玩家更新 ================= */
+let newBuild = null;
+function goUpdate(){ const u=new URL(location.href); u.searchParams.set('v', newBuild||Date.now()); location.replace(u.toString()); }
+async function checkUpdate(fromWake){
   try{
     const t = await (await fetch('index.html?u='+Date.now(), {cache:'no-store'})).text();
     const v = (t.match(/const BUILD="(\d+)"/)||[])[1];
-    if(v && v!==BUILD){
-      if(document.querySelector('#ov.show') || (typeof ui!=='undefined' && ui.busy)) return;  // 不打斷正在做的事
-      toast('有新版本，更新中…');
-      setTimeout(()=>{ const u=new URL(location.href); u.searchParams.set('v', v); location.replace(u.toString()); }, 800);
-    }
+    if(!v || v===BUILD) return;
+    newBuild = v;
+    // 剛切回遊戲、沒有開視窗、沒在操作：直接換新版
+    if(fromWake && !document.querySelector('#ov.show') && !(typeof ui!=='undefined' && ui.busy)) return goUpdate();
+    if(!$('updBar')){ const d=document.createElement('button'); d.id='updBar'; d.innerHTML='✨ 有新版本！點這裡更新'; d.onclick=goUpdate; document.body.appendChild(d); }
   }catch(e){}
 }
-setInterval(checkUpdate, 60000);
-document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkUpdate(); });
-setTimeout(checkUpdate, 3000);
+setInterval(()=>checkUpdate(false), 60000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkUpdate(true); });
+setTimeout(()=>checkUpdate(false), 3000);
 
 /* ================= 自動農場設定（我的家最上面） ================= */
 const AUTO_ROWS = [['plant',['plant']],['water',['water']],['harvest',['harvest']],['weed',['weed']],['bug',['bug']],['feed',['feed','clear']],['swat',['swat']],['dog',['dog']],['scare',['scare']]];
