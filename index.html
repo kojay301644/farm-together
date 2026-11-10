@@ -536,21 +536,21 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794310849" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794333541" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794310849" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794310849" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794333541" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794333541" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794310849" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794333541" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794310849" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794310849" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794333541" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794333541" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -566,11 +566,11 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794310849" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794333541" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794310849";
+const BUILD="1794333541";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -706,7 +706,12 @@ function floatAt(el, text, color){
   document.body.appendChild(f); setTimeout(()=>f.remove(),1100);
 }
 /* ================= 視窗 ================= */
+let modalKey = '';
 function modal(title, body, btns){
+  // 同一個視窗重新整理（例如買東西後）時，保留原本捲動的位置，不要跳回最上面
+  const key = String(title).replace(/<[\s\S]*$/, '').trim(), oldBd = $('md').querySelector('.bd');
+  const keep = $('ov').classList.contains('show') && key === modalKey && oldBd ? oldBd.scrollTop : 0;
+  modalKey = key;
   $('md').innerHTML = `<h3><span>${title}</span><button class="x" id="mx">×</button></h3><div class="bd">${body}</div>${btns&&btns.length?'<div class="ft" id="mft"></div>':''}`;
   $('mx').onclick = closeModal;
   if(btns && btns.length){
@@ -718,9 +723,11 @@ function modal(title, body, btns){
   const upd=()=>{ const more = bd.scrollHeight - bd.scrollTop - bd.clientHeight > 24; mm.classList.toggle('on', more); $('md').classList.toggle('hasmore', more); };
   bd.addEventListener('scroll', upd, {passive:true}); mm.onclick=()=>bd.scrollBy({top:bd.clientHeight*0.7, behavior:'smooth'});
   bd.querySelectorAll('img').forEach(im=>{ if(!im.complete) im.addEventListener('load', upd, {once:true}); });
-  $('ov').classList.add('show'); document.body.classList.add('modalopen'); upd(); setTimeout(upd, 120); setTimeout(upd, 600);
+  $('ov').classList.add('show'); document.body.classList.add('modalopen');
+  if(keep) bd.scrollTop = keep;
+  upd(); setTimeout(upd, 120); setTimeout(upd, 600);
 }
-function closeModal(){ $('ov').classList.remove('show'); document.body.classList.remove('modalopen'); }
+function closeModal(){ modalKey=''; $('ov').classList.remove('show'); document.body.classList.remove('modalopen'); }
 $('ov').addEventListener('click', e=>{ if(e.target.id==='ov') closeModal(); });
 
 

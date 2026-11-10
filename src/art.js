@@ -133,7 +133,12 @@ function floatAt(el, text, color){
   document.body.appendChild(f); setTimeout(()=>f.remove(),1100);
 }
 /* ================= 視窗 ================= */
+let modalKey = '';
 function modal(title, body, btns){
+  // 同一個視窗重新整理（例如買東西後）時，保留原本捲動的位置，不要跳回最上面
+  const key = String(title).replace(/<[\s\S]*$/, '').trim(), oldBd = $('md').querySelector('.bd');
+  const keep = $('ov').classList.contains('show') && key === modalKey && oldBd ? oldBd.scrollTop : 0;
+  modalKey = key;
   $('md').innerHTML = `<h3><span>${title}</span><button class="x" id="mx">×</button></h3><div class="bd">${body}</div>${btns&&btns.length?'<div class="ft" id="mft"></div>':''}`;
   $('mx').onclick = closeModal;
   if(btns && btns.length){
@@ -145,8 +150,10 @@ function modal(title, body, btns){
   const upd=()=>{ const more = bd.scrollHeight - bd.scrollTop - bd.clientHeight > 24; mm.classList.toggle('on', more); $('md').classList.toggle('hasmore', more); };
   bd.addEventListener('scroll', upd, {passive:true}); mm.onclick=()=>bd.scrollBy({top:bd.clientHeight*0.7, behavior:'smooth'});
   bd.querySelectorAll('img').forEach(im=>{ if(!im.complete) im.addEventListener('load', upd, {once:true}); });
-  $('ov').classList.add('show'); document.body.classList.add('modalopen'); upd(); setTimeout(upd, 120); setTimeout(upd, 600);
+  $('ov').classList.add('show'); document.body.classList.add('modalopen');
+  if(keep) bd.scrollTop = keep;
+  upd(); setTimeout(upd, 120); setTimeout(upd, 600);
 }
-function closeModal(){ $('ov').classList.remove('show'); document.body.classList.remove('modalopen'); }
+function closeModal(){ modalKey=''; $('ov').classList.remove('show'); document.body.classList.remove('modalopen'); }
 $('ov').addEventListener('click', e=>{ if(e.target.id==='ov') closeModal(); });
 
