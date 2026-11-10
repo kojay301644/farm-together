@@ -367,6 +367,15 @@ body.lowfx #map .bob, body.lowfx #map .cloud, body.lowfx #map [class*="spark"], 
 .a2v{font-size:12px;font-weight:800;color:var(--ink2);text-align:right;margin-top:2px}.a2d{font-size:12px;font-weight:800;color:#2E9660;margin-top:3px}
 .tag.wear{display:inline-flex;align-items:center;gap:3px;background:#E8F8EE;color:#2E9660;padding:1px 7px 1px 2px;vertical-align:middle}.tag.wear img{width:20px;height:20px;object-fit:contain}
 .tag.wear.none{background:#F3EEE5;color:#9A8C78;padding:1px 7px}
+.buffs{position:absolute;right:10px;top:calc(100% + 8px);display:flex;flex-direction:column;align-items:flex-end;gap:5px;pointer-events:none}
+.buff{pointer-events:auto;background:rgba(255,255,255,.94);border-radius:999px;padding:4px 10px;font-weight:900;font-size:13px;color:var(--ink);box-shadow:0 2px 0 rgba(75,52,35,.35);white-space:nowrap}
+.buff.bad{background:#FFF0F0;color:#D63B42}.buff.party{border:0;background:#FFB547;color:#fff;cursor:pointer;animation:sashake 1.2s infinite}
+.itemoji{display:inline-grid;place-items:center;line-height:1}.ibtns{display:flex;flex-direction:column;gap:4px;align-items:stretch}
+.tkshout{color:#FFE066;text-shadow:0 0 6px rgba(255,120,0,.9)}
+.spgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.spc{background:#FFF8EC;border:3px solid #EADFC9;border-radius:14px;padding:8px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.08s}
+.spc b{font-size:12px}.spc.on{border-color:#FFB547;background:#FFF1C9;transform:scale(1.06);box-shadow:0 0 0 3px rgba(255,181,71,.35)}
+.spbtns{display:flex;flex-direction:column;gap:8px;margin-top:12px}.btn.gem{background:#7B6CF6;box-shadow:0 4px 0 #5747D4}
+.odds{margin-top:10px;font-size:13px}.odds summary{font-weight:900;cursor:pointer;color:var(--ink2)}.odds table{width:100%;margin-top:6px;border-collapse:collapse}.odds td{padding:3px 6px;border-bottom:1px solid #EFE6D6}.odds td:last-child{text-align:right;font-weight:800}
 .avw{position:relative;flex:none}.aved{position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;border-radius:50%;background:#FF9F43;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 0 #D67D22;pointer-events:none}
 .admbox{background:#FFF3F3;border:2px dashed #F2A0A0;border-radius:14px;padding:10px;margin-top:6px}
 .admrow{display:grid;grid-template-columns:4.5em 1fr;gap:6px 8px;align-items:center;font-weight:800;font-size:14px}
@@ -487,7 +496,9 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
+  <div class="buffs" id="buffs"></div>
   <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">

@@ -1,5 +1,5 @@
 /* ================= 背包：商店買到的東西都分類放在這裡 ================= */
-const BAG_TABS = [['gear','🐾 寵物裝備'],['decor','🎨 裝飾'],['skin','🏠 建築外觀'],['tone','🌈 城鎮色調']];
+const BAG_TABS = [['item','🧪 道具'],['gear','🐾 寵物裝備'],['decor','🎨 裝飾'],['skin','🏠 建築外觀'],['tone','🌈 城鎮色調']];
 let bagTab = 'gear';
 function openPack(t){
   if(mode==='visit') return toast('回到自己的農場才能打開背包');
@@ -14,6 +14,8 @@ function openPack(t){
       : `<div class="empty">還沒有裝備<br><small>可以在寵物商店買、收成時撿到寶箱，或升級領禮物</small></div>`;
     body += `<div class="sec">自動設定</div>` + autoSeedHTML() + autoFeedHTML();
     body += `<div class="rhint" style="text-align:center;margin-top:8px">到「我的家」點寵物下面的裝備格就能插上</div>`;
+  } else if(bagTab==='item'){
+    body += itemBagHTML();
   } else if(bagTab==='decor'){
     const inv=me.decor_inv||{}, placed={}; (me.decor_place||[]).forEach(d=>placed[d.i]=(placed[d.i]||0)+1);
     const own=DECOR.filter(d=>(inv[d.id]||0)>0);
@@ -35,11 +37,11 @@ function openPack(t){
       return `<div class="skcard${t.id===cur?' on':''}"><div class="tsw" data-tpv="${t.id}" style="background:linear-gradient(${fx.sky[0]},${fx.sky[1]} 60%,${fx.sky[2]})"><img alt="" src="${A('home_island')}"><span>${TONE_ICON[fx.fx]||'🌼'}</span></div><b>${esc(t.name)}</b>
         ${t.id===cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':`<button class="mini" data-tu="${t.id}">套用</button>`}</div>`; }).join('')}</div>`;
   }
-  modal('🎒 背包', body, [[bagTab==='gear'?'🛒 去寵物商店':'🛒 去建築商店','o',()=>openShopTab(bagTab==='gear'?'gear':bagTab)]]);
+  modal('🎒 背包', body, [[bagTab==='gear'?'🛒 去寵物商店':bagTab==='item'?'🛒 去道具商店':'🛒 去建築商店','o',()=>bagTab==='item'?openItemShop():openShopTab(bagTab==='gear'?'gear':bagTab)]]);
   const md=$('md');
   md.querySelectorAll('[data-bag]').forEach(b=>b.onclick=()=>openPack(b.dataset.bag));
   md.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>enterDecorEdit(b.dataset.pd));
-  bindAutoSel();
+  bindAutoSel(); bindItemBag();
   md.querySelectorAll('[data-sk]').forEach(b=>b.onclick=async()=>{ const [bld,st]=b.dataset.sk.split('|');
     try{ applyState(await rpc('farm_set_skin',{p_bld:bld,p_style:st})); refresh(); sfx('coin'); openPack(); }catch(e){ toast(e.message); } });
   md.querySelectorAll('[data-tu]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_tone',{p_id:b.dataset.tu})); refresh(); sfx('coin'); openPack(); }catch(e){ toast(e.message); } });
