@@ -48,6 +48,7 @@ function openBeastPark(t){
   md.querySelectorAll('[data-skin]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); openPetSkin(b.dataset.skin, ()=>openBeastPark('mine')); });
   md.querySelectorAll('[data-pick] button').forEach(b=>b.addEventListener('click', e=>e.stopPropagation()));
   md.querySelectorAll('[data-pick]').forEach(c=>c.onclick=()=>pickPal(c.dataset.pick));
+  md.querySelectorAll('[data-addpal]').forEach(c=>c.onclick=()=>addPal());
   md.querySelectorAll('[data-bb]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.bb;
     try{ applyState(await rpc('farm_buy_beast',{p_id:id})); refresh(); fxConfetti(); sfx('lvup');
       modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">已經住進寵物園了</div></div>`,
@@ -55,6 +56,14 @@ function openBeastPark(t){
     }catch(e){ toast(e.message); } });
 }
 
+/* 夥伴空位：選一隻還沒上場的寵物加入；都上場了就去買 */
+function addPal(){
+  const own=S.me.beasts||{}, pt=partyOf(S.me), list=BEASTS.filter(b=>own[b.id]!=null && !pt.some(p=>p.s===b.id));
+  if(!list.length) return modal('新增夥伴', `<div style="text-align:center;font-weight:800;line-height:1.8">你的寵物都已經上場了<br><small style="color:var(--ink2)">買新寵物就能多一位夥伴</small></div>`, [['取消','sub',()=>openBeastPark('mine')],['🛒 去買寵物','',()=>openBeastPark('dex')]]);
+  modal('選一隻當夥伴', `<div class="bgrid">${list.map(b=>`<div class="bcard" data-ap="${b.id}" style="cursor:pointer"><img src="${petSrc(b.id, S.me)}" alt=""><b>${bName(b.id)}</b><button class="mini">上場</button></div>`).join('')}</div>`,
+    [['🛒 買新寵物','sub',()=>openBeastPark('dex')],['取消','sub',()=>openBeastPark('mine')]]);
+  document.querySelectorAll('#md [data-ap]').forEach(c=>c.onclick=async()=>{ const sp=c.dataset.ap, p2=JSON.parse(JSON.stringify(partyOf(S.me))); p2.push({s:sp,g:null}); await saveParty(p2, `${bName(sp)} 上場了！`); openBeastPark('mine'); });
+}
 /* 點寵物就換：不在隊上→上場（滿了就選一隻換掉，裝備留給新寵物）；在隊上→當隊長／下場 */
 async function pickPal(sp){
   const pt = JSON.parse(JSON.stringify(partyOf(S.me))), cap = S.me.party_cap||1, k = pt.findIndex(p=>p.s===sp);
@@ -112,7 +121,7 @@ function partyRowHTML(who, editable){
   const pt=partyOf(who), cap=editable ? (who.party_cap||1) : pt.length, lvs=partyLvs();
   return `<div class="prow">${[0,1,2,3,4,5,6,7,8].map(i=>{ const p=pt[i];
     if(p){ const g=GEAR[p.g]; return `<div class="pslot${i===0?' lead':''}">${i===0?'<span class="crown">👑</span>':''}<img class="pb" src="${petSrc(p.s, who)}" alt="">${editable?`<button class="pg${g?' on':''}" data-pg="${i}">${g?`<img src="${A(g.icon)}" alt="">`:'<i>＋</i>'}<span>${g?'✓':'裝備'}</span></button>`:(g?`<span class="pg on"><img src="${A(g.icon)}" alt=""><span>裝備</span></span>`:'')}</div>`; }
-    if(i<cap) return `<div class="pslot empty">空位</div>`;
+    if(i<cap) return editable ? `<div class="pslot empty" data-addpal="1" style="cursor:pointer">＋<br>新增夥伴</div>` : `<div class="pslot empty">空位</div>`;
     return `<div class="pslot lock">🔒<br>Lv${lvs[i]}</div>`; }).join('')}</div>`;
 }
 
