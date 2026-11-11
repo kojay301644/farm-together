@@ -748,6 +748,15 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjchi{position:absolute;right:22px;bottom:calc(100% + 90px);display:flex;gap:8px;z-index:9}
 .mjchi:empty{display:none}
 .mja small{display:block;font-size:10px;margin-top:-4px}
+.mjcb{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 8px 5px;border-radius:14px;border:2px solid #fff;background:radial-gradient(circle at 35% 25%,#7EE0A6,#2E9E60);box-shadow:0 4px 0 #1E6E42;flex:none;animation:mjin .25s ease-out;cursor:pointer}
+.mjcb:active{transform:translateY(2px);box-shadow:0 2px 0 #1E6E42}
+.mjcbt{display:flex;gap:2px}.mjcbt .mt{width:28px!important;margin:0!important}.mjcbt .mt svg{width:100%;height:auto;display:block}
+.mjcbt .mt.got{outline:3px solid #FFD84A;outline-offset:-1px;border-radius:5px;box-shadow:0 0 10px #FFD84A}
+.mjcb b{color:#fff;font-size:14px;font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.25);line-height:1}
+#mj.tech .mjcb{background:rgba(6,30,60,.92);border-color:#39F3FF;box-shadow:0 0 14px rgba(57,243,255,.55)}
+.mjwaitb{padding:12px 18px;border-radius:999px;background:rgba(8,20,48,.92);color:#BDF6FF;font-weight:900;font-size:16px;border:2px solid #39F3FF;animation:mjpulse3 1s ease-in-out infinite}
+.mjhint.up{left:auto;right:22px;transform:none;bottom:calc(100% + 100px)}
+.mjacts.still .mjcb{animation:none}
 .mjpkt{align-self:center;background:rgba(0,0,0,.55);color:#fff;font-weight:900;font-size:12px;border-radius:8px;padding:4px 8px}
 .mjpk{background:#fff;border-radius:12px;padding:6px;display:flex;box-shadow:0 3px 0 rgba(0,0,0,.2);border:3px solid #7EE0A6}
 .mjhint{position:absolute;left:50%;bottom:calc(100% + 18px);transform:translateX(-50%);background:rgba(255,255,255,.95);border-radius:999px;padding:5px 14px;font-size:13px;font-weight:900;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.2);animation:mjin .3s ease-out}
@@ -837,21 +846,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794415627" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794416509" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794415627" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794415627" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794416509" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794416509" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794415627" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794416509" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794415627" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794415627" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794416509" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794416509" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -868,11 +877,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794415627" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794416509" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794415627";
+const BUILD="1794416509";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3574,6 +3583,10 @@ function mjFace(t){
   if(n===1) return `<ellipse cx="21" cy="33" rx="11" ry="9" fill="${MJC.green}"/><circle cx="29" cy="19" r="7" fill="${MJC.green}"/><circle cx="31" cy="17.5" r="1.8" fill="#fff"/><circle cx="31.4" cy="17.5" r="0.9" fill="#222"/>
     <path d="M35.5 19 L41 20.5 L35.5 22.5Z" fill="#E8A21E"/><path d="M11 30 L3 22 L6 34 L2 40 L13 38Z" fill="${MJC.red}"/><path d="M17 31 Q22 36 28 31" stroke="#fff" stroke-width="1.6" fill="none"/>
     <path d="M18 41 L16 50 M24 41 L25 50" stroke="#B8701E" stroke-width="2" stroke-linecap="round"/>`;
+  if(n===8){   // 八條：兩邊直的、中間兩根斜的（上面像 W、下面像 M）
+    const g = MJC.green, st = (x,y,h,rot)=>{ const w=5.4; return `<g transform="rotate(${rot} ${x} ${y})"><rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="2.6" fill="${g}"/><rect x="${x-w/2-0.6}" y="${y-0.9}" width="${w+1.2}" height="1.8" rx=".9" fill="${g}" opacity=".7"/><line x1="${x}" y1="${y-h/2+2.5}" x2="${x}" y2="${y+h/2-2.5}" stroke="#fff" stroke-width=".9" opacity=".55"/></g>`; };
+    const half = (cy,a)=>st(8.5,cy,16,0)+st(35.5,cy,16,0)+st(17.5,cy,16.5,a)+st(26.5,cy,16.5,-a);
+    return half(16.5,24) + half(39.5,-24); }
   return MJ_BAM[n].map(([x,y,h,r])=>{ const c=r?MJC.red:MJC.green, w=5.6;
     return `<rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="2.6" fill="${c}"/><rect x="${x-w/2-0.6}" y="${y-0.9}" width="${w+1.2}" height="1.8" rx=".9" fill="${c}" opacity=".7"/><line x1="${x}" y1="${y-h/2+2.5}" x2="${x}" y2="${y+h/2-2.5}" stroke="#fff" stroke-width=".9" opacity=".55"/>`; }).join('');
 }
@@ -3675,7 +3688,7 @@ function mjRules(){
 /* ---------- 牌桌控制：練習場（本機跟電腦）／連線（伺服器） ---------- */
 const MJ_BOTS = [{name:'小兔',av:3},{name:'阿熊',av:7},{name:'狐狸妹',av:15},{name:'企鵝哥',av:21},{name:'水獺',av:24},{name:'小鼠',av:9}];
 const MJ_TURN_SEC = 15, MJ_CLAIM_SEC = 5;
-let mjChiPick = null, mjTingMode = false, mjAnimKey = {};   // 動畫只在第一次出現時播，重畫畫面不要重播
+let mjTingMode = false, mjAnimKey = {};   // 動畫只在第一次出現時播，重畫畫面不要重播
 let mjDiceHand = 0, mjDiceUntil = 0, mjMe = 0;
 let MJG = null, MJO = null, mjSel = null, mjTimer = 0, mjDeadline = 0, mjDue = '', mjBotT = 0, mjMiss = 0, mjLastLog = 0, mjNextT = 0;
 const mjOn = () => !!(MJG || MJO);
@@ -3761,7 +3774,7 @@ async function mjOnline(a, extra){
   if(!MJO || MJO.busy) return;
   MJO.busy = true;
   try{ const r = await mjCall(a, extra); if(MJO){ MJO.busy = false; mjApply(r.view, null, false, true); } }
-  catch(e){ mjToast(e.message); if(MJO){ MJO.busy = false; MJO.seq = -1; const q = MJO.queued; MJO.queued = null; if(q) mjApply(q.view, q.seq); mjCall('state').then(r=>MJO && mjApply(r.view, null)).catch(()=>{}); } }
+  catch(e){ mjToast(e.message); if(MJO){ MJO.busy = false; MJO.seq = -1; MJO.claimWait = null; const q = MJO.queued; MJO.queued = null; if(q) mjApply(q.view, q.seq); mjCall('state').then(r=>MJO && mjApply(r.view, null)).catch(()=>{}); } }
   finally{ if(MJO) MJO.busy = false; }
 }
 function mjCurView(){ return MJG ? mjLocalView() : MJO && MJO.V; }
@@ -3787,10 +3800,9 @@ function mjDo(a){
       if(i>=0){ me.hand.splice(i,1); me.n = me.hand.length; me.river.push(a.t); if(a.ting) me.ting = true; V.last = { t:a.t, from:V.me }; V.drawn = null; V.waiting = []; V.opts = {}; V.turn = -1;
         mjSfx('tile'); MJO.skipSig = 'discard:' + V.me + ':' + a.t; mjRender(); } }
     else if(['chi','pon','kan','hu'].includes(a.a)){
-      // 馬上喊出來、按鈕收掉；伺服器確認在背景做（之後同一個事件不再重播）
+      // 先顯示「等待中⋯」，伺服器確認吃到了才喊；被別人搶走就提示
       V.waiting = (V.waiting||[]).filter(j=>j!==V.me); V.opts = {};
-      mjShout(V.me, {chi:'吃！',pon:'碰！',kan:'槓！',hu:'胡了！'}[a.a]); MJO.skipShout = a.a + ':' + V.me;
-      const ui = $('mjUi'); if(ui){ const ac = ui.querySelector('.mjacts'); if(ac) ac.innerHTML = ''; const ch = $('mjChi'); if(ch) ch.innerHTML = ''; }
+      MJO.claimWait = { a:a.a, hand:V.handNo }; mjSfx('pick'); mjRender();
     }
     else if(a.a==='ting'){ me.ting = true; V.opts = Object.assign({}, V.opts, { canTing:false }); mjRender(); }
     else if(a.a==='pass'){ V.waiting = (V.waiting||[]).filter(j=>j!==V.me); V.opts = {}; mjRender(); }
@@ -3892,13 +3904,12 @@ function mjRender(first){
   const oo = V.phase==='claim' && wl.includes(0) ? (V.opts||{}) : {}, lt = V.last && V.last.t;
   const chiSet = new Set((oo.chi||[]).flat()), ponOn = oo.pon || oo.kan;
   const marked = {};   // 每種牌只標一張（碰標兩張）
-  const mark = t => { if(ponOn && t===lt && (marked[t]||0) < 2){ marked[t]=(marked[t]||0)+1; return ' hp'; } if(chiSet.has(t) && !marked[t]){ marked[t]=1; return ' hc'; } return ''; };
+  const mark = t => { if(ponOn && t===lt && (marked[t]||0) < 2){ marked[t]=(marked[t]||0)+1; return ' hp'; } return ''; };   // 吃不標在手牌上，改成上面的吃法按鈕
   const tMarked = {};
   const tingCls = t => { if(!tt || !tt[t] || tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
   const newKey = drawn!=null ? `${V.handNo}:${me.river.length}:${me.melds.length}:${drawn}` : '';
   const newAnim = newKey && newKey !== mjAnimKey.draw; mjAnimKey.draw = newKey;
   const claimMine = V.phase==='claim' && wl.includes(ME) && !me.ting;
-  if(!claimMine) mjChiPick = null;   // 可以吃碰胡：不要的話直接點手牌就當作不要
   const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis||claimMine?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
   const handHtml = (me.melds.length?`<div class="mjmy">${me.melds.map(m=>mjMeld(m,'mm')).join('')}</div>`:'')
     + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d', newAnim ? ' new' : '') : '');
@@ -3906,7 +3917,7 @@ function mjRender(first){
   const o = V.opts || {}, acts = [];
   if(o.canTing && !me.auto) acts.push(['ting','聽','t']);   // 打出去之後聽牌了：按「聽」就報聽，不按就不聽
   if(V.phase==='claim' && wl.includes(0)){
-    if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']); if(o.chi) acts.push(['chi', o.chi.length>1 ? `吃<small>${o.chi.length}種</small>` : '吃','c']);   // 沒有「過」：不點就是不要
+    if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']);    // 沒有「過」：不點就是不要；吃法另外畫成按鈕
   } else if(V.phase==='play' && V.turn===ME && !me.auto){
     if(o.zimo) acts.push(['zimo','自摸','w']); if(o.ankan) acts.push(['ankan','暗槓','k']); if(o.kakan) acts.push(['kakan','加槓','k']);   // 不想胡就直接打牌
 
@@ -3917,7 +3928,7 @@ function mjRender(first){
     : me.ting ? `<div class="mjhint ting">🀄 已報聽・聽：${waitTxt(myWaits) || '—'}</div>`
     : canDis && tt && selT!=null && tt[selT] ? `<div class="mjhint ting">聽：${waitTxt(tt[selT])}</div>`
     : o.canTing ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}　按「聽」報聽多 1 台</div>`
-    : claimMine ? `<div class="mjhint">要的話點按鈕或亮起來的牌，不要就點其他手牌</div>`
+    : claimMine ? `<div class="mjhint${o.chi?' up':''}">要的話點${o.chi?'上面的吃法':'按鈕'}，不要就把手牌點兩下</div>`
     : !canDis && myWaits.length ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}</div>`
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
   const myOn = wl.includes(0) && V.phase!=='end';
@@ -3930,7 +3941,10 @@ function mjRender(first){
   const actKey = acts.map(a=>a[0]).join(',') + '|' + V.handNo + ':' + V.phase + ':' + (V.last ? V.last.t + ':' + V.last.from : '') + ':' + me.river.length;
   const actStill = actKey === mjAnimKey.acts; mjAnimKey.acts = actKey;
   const hintKey = hint.replace(/<[^>]+>/g,''); const hintStill = hintKey === mjAnimKey.hint; mjAnimKey.hint = hintKey;
-  $('mjUi').innerHTML = `<div class="mjacts${actStill?' still':''}">${claimTile}${acts.map(([k,t,c])=>`<button class="mja mja-${c}" data-ma="${k}">${t}</button>`).join('')}</div><div class="mjchi" id="mjChi"></div>${hintStill ? hint.replace('class="mjhint', 'class="mjhint still').replace('class="mjauto', 'class="mjauto still') : hint}
+  const chiBtns = V.phase==='claim' && wl.includes(0) && o.chi && V.last ? o.chi.map((u,i)=>{ const ts = sortChi(u, V.last.t); let lit = false;
+      return `<button class="mjcb" data-mc="${i}"><span class="mjcbt">${ts.map(t=>{ const g = !lit && t===V.last.t; if(g) lit = true; return mjTile(t,'sm'+(g?' got':'')); }).join('')}</span><b>吃 ${ts.map(t=>MJ.name(t).slice(0,1)).join('')}</b></button>`; }).join('') : '';
+  const cw = MJO && MJO.claimWait && V.phase==='claim' && MJO.claimWait.hand===V.handNo ? `<div class="mjwaitb">等待中⋯</div>` : '';
+  $('mjUi').innerHTML = `<div class="mjacts${actStill?' still':''}">${claimTile}${cw}${acts.map(([k,t,c])=>`<button class="mja mja-${c}" data-ma="${k}">${t}</button>`).join('')}${chiBtns}</div><div class="mjchi" id="mjChi"></div>${hintStill ? hint.replace('class="mjhint', 'class="mjhint still').replace('class="mjauto', 'class="mjauto still') : hint}
     <div class="mjhand${canDis?' can':''}" style="--tw:${tw}px;--mw:${Math.round(tw*0.62)}px">${handHtml}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div>
     <div class="mjbme${myOn?' on':''}"><img src="${avSrc(me.av)}" alt=""><span class="mjbw">${MJ.WIND[me.wind]}</span>${me.ting?'<span class="mjbd" style="background:#F08A1C">聽</span>':''}${V.dealer===ME?`<span class="mjbd">莊${V.lian?V.lian:''}</span>`:''}<b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
@@ -3945,17 +3959,12 @@ function mjRender(first){
   document.querySelectorAll('#mj .mjhand .mt.hd').forEach(el=>el.onclick=()=>{
     if(claimMine){
       const tt0 = +el.dataset.t;
-      // 點有標「碰」「吃」的牌：直接碰／吃
+      // 點有標「碰」的牌：直接碰
       if(el.classList.contains('hp') && o.pon) return mjDo({a:'pon'});
-      if(el.classList.contains('hc') && o.chi){
-        // 吃法不只一種：點的牌只出現在一種吃法 → 直接吃；不然先選起來，再點第二張決定吃法
-        const cand = o.chi.filter(c=>c.includes(tt0));
-        if(mjChiPick!=null && mjChiPick!==tt0){ const u = o.chi.find(c=>c.includes(mjChiPick) && c.includes(tt0)); if(u){ mjChiPick = null; return mjDo({a:'chi', use:u}); } }
-        if(cand.length===1){ mjChiPick = null; return mjDo({a:'chi', use:cand[0]}); }
-        if(cand.length>1){ mjChiPick = tt0; mjSfx('pick'); document.querySelectorAll('#mj .mjhand .mt.hd').forEach(x=>x.classList.toggle('sel', x===el));
-          const hEl = document.querySelector('#mjUi .mjhint'); if(hEl){ hEl.className='mjhint still'; hEl.textContent = `再點一張要跟${MJ.name(tt0)}配的牌`; } return; }
-      }
-      mjSel = el.dataset.k; mjSfx('pick'); return mjDo({a:'pass'});   // 點其他牌：當作不要，並先把這張牌選起來
+      // 其他手牌：第一下只把牌升起來（不小心碰到不會跳過），同一張再點一下才算「不要」
+      if(mjSel !== el.dataset.k){ mjSel = el.dataset.k; mjSfx('pick'); document.querySelectorAll('#mj .mjhand .mt.hd').forEach(x=>x.classList.toggle('sel', x===el));
+        const hEl = document.querySelector('#mjUi .mjhint'); if(hEl){ hEl.classList.add('still'); hEl.textContent = '再點一下這張就是「不要」'; } return; }
+      return mjDo({a:'pass'});
     }
     if(!canDis) return;
     const k = el.dataset.k, t = +el.dataset.t;
@@ -3973,14 +3982,8 @@ function mjRender(first){
     if(k==='zimo') return mjDo({a:'zimo'});
     if(k==='pon'||k==='kan') return mjDo({a:k});
     if(k==='ankan'||k==='kakan'){ const L=o[k]; if(L.length===1) return mjDo({a:k, t:L[0]}); return mjPick(L.map(t=>({h:[t,t,t,t].map(x=>mjTile(x,'sm')).join(''), a:{a:k,t}}))); }
-    if(k==='chi'){ const L=o.chi; if(L.length===1) return mjDo({a:'chi', use:L[0]});
-      // 好幾種吃法：不跳選單，改成點亮起來的牌來選
-      const hEl = document.querySelector('#mjUi .mjhint'), msg = '點亮起來的牌選吃法（點兩張決定怎麼吃）';
-      if(hEl){ hEl.className='mjhint still'; hEl.textContent = msg; } else $('mjUi').insertAdjacentHTML('afterbegin', `<div class="mjhint">${msg}</div>`);
-      document.querySelectorAll('#mj .mjhand .mt.hc').forEach(x=>{ x.classList.remove('blink'); void x.offsetWidth; x.classList.add('blink'); });
-      return;
-      return mjPick(L.map(u=>({h:sortChi(u, V.last.t).map(t=>mjTile(t,'sm'+(t===V.last.t?' got':''))).join(''), a:{a:'chi', use:u}}))); }
   });
+  document.querySelectorAll('#mj [data-mc]').forEach(b=>b.onclick=()=>{ const u = (o.chi||[])[+b.dataset.mc]; if(u) mjDo({a:'chi', use:u}); });
   if(V.phase==='end') mjBindResult(V);
   // 把這次更新新增的事件都播出來（槓之後會馬上補牌，只看最後一筆會漏掉「槓」）
   const L = V.log || [], N = V.logN != null ? V.logN : L.length;
@@ -3989,10 +3992,13 @@ function mjRender(first){
   mjLastLog.n = N;
   let shouted = false;
   for(const e of fresh){
-    if(['pon','chi','kan','ankan','kakan','hu','zimo','ting'].includes(e.k)){ if(MJO && MJO.skipShout === e.k + ':' + e.s){ MJO.skipShout = null; shouted = true; continue; } mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！',ting:'聽！'}[e.k]); shouted = true; }
+    if(['pon','chi','kan','ankan','kakan','hu','zimo','ting'].includes(e.k)){ if(MJO && MJO.claimWait && ['pon','chi','kan','hu'].includes(e.k)){ const cwa = MJO.claimWait; MJO.claimWait = null;
+        if(e.s !== V.me){ const vb = {chi:'吃',pon:'碰',kan:'槓',hu:'胡'}; mjToast(`沒${vb[cwa.a]}到，被${(V.seats[e.s]||{}).name||'別人'}${vb[e.k]}走了`); } }
+      mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！',ting:'聽！'}[e.k]); shouted = true; }
     else if(e.k==='discard'){ const k = 'discard:' + e.s + ':' + e.t; if(MJO && MJO.skipSig === k) MJO.skipSig = null; else mjSfx('tile'); }
     else if(e.k==='flower' && !shouted) mjShout(e.s, '補花', true);
   }
+  if(MJO && MJO.claimWait && V.phase!=='claim') MJO.claimWait = null;   // 這次吃碰沒有結果（例如時間到）就收掉
 }
 function mjRenderWait(V){
   const T = MJ.TABLES[V.lvl] || MJ.TABLES.n;
