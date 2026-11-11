@@ -533,7 +533,7 @@ function mjCelebrate(j, txt){
   const conf = Array.from({length: 46}, (_, i)=>`<i style="left:${(Math.random()*100).toFixed(1)}%;background:${cols[i%cols.length]};animation-delay:${(Math.random()*0.6).toFixed(2)}s;animation-duration:${(1.6+Math.random()*1.2).toFixed(2)}s;transform:rotate(${Math.floor(Math.random()*360)}deg)"></i>`).join('');
   const d = document.createElement('div'); d.className = 'mjwin' + (mine ? ' mine' : '');
   d.innerHTML = `<div class="mjwrays"></div><div class="mjwconf">${conf}</div>
-    <div class="mjwbox"><img src="${typeof chrSrc==='function' ? chrSrc(pet) : ''}" alt=""><div class="mjwt">${self ? '自摸' : '胡了'}</div><div class="mjwwho">${esc(who)}${mine ? ' 贏了！' : ''}</div></div>`;
+    <div class="mjwbox"><img src="${typeof chrSrc==='function' ? chrSrc(pet) : ''}" alt=""><div class="mjwint">${self ? '自摸' : '胡了'}</div><div class="mjwwho">${esc(who)}${mine ? ' 贏了！' : ''}</div></div>`;
   box.appendChild(d); setTimeout(()=>d.remove(), 2600);
   mjSfx('win'); setTimeout(()=>mjSfx('win'), 450); try{ if(mine && typeof vib==='function') vib([60,40,120]); }catch(e){}
 }

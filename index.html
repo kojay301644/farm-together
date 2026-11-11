@@ -656,6 +656,26 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 #mj.tech .mt.last:after{border-top-color:#00E5FF}
 #mj.tech .mjhint{background:rgba(8,20,48,.92);color:#BDF6FF;border:1px solid rgba(0,229,255,.5);box-shadow:0 0 12px rgba(0,229,255,.35)}
 #mj.tech .mjhint.ting{background:rgba(40,12,60,.92);color:#FFC6F2;border-color:rgba(255,79,216,.6)}
+#mj.tech .mjwait{background:linear-gradient(160deg,rgba(14,32,70,.94),rgba(8,16,40,.96));color:#DDF7FF;border:2px solid rgba(0,229,255,.6);box-shadow:0 0 0 1px rgba(178,107,255,.5),0 0 30px rgba(0,229,255,.35),inset 0 0 24px rgba(0,229,255,.12)}
+#mj.tech .mjwt{color:#E8FBFF;text-shadow:0 0 10px rgba(0,229,255,.7)}
+#mj.tech .mjcode{color:#9FEFFF}
+#mj.tech .mjcode b{color:#5CF2FF;text-shadow:0 0 12px #00E5FF,0 0 2px #fff}
+#mj.tech .mjcode small,#mj.tech .mjws{color:#8FB8D8}
+#mj.tech .mjwq{color:#DDF7FF}
+#mj.tech .mjwq img{border-color:#5CF2FF;box-shadow:0 0 0 2px #7A5CFF,0 0 12px rgba(122,92,255,.7)}
+#mj.tech .mjwq i{background:#0A1838;color:#3E7FA8;border-color:rgba(0,229,255,.5);box-shadow:0 0 0 2px rgba(122,92,255,.5)}
+#mj.tech .mjwq.e span{color:#6F93B5}
+#mj.tech .mjwait .btn,#mj.tech .mjpc .btn{background:linear-gradient(135deg,#00C2FF,#7A5CFF);color:#fff;box-shadow:0 3px 0 #3B2E9E,0 0 14px rgba(0,229,255,.45)}
+#mj.tech .mjwait .btn.sub,#mj.tech .mjpc .btn.sub{background:#0F2148;color:#9FEFFF;box-shadow:0 3px 0 #050C22;border:1px solid rgba(0,229,255,.4)}
+#mj.tech .mjwait .btn.o,#mj.tech .mjpc .btn.o{background:linear-gradient(135deg,#FF4FD8,#FF9F43);box-shadow:0 3px 0 #8A2B6E,0 0 14px rgba(255,79,216,.45)}
+#mj.tech .mjwait .btn:disabled{opacity:.45}
+#mj.tech .mjpc{background:linear-gradient(160deg,#0E2046,#081430);color:#DDF7FF;border:2px solid rgba(0,229,255,.55);box-shadow:0 0 30px rgba(0,229,255,.3)}
+#mj.tech .mjpc .help p{color:#BFDDF0}
+#mj.tech .mjpc input{background:#071330;color:#E8FBFF;border-color:rgba(0,229,255,.5)!important}
+#mj.tech .mjph .x{background:#0F2148;color:#9FEFFF}
+#mj.tech .mjmi{background:#0F2148;color:#DDF7FF;box-shadow:0 3px 0 #050C22;border:1px solid rgba(0,229,255,.3)}
+#mj.tech .mjmi.r{background:#3A0F2E;border-color:rgba(255,79,216,.4)}
+#mj.tech .mjrl div{background:#0F2148;color:#DDF7FF}
 /* 胡牌慶祝 */
 .mjwin{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden;background:radial-gradient(circle at 50% 46%,rgba(255,220,120,.55),rgba(60,20,0,.55) 70%);animation:mjwbg 2.6s ease-out forwards}
 @keyframes mjwbg{0%{opacity:0}8%{opacity:1}80%{opacity:1}100%{opacity:0}}
@@ -667,10 +687,10 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 @keyframes mjwpop{0%{scale:.2;opacity:0}12%{scale:1.25;opacity:1}22%{scale:.92}32%{scale:1.05}42%{scale:1}85%{opacity:1}100%{opacity:0;scale:1.1}}
 .mjwbox img{width:130px;height:130px;object-fit:contain;margin-bottom:-26px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4));animation:mjwpet 1s ease-in-out infinite}
 @keyframes mjwpet{50%{transform:translateY(-10px) rotate(-5deg)}}
-.mjwt{font-size:110px;font-weight:900;line-height:1;letter-spacing:8px;color:#FFE14D;background:linear-gradient(#FFF6A8,#FFC21A 45%,#FF7A00);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+.mjwint{font-size:110px;font-weight:900;line-height:1;letter-spacing:8px;color:#FFE14D;background:linear-gradient(#FFF6A8,#FFC21A 45%,#FF7A00);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   -webkit-text-stroke:4px #8A2B00;paint-order:stroke fill;filter:drop-shadow(0 6px 0 #8A2B00) drop-shadow(0 0 24px rgba(255,200,0,.9))}
 .mjwwho{margin-top:6px;font-size:26px;font-weight:900;color:#fff;background:rgba(138,43,0,.85);border:3px solid #FFD43B;border-radius:999px;padding:2px 22px;box-shadow:0 0 18px rgba(255,200,0,.7)}
-.mjwin.mine .mjwt{font-size:124px}
+.mjwin.mine .mjwint{font-size:124px}
 #mjEnd .mjres{animation:mjfade .35s 2.2s both}
 #mjEnd .mjres.still{animation:none}#mjEnd .mjres.fast{animation:mjfade .3s both}
 /* 輪到你了 */
@@ -817,21 +837,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794415545" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794415627" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794415545" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794415545" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794415627" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794415627" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794415545" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794415627" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794415545" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794415545" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794415627" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794415627" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -848,11 +868,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794415545" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794415627" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794415545";
+const BUILD="1794415627";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -4053,7 +4073,7 @@ function mjCelebrate(j, txt){
   const conf = Array.from({length: 46}, (_, i)=>`<i style="left:${(Math.random()*100).toFixed(1)}%;background:${cols[i%cols.length]};animation-delay:${(Math.random()*0.6).toFixed(2)}s;animation-duration:${(1.6+Math.random()*1.2).toFixed(2)}s;transform:rotate(${Math.floor(Math.random()*360)}deg)"></i>`).join('');
   const d = document.createElement('div'); d.className = 'mjwin' + (mine ? ' mine' : '');
   d.innerHTML = `<div class="mjwrays"></div><div class="mjwconf">${conf}</div>
-    <div class="mjwbox"><img src="${typeof chrSrc==='function' ? chrSrc(pet) : ''}" alt=""><div class="mjwt">${self ? '自摸' : '胡了'}</div><div class="mjwwho">${esc(who)}${mine ? ' 贏了！' : ''}</div></div>`;
+    <div class="mjwbox"><img src="${typeof chrSrc==='function' ? chrSrc(pet) : ''}" alt=""><div class="mjwint">${self ? '自摸' : '胡了'}</div><div class="mjwwho">${esc(who)}${mine ? ' 贏了！' : ''}</div></div>`;
   box.appendChild(d); setTimeout(()=>d.remove(), 2600);
   mjSfx('win'); setTimeout(()=>mjSfx('win'), 450); try{ if(mine && typeof vib==='function') vib([60,40,120]); }catch(e){}
 }
