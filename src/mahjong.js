@@ -31,9 +31,15 @@ function mjFace(t){
     if(n===1) return `<circle cx="22" cy="29" r="15" fill="${MJC.green}"/><circle cx="22" cy="29" r="11.5" fill="#fff"/><circle cx="22" cy="29" r="9" fill="${MJC.red}"/><circle cx="22" cy="29" r="5.5" fill="#fff"/><circle cx="22" cy="29" r="3" fill="${MJC.blue}"/>`;
     return MJ_DOT[n].map(([x,y,r],i)=>{ const c=cs[MJ_DOTC[n][i]]; return `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/><circle cx="${x}" cy="${y}" r="${(r*0.62).toFixed(1)}" fill="#fff"/><circle cx="${x}" cy="${y}" r="${(r*0.32).toFixed(1)}" fill="${c}"/>`; }).join(''); }
   // 條
-  if(n===1) return `<ellipse cx="21" cy="33" rx="11" ry="9" fill="${MJC.green}"/><circle cx="29" cy="19" r="7" fill="${MJC.green}"/><circle cx="31" cy="17.5" r="1.8" fill="#fff"/><circle cx="31.4" cy="17.5" r="0.9" fill="#222"/>
-    <path d="M35.5 19 L41 20.5 L35.5 22.5Z" fill="#E8A21E"/><path d="M11 30 L3 22 L6 34 L2 40 L13 38Z" fill="${MJC.red}"/><path d="M17 31 Q22 36 28 31" stroke="#fff" stroke-width="1.6" fill="none"/>
-    <path d="M18 41 L16 50 M24 41 L25 50" stroke="#B8701E" stroke-width="2" stroke-linecap="round"/>`;
+  if(n===1){   // 一條：紅色側身小鳥站在綠樹枝上（樹枝左下垂著細葉子）
+    const r = MJC.red, gr = MJC.green, lv = [[10.4,42.6],[13,41],[15.8,39.8],[18.6,38.8],[21.4,37.6]];
+    return `<path d="M37.5 26 Q41.5 22.5 39.8 20 Q37.6 18.6 36.6 21.4" stroke="${gr}" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M37.5 26 Q31 34 16 39.2 Q11 41 8.5 44" stroke="${gr}" stroke-width="2.1" fill="none" stroke-linecap="round"/>`
+      + lv.map(([x,y],i)=>`<path d="M${x} ${y} Q${x-0.4} ${y+4.5} ${x-1.8} ${y+(i%2?7.5:9)}" stroke="${gr}" stroke-width="1.3" fill="none" stroke-linecap="round"/>`).join('')
+      + `<path d="M15.4 15.8 Q17 10 22.6 10.4 Q27.6 11 28 16.4 Q31.4 21 30.6 27 Q29.6 33.6 23.6 36.4 Q18.6 34 17.2 27.6 Q16.4 22 18.6 19 Z" fill="#fff" stroke="${r}" stroke-width="1.7" stroke-linejoin="round"/>
+<path d="M16 15.6 L11.6 16.8 L16.4 18.4" fill="${r}"/><circle cx="20.6" cy="14.6" r="2.2" fill="${r}"/><circle cx="21" cy="14.2" r=".7" fill="#fff"/>
+<path d="M19.8 9.8 Q19 6.6 16.6 6 M24.8 10.4 Q26.6 7 29.4 6.8" stroke="${r}" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+<path d="M27.4 18 Q22 22 21.6 30 Q25.6 26 29.6 25.6 M22.6 24 Q25.4 23.4 28.4 21.2" stroke="${r}" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M23.6 36.4 L20.4 44.6 L24.4 41.6 L26.4 45.2 L26.2 36.2" fill="${r}"/>`; }
   if(n===8){   // 八條：兩邊直的、中間兩根斜的（上面像 W、下面像 M）
     const g = MJC.green, st = (x,y,h,rot)=>{ const w=5.4; return `<g transform="rotate(${rot} ${x} ${y})"><rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="2.6" fill="${g}"/><rect x="${x-w/2-0.6}" y="${y-0.9}" width="${w+1.2}" height="1.8" rx=".9" fill="${g}" opacity=".7"/><line x1="${x}" y1="${y-h/2+2.5}" x2="${x}" y2="${y+h/2-2.5}" stroke="#fff" stroke-width=".9" opacity=".55"/></g>`; };
     const half = (cy,a)=>st(8.5,cy,16,0)+st(35.5,cy,16,0)+st(17.5,cy,16.5,a)+st(26.5,cy,16.5,-a);
