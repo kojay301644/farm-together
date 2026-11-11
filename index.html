@@ -560,7 +560,8 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjhid-r .mjbar{background:linear-gradient(270deg,#FFF3DC 0 38%,#F59A2A 38%)}
 .mjfl{display:inline-flex;gap:1px;flex:none;background:rgba(255,255,255,.18);border-radius:6px;padding:2px}
 /* ---------- 大老二 ---------- */
-.b2c{display:inline-block;position:relative;width:var(--w,40px);aspect-ratio:5/7;border-radius:calc(var(--w,40px) * .12);background:linear-gradient(#fff,#F1F5FB);box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 0 0 1px #C9D6EA;color:#1B2440;flex:none;font-style:normal;transition:transform .12s}
+.b2c{display:inline-block;position:relative;width:var(--w,40px);aspect-ratio:5/7;border-radius:calc(var(--w,40px) * .12);background:linear-gradient(#fff,#F1F5FB);box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 0 0 1px #C9D6EA;color:#1B2440;flex:none;font-style:normal}
+.b2c.hd{transition:transform .12s}
 .b2c b{position:absolute;left:9%;top:5%;font-size:calc(var(--w,40px) * .34);font-weight:900;line-height:1;letter-spacing:-1px}
 .b2c em{position:absolute;left:10%;top:34%;font-size:calc(var(--w,40px) * .27);font-style:normal;line-height:1}
 .b2c u{position:absolute;right:8%;bottom:5%;font-size:calc(var(--w,40px) * .5);text-decoration:none;line-height:1}
@@ -589,6 +590,7 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2on{font-weight:900;color:#DDF7FF;font-size:13px;background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.35);border-radius:8px;padding:0 8px}
 .b2on.warn{color:#fff;background:#E2364B;border-color:#fff;animation:mjpulse2 .8s ease-in-out infinite}
 .b2p{position:absolute;display:flex;z-index:2;animation:mjin .25s ease-out}
+.b2p.still{animation:none}
 .b2p .b2c+.b2c{margin-left:calc(var(--pw,38px) * -0.4)}
 .b2p.top .b2c{box-shadow:0 0 0 2px #FFD43B,0 0 12px #FFD43B}
 .b2p-t{top:58px;left:50%;transform:translateX(-50%)}
@@ -893,21 +895,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794420040" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794420218" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794420040" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794420040" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794420218" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794420218" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794420040" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794420218" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794420040" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794420040" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794420218" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794420218" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -924,11 +926,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794420040" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794420218" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794420040";
+const BUILD="1794420218";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -4489,8 +4491,13 @@ function b2Render(V){
     return `<div class="mjs mjs-${mjSeatPos(j)}${on?' on':''}"><div class="mjav"><img src="${avSrc(s.av)}" alt="">${s.auto&&!s.bot?'<span class="mjtg" style="background:#7A8BA6">託</span>':''}</div>
       <div class="mjtx"><div class="mjnm">${esc(s.name)}</div><div class="mjgd">${s.gold.toLocaleString()}</div></div></div>`; };
   const play = j => { const s = V.seats[j], p = mjSeatPos(j), top = V.cur && V.cur.by===j;
-    if(s.last==='pass') return `<div class="b2p b2p-${p}"><span class="b2pass">過</span></div>`;
-    if(Array.isArray(s.last) && s.last.length) return `<div class="b2p b2p-${p}${top?' top':''}">${b2Cards(s.last,'pl')}</div>`;
+    if(s.last==='pass'){ const k = V.handNo + ':pass:' + V.logN, still = (mjAnimKey['b2p' + j]||'').startsWith(V.handNo + ':pass'); if(!still) mjAnimKey['b2p' + j] = k;
+      return `<div class="b2p b2p-${p}${still?' still':''}"><span class="b2pass">過</span></div>`; }
+    if(Array.isArray(s.last) && s.last.length){
+      // 出過的牌只在剛出的那一下有動畫，之後畫面更新不要再跳
+      const k = V.handNo + ':' + s.last.join(','), still = mjAnimKey['b2p' + j] === k; mjAnimKey['b2p' + j] = k;
+      return `<div class="b2p b2p-${p}${top?' top':''}${still?' still':''}">${b2Cards(s.last,'pl')}</div>`; }
+    mjAnimKey['b2p' + j] = '';
     return ''; };
   const other = j => { const s = V.seats[j], p = mjSeatPos(j), n = s.n;
     const backs = Array.from({length: Math.min(n, 3)}, ()=>b2Card(null,'ob')).join('');

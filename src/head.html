@@ -560,7 +560,8 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjhid-r .mjbar{background:linear-gradient(270deg,#FFF3DC 0 38%,#F59A2A 38%)}
 .mjfl{display:inline-flex;gap:1px;flex:none;background:rgba(255,255,255,.18);border-radius:6px;padding:2px}
 /* ---------- 大老二 ---------- */
-.b2c{display:inline-block;position:relative;width:var(--w,40px);aspect-ratio:5/7;border-radius:calc(var(--w,40px) * .12);background:linear-gradient(#fff,#F1F5FB);box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 0 0 1px #C9D6EA;color:#1B2440;flex:none;font-style:normal;transition:transform .12s}
+.b2c{display:inline-block;position:relative;width:var(--w,40px);aspect-ratio:5/7;border-radius:calc(var(--w,40px) * .12);background:linear-gradient(#fff,#F1F5FB);box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 0 0 1px #C9D6EA;color:#1B2440;flex:none;font-style:normal}
+.b2c.hd{transition:transform .12s}
 .b2c b{position:absolute;left:9%;top:5%;font-size:calc(var(--w,40px) * .34);font-weight:900;line-height:1;letter-spacing:-1px}
 .b2c em{position:absolute;left:10%;top:34%;font-size:calc(var(--w,40px) * .27);font-style:normal;line-height:1}
 .b2c u{position:absolute;right:8%;bottom:5%;font-size:calc(var(--w,40px) * .5);text-decoration:none;line-height:1}
@@ -589,6 +590,7 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2on{font-weight:900;color:#DDF7FF;font-size:13px;background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.35);border-radius:8px;padding:0 8px}
 .b2on.warn{color:#fff;background:#E2364B;border-color:#fff;animation:mjpulse2 .8s ease-in-out infinite}
 .b2p{position:absolute;display:flex;z-index:2;animation:mjin .25s ease-out}
+.b2p.still{animation:none}
 .b2p .b2c+.b2c{margin-left:calc(var(--pw,38px) * -0.4)}
 .b2p.top .b2c{box-shadow:0 0 0 2px #FFD43B,0 0 12px #FFD43B}
 .b2p-t{top:58px;left:50%;transform:translateX(-50%)}

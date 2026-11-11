@@ -53,8 +53,13 @@ function b2Render(V){
     return `<div class="mjs mjs-${mjSeatPos(j)}${on?' on':''}"><div class="mjav"><img src="${avSrc(s.av)}" alt="">${s.auto&&!s.bot?'<span class="mjtg" style="background:#7A8BA6">託</span>':''}</div>
       <div class="mjtx"><div class="mjnm">${esc(s.name)}</div><div class="mjgd">${s.gold.toLocaleString()}</div></div></div>`; };
   const play = j => { const s = V.seats[j], p = mjSeatPos(j), top = V.cur && V.cur.by===j;
-    if(s.last==='pass') return `<div class="b2p b2p-${p}"><span class="b2pass">過</span></div>`;
-    if(Array.isArray(s.last) && s.last.length) return `<div class="b2p b2p-${p}${top?' top':''}">${b2Cards(s.last,'pl')}</div>`;
+    if(s.last==='pass'){ const k = V.handNo + ':pass:' + V.logN, still = (mjAnimKey['b2p' + j]||'').startsWith(V.handNo + ':pass'); if(!still) mjAnimKey['b2p' + j] = k;
+      return `<div class="b2p b2p-${p}${still?' still':''}"><span class="b2pass">過</span></div>`; }
+    if(Array.isArray(s.last) && s.last.length){
+      // 出過的牌只在剛出的那一下有動畫，之後畫面更新不要再跳
+      const k = V.handNo + ':' + s.last.join(','), still = mjAnimKey['b2p' + j] === k; mjAnimKey['b2p' + j] = k;
+      return `<div class="b2p b2p-${p}${top?' top':''}${still?' still':''}">${b2Cards(s.last,'pl')}</div>`; }
+    mjAnimKey['b2p' + j] = '';
     return ''; };
   const other = j => { const s = V.seats[j], p = mjSeatPos(j), n = s.n;
     const backs = Array.from({length: Math.min(n, 3)}, ()=>b2Card(null,'ob')).join('');
