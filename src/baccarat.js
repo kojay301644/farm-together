@@ -1,5 +1,5 @@
 /* ---------- 百家樂（多人同桌，跟系統對賭；共用麻將的牌桌外框、連線流程） ---------- */
-let bcPrevShown = {}, bcChip = 0, bcTimer = 0, bcStage = '', bcFlash = {};
+let bcShufShown = false, bcSlid = 0, bcPrevShown = {}, bcChip = 0, bcTimer = 0, bcStage = '', bcFlash = {};
 const BC_ICON = {n:'🌱',m:'🌻',h:'🏆',r:'💰'};
 const BC_ORDER = ['pp','p','t','b','bp'];
 
@@ -35,11 +35,12 @@ function bcReveal(V){
   if(!V.cards) return { p:0, b:0, done:false };
   const t = Date.now() - ((V.dealAt||0) + (MJO ? MJO.off : 0));
   const seq = [['p',0],['b',0],['p',1],['b',1]]; if(V.cards.p.length>2) seq.push(['p',2]); if(V.cards.b.length>2) seq.push(['b',2]);
-  const times = [0,700,1400,2100]; let last = 2100; for(let i=4;i<seq.length;i++){ last += 1000; times.push(last); }
-  if(V.phase==='end') return { p:V.cards.p.length, b:V.cards.b.length, done:true };
+  const S0 = 900;   // 前 0.9 秒是把牌從牌靴滑出來
+  const times = [S0,S0+700,S0+1400,S0+2100]; let last = S0+2100; for(let i=4;i<seq.length;i++){ last += 1000; times.push(last); }
+  if(V.phase==='end') return { p:V.cards.p.length, b:V.cards.b.length, done:true, t };
   const n = times.filter(x=>t >= x + 300).length, shown = { p:0, b:0 };
   seq.slice(0, n).forEach(([s])=>shown[s]++);
-  return { ...shown, done: n >= seq.length };
+  return { ...shown, done: n >= seq.length, t };
 }
 function bcRender(V){
   const T = BC.TABLES[V.lvl] || BC.TABLES.n;
@@ -51,26 +52,32 @@ function bcRender(V){
   // 翻牌動畫只給剛翻開的那張，翻好的不要每次重畫都再跳
   const prev = bcPrevShown.round === V.round ? bcPrevShown : { p:0, b:0 };
   bcPrevShown = { round: V.round, p: rv.p, b: rv.b };
+  const shuffling = bet && (V.shufUntil||0) + (MJO?MJO.off:0) > Date.now(); bcShufShown = shuffling;
+  const slide = V.phase==='deal' && rv.p + rv.b === 0 && bcSlid !== V.round;   // 這局第一次畫：牌從牌靴滑出來
   const cards = side => { const cs = (V.cards && V.cards[side]) || [], n = side==='p' ? rv.p : rv.b;
     const shown = cs.slice(0, n), pt = shown.length ? BC.pts(shown) : null;
-    const slots = [0,1,2].map(i=> i < cs.length ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'') + (i >= prev[side] ? ' new' : '')) : b2Card(null, 'bcc' + (i===2?' third':''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
+    const slots = [0,1,2].map(i=> i < cs.length ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'') + (i >= prev[side] ? ' new' : '')) : b2Card(null, 'bcc' + (i===2?' third':'') + (i<2 && slide ? ` in d${side==='p'?i*2:i*2+1}` : ''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
     const won = V.result && (V.result.win===side);
     return `<div class="bcside bc-${side}${won?' won':''}"><div class="bcsh"><b>${side==='p'?'閒':'莊'}</b>${pt!=null?`<span class="bcpt">${pt} 點</span>`:''}</div><div class="bccs">${slots}</div></div>`; };
   const road = bcRoad(V.hist||[]);
   const players = `<div class="bcpl">${(V.players||[]).map(p=>`<div class="bcpp${p.me?' me':''}"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span><b>${p.win!=null && p.bet ? (p.win>0?`<em class="up">+${p.win.toLocaleString()}</em>`:p.win<0?`<em class="dn">${p.win.toLocaleString()}</em>`:'退回') : p.bet ? p.bet.toLocaleString() : '—'}</b></div>`).join('')}</div>`;
   const left = Math.max(0, Math.ceil(((V.tEnd||0) + (MJO?MJO.off:0) - Date.now())/1000));
-  const status = bet ? `<div class="bcst bet"><b id="bcSec">${left}</b><span>請下注</span></div>`
+  const status = bet && shuffling ? `<div class="bcst deal"><span>洗牌中</span></div>` : bet ? `<div class="bcst bet"><b id="bcSec">${left}</b><span>請下注</span></div>`
     : V.phase==='deal' ? `<div class="bcst deal"><span>停止下注・開牌中</span></div>`
     : V.result ? `<div class="bcst res r-${V.result.win}"><b>${V.result.win==='t'?'和局':V.result.win==='b'?'莊贏':'閒贏'}</b><span>${V.result.pt} : ${V.result.bt}${V.result.pp?'・閒對':''}${V.result.bp?'・莊對':''}</span></div>` : '';
+  if(slide) bcSlid = V.round;
+  // 洗牌動畫：換新牌靴時播
+  const shufLeft = (V.shufUntil||0) + (MJO?MJO.off:0) - Date.now();
+  const shuffle = bet && shufLeft > 0 ? `<div class="bcshuf"><div class="bcsl">${b2Card(null,'sh')}${b2Card(null,'sh')}${b2Card(null,'sh')}</div><div class="bcsr">${b2Card(null,'sh')}${b2Card(null,'sh')}${b2Card(null,'sh')}</div><b>洗牌中⋯</b><small>換一副新的 8 副牌，牌路從頭開始</small></div>` : '';
   felt.style.setProperty('--bcw', (mjW < 760 ? 40 : 46) + 'px');
-  felt.innerHTML = `${road}${players}<div class="bctable">${cards('p')}${status}${cards('b')}</div>`;
+  felt.innerHTML = `${road}${players}<div class="bcshoe">${b2Card(null,'shoe')}<small>${V.shoeLeft!=null?`剩 ${V.shoeLeft} 張`:''}</small></div>${shuffle}<div class="bctable">${cards('p')}${status}${cards('b')}</div>`;
 
   // 押注區
   const my = V.myBets || {}, tot = V.totals || {};
   const res = V.result, winArea = k => res && (k===res.win || (k==='pp'&&res.pp) || (k==='bp'&&res.bp));
   const areas = BC_ORDER.map(k=>{ const A = BC.AREAS[k], m = my[k]||0, all = tot[k]||0;
     const fk = V.round + ':' + k + ':' + m, flash = m && bcFlash[k] !== fk; bcFlash[k] = fk;
-    return `<button class="bca bca-${k}${winArea(k)?' win':''}${res && !winArea(k) && m ? ' lose':''}" data-bca="${k}" ${bet?'':'disabled'}>
+    return `<button class="bca bca-${k}${winArea(k)?' win':''}${res && !winArea(k) && m ? ' lose':''}" data-bca="${k}" ${bet && !shuffling?'':'disabled'}>
       <b>${A.name}</b><small>1 賠 ${A.pay}・上限 ${BC.LIMIT[k]/10000} 萬</small>${all?`<span class="bcall">全桌 ${all.toLocaleString()}</span>`:''}${m?`<span class="bcmy${flash?' pop':''}">${m.toLocaleString()}</span>`:''}</button>`; }).join('');
   const myTot = Object.values(my).reduce((s,x)=>s+x,0);
   const winTxt = V.phase==='end' && V.myWin!=null && myTot ? (V.myWin>0?`<span class="bcwin up">贏 +${V.myWin.toLocaleString()}</span>`:V.myWin<0?`<span class="bcwin dn">輸 ${V.myWin.toLocaleString()}</span>`:`<span class="bcwin">押注退回</span>`) : '';
@@ -96,6 +103,7 @@ function bcRender(V){
   clearInterval(bcTimer);
   bcTimer = setInterval(()=>{
     const VV = mjCurView(); if(!VV || VV.game!=='bc' || !mjOn()){ clearInterval(bcTimer); return; }
+    if(VV.phase==='bet' && (VV.shufUntil||0) && bcShufShown !== (VV.shufUntil + (MJO?MJO.off:0) > Date.now())){ bcRender(VV); return; }
     if(VV.phase==='bet'){ const el = $('bcSec'); if(el){ const l = Math.max(0, Math.ceil(((VV.tEnd||0) + (MJO?MJO.off:0) - Date.now())/1000)); el.textContent = l; el.classList.toggle('hurry', l<=5); } return; }
     if(VV.phase==='deal'){ const r = bcReveal(VV); if(VV.round + ':deal:' + r.p + ':' + r.b !== bcStage) bcRender(VV); }
   }, 200);

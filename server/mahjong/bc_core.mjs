@@ -1,9 +1,9 @@
 // 百家樂：牌桌狀態機（純邏輯，不碰資料庫）。跟系統對賭，不需要電腦補位
 import BC from './bc_engine.mjs';
 
-export const BT = { BET: 10000, DEAL: 7000, END: 4500 };
+export const BT = { BET: 10000, DEAL: 7000, END: 4500, SHUFFLE: 3500, SLIDE: 900 };
 // 開牌動畫要多久：4 張各 0.7 秒，補牌各 1 秒，再停 1.2 秒看結果
-const dealMs = (r) => 4 * 700 + (r.p.length - 2 + r.b.length - 2) * 1000 + 1500;
+const dealMs = (r) => BT.SLIDE + 4 * 700 + (r.p.length - 2 + r.b.length - 2) * 1000 + 1500;   // 先滑牌出來，再一張一張翻
 
 export function newTable(lvl, priv, host, me, now) {
   return { lvl, priv, host, game: 'bc', status: 'play',
@@ -17,7 +17,9 @@ export function addPlayer(T, me, now) {
   G.players.push({ ...me, gold: null, bets: {} });
 }
 function startRound(G, now) {
-  G.round++; G.phase = 'bet'; G.tEnd = now + BT.BET; G.cards = null; G.result = null;
+  G.round++; G.phase = 'bet'; G.tEnd = now + BT.BET; G.cards = null; G.result = null; G.shufUntil = 0;
+  // 牌靴快用完（或剛開桌）：換一副新洗的 8 副牌，牌路從頭開始，先播洗牌動畫再下注
+  if (G.shoe.length < 60) { G.shoe = BC.newShoe(); G.hist = []; G.shufUntil = now + BT.SHUFFLE; G.tEnd += BT.SHUFFLE; }
   G.players.forEach(p => { p.bets = {}; p.win = 0; });
   G.pet = BC.PETS[Math.floor(Math.random() * BC.PETS.length)];
 }
@@ -35,7 +37,6 @@ export function advance(T, now, gold) {
     if (G.phase === 'start') { startRound(G, now); continue; }
     if (G.phase === 'bet') {
       if (now < G.tEnd) break;
-      if (G.shoe.length < 60) G.shoe = BC.newShoe();
       const r = BC.deal(G.shoe);
       G.cards = { p: r.p, b: r.b }; G.result = r; G.phase = 'deal'; G.dealAt = now; G.tEnd = now + dealMs(r);
       G.log.push({ k: 'deal', round: G.round });
@@ -106,7 +107,7 @@ export function viewFor(T, uid, now) {
   if (!me) return base;
   const tot = {}; G.players.forEach(p => Object.entries(p.bets || {}).forEach(([k, a]) => tot[k] = (tot[k] || 0) + a));
   const showCards = G.phase === 'deal' || G.phase === 'end';
-  return { ...base, phase: G.phase, round: G.round, tEnd: G.tEnd, dealAt: G.dealAt, pet: G.pet, hist: G.hist,
+  return { ...base, phase: G.phase, round: G.round, tEnd: G.tEnd, dealAt: G.dealAt, shufUntil: G.shufUntil || 0, shoeLeft: G.shoe.length, pet: G.pet, hist: G.hist,
     me: G.players.indexOf(me), myGold: me.gold, myBets: me.bets, myWin: G.phase === 'end' ? me.win : null, totals: tot,
     players: G.players.map(p => ({ name: p.name, av: p.av, gold: p.gold, bet: Object.values(p.bets || {}).reduce((s, x) => s + x, 0), win: G.phase === 'end' ? p.win : null, me: p.uid === uid })),
     cards: showCards ? G.cards : null, result: G.phase === 'end' ? { win: G.result.win, pt: G.result.pt, bt: G.result.bt, pp: G.result.pp, bp: G.result.bp } : null,

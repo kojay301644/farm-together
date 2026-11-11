@@ -647,6 +647,24 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2c.bcc.new{animation:bcflip .35s ease-out}
 .b2c.bcc.third{transform:rotate(90deg);margin:0 8px}
 .b2c.ghost{background:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18);animation:none}
+.bcshoe{position:absolute;left:50%;top:6px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;z-index:2}
+.bcshoe .b2c.shoe{--w:26px;transform:rotate(-8deg);box-shadow:3px 3px 0 #0A1B44,6px 6px 0 rgba(57,243,255,.5),0 2px 4px rgba(0,0,0,.4),inset 0 0 0 2px #39F3FF}
+.bcshoe small{font-size:10px;color:#9FEFFF;font-weight:900;white-space:nowrap}
+.b2c.bcc.in{animation:bcin .5s ease-out both}
+.b2c.bcc.in.d1{animation-delay:.15s}.b2c.bcc.in.d2{animation-delay:.3s}.b2c.bcc.in.d3{animation-delay:.45s}
+@keyframes bcin{0%{transform:translate(var(--sx,0),-150px) scale(.5) rotate(-20deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+.bc-p .b2c.bcc.in{--sx:120px}.bc-b .b2c.bcc.in{--sx:-120px}
+.bcshuf{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 30px 12px;border-radius:18px;background:rgba(5,12,34,.92);border:2px solid #39F3FF;box-shadow:0 0 24px rgba(0,229,255,.5)}
+.bcshuf b{font-size:22px;color:#FFE59A;font-weight:900}.bcshuf small{font-size:11px;color:#9FEFFF;font-weight:700}
+.bcshuf .bcsl,.bcshuf .bcsr{position:relative;width:60px;height:62px;display:inline-block}
+.bcshuf>div{display:inline-block}
+.bcshuf .bcsl{position:absolute;left:calc(50% - 64px);top:16px}.bcshuf .bcsr{position:absolute;left:calc(50% + 4px);top:16px}
+.bcshuf b{margin-top:70px}
+.b2c.sh{--w:40px;position:absolute;left:0;top:0}
+.bcsl .b2c.sh{animation:bcrif 0.9s ease-in-out infinite}.bcsr .b2c.sh{animation:bcrif2 0.9s ease-in-out infinite}
+.bcsl .b2c.sh:nth-child(2),.bcsr .b2c.sh:nth-child(2){animation-delay:.12s}.bcsl .b2c.sh:nth-child(3),.bcsr .b2c.sh:nth-child(3){animation-delay:.24s}
+@keyframes bcrif{0%,100%{transform:none}50%{transform:translate(30px,-10px) rotate(12deg)}}
+@keyframes bcrif2{0%,100%{transform:none}50%{transform:translate(-30px,-10px) rotate(-12deg)}}
 @keyframes bcflip{0%{transform:rotateY(90deg)}100%{transform:none}}
 .b2c.bcc.third.new{animation:bcflip3 .35s ease-out}
 @keyframes bcflip3{0%{transform:rotate(90deg) rotateY(90deg)}100%{transform:rotate(90deg)}}
