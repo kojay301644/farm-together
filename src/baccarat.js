@@ -36,12 +36,15 @@ function bcReveal(V){
   const t = Date.now() - ((V.dealAt||0) + (MJO ? MJO.off : 0));
   const seq = [['p',0],['b',0],['p',1],['b',1]]; if(V.cards.p.length>2) seq.push(['p',2]); if(V.cards.b.length>2) seq.push(['b',2]);
   const S0 = 900;   // 前 0.9 秒是把牌從牌靴滑出來
-  const times = [S0,S0+700,S0+1400,S0+2100]; let last = S0+2100; for(let i=4;i<seq.length;i++){ last += 1000; times.push(last); }
-  if(V.phase==='end') return { p:V.cards.p.length, b:V.cards.b.length, done:true, t };
+  const times = [S0,S0+700,S0+1400,S0+2100]; let last = S0+2100; for(let i=4;i<seq.length;i++){ last += 1500; times.push(last); }
+  if(V.phase==='end') return { p:V.cards.p.length, b:V.cards.b.length, done:true, t, dl:{ p:true, b:true } };
   const n = times.filter(x=>t >= x + 300).length, shown = { p:0, b:0 };
   seq.slice(0, n).forEach(([s])=>shown[s]++);
-  return { ...shown, done: n >= seq.length, t };
+  // 補牌：要補的那一家，前面四張都翻完才從牌靴發出第三張（沒要補就只有兩張，不會先擺一張蓋著的牌）
+  const dl = { p:false, b:false }; seq.forEach(([s,i],k)=>{ if(i===2 && t >= times[k] - 300) dl[s] = true; });
+  return { ...shown, done: n >= seq.length, t, dl };
 }
+let bcDl3 = {};   // 第三張滑出來的動畫只播一次
 function bcRender(V){
   const T = BC.TABLES[V.lvl] || BC.TABLES.n;
   if(!T.chips.includes(bcChip)) bcChip = T.chips[0];
@@ -56,7 +59,7 @@ function bcRender(V){
   const slide = V.phase==='deal' && rv.p + rv.b === 0 && bcSlid !== V.round;   // 這局第一次畫：牌從牌靴滑出來
   const cards = side => { const cs = (V.cards && V.cards[side]) || [], n = side==='p' ? rv.p : rv.b;
     const shown = cs.slice(0, n), pt = shown.length ? BC.pts(shown) : null;
-    const slots = [0,1,2].map(i=> i < cs.length ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'') + (i >= prev[side] ? ' new' : '')) : b2Card(null, 'bcc' + (i===2?' third':'') + (i<2 && slide ? ` in d${side==='p'?i*2:i*2+1}` : ''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
+    const slots = [0,1,2].map(i=> i < cs.length && (i < 2 || rv.dl[side]) ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'') + (i >= prev[side] ? ' new' : '')) : b2Card(null, 'bcc' + (i===2?' third' + (bcDl3[V.round+side] ? '' : (bcDl3[V.round+side]=1, ' in')):'') + (i<2 && slide ? ` in d${side==='p'?i*2:i*2+1}` : ''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
     const won = V.result && (V.result.win===side);
     return `<div class="bcside bc-${side}${won?' won':''}"><div class="bcsh"><b>${side==='p'?'閒':'莊'}</b>${pt!=null?`<span class="bcpt">${pt} 點</span>`:''}</div><div class="bccs">${slots}</div></div>`; };
   const road = bcRoad(V.hist||[]);
@@ -94,7 +97,7 @@ function bcRender(V){
   if($('bcClr')) $('bcClr').onclick = ()=>{ const VV = mjCurView(); if(!VV || !MJO) return; VV.myBets = {}; mjSfx('pick'); bcRender(VV); bcSend({ a:'clear' }); };
 
   // 開牌：照時間重畫；有人中獎放音效
-  const stage = V.round + ':' + V.phase + ':' + rv.p + ':' + rv.b;
+  const stage = V.round + ':' + V.phase + ':' + rv.p + ':' + rv.b + ':' + (rv.dl?(+rv.dl.p)+''+(+rv.dl.b):'');
   if(stage !== bcStage){
     if(V.phase==='deal' && (rv.p + rv.b) > 0) mjSfx('tile');
     if(V.phase==='end' && bcStage.indexOf(V.round + ':end') !== 0 && V.myWin > 0){ mjSfx('win'); }
@@ -105,7 +108,7 @@ function bcRender(V){
     const VV = mjCurView(); if(!VV || VV.game!=='bc' || !mjOn()){ clearInterval(bcTimer); return; }
     if(VV.phase==='bet' && (VV.shufUntil||0) && bcShufShown !== (VV.shufUntil + (MJO?MJO.off:0) > Date.now())){ bcRender(VV); return; }
     if(VV.phase==='bet'){ const el = $('bcSec'); if(el){ const l = Math.max(0, Math.ceil(((VV.tEnd||0) + (MJO?MJO.off:0) - Date.now())/1000)); el.textContent = l; el.classList.toggle('hurry', l<=5); } return; }
-    if(VV.phase==='deal'){ const r = bcReveal(VV); if(VV.round + ':deal:' + r.p + ':' + r.b !== bcStage) bcRender(VV); }
+    if(VV.phase==='deal'){ const r = bcReveal(VV); if(VV.round + ':deal:' + r.p + ':' + r.b + ':' + (+r.dl.p) + (+r.dl.b) !== bcStage) bcRender(VV); }
   }, 200);
 }
 function bcBet(k){
