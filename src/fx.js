@@ -15,6 +15,18 @@ function bgmSync(){
 addEventListener('pointerdown', ()=>{ if(BGM_ON && (!BGM || BGM.paused)) bgmSync(); }, {passive:true});
 document.addEventListener('visibilitychange', bgmSync);
 document.body.classList.toggle('lowfx', LOWFX);
+/* 手機電量 20% 以下（沒在充電）自動開省電模式；充電或電量回到 30% 以上就恢復。玩家自己在設定開的不動。
+   只有安卓 Chrome 抓得到電量，iPhone 抓不到就不會自動開 */
+let LOW_AUTO = false;
+try{ if(navigator.getBattery) navigator.getBattery().then(b=>{
+  const chk = ()=>{
+    if(PREF('low', false)) return;   // 自己開的省電模式不管
+    const low = !b.charging && b.level <= 0.2, ok = b.charging || b.level >= 0.3;
+    if(low && !LOWFX){ LOWFX = LOW_AUTO = true; document.body.classList.add('lowfx'); try{ toast('🔋 電量偏低，已自動開啟省電模式'); }catch(e){} }
+    else if(ok && LOW_AUTO){ LOWFX = LOW_AUTO = false; document.body.classList.remove('lowfx'); }
+  };
+  chk(); b.addEventListener('levelchange', chk); b.addEventListener('chargingchange', chk);
+}).catch(()=>{}); }catch(e){}
 
 /* ================= 音效（WebAudio 即時合成，不用音檔） ================= */
 let AC = null;

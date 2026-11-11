@@ -379,7 +379,7 @@ async function openSettings(){
   $('tBgm').onclick = ()=>{ BGM_ON=!BGM_ON; SETPREF('bgm',BGM_ON); bgmSync(); openSettings(); };
   $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openSettings(); };
   $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openSettings(); };
-  $('tLow').onclick = ()=>{ LOWFX=!LOWFX; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openSettings(); };
+  $('tLow').onclick = ()=>{ LOWFX=!LOWFX; LOW_AUTO=false; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openSettings(); };
   $('sInv').onclick = invite; $('sA2hs').onclick = openA2HS;
   $('rGo').onclick = async()=>{ const c=$('rCode').value.trim(); if(!c) return toast('請輸入兌換碼');
     try{ const r=await rpc('farm_redeem',{p_code:c}); applyState(r.state); refresh(); sfx('lvup'); fxConfetti(); closeModal(); modal('🎁 兌換成功！', `<div class="rwbox">${rewardHTML(r.reward)}</div>`); if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } };

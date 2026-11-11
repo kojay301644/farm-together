@@ -410,12 +410,29 @@ function farmerStep(m, dt){
 /* 移動動畫 */
 let lastF=performance.now();
 /* 省電：畫面最多 30fps（省電模式 20fps），開著視窗或切到背景時整個停下來 */
-const FPS_CAP = () => (typeof LOWFX!=='undefined' && LOWFX) ? 20 : 30;
+const FPS_CAP = () => (typeof LOWFX!=='undefined' && LOWFX) ? 12 : 20;   // 每秒畫幾次：20 次（省電模式 12 次）
+/* 農場地圖上的循環動畫（草搖、作物彈跳、雲、蝴蝶、走路擺腿⋯）改由這裡推進：每秒 20 次（省電模式 12 次）。
+   瀏覽器自己跑的話是每秒 60 次，整張地圖每次都要重算，手機會燙。跟角色移動在同一格畫面一起更新 */
+let _anT = performance.now();
+function animTick(now){
+  const dt = Math.min(200, now - _anT); _anT = now;
+  const frozen = PAUSED() || IDLE();
+  for(const a of document.getAnimations()){
+    if(!a.__m){ const tg = a.effect && a.effect.target;   // 還沒接手的每次都重新看（元素可能剛被放進地圖）
+      a.__m = !!(tg && tg.isConnected && tg.closest && tg.closest('#map') && a.effect.getTiming().iterations === Infinity); }
+    if(!a.__m) continue;
+    if(a.playState === 'running'){ a.pause(); continue; }   // 新出現的動畫：接手，之後由這裡推進
+    if(frozen) continue;
+    if(a.animationName === 'hop' && !a.effect.target.closest('.walk')){ a.currentTime = 0; continue; }   // 停下來就不跳
+    a.currentTime = (a.currentTime || 0) + dt;
+  }
+}
 const PAUSED = () => document.hidden || document.body.classList.contains('modalopen') || document.body.classList.contains('mjon');
 const IDLE = () => document.body.classList.contains('idle');
 function animate(now){
-  if(PAUSED() || now-lastF < 1000/FPS_CAP()-2){ if(PAUSED()) lastF=now; requestAnimationFrame(animate); return; }
+  if(PAUSED() || now-lastF < 1000/FPS_CAP()-2){ if(PAUSED()){ lastF=now; _anT=now; } requestAnimationFrame(animate); return; }
   const dt=Math.min(0.1,(now-lastF)/1000); lastF=now;
+  try{ animTick(now); }catch(e){}
   const idle = IDLE();
   for(const m of movers){
     if(idle && !(m.farmer && (m.task || (m.jobs && m.jobs.length)))) continue;   // 閒置省電：只剩正在做事的農夫會動
