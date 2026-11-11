@@ -157,7 +157,7 @@ function checkEvolve(){
 
 /* ================= 建築外觀商店 ================= */
 let SKINS = [], skinTab = 'home';
-const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'寵物園', decor:'裝飾店'};
+const SKIN_BLD = {home:'我的家', barn:'穀倉', shop:'種子商店', fountain:'噴水池', pen:'寵物娛樂廳', decor:'裝飾店'};
 function openSkinShop(t){
   if(mode==='visit') return toast('回到自己的農場才能換外觀');
   if(t) skinTab=t;

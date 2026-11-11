@@ -8,7 +8,7 @@ const TUT_STEPS = [
   {text:'白蘿蔔大約 <b>2 分鐘</b>成熟。成熟後選「收成」點它，作物就會收進穀倉', target:()=>plotEls[S.plots.findIndex(p=>p.s==='grow')], done:()=>Object.values(S.me.crops||{}).some(n=>n>0), next:true},
   {text:'點<b>穀倉</b>可以把作物賣掉換金幣；穀倉裡的<b>種子商店</b>可以買更多、更高級的種子', target:()=>bEl('barn'), next:true},
   {text:'這是<b>你的家</b>：可以<b>擺放城鎮</b>裝飾、換<b>稱號・頭像框</b>，還有<b>成就</b>可以拿鑽石 💎。下面工具列上方的「🎒 背包」「🐾 我的夥伴」可以打開背包、換夥伴、插裝備和設定自動農場', target:()=>bEl('home'), next:true},
-  {text:'<b>寵物園</b>可以買新寵物、讓牠們上場當夥伴。夥伴會在農場陪你，插上裝備還會<b>自動幫你做事</b>', target:()=>bEl('pen'), next:true},
+  {text:'<b>寵物娛樂廳</b>是遊戲廳，可以用金幣跟大家打<b>麻將</b>，之後還會有更多小遊戲！', target:()=>bEl('pen'), next:true},
   {text:'<b>綜合商店</b>賣寵物、寵物造型、寵物裝備和道具。裝備會自動播種、澆水、收成、除草、除蟲…插滿 9 種就是<b>全自動農場</b>，休息時間也在賺錢！', target:()=>bEl('decor'), next:true},
   {text:'上面的功能條：點<b>頭像</b>換頭像，📬 <b>禮物信箱</b>收獎勵，📖 <b>遊戲說明</b>，⚙️ 設定（可以開關🎵音樂）。左邊 ✍️ <b>每日簽到</b>（連續 7 天有大獎）和 🎟️ <b>每日轉盤</b>（每天免費轉 1 次）！', target:()=>$('bGift'), next:true},
   {text:'最後，點中間的<b>好友廣場</b>用暱稱加好友、拜訪鄰居，成熟的菜可以偷喔！被偷或被惡作劇時，好友廣場會出現<b>紅點</b>，可以去「動態」看是誰還能<b>復仇</b>。按「開始玩！」還有一隻<b>寵物夥伴</b>送給你 🎁', target:()=>bEl('board'), next:true, last:true},
@@ -18,7 +18,7 @@ const FEAT_TUTS = [
   {id:'till', when:()=>S.plots.some(p=>p.s==='wild' && LAND[p.i] && S.me.lv>=LAND[p.i].lv && S.me.gold>=LAND[p.i].cost),
    text:'🪓 有<b>荒地</b>可以開墾了！點荒地花一點金幣開墾，就能種更多田', target:()=>plotEls[S.plots.findIndex(p=>p.s==='wild' && LAND[p.i] && S.me.lv>=LAND[p.i].lv)]},
   {id:'party2', when:()=>(S.me.party_cap||1)>=2,
-   text:'🐾 <b>第 2 個夥伴格</b>開放了！到<b>寵物園</b>買新寵物，按「上場當夥伴」讓牠一起幫忙', target:()=>bEl('pen')},
+   text:'🐾 <b>第 2 個夥伴格</b>開放了！到<b>綜合商店</b>買新寵物，再到「🐾 我的夥伴」讓牠上場一起幫忙', target:()=>$('bPals')},
   {id:'gear', when:()=>S.me.lv>=3 && !Object.values(S.me.gear||{}).some(n=>n>0),
    text:'🛡️ <b>綜合商店</b>可以買裝備了！買完選一隻寵物插上，牠就會自動幫你做事（例如自動澆水、自動收成）', target:()=>bEl('decor')},
   {id:'ranch', when:()=>S.me.lv>=RANCH_LV,
@@ -111,10 +111,10 @@ function openTutPet(){
   if(!tutPetPick.length) return;
   modal('🎉 完成新手教學！', `<div style="text-align:center;font-weight:800;margin-bottom:8px">送你一隻寵物夥伴，挑一隻帶回家吧！</div>
     <div class="bgrid">${tutPetPick.map(id=>`<div class="bcard"><img src="${chrSrc(id+'1')}" alt=""><b>${bName(id)}</b><button class="mini o" data-tp="${id}">就是你了！</button></div>`).join('')}</div>
-    <div class="rhint" style="text-align:center">選好會住進寵物園，夥伴格有空位就直接上場；插上裝備就會自動幫你做事</div>`);
+    <div class="rhint" style="text-align:center">夥伴格有空位就直接上場；插上裝備就會自動幫你做事</div>`);
   document.querySelectorAll('#md [data-tp]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.tp;
     try{ applyState(await rpc('farm_tut_pet',{p_id:id})); refresh(); fxConfetti(); sfx('lvup'); tutPetPick=null;
-      modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">${partyOf(S.me).some(p=>p.s===id)?'已經上場當你的夥伴了':'已經住進寵物園了（夥伴格滿了，升級開放新格子就能讓牠上場）'}</div></div>`, [['太好了！','',closeModal]]);
+      modal('新夥伴加入！', `<div style="text-align:center;padding:6px 0"><img src="${chrSrc(id+'1')}" style="width:140px;height:140px;object-fit:contain;animation:floaty 3s ease-in-out infinite"><div style="font-weight:900;font-size:20px;margin-top:6px">${bName(id)}</div><div style="color:var(--ink2);font-weight:700">${partyOf(S.me).some(p=>p.s===id)?'已經上場當你的夥伴了':'已經是你的寵物了（夥伴格滿了，升級開放新格子就能讓牠上場）'}</div></div>`, [['太好了！','',closeModal]]);
     }catch(e){ toast(e.message); } });
 }
 setInterval(tutTick, 500);
@@ -144,8 +144,8 @@ function openHelp(){
     <h4>🐔 牧場</h4>
     <p>Lv3 開放。在牧場買小雞、小鴨、綿羊、乳牛、小豬，用倉庫裡的作物餵牠們，過一段時間就會產出雞蛋、牛奶、羊毛等，收成後到穀倉賣錢。好友可以來偷、幫忙餵食和拍蚊子，惡作劇的人會放蚊子讓產量變少。動物頭上有 🦟 時，在主畫面<b>直接點那隻動物</b>就能拍掉；有蚊子時「牧場」標籤旁會出現紅點。</p>
     <h4>🐾 寵物夥伴</h4>
-    <p>在<b>綜合商店</b>或寵物園買寵物（全部一開始就能買），再到寵物園按「上場」當夥伴。夥伴格會隨等級開放，最多 9 隻；夥伴會在農場走來走去，用裝備自動做事時會跑過去幫忙。</p>
-    <p>每隻寵物都有 3 款特別造型（🪄 魔法、🤖 機甲、✨ 星辰），在綜合商店買；到寵物園點寵物就能隨時換造型或換回原本的樣子。</p>
+    <p>在<b>綜合商店</b>買寵物（全部一開始就能買），再到「🐾 我的夥伴」按「上場」當夥伴。夥伴格會隨等級開放，最多 9 隻；夥伴會在農場走來走去，用裝備自動做事時會跑過去幫忙。</p>
+    <p>每隻寵物都有 3 款特別造型（🪄 魔法、🤖 機甲、✨ 星辰），在綜合商店買；到「🐾 我的夥伴」點寵物就能隨時換造型或換回原本的樣子。</p>
     <h4>🛡️ 寵物裝備</h4>
     <p>每隻夥伴有 <b>1 格裝備欄</b>，插上裝備就會幫你自動做事：自動澆水、自動播種、自動除蟲、自動除草、自動餵食、自動收成、自動拍蚊子、看門狗（趕走小偷）、稻草人（擋下惡作劇）。開滿 9 隻夥伴、插上 9 種裝備，就是<b>全自動農場</b>。裝備在<b>離線時也會一直工作</b>（伺服器每 2 分鐘幫你的農場跑一次）。</p>
     <p><b>⚙️ 自動農場設定</b>：在「🐾 我的夥伴」最上面，可以看每個自動功能由哪隻夥伴負責，也能單獨開關（例如想自己收成拿寶箱，就關掉自動收成）。</p>
@@ -246,7 +246,7 @@ function openSign(){
 }
 let signAuto = false;
 function signMaybePop(){ // 每天第一次進遊戲自動跳出（教學進行中不跳）
-  signBadge(); if(signAuto || !S || signedToday() || tut || mode!=='home') return; signAuto = true;
+  signBadge(); if(MJG || signAuto || !S || signedToday() || tut || mode!=='home') return; signAuto = true;
   if(document.querySelector('#ov.show')) return;
   openSign();
 }

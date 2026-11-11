@@ -80,7 +80,7 @@ const BLD = [
   {id:'decor', name:'綜合商店',   img:'bc_forge',    c:HG(322,362),  w:200, foot:0.80},
   {id:'coop',  name:'牧場',     img:'dc_hay',     c:[4.1+6.2, 11.85+1.6], w:120, foot:0.78},
   {id:'bin',   name:'收集倉',   img:'dc_hay',   c:[3.0,11.3], w:104, foot:0.80},
-  {id:'pen',   name:'寵物園',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
+  {id:'pen',   name:'寵物娛樂廳',   img:'b_play',   c:HG(440,560), w:440, foot:0.58},
 ];
 
 // 描邊：把向量圖形加上粗咖啡色外框，統一成手繪風
@@ -297,7 +297,7 @@ function buildWorld(){
     const [lx,ly]=iso(gx,gy);
     if(o.id==='home'){ HOME_LBL=[lx, ly - h*0.12]; homeLblCur=homeLblName(); lab += `<g id="homeLbl">${labelPill(lx, ly - h*0.12, '🏠 '+esc(homeLblCur)+'的家', {big:1})}</g>`; }  // 放在大門前面，不會被上方玩家欄擋住
     else if(o.id==='bin'){ BIN_LBL=[lx, ly-h*o.foot-18]; lab += `<g id="binLbl">${labelPill(lx, ly-h*o.foot-18, binLblText(), {bg:'#FFF1DC'})}</g>`; }
-    else lab += labelPill(lx, ly - (o.id==='coop'?20:o.id==='barn'?h*0.42:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':null});
+    else lab += labelPill(lx, ly - (o.id==='coop'?20:o.id==='barn'?h*0.42:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':o.id==='pen'?'#FFE7A8':null});
     if(o.id==='coop'){ const bx=lx + ([...o.name].length*19+30)/2 + 4, by=ly-20-16;   // 牧場紅點：自己的動物有蚊子時亮
       lab += `<g id="coopDot" style="display:none;pointer-events:none" transform="translate(${bx.toFixed(1)} ${by.toFixed(1)})"><circle r="12" fill="#F2545B" stroke="#fff" stroke-width="3"/><text id="coopDotN" y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="Noto Sans TC,sans-serif">1</text></g>`; }
   });
