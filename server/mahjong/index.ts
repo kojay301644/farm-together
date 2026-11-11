@@ -54,7 +54,8 @@ async function mutate(id: number, fn: (T: any, now: number) => Promise<any> | an
   throw new Fail('太多人同時操作，請再試一次');
 }
 async function pushViews(T: any, now: number, kicked: string[]) {
-  const rows = C.humans(T).map(u => ({ uid: u, table_id: T.status === 'closed' ? null : T.id, view: C.viewFor(T, u, now), seq: T.ver, updated_at: new Date().toISOString() }));
+  const gone = (T.state && T.state.leaving) || [];   // 已經按離開的人：不要再把他拉回這桌
+  const rows = C.humans(T).map(u => ({ uid: u, table_id: T.status === 'closed' || gone.includes(u) ? null : T.id, view: C.viewFor(T, u, now), seq: T.ver, updated_at: new Date().toISOString() }));
   for (const k of kicked as any[]) rows.push({ uid: k.uid, table_id: null, view: { status: 'kicked', msg: k.msg, broke: !!k.broke, tid: T.id }, seq: T.ver, updated_at: new Date().toISOString() });
   if (rows.length) await sb.from('mj_views').upsert(rows);
 }

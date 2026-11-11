@@ -74,7 +74,9 @@ function nextHandServer(T, gold, now) {
 // 推進：開局、電腦出牌、超時代打、結算、下一局。回傳 {settle:{uid:delta}|null, needGold:[uid]}
 function _advance(T, now, gold) {
   const out = { settle: null, kicked: [] };
-  for (let i = 0; i < 80; i++) {
+  // 桌上的真人都按了離開：沒人會再來推進這桌，直接讓電腦把這局打完、結算、散桌（不然會卡到有人回來才繼續打）
+  const fast = () => T.status === 'play' && T.state.uids && T.state.uids.some(Boolean) && T.state.uids.every(u => !u || T.state.leaving.includes(u));
+  for (let i = 0; i < 4000; i++) {
     if (T.status === 'wait') {
       const W = T.state.wait;
       if (!W.players.length) { T.status = 'closed'; break; }
@@ -107,7 +109,7 @@ function _advance(T, now, gold) {
     for (const j of w) {
       const s = G.seats[j], bot = !G.uids[j] || s.auto || s.ting;   // 報聽的人由系統自動處理
       const due = bot ? G.tAct + (G.phase === 'claim' ? TIME.BOT_CLAIM : TIME.BOT_PLAY) : G.tWait + (G.phase === 'claim' ? TIME.CLAIM : turnMs(T));
-      if (now >= due) {
+      if (now >= due || fast()) {
         if (bot) E(T).autoAct(G, j, !!(!G.uids[j] || s.auto || s.ting));
         else if (G.phase === 'claim') E(T).autoAct(G, j, false);   // 吃碰胡沒點：當作不要，不算超時
         else { E(T).autoAct(G, j, false); G.miss[j]++; if (G.miss[j] >= 2) s.auto = true; }
