@@ -46,12 +46,12 @@ function nextHandServer(T, gold, now) {
   const used = () => G.seats.map(s => s.name);
   const toBot = (j) => { const b = pickBot(used()); G.uids[j] = null; Object.assign(G.seats[j], { id: null, name: b.name, av: b.av, bot: true, auto: false, gold: botGold(T.lvl) }); G.miss[j] = 0; };
   G.kicked = [];
-  const BROKE = '你輸光了……金幣不夠坐這桌了，回去種田吧！';
+  const BROKE = '你輸光了……回去種田吧！', POOR = '金幣不夠坐這桌了，可以換小一點的桌子再玩';
   for (let j = 0; j < 4; j++) {
     const u = G.uids[j]; if (!u) continue;
     if (G.leaving.includes(u)) { G.kicked.push({ uid: u, msg: (G.broke || []).includes(u) ? BROKE : '已經離開牌桌', broke: (G.broke || []).includes(u) }); toBot(j); continue; }
     G.seats[j].gold = gold[u] ?? G.seats[j].gold;
-    if (G.seats[j].gold < min) { G.kicked.push({ uid: u, msg: BROKE, broke: true }); toBot(j); }
+    if (G.seats[j].gold < min) { const b = G.seats[j].gold <= 0; G.kicked.push({ uid: u, msg: b ? BROKE : POOR, broke: b }); toBot(j); }
   }
   G.leaving = [];
   for (const p of (G.pending || []).splice(0)) {
@@ -82,9 +82,9 @@ export function advance(T, now, gold) {
         G.settled = true; G.endAt = now;
         const d = {}; G.uids.forEach((u, j) => { if (u && G.result.pay[j]) d[u] = (d[u] || 0) + G.result.pay[j]; });
         out.settle = { hand: G.handNo, delta: d };
-        // 輸光（金幣少於這桌最低金額）：直接請他離桌
-        const min = MJ.TABLES[T.lvl].min; G.broke = [];
-        G.uids.forEach((u, j) => { if (u && G.seats[j].gold < min) { G.broke.push(u); if (!G.leaving.includes(u)) G.leaving.push(u); G.seats[j].auto = true; } });
+        // 輸光（金幣變 0）：直接請他離桌
+        G.broke = [];
+        G.uids.forEach((u, j) => { if (u && G.seats[j].gold <= 0) { G.broke.push(u); if (!G.leaving.includes(u)) G.leaving.push(u); G.seats[j].auto = true; } });
       }
       const act = G.uids.map((u, j) => u && !G.leaving.includes(u) && !G.seats[j].auto ? j : -1).filter(j => j >= 0);
       const allReady = act.every(j => G.ready.includes(j));

@@ -430,7 +430,7 @@ function mjBroke(){
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); MJO.busy = true; }
   const d = document.createElement('div'); d.id = 'mjBroke'; d.className = 'mjbroke';
   d.innerHTML = `<div class="mjbk"><img src="${typeof chrSrc==='function' ? chrSrc('bunny1') : ''}" alt=""><div class="mjbt1">你輸光了……</div>
-    <div class="mjbt2">金幣不夠坐這桌了，回去種田吧！🌾</div><button class="btn" id="mjBrokeGo">🌾 回去種田</button></div>`;
+    <div class="mjbt2">金幣一毛都不剩，回去種田吧！🌾</div><button class="btn" id="mjBrokeGo">🌾 回去種田</button></div>`;
   $('mj').appendChild(d); mjSfx('lose');
   $('mjBrokeGo').onclick = ()=>{ if(MJO) mjCall('leave').catch(()=>{}); mjClose(); try{ sync(); }catch(e){} try{ if(typeof FARM_C!=='undefined') centerOn(...FARM_C); }catch(e){} };
 }
