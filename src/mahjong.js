@@ -439,7 +439,7 @@ function mjBindResult(V){
   $('mjOut').onclick = ()=>mjLeave(true);
   const T = MJ.TABLES[V.table], go = ()=>{ clearTimeout(mjNextT);
     if(MJO){ const b=$('mjNext'); if(b){ b.disabled=true; b.textContent='等其他人…'; } return mjOnline('ready'); }
-    if(!MJG) return; if(MJG.seats[0].gold < T.min){ toast(`金幣少於 ${T.min.toLocaleString()}，不能繼續坐這桌`); return mjLeave(true); }
+    if(!MJG) return; if(MJG.seats[0].gold <= 0){ MJG.seats[0].gold = 50000; mjToast("練習場的金幣補滿了"); }
     MJG.seats.forEach(s=>{ if(s.bot && s.gold < T.min) s.gold += T.min*5; }); MJ.nextHand(MJG); mjSel=null; mjTick(); };
   $('mjNext').onclick = go;
   if(MJO && (V.ready||[]).includes(V.me)){ const b=$('mjNext'); b.disabled=true; b.textContent='等其他人…'; }

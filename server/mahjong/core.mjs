@@ -46,12 +46,12 @@ function nextHandServer(T, gold, now) {
   const used = () => G.seats.map(s => s.name);
   const toBot = (j) => { const b = pickBot(used()); G.uids[j] = null; Object.assign(G.seats[j], { id: null, name: b.name, av: b.av, bot: true, auto: false, gold: botGold(T.lvl) }); G.miss[j] = 0; };
   G.kicked = [];
-  const BROKE = '你輸光了……回去種田吧！', POOR = '金幣不夠坐這桌了，可以換小一點的桌子再玩';
+  const BROKE = '你輸光了……回去種田吧！';
   for (let j = 0; j < 4; j++) {
     const u = G.uids[j]; if (!u) continue;
     if (G.leaving.includes(u)) { G.kicked.push({ uid: u, msg: (G.broke || []).includes(u) ? BROKE : '已經離開牌桌', broke: (G.broke || []).includes(u) }); toBot(j); continue; }
     G.seats[j].gold = gold[u] ?? G.seats[j].gold;
-    if (G.seats[j].gold < min) { const b = G.seats[j].gold <= 0; G.kicked.push({ uid: u, msg: b ? BROKE : POOR, broke: b }); toBot(j); }
+    if (G.seats[j].gold <= 0) { G.kicked.push({ uid: u, msg: BROKE, broke: true }); toBot(j); }   // 已經坐下的人，金幣少於入座門檻也可以繼續打，0 元才離桌
   }
   G.leaving = [];
   for (const p of (G.pending || []).splice(0)) {
