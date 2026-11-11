@@ -578,7 +578,7 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjr-l{right:calc(52px * var(--cs) + 8px);top:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * 4);flex-direction:row-reverse}
 .mjr-r{left:calc(52px * var(--cs) + 8px);top:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * 4)}
 .mt.last svg{filter:drop-shadow(0 0 3px #FFD43B) drop-shadow(0 0 2px #FFD43B)}
-.mt.last{animation:mjdrop .35s ease-out}
+.mt.last.anim{animation:mjdrop .35s ease-out}
 .mt.last:after{content:"";position:absolute;left:50%;top:-9px;margin-left:-4px;border:4px solid transparent;border-top:6px solid #FFD43B;animation:tbounce .8s ease-in-out infinite}
 @keyframes mjdrop{from{transform:translateY(-14px) scale(1.4);opacity:.3}}
 /* 喊牌 */
@@ -637,6 +637,8 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjhand .mt.sel{transform:translateY(-16px)}
 .mjhand .mt.sel svg{filter:drop-shadow(0 0 5px #FFD43B) drop-shadow(0 4px 3px rgba(0,0,0,.35))}
 .mjhand .mt.new{animation:mjnew .3s ease-out}
+.mjacts.still .mja,.mjacts.still .mja-w,.mjhint.still,.mjauto.still{animation:none}
+.mjacts.still .mja-w{animation:mjpulse3 1s ease-in-out infinite}
 @keyframes mjnew{from{transform:translateY(-22px);opacity:0}}
 .mjgap{width:10px;flex:none}
 .mjhand .mt.hc svg{filter:drop-shadow(0 0 0 #2E9E60) drop-shadow(0 0 4px #4BE08A) drop-shadow(0 0 2px #2E9E60)}

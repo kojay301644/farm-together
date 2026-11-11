@@ -125,7 +125,7 @@ function mjRules(){
 /* ---------- 牌桌控制：練習場（本機跟電腦）／連線（伺服器） ---------- */
 const MJ_BOTS = [{name:'小兔',av:3},{name:'阿熊',av:7},{name:'狐狸妹',av:15},{name:'企鵝哥',av:21},{name:'水獺',av:24},{name:'小鼠',av:9}];
 const MJ_TURN_SEC = 15, MJ_CLAIM_SEC = 5;
-let mjTingMode = false;
+let mjTingMode = false, mjAnimKey = {};   // 動畫只在第一次出現時播，重畫畫面不要重播
 let mjDiceHand = 0, mjDiceUntil = 0, mjMe = 0;
 let MJG = null, MJO = null, mjSel = null, mjTimer = 0, mjDeadline = 0, mjDue = '', mjBotT = 0, mjMiss = 0, mjLastLog = 0, mjNextT = 0;
 const mjOn = () => !!(MJG || MJO);
@@ -145,7 +145,8 @@ function mjBgmSync(){
 }
 document.addEventListener('visibilitychange', mjBgmSync);
 addEventListener('pointerdown', ()=>{ if(mjOn() && MJ_BGM && MJ_BGM.paused && mjBgmOn) mjBgmSync(); }, {passive:true});
-function mjOpen(){ $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; mjBgmSync(); }
+function mjOpenReset(){ mjAnimKey = {}; }
+function mjOpen(){ mjOpenReset(); $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; mjBgmSync(); }
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
@@ -304,8 +305,10 @@ function mjRender(first){
     const ml = s.melds.map(m=>mjMeld(m,'xs')).join('') + (s.flowers.length?`<span class="mjfl">${s.flowers.map(t=>mjTile(t,'xs')).join('')}</span>`:'');
     if(p==='t') return `<div class="mjtz">${seatCard(j)}<div class="mjhid">${Array.from({length:s.n},()=>mjTile(null,'xs')).join('')}</div>${ml?`<div class="mjx">${ml}</div>`:''}</div>`;
     return `<div class="mjsz mjsz-${p}">${seatCard(j)}<div class="mjx">${ml}</div></div><div class="mjhid mjhid-${p}">${Array.from({length:s.n},()=>'<i class="mjbar"></i>').join('')}</div>`; };
+  const dropKey = V.last ? `${V.handNo}:${V.last.from}:${V.last.t}:${(V.seats[V.last.from]||{river:[]}).river.length}` : '';
+  const dropAnim = dropKey && dropKey !== mjAnimKey.drop; mjAnimKey.drop = dropKey;
   const river = j => { const s = V.seats[j], lastJ = V.last && V.last.from===j && V.phase!=='end';
-    return `<div class="mjr mjr-${mjSeatPos(j)}">${s.river.map((t,i)=>mjTile(t, 'rv' + (lastJ && i===s.river.length-1 ? ' last':''))).join('')}</div>`; };
+    return `<div class="mjr mjr-${mjSeatPos(j)}">${s.river.map((t,i)=>mjTile(t, 'rv' + (lastJ && i===s.river.length-1 ? ' last' + (dropAnim ? ' anim' : '') : ''))).join('')}</div>`; };
   const compass = `<div class="mjc">${['b','r','t','l'].map(p=>{ const j=posOf[p], on=wl.includes(j) && V.phase==='play'; return `<span class="mjcw mjcw-${p}${on?' on':''}${j===V.dealer?' dl':''}">${MJ.WIND[V.seats[j].wind]}</span>`; }).join('')}
     <div class="mjcc"><small class="mjrd">${MJ.WIND[V.wind]}風${MJ.WIND[(V.dealer - V.firstDealer + 4) % 4]}局</small><b id="mjSec"></b><small>剩 ${V.left} 張</small></div></div>`;
 
@@ -323,7 +326,7 @@ function mjRender(first){
   const waitTxt = w => w.map(t=>`${MJ.name(t)}<small>剩${leftOf(t)}</small>`).join('、');
   const meldN = me.melds.reduce((a,m)=>a+(m.k==='chi'||m.k==='pon'?3:4),0);
   const units = hand.length + (drawn!=null?1.3:0) + meldN*0.62 + me.melds.length*0.2;
-  const tw = Math.max(24, Math.min(58, Math.floor(mjH*0.19*44/60), Math.floor((mjW - 30) / Math.max(units, 12))));
+  const tw = Math.max(24, Math.min(58, Math.floor(mjH*0.19*44/60), Math.floor((mjW - 30) / Math.max(units, 17.6))));   // 固定用 17 張＋間隔來算，摸牌打牌時牌的大小和桌面位置才不會跳
   // 中間（方位盤＋四家打出的牌）夾在對家那排和我的手牌之間，依螢幕高度自動算大小
   const Fh = mjH - 36, handTop = Fh - tw*60/44 - 6, TOPH = 50, avail = handTop - TOPH;
   const rv = Math.max(13, Math.min(25, Math.floor(((avail - 8 - 104) / 4 - 1) * 44 / 61)));
@@ -336,9 +339,11 @@ function mjRender(first){
   const mark = t => { if(ponOn && t===lt && (marked[t]||0) < 2){ marked[t]=(marked[t]||0)+1; return ' hp'; } if(chiSet.has(t) && !marked[t]){ marked[t]=1; return ' hc'; } return ''; };
   const tMarked = {};
   const tingCls = t => { if(!tt || !tt[t] || tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
+  const newKey = drawn!=null ? `${V.handNo}:${me.river.length}:${me.melds.length}:${drawn}` : '';
+  const newAnim = newKey && newKey !== mjAnimKey.draw; mjAnimKey.draw = newKey;
   const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
   const handHtml = (me.melds.length?`<div class="mjmy">${me.melds.map(m=>mjMeld(m,'mm')).join('')}</div>`:'')
-    + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d',' new') : '');
+    + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d', newAnim ? ' new' : '') : '');
 
   const o = V.opts || {}, acts = [];
   if(o.canTing && !me.auto) acts.push(['ting','聽','t']);   // 打出去之後聽牌了：按「聽」就報聽，不按就不聽
@@ -359,7 +364,10 @@ function mjRender(first){
   const myOn = wl.includes(0) && V.phase!=='end';
 
   $('mjFelt').innerHTML = [1,2,3].map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
-  $('mjUi').innerHTML = `<div class="mjacts">${claimTile}${acts.map(([k,t,c])=>`<button class="mja mja-${c}" data-ma="${k}">${t}</button>`).join('')}</div><div class="mjchi" id="mjChi"></div>${hint}
+  const actKey = acts.map(a=>a[0]).join(',') + '|' + V.handNo + ':' + V.phase + ':' + (V.last ? V.last.t + ':' + V.last.from : '') + ':' + me.river.length;
+  const actStill = actKey === mjAnimKey.acts; mjAnimKey.acts = actKey;
+  const hintKey = hint.replace(/<[^>]+>/g,''); const hintStill = hintKey === mjAnimKey.hint; mjAnimKey.hint = hintKey;
+  $('mjUi').innerHTML = `<div class="mjacts${actStill?' still':''}">${claimTile}${acts.map(([k,t,c])=>`<button class="mja mja-${c}" data-ma="${k}">${t}</button>`).join('')}</div><div class="mjchi" id="mjChi"></div>${hintStill ? hint.replace('class="mjhint', 'class="mjhint still').replace('class="mjauto', 'class="mjauto still') : hint}
     <div class="mjhand${canDis?' can':''}" style="--tw:${tw}px;--mw:${Math.round(tw*0.62)}px">${handHtml}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div>
     <div class="mjbme${myOn?' on':''}"><img src="${avSrc(me.av)}" alt=""><span class="mjbw">${MJ.WIND[me.wind]}</span>${me.ting?'<span class="mjbd" style="background:#F08A1C">聽</span>':''}${V.dealer===ME?`<span class="mjbd">莊${V.lian?V.lian:''}</span>`:''}<b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>

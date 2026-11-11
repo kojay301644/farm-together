@@ -578,7 +578,7 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjr-l{right:calc(52px * var(--cs) + 8px);top:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * 4);flex-direction:row-reverse}
 .mjr-r{left:calc(52px * var(--cs) + 8px);top:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * 4)}
 .mt.last svg{filter:drop-shadow(0 0 3px #FFD43B) drop-shadow(0 0 2px #FFD43B)}
-.mt.last{animation:mjdrop .35s ease-out}
+.mt.last.anim{animation:mjdrop .35s ease-out}
 .mt.last:after{content:"";position:absolute;left:50%;top:-9px;margin-left:-4px;border:4px solid transparent;border-top:6px solid #FFD43B;animation:tbounce .8s ease-in-out infinite}
 @keyframes mjdrop{from{transform:translateY(-14px) scale(1.4);opacity:.3}}
 /* 喊牌 */
@@ -637,6 +637,8 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjhand .mt.sel{transform:translateY(-16px)}
 .mjhand .mt.sel svg{filter:drop-shadow(0 0 5px #FFD43B) drop-shadow(0 4px 3px rgba(0,0,0,.35))}
 .mjhand .mt.new{animation:mjnew .3s ease-out}
+.mjacts.still .mja,.mjacts.still .mja-w,.mjhint.still,.mjauto.still{animation:none}
+.mjacts.still .mja-w{animation:mjpulse3 1s ease-in-out infinite}
 @keyframes mjnew{from{transform:translateY(-22px);opacity:0}}
 .mjgap{width:10px;flex:none}
 .mjhand .mt.hc svg{filter:drop-shadow(0 0 0 #2E9E60) drop-shadow(0 0 4px #4BE08A) drop-shadow(0 0 2px #2E9E60)}
@@ -751,21 +753,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794413021" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794413074" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794413021" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794413021" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794413074" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794413074" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794413021" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794413074" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794413021" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794413021" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794413074" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794413074" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -782,11 +784,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794413021" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794413074" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794413021";
+const BUILD="1794413074";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3579,7 +3581,7 @@ function mjRules(){
 /* ---------- 牌桌控制：練習場（本機跟電腦）／連線（伺服器） ---------- */
 const MJ_BOTS = [{name:'小兔',av:3},{name:'阿熊',av:7},{name:'狐狸妹',av:15},{name:'企鵝哥',av:21},{name:'水獺',av:24},{name:'小鼠',av:9}];
 const MJ_TURN_SEC = 15, MJ_CLAIM_SEC = 5;
-let mjTingMode = false;
+let mjTingMode = false, mjAnimKey = {};   // 動畫只在第一次出現時播，重畫畫面不要重播
 let mjDiceHand = 0, mjDiceUntil = 0, mjMe = 0;
 let MJG = null, MJO = null, mjSel = null, mjTimer = 0, mjDeadline = 0, mjDue = '', mjBotT = 0, mjMiss = 0, mjLastLog = 0, mjNextT = 0;
 const mjOn = () => !!(MJG || MJO);
@@ -3599,7 +3601,8 @@ function mjBgmSync(){
 }
 document.addEventListener('visibilitychange', mjBgmSync);
 addEventListener('pointerdown', ()=>{ if(mjOn() && MJ_BGM && MJ_BGM.paused && mjBgmOn) mjBgmSync(); }, {passive:true});
-function mjOpen(){ $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; mjBgmSync(); }
+function mjOpenReset(){ mjAnimKey = {}; }
+function mjOpen(){ mjOpenReset(); $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; mjBgmSync(); }
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
@@ -3758,8 +3761,10 @@ function mjRender(first){
     const ml = s.melds.map(m=>mjMeld(m,'xs')).join('') + (s.flowers.length?`<span class="mjfl">${s.flowers.map(t=>mjTile(t,'xs')).join('')}</span>`:'');
     if(p==='t') return `<div class="mjtz">${seatCard(j)}<div class="mjhid">${Array.from({length:s.n},()=>mjTile(null,'xs')).join('')}</div>${ml?`<div class="mjx">${ml}</div>`:''}</div>`;
     return `<div class="mjsz mjsz-${p}">${seatCard(j)}<div class="mjx">${ml}</div></div><div class="mjhid mjhid-${p}">${Array.from({length:s.n},()=>'<i class="mjbar"></i>').join('')}</div>`; };
+  const dropKey = V.last ? `${V.handNo}:${V.last.from}:${V.last.t}:${(V.seats[V.last.from]||{river:[]}).river.length}` : '';
+  const dropAnim = dropKey && dropKey !== mjAnimKey.drop; mjAnimKey.drop = dropKey;
   const river = j => { const s = V.seats[j], lastJ = V.last && V.last.from===j && V.phase!=='end';
-    return `<div class="mjr mjr-${mjSeatPos(j)}">${s.river.map((t,i)=>mjTile(t, 'rv' + (lastJ && i===s.river.length-1 ? ' last':''))).join('')}</div>`; };
+    return `<div class="mjr mjr-${mjSeatPos(j)}">${s.river.map((t,i)=>mjTile(t, 'rv' + (lastJ && i===s.river.length-1 ? ' last' + (dropAnim ? ' anim' : '') : ''))).join('')}</div>`; };
   const compass = `<div class="mjc">${['b','r','t','l'].map(p=>{ const j=posOf[p], on=wl.includes(j) && V.phase==='play'; return `<span class="mjcw mjcw-${p}${on?' on':''}${j===V.dealer?' dl':''}">${MJ.WIND[V.seats[j].wind]}</span>`; }).join('')}
     <div class="mjcc"><small class="mjrd">${MJ.WIND[V.wind]}風${MJ.WIND[(V.dealer - V.firstDealer + 4) % 4]}局</small><b id="mjSec"></b><small>剩 ${V.left} 張</small></div></div>`;
 
@@ -3777,7 +3782,7 @@ function mjRender(first){
   const waitTxt = w => w.map(t=>`${MJ.name(t)}<small>剩${leftOf(t)}</small>`).join('、');
   const meldN = me.melds.reduce((a,m)=>a+(m.k==='chi'||m.k==='pon'?3:4),0);
   const units = hand.length + (drawn!=null?1.3:0) + meldN*0.62 + me.melds.length*0.2;
-  const tw = Math.max(24, Math.min(58, Math.floor(mjH*0.19*44/60), Math.floor((mjW - 30) / Math.max(units, 12))));
+  const tw = Math.max(24, Math.min(58, Math.floor(mjH*0.19*44/60), Math.floor((mjW - 30) / Math.max(units, 17.6))));   // 固定用 17 張＋間隔來算，摸牌打牌時牌的大小和桌面位置才不會跳
   // 中間（方位盤＋四家打出的牌）夾在對家那排和我的手牌之間，依螢幕高度自動算大小
   const Fh = mjH - 36, handTop = Fh - tw*60/44 - 6, TOPH = 50, avail = handTop - TOPH;
   const rv = Math.max(13, Math.min(25, Math.floor(((avail - 8 - 104) / 4 - 1) * 44 / 61)));
@@ -3790,9 +3795,11 @@ function mjRender(first){
   const mark = t => { if(ponOn && t===lt && (marked[t]||0) < 2){ marked[t]=(marked[t]||0)+1; return ' hp'; } if(chiSet.has(t) && !marked[t]){ marked[t]=1; return ' hc'; } return ''; };
   const tMarked = {};
   const tingCls = t => { if(!tt || !tt[t] || tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
+  const newKey = drawn!=null ? `${V.handNo}:${me.river.length}:${me.melds.length}:${drawn}` : '';
+  const newAnim = newKey && newKey !== mjAnimKey.draw; mjAnimKey.draw = newKey;
   const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
   const handHtml = (me.melds.length?`<div class="mjmy">${me.melds.map(m=>mjMeld(m,'mm')).join('')}</div>`:'')
-    + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d',' new') : '');
+    + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d', newAnim ? ' new' : '') : '');
 
   const o = V.opts || {}, acts = [];
   if(o.canTing && !me.auto) acts.push(['ting','聽','t']);   // 打出去之後聽牌了：按「聽」就報聽，不按就不聽
@@ -3813,7 +3820,10 @@ function mjRender(first){
   const myOn = wl.includes(0) && V.phase!=='end';
 
   $('mjFelt').innerHTML = [1,2,3].map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
-  $('mjUi').innerHTML = `<div class="mjacts">${claimTile}${acts.map(([k,t,c])=>`<button class="mja mja-${c}" data-ma="${k}">${t}</button>`).join('')}</div><div class="mjchi" id="mjChi"></div>${hint}
+  const actKey = acts.map(a=>a[0]).join(',') + '|' + V.handNo + ':' + V.phase + ':' + (V.last ? V.last.t + ':' + V.last.from : '') + ':' + me.river.length;
+  const actStill = actKey === mjAnimKey.acts; mjAnimKey.acts = actKey;
+  const hintKey = hint.replace(/<[^>]+>/g,''); const hintStill = hintKey === mjAnimKey.hint; mjAnimKey.hint = hintKey;
+  $('mjUi').innerHTML = `<div class="mjacts${actStill?' still':''}">${claimTile}${acts.map(([k,t,c])=>`<button class="mja mja-${c}" data-ma="${k}">${t}</button>`).join('')}</div><div class="mjchi" id="mjChi"></div>${hintStill ? hint.replace('class="mjhint', 'class="mjhint still').replace('class="mjauto', 'class="mjauto still') : hint}
     <div class="mjhand${canDis?' can':''}" style="--tw:${tw}px;--mw:${Math.round(tw*0.62)}px">${handHtml}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div>
     <div class="mjbme${myOn?' on':''}"><img src="${avSrc(me.av)}" alt=""><span class="mjbw">${MJ.WIND[me.wind]}</span>${me.ting?'<span class="mjbd" style="background:#F08A1C">聽</span>':''}${V.dealer===ME?`<span class="mjbd">莊${V.lian?V.lian:''}</span>`:''}<b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
