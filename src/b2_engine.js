@@ -41,7 +41,8 @@ const B2 = (() => {
   function beats(a, b) {   // a 能不能壓過 b
     if (!a) return false; if (!b) return true;
     if (a.ty !== b.ty) return false;
-    if (a.ty === 'five' && a.kind !== b.kind) return a.kind > b.kind;
+    // 五張牌型：只能壓同一種（順子壓順子…），鐵支、同花順例外，可以壓比它小的任何五張牌型
+    if (a.ty === 'five' && a.kind !== b.kind) return a.kind >= 4 && a.kind > b.kind;
     return a.key > b.key;
   }
   function comboName(cb) { return !cb ? '' : cb.ty === 'single' ? '單張' : cb.ty === 'pair' ? '對子' : KIND[cb.kind]; }
@@ -86,7 +87,7 @@ const B2 = (() => {
     if (!cards.length || new Set(cards).size !== cards.length || !cards.every(c => s.hand.includes(c))) throw new Error('選的牌不對');
     const cb = classify(cards); if (!cb) throw new Error('這不是能出的牌型');
     if (G.must != null && !cards.includes(G.must)) throw new Error('第一手要出到梅花 3');
-    if (!isLead(G, si) && !beats(cb, G.cur.cb)) throw new Error(G.cur.cb.ty !== cb.ty ? `要出${G.cur.cb.ty === 'five' ? '五張牌型' : comboName(G.cur.cb)}` : '要比上一手大');
+    if (!isLead(G, si) && !beats(cb, G.cur.cb)) throw new Error(G.cur.cb.ty !== cb.ty ? `要出${G.cur.cb.ty === 'five' ? '五張牌型' : comboName(G.cur.cb)}` : cb.ty === 'five' && cb.kind !== G.cur.cb.kind && cb.kind < 4 ? `要出${comboName(G.cur.cb)}（或鐵支、同花順）` : '要比上一手大');
     s.hand = s.hand.filter(c => !cards.includes(c));
     const sorted = cards.slice().sort((x, y) => x - y);
     G.cur = { cards: sorted, cb, by: si }; s.last = sorted; G.must = null;

@@ -23,7 +23,7 @@ function b2Rules(){
   const body = `<div class="help">
     <p><b>目標：</b>最先把 13 張牌出完的人贏。</p>
     <p><b>大小：</b>3 最小，2 最大（3 4 5 6 7 8 9 10 J Q K A 2）。一樣大時比花色：♠ 黑桃 &gt; ♥ 紅心 &gt; ♦ 方塊 &gt; ♣ 梅花。</p>
-    <p><b>能出的牌：</b>單張、對子、五張牌型。五張牌型由小到大：順子 &lt; 同花 &lt; 葫蘆 &lt; 鐵支 &lt; 同花順。</p>
+    <p><b>能出的牌：</b>單張、對子、五張牌型（順子、同花、葫蘆、鐵支、同花順）。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、同花、葫蘆；同花順可以壓所有五張牌型。</p>
     <p><b>怎麼出：</b>第一局拿到梅花 3 的人先出，而且要出到梅花 3；之後每局由上一局贏家先出。輪到你時要出同樣張數、比較大的牌，或按「過」。其他三家都過，就由最後出牌的人重新出任何牌型。</p>
     <p><b>怎麼算：</b>有人出完，其他三家照手上剩幾張付錢，每張 × 桌上的「每張」金額：</p>
     <ul><li>手上的 2，每張多算一張</li><li>剩 10 張以上：加倍</li><li>13 張都沒出：3 倍</li></ul>
@@ -80,9 +80,9 @@ function b2Render(V){
   if(myTurn){
     if(V.must!=null && lead) hint = '第一手要出到 ♣3';
     else if(lead) hint = '換你先出，任何牌型都可以';
-    else hint = `要出比 ${esc(V.cur.ty)} 大的${V.cur.cards.length===5?'五張牌型':V.cur.ty}，或按「過」`;
+    else hint = V.cur.cards.length===5 ? `要出比 ${esc(V.cur.ty)} 大的${esc(V.cur.ty)}${/鐵支|同花順/.test(V.cur.ty)?'':'（或鐵支、同花順）'}，或按「過」` : `要出比 ${esc(V.cur.ty)} 大的${V.cur.ty}，或按「過」`;
     if(selArr.length && !cb) hint = '這幾張組不成牌型';
-    else if(selArr.length && cb && !canPlay && !lead) hint = cb.ty !== curCb(V).ty ? '張數要跟上一手一樣' : '不夠大';
+    else if(selArr.length && cb && !canPlay && !lead) hint = cb.ty !== curCb(V).ty ? '張數要跟上一手一樣' : cb.ty==='five' && cb.kind !== curCb(V).kind && cb.kind < 4 ? `要出${esc(V.cur.ty)}才能壓（或鐵支、同花順）` : '不夠大';
   }
   $('mjUi').innerHTML = `${hint?`<div class="mjhint still b2hint">${hint}</div>`:''}
     ${myTurn ? `<div class="b2btns"><button class="b2b hint" id="b2Hint">提示</button>${V.opts && V.opts.pass ? `<button class="b2b pass" id="b2Pass">過</button>` : ''}<button class="b2b go" id="b2Go" ${canPlay?'':'disabled'}>出牌${cb?`<small>${B2.comboName(cb)}</small>`:''}</button></div>` : ''}
