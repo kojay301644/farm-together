@@ -229,7 +229,7 @@ function mjConfirmLeave(){
 }
 function mjDo(a){
   const V = mjCurView(); if(!V || V.phase==='end') return;
-  if(a.a!=='ting') mjSel = null;
+  if(a.a!=='ting' && a.a!=='pass') mjSel = null;
   if(MJO){
     // 自己的動作先顯示在畫面上，伺服器確認是在背景做
     if(MJO.busy) return;
@@ -342,7 +342,8 @@ function mjRender(first){
   const tingCls = t => { if(!tt || !tt[t] || tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
   const newKey = drawn!=null ? `${V.handNo}:${me.river.length}:${me.melds.length}:${drawn}` : '';
   const newAnim = newKey && newKey !== mjAnimKey.draw; mjAnimKey.draw = newKey;
-  const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
+  const claimMine = V.phase==='claim' && wl.includes(ME) && !me.ting;   // 可以吃碰胡：不要的話直接點手牌就當作不要
+  const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis||claimMine?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
   const handHtml = (me.melds.length?`<div class="mjmy">${me.melds.map(m=>mjMeld(m,'mm')).join('')}</div>`:'')
     + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d', newAnim ? ' new' : '') : '');
 
@@ -360,6 +361,7 @@ function mjRender(first){
     : me.ting ? `<div class="mjhint ting">🀄 已報聽・聽：${waitTxt(myWaits) || '—'}</div>`
     : canDis && tt && selT!=null && tt[selT] ? `<div class="mjhint ting">聽：${waitTxt(tt[selT])}</div>`
     : o.canTing ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}　按「聽」報聽多 1 台</div>`
+    : claimMine ? `<div class="mjhint">不要的話，直接點手牌就好</div>`
     : !canDis && myWaits.length ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}</div>`
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
   const myOn = wl.includes(0) && V.phase!=='end';
@@ -381,6 +383,7 @@ function mjRender(first){
 
   if($('mjAuto')) $('mjAuto').onclick = ()=>{ if(MJO) return mjOnline('auto', {on:false}); MJG.seats[0].auto=false; mjMiss=0; mjTick(); };
   document.querySelectorAll('#mj .mjhand .mt.hd').forEach(el=>el.onclick=()=>{
+    if(claimMine){ mjSel = el.dataset.k; mjSfx('pick'); return mjDo({a:'pass'}); }   // 不吃不碰：當作「過」，並先把這張牌選起來
     if(!canDis) return;
     const k = el.dataset.k, t = +el.dataset.t;
     if(mjSel===k){ if(!MJO) mjSfx('tile'); return mjDo({a:'discard', t}); }
