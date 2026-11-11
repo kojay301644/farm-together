@@ -71,13 +71,22 @@ let mjMyGender = (()=>{ try{ return localStorage.getItem('ytzt_mjvg')||'f'; }cat
 const mjVsrc = (g,k) => (window.MJ_VBASE||'assets/voice/') + g + '_' + k + '.mp3' + (typeof BUILD!=='undefined' ? '?v='+BUILD : '');
 const mjVcache = {};
 function mjSeatGender(j){ return 'f'; }   // 語音統一用女聲
+// 用 Web Audio 播（第一次點畫面後就解鎖，電腦出牌時也能播；HTML Audio 在 iPhone 常被擋）
+const mjVbuf = {};
+function mjLoadVoice(src){
+  if(mjVbuf[src]) return mjVbuf[src];
+  const a = typeof audio==='function' ? audio() : null; if(!a) return null;
+  mjVbuf[src] = fetch(src).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,no)=>a.decodeAudioData(b, ok, no))).catch(()=>{ delete mjVbuf[src]; return null; });
+  return mjVbuf[src];
+}
 function mjPlayVoice(word, j){
   if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON)) return true;
-  const k = MJ_VKEY[word]; if(!k) return false;
-  const src = mjVsrc(mjSeatGender(j||0), k);
-  try{ const a = mjVcache[src] || (mjVcache[src] = new Audio(src)); a.currentTime = 0; a.volume = 1; const p = a.play(); if(p && p.catch) p.catch(()=>mjSay(word)); return true; }catch(e){ return false; }
+  const k = MJ_VKEY[word]; if(!k) return true;
+  const src = mjVsrc('f', k), p = mjLoadVoice(src); if(!p) return true;
+  p.then(buf=>{ if(!buf) return; const a = audio(); if(!a) return; const n = a.createBufferSource(), g = a.createGain(); g.gain.value = 1; n.buffer = buf; n.connect(g).connect(a.destination); n.start(); });
+  return true;   // 一律用女聲音檔，不再改用手機內建語音（避免念成男聲）
 }
-function mjPreloadVoice(){ ['f'].forEach(g=>Object.values(MJ_VKEY).forEach(k=>{ const s=mjVsrc(g,k); if(!mjVcache[s]){ const a=new Audio(); a.preload='auto'; a.src=s; mjVcache[s]=a; } })); }
+function mjPreloadVoice(){ Object.values(MJ_VKEY).forEach(k=>mjLoadVoice(mjVsrc('f',k))); }
 function mjSay(txt){
   if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON) || !window.speechSynthesis) return false;
   if(!mjVoice) mjPickVoice(); if(!mjVoice) return false;
