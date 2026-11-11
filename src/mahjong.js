@@ -135,7 +135,7 @@ function mjRules(){
 /* ---------- 牌桌控制：練習場（本機跟電腦）／連線（伺服器） ---------- */
 const MJ_BOTS = [{name:'小兔',av:3},{name:'阿熊',av:7},{name:'狐狸妹',av:15},{name:'企鵝哥',av:21},{name:'水獺',av:24},{name:'小鼠',av:9}];
 const MJ_TURN_SEC = 15, MJ_CLAIM_SEC = 5;
-let mjTingMode = false, mjAnimKey = {};   // 動畫只在第一次出現時播，重畫畫面不要重播
+let mjChiPick = null, mjTingMode = false, mjAnimKey = {};   // 動畫只在第一次出現時播，重畫畫面不要重播
 let mjDiceHand = 0, mjDiceUntil = 0, mjMe = 0;
 let MJG = null, MJO = null, mjSel = null, mjTimer = 0, mjDeadline = 0, mjDue = '', mjBotT = 0, mjMiss = 0, mjLastLog = 0, mjNextT = 0;
 const mjOn = () => !!(MJG || MJO);
@@ -355,7 +355,8 @@ function mjRender(first){
   const tingCls = t => { if(!tt || !tt[t] || tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
   const newKey = drawn!=null ? `${V.handNo}:${me.river.length}:${me.melds.length}:${drawn}` : '';
   const newAnim = newKey && newKey !== mjAnimKey.draw; mjAnimKey.draw = newKey;
-  const claimMine = V.phase==='claim' && wl.includes(ME) && !me.ting;   // 可以吃碰胡：不要的話直接點手牌就當作不要
+  const claimMine = V.phase==='claim' && wl.includes(ME) && !me.ting;
+  if(!claimMine) mjChiPick = null;   // 可以吃碰胡：不要的話直接點手牌就當作不要
   const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis||claimMine?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
   const handHtml = (me.melds.length?`<div class="mjmy">${me.melds.map(m=>mjMeld(m,'mm')).join('')}</div>`:'')
     + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d', newAnim ? ' new' : '') : '');
@@ -400,7 +401,14 @@ function mjRender(first){
       const tt0 = +el.dataset.t;
       // 點有標「碰」「吃」的牌：直接碰／吃
       if(el.classList.contains('hp') && o.pon) return mjDo({a:'pon'});
-      if(el.classList.contains('hc') && o.chi){ const u = o.chi.find(c=>c.includes(tt0)); if(u) return mjDo({a:'chi', use:u}); }
+      if(el.classList.contains('hc') && o.chi){
+        // 吃法不只一種：點的牌只出現在一種吃法 → 直接吃；不然先選起來，再點第二張決定吃法
+        const cand = o.chi.filter(c=>c.includes(tt0));
+        if(mjChiPick!=null && mjChiPick!==tt0){ const u = o.chi.find(c=>c.includes(mjChiPick) && c.includes(tt0)); if(u){ mjChiPick = null; return mjDo({a:'chi', use:u}); } }
+        if(cand.length===1){ mjChiPick = null; return mjDo({a:'chi', use:cand[0]}); }
+        if(cand.length>1){ mjChiPick = tt0; mjSfx('pick'); document.querySelectorAll('#mj .mjhand .mt.hd').forEach(x=>x.classList.toggle('sel', x===el));
+          const hEl = document.querySelector('#mjUi .mjhint'); if(hEl){ hEl.className='mjhint still'; hEl.textContent = `再點一張要跟${MJ.name(tt0)}配的牌`; } return; }
+      }
       mjSel = el.dataset.k; mjSfx('pick'); return mjDo({a:'pass'});   // 點其他牌：當作不要，並先把這張牌選起來
     }
     if(!canDis) return;
@@ -419,7 +427,13 @@ function mjRender(first){
     if(k==='zimo') return mjDo({a:'zimo'});
     if(k==='pon'||k==='kan') return mjDo({a:k});
     if(k==='ankan'||k==='kakan'){ const L=o[k]; if(L.length===1) return mjDo({a:k, t:L[0]}); return mjPick(L.map(t=>({h:[t,t,t,t].map(x=>mjTile(x,'sm')).join(''), a:{a:k,t}}))); }
-    if(k==='chi'){ const L=o.chi; if(L.length===1) return mjDo({a:'chi', use:L[0]}); return mjPick(L.map(u=>({h:sortChi(u, V.last.t).map(t=>mjTile(t,'sm'+(t===V.last.t?' got':''))).join(''), a:{a:'chi', use:u}}))); }
+    if(k==='chi'){ const L=o.chi; if(L.length===1) return mjDo({a:'chi', use:L[0]});
+      // 好幾種吃法：不跳選單，改成點亮起來的牌來選
+      const hEl = document.querySelector('#mjUi .mjhint'), msg = '點亮起來的牌選吃法（點兩張決定怎麼吃）';
+      if(hEl){ hEl.className='mjhint still'; hEl.textContent = msg; } else $('mjUi').insertAdjacentHTML('afterbegin', `<div class="mjhint">${msg}</div>`);
+      document.querySelectorAll('#mj .mjhand .mt.hc').forEach(x=>{ x.classList.remove('blink'); void x.offsetWidth; x.classList.add('blink'); });
+      return;
+      return mjPick(L.map(u=>({h:sortChi(u, V.last.t).map(t=>mjTile(t,'sm'+(t===V.last.t?' got':''))).join(''), a:{a:'chi', use:u}}))); }
   });
   if(V.phase==='end') mjBindResult(V);
   // 把這次更新新增的事件都播出來（槓之後會馬上補牌，只看最後一筆會漏掉「槓」）

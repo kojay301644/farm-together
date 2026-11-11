@@ -651,6 +651,8 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjhand .mt.hc svg{filter:drop-shadow(0 0 0 #2E9E60) drop-shadow(0 0 4px #4BE08A) drop-shadow(0 0 2px #2E9E60)}
 .mjhand .mt.hp svg{filter:drop-shadow(0 0 4px #5AB6FF) drop-shadow(0 0 2px #2F86E0)}
 .mjhand .mt.hc,.mjhand .mt.hp{transform:translateY(-6px)}
+.mjhand .mt.hc.blink{animation:mjblink .5s ease-in-out 3}
+@keyframes mjblink{50%{transform:translateY(-14px)}}
 .mjhand .mt.hc:after,.mjhand .mt.hp:after{content:"吃";position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-size:11px;font-weight:900;color:#fff;background:#2E9E60;border-radius:6px;padding:0 5px;line-height:16px}
 .mjhand .mt.hp:after{content:"碰";background:#2F86E0}
 .mjacts{position:absolute;right:22px;bottom:calc(100% + 14px);display:flex;gap:10px;align-items:center;z-index:9}
@@ -760,21 +762,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794414459" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794414864" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794414459" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794414459" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794414864" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794414864" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794414459" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794414864" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794414459" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794414459" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794414864" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794414864" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -791,11 +793,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794414459" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794414864" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794414459";
+const BUILD="1794414864";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3598,7 +3600,7 @@ function mjRules(){
 /* ---------- 牌桌控制：練習場（本機跟電腦）／連線（伺服器） ---------- */
 const MJ_BOTS = [{name:'小兔',av:3},{name:'阿熊',av:7},{name:'狐狸妹',av:15},{name:'企鵝哥',av:21},{name:'水獺',av:24},{name:'小鼠',av:9}];
 const MJ_TURN_SEC = 15, MJ_CLAIM_SEC = 5;
-let mjTingMode = false, mjAnimKey = {};   // 動畫只在第一次出現時播，重畫畫面不要重播
+let mjChiPick = null, mjTingMode = false, mjAnimKey = {};   // 動畫只在第一次出現時播，重畫畫面不要重播
 let mjDiceHand = 0, mjDiceUntil = 0, mjMe = 0;
 let MJG = null, MJO = null, mjSel = null, mjTimer = 0, mjDeadline = 0, mjDue = '', mjBotT = 0, mjMiss = 0, mjLastLog = 0, mjNextT = 0;
 const mjOn = () => !!(MJG || MJO);
@@ -3818,7 +3820,8 @@ function mjRender(first){
   const tingCls = t => { if(!tt || !tt[t] || tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
   const newKey = drawn!=null ? `${V.handNo}:${me.river.length}:${me.melds.length}:${drawn}` : '';
   const newAnim = newKey && newKey !== mjAnimKey.draw; mjAnimKey.draw = newKey;
-  const claimMine = V.phase==='claim' && wl.includes(ME) && !me.ting;   // 可以吃碰胡：不要的話直接點手牌就當作不要
+  const claimMine = V.phase==='claim' && wl.includes(ME) && !me.ting;
+  if(!claimMine) mjChiPick = null;   // 可以吃碰胡：不要的話直接點手牌就當作不要
   const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis||claimMine?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
   const handHtml = (me.melds.length?`<div class="mjmy">${me.melds.map(m=>mjMeld(m,'mm')).join('')}</div>`:'')
     + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d', newAnim ? ' new' : '') : '');
@@ -3863,7 +3866,14 @@ function mjRender(first){
       const tt0 = +el.dataset.t;
       // 點有標「碰」「吃」的牌：直接碰／吃
       if(el.classList.contains('hp') && o.pon) return mjDo({a:'pon'});
-      if(el.classList.contains('hc') && o.chi){ const u = o.chi.find(c=>c.includes(tt0)); if(u) return mjDo({a:'chi', use:u}); }
+      if(el.classList.contains('hc') && o.chi){
+        // 吃法不只一種：點的牌只出現在一種吃法 → 直接吃；不然先選起來，再點第二張決定吃法
+        const cand = o.chi.filter(c=>c.includes(tt0));
+        if(mjChiPick!=null && mjChiPick!==tt0){ const u = o.chi.find(c=>c.includes(mjChiPick) && c.includes(tt0)); if(u){ mjChiPick = null; return mjDo({a:'chi', use:u}); } }
+        if(cand.length===1){ mjChiPick = null; return mjDo({a:'chi', use:cand[0]}); }
+        if(cand.length>1){ mjChiPick = tt0; mjSfx('pick'); document.querySelectorAll('#mj .mjhand .mt.hd').forEach(x=>x.classList.toggle('sel', x===el));
+          const hEl = document.querySelector('#mjUi .mjhint'); if(hEl){ hEl.className='mjhint still'; hEl.textContent = `再點一張要跟${MJ.name(tt0)}配的牌`; } return; }
+      }
       mjSel = el.dataset.k; mjSfx('pick'); return mjDo({a:'pass'});   // 點其他牌：當作不要，並先把這張牌選起來
     }
     if(!canDis) return;
@@ -3882,7 +3892,13 @@ function mjRender(first){
     if(k==='zimo') return mjDo({a:'zimo'});
     if(k==='pon'||k==='kan') return mjDo({a:k});
     if(k==='ankan'||k==='kakan'){ const L=o[k]; if(L.length===1) return mjDo({a:k, t:L[0]}); return mjPick(L.map(t=>({h:[t,t,t,t].map(x=>mjTile(x,'sm')).join(''), a:{a:k,t}}))); }
-    if(k==='chi'){ const L=o.chi; if(L.length===1) return mjDo({a:'chi', use:L[0]}); return mjPick(L.map(u=>({h:sortChi(u, V.last.t).map(t=>mjTile(t,'sm'+(t===V.last.t?' got':''))).join(''), a:{a:'chi', use:u}}))); }
+    if(k==='chi'){ const L=o.chi; if(L.length===1) return mjDo({a:'chi', use:L[0]});
+      // 好幾種吃法：不跳選單，改成點亮起來的牌來選
+      const hEl = document.querySelector('#mjUi .mjhint'), msg = '點亮起來的牌選吃法（點兩張決定怎麼吃）';
+      if(hEl){ hEl.className='mjhint still'; hEl.textContent = msg; } else $('mjUi').insertAdjacentHTML('afterbegin', `<div class="mjhint">${msg}</div>`);
+      document.querySelectorAll('#mj .mjhand .mt.hc').forEach(x=>{ x.classList.remove('blink'); void x.offsetWidth; x.classList.add('blink'); });
+      return;
+      return mjPick(L.map(u=>({h:sortChi(u, V.last.t).map(t=>mjTile(t,'sm'+(t===V.last.t?' got':''))).join(''), a:{a:'chi', use:u}}))); }
   });
   if(V.phase==='end') mjBindResult(V);
   // 把這次更新新增的事件都播出來（槓之後會馬上補牌，只看最後一筆會漏掉「槓」）
