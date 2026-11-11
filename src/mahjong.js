@@ -66,11 +66,11 @@ let mjVoice = null, mjVoiceOn = (()=>{ try{ return localStorage.getItem('ytzt_mj
 function mjPickVoice(){ try{ const vs = speechSynthesis.getVoices(); mjVoice = vs.find(v=>/zh[-_]TW/i.test(v.lang)) || vs.find(v=>/zh[-_](HK|Hant)/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang)) || null; }catch(e){} }
 try{ mjPickVoice(); speechSynthesis.onvoiceschanged = mjPickVoice; }catch(e){}
 /* 錄好的男女聲（Higgsfield 生成）：每個座位固定一種聲音；放不出來才改用瀏覽器語音 */
-const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','胡啦':'hu','自摸':'zimo','聽':'ting'};
+const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','聽':'ting'};   // 胡、自摸不念，改用畫面慶祝
 let mjMyGender = (()=>{ try{ return localStorage.getItem('ytzt_mjvg')||'f'; }catch(e){ return 'f'; } })();
 const mjVsrc = (g,k) => (window.MJ_VBASE||'assets/voice/') + g + '_' + k + '.mp3' + (typeof BUILD!=='undefined' ? '?v='+BUILD : '');
 const mjVcache = {};
-function mjSeatGender(j){ return 'f'; }   // 語音統一用女聲
+function mjSeatGender(j){ const rel = (j - mjMe + 4) % 4; return rel===0 ? mjMyGender : (rel===2 ? (mjMyGender==='f'?'m':'f') : (rel===1 ? 'm' : 'f')); }   // 自己用選單選的聲音，其他人男女混合
 // 用 Web Audio 播（第一次點畫面後就解鎖，電腦出牌時也能播；HTML Audio 在 iPhone 常被擋）
 const mjVbuf = {};
 function mjLoadVoice(src){
@@ -82,11 +82,11 @@ function mjLoadVoice(src){
 function mjPlayVoice(word, j){
   if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON)) return true;
   const k = MJ_VKEY[word]; if(!k) return true;
-  const src = mjVsrc('f', k), p = mjLoadVoice(src); if(!p) return true;
+  const src = mjVsrc(mjSeatGender(j||0), k), p = mjLoadVoice(src); if(!p) return true;
   p.then(buf=>{ if(!buf) return; const a = audio(); if(!a) return; const n = a.createBufferSource(), g = a.createGain(); g.gain.value = 1; n.buffer = buf; n.connect(g).connect(a.destination); n.start(); });
-  return true;   // 一律用女聲音檔，不再改用手機內建語音（避免念成男聲）
+  return true;   // 只播音檔，不改用手機內建語音
 }
-function mjPreloadVoice(){ Object.values(MJ_VKEY).forEach(k=>mjLoadVoice(mjVsrc('f',k))); }
+function mjPreloadVoice(){ ['f','m'].forEach(g=>Object.values(MJ_VKEY).forEach(k=>mjLoadVoice(mjVsrc(g,k)))); }
 function mjSay(txt){
   if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON) || !window.speechSynthesis) return false;
   if(!mjVoice) mjPickVoice(); if(!mjVoice) return false;
@@ -294,10 +294,12 @@ function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
     <button class="mjmi" id="mmRules">📖<span>台數表</span></button>
     <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
+    <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
   $('mmRules').onclick = mjRules;
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
+  $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', mjMe); mjMenu(); };
   $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
   $('mmExit').onclick = ()=>{ mjPanelClose(); mjLeave(); };
 }
@@ -393,7 +395,11 @@ function mjRender(first){
   $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div>
     <div class="mjbme${myOn?' on':''}"><img src="${avSrc(me.av)}" alt=""><span class="mjbw">${MJ.WIND[me.wind]}</span>${me.ting?'<span class="mjbd" style="background:#F08A1C">聽</span>':''}${V.dealer===ME?`<span class="mjbd">莊${V.lian?V.lian:''}</span>`:''}<b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
     <div class="mjbf">${me.flowers.map(t=>mjTile(t,'xs')).join('')}</div><div class="mjbt r">${T.name}・第 ${V.handNo} 局</div>`;
-  $('mjEnd').innerHTML = V.phase==='end' ? mjResultHtml(V) : '';
+  // 結算視窗：第一次出現時等慶祝動畫播完才淡入；之後畫面更新不要重播
+  const endKey = V.phase==='end' ? V.handNo + ':' + (V.result && V.result.draw ? 'd' : 'w') : '';
+  const endHtml = V.phase==='end' ? mjResultHtml(V) : '';
+  $('mjEnd').innerHTML = endKey && endKey === mjAnimKey.end ? endHtml.replace('class="mjres"', 'class="mjres still"') : (V.result && V.result.draw ? endHtml.replace('class="mjres"', 'class="mjres fast"') : endHtml);
+  mjAnimKey.end = endKey;
 
   if($('mjAuto')) $('mjAuto').onclick = ()=>{ if(MJO) return mjOnline('auto', {on:false}); MJG.seats[0].auto=false; mjMiss=0; mjTick(); };
   document.querySelectorAll('#mj .mjhand .mt.hd').forEach(el=>el.onclick=()=>{
@@ -515,7 +521,21 @@ function mjShout(j, txt, small){
   d.className = `mjsh mjsh-${pos}${small?' sm':''}${big?' big':''}`;
   d.innerHTML = `<span>${txt.replace('！','')}</span>${pet && typeof chrSrc==='function' ? `<img src="${chrSrc(pet)}" alt="">` : ''}`;
   box.appendChild(d); setTimeout(()=>d.remove(), 1400);
+  if(big){ d.remove(); return mjCelebrate(j, txt); }
   if(!small){ mjSfx(big ? 'win' : 'call'); const w = {'碰！':'碰','吃！':'吃','槓！':'槓','暗槓！':'槓','加槓！':'槓','胡了！':'胡啦','自摸！':'自摸','聽！':'聽'}[txt] || txt; if(!mjPlayVoice(w, j)) mjSay(w); }
+}
+// 胡牌／自摸：全螢幕慶祝（金光、大字、寵物、彩帶），結算視窗晚一點才出來
+function mjCelebrate(j, txt){
+  const box = $('mj'); if(!box) return;
+  box.querySelectorAll('.mjwin').forEach(x=>x.remove());
+  const self = /自摸/.test(txt), mine = j === mjMe, V = mjCurView() || { seats: [] }, who = mine ? '你' : ((V.seats[j]||{}).name || '');
+  const pet = self ? 'phoenix1' : 'dragon1', cols = ['#FFD43B','#FF6B6B','#4ECDC4','#FF9F43','#A55EEA','#26DE81','#fff'];
+  const conf = Array.from({length: 46}, (_, i)=>`<i style="left:${(Math.random()*100).toFixed(1)}%;background:${cols[i%cols.length]};animation-delay:${(Math.random()*0.6).toFixed(2)}s;animation-duration:${(1.6+Math.random()*1.2).toFixed(2)}s;transform:rotate(${Math.floor(Math.random()*360)}deg)"></i>`).join('');
+  const d = document.createElement('div'); d.className = 'mjwin' + (mine ? ' mine' : '');
+  d.innerHTML = `<div class="mjwrays"></div><div class="mjwconf">${conf}</div>
+    <div class="mjwbox"><img src="${typeof chrSrc==='function' ? chrSrc(pet) : ''}" alt=""><div class="mjwt">${self ? '自摸' : '胡了'}</div><div class="mjwwho">${esc(who)}${mine ? ' 贏了！' : ''}</div></div>`;
+  box.appendChild(d); setTimeout(()=>d.remove(), 2600);
+  mjSfx('win'); setTimeout(()=>mjSfx('win'), 450); try{ if(mine && typeof vib==='function') vib([60,40,120]); }catch(e){}
 }
 function mjResultHtml(V){
   const r = V.result, T = MJ.TABLES[V.table];

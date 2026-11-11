@@ -618,6 +618,23 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjbt1{font-size:30px;font-weight:900;color:#D3403A;margin-top:4px}
 .mjbt2{font-size:14px;font-weight:700;color:var(--ink2);margin:6px 0 14px}
 .mjbk .btn{width:100%}
+/* 胡牌慶祝 */
+.mjwin{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden;background:radial-gradient(circle at 50% 46%,rgba(255,220,120,.55),rgba(60,20,0,.55) 70%);animation:mjwbg 2.6s ease-out forwards}
+@keyframes mjwbg{0%{opacity:0}8%{opacity:1}80%{opacity:1}100%{opacity:0}}
+.mjwrays{position:absolute;left:50%;top:46%;width:1400px;height:1400px;margin:-700px 0 0 -700px;background:repeating-conic-gradient(rgba(255,230,140,.55) 0 8deg,transparent 8deg 20deg);animation:mjwspin 6s linear infinite;-webkit-mask:radial-gradient(circle,#000 10%,transparent 55%);mask:radial-gradient(circle,#000 10%,transparent 55%)}
+@keyframes mjwspin{to{transform:rotate(360deg)}}
+.mjwconf i{position:absolute;top:-20px;width:10px;height:16px;border-radius:2px;animation:mjwfall 2s ease-in forwards}
+@keyframes mjwfall{to{top:110%;transform:rotate(720deg) translateX(40px)}}
+.mjwbox{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;animation:mjwpop 2.6s ease-out forwards}
+@keyframes mjwpop{0%{scale:.2;opacity:0}12%{scale:1.25;opacity:1}22%{scale:.92}32%{scale:1.05}42%{scale:1}85%{opacity:1}100%{opacity:0;scale:1.1}}
+.mjwbox img{width:130px;height:130px;object-fit:contain;margin-bottom:-26px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4));animation:mjwpet 1s ease-in-out infinite}
+@keyframes mjwpet{50%{transform:translateY(-10px) rotate(-5deg)}}
+.mjwt{font-size:110px;font-weight:900;line-height:1;letter-spacing:8px;color:#FFE14D;background:linear-gradient(#FFF6A8,#FFC21A 45%,#FF7A00);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  -webkit-text-stroke:4px #8A2B00;paint-order:stroke fill;filter:drop-shadow(0 6px 0 #8A2B00) drop-shadow(0 0 24px rgba(255,200,0,.9))}
+.mjwwho{margin-top:6px;font-size:26px;font-weight:900;color:#fff;background:rgba(138,43,0,.85);border:3px solid #FFD43B;border-radius:999px;padding:2px 22px;box-shadow:0 0 18px rgba(255,200,0,.7)}
+.mjwin.mine .mjwt{font-size:124px}
+#mjEnd .mjres{animation:mjfade .35s 2.2s both}
+#mjEnd .mjres.still{animation:none}#mjEnd .mjres.fast{animation:mjfade .3s both}
 /* 輪到你了 */
 .mjturn{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font-size:60px;font-weight:900;color:#fff;letter-spacing:4px;
   background:linear-gradient(#FFC15A,#F0731C);border:5px solid #fff;border-radius:999px;padding:6px 40px 10px;white-space:nowrap;
@@ -762,21 +779,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794414864" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794415390" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794414864" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794414864" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794415390" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794415390" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794414864" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794415390" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794414864" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794414864" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794415390" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794415390" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -793,11 +810,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794414864" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794415390" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794414864";
+const BUILD="1794415390";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3531,11 +3548,11 @@ let mjVoice = null, mjVoiceOn = (()=>{ try{ return localStorage.getItem('ytzt_mj
 function mjPickVoice(){ try{ const vs = speechSynthesis.getVoices(); mjVoice = vs.find(v=>/zh[-_]TW/i.test(v.lang)) || vs.find(v=>/zh[-_](HK|Hant)/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang)) || null; }catch(e){} }
 try{ mjPickVoice(); speechSynthesis.onvoiceschanged = mjPickVoice; }catch(e){}
 /* 錄好的男女聲（Higgsfield 生成）：每個座位固定一種聲音；放不出來才改用瀏覽器語音 */
-const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','胡啦':'hu','自摸':'zimo','聽':'ting'};
+const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','聽':'ting'};   // 胡、自摸不念，改用畫面慶祝
 let mjMyGender = (()=>{ try{ return localStorage.getItem('ytzt_mjvg')||'f'; }catch(e){ return 'f'; } })();
 const mjVsrc = (g,k) => (window.MJ_VBASE||'assets/voice/') + g + '_' + k + '.mp3' + (typeof BUILD!=='undefined' ? '?v='+BUILD : '');
 const mjVcache = {};
-function mjSeatGender(j){ return 'f'; }   // 語音統一用女聲
+function mjSeatGender(j){ const rel = (j - mjMe + 4) % 4; return rel===0 ? mjMyGender : (rel===2 ? (mjMyGender==='f'?'m':'f') : (rel===1 ? 'm' : 'f')); }   // 自己用選單選的聲音，其他人男女混合
 // 用 Web Audio 播（第一次點畫面後就解鎖，電腦出牌時也能播；HTML Audio 在 iPhone 常被擋）
 const mjVbuf = {};
 function mjLoadVoice(src){
@@ -3547,11 +3564,11 @@ function mjLoadVoice(src){
 function mjPlayVoice(word, j){
   if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON)) return true;
   const k = MJ_VKEY[word]; if(!k) return true;
-  const src = mjVsrc('f', k), p = mjLoadVoice(src); if(!p) return true;
+  const src = mjVsrc(mjSeatGender(j||0), k), p = mjLoadVoice(src); if(!p) return true;
   p.then(buf=>{ if(!buf) return; const a = audio(); if(!a) return; const n = a.createBufferSource(), g = a.createGain(); g.gain.value = 1; n.buffer = buf; n.connect(g).connect(a.destination); n.start(); });
-  return true;   // 一律用女聲音檔，不再改用手機內建語音（避免念成男聲）
+  return true;   // 只播音檔，不改用手機內建語音
 }
-function mjPreloadVoice(){ Object.values(MJ_VKEY).forEach(k=>mjLoadVoice(mjVsrc('f',k))); }
+function mjPreloadVoice(){ ['f','m'].forEach(g=>Object.values(MJ_VKEY).forEach(k=>mjLoadVoice(mjVsrc(g,k)))); }
 function mjSay(txt){
   if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON) || !window.speechSynthesis) return false;
   if(!mjVoice) mjPickVoice(); if(!mjVoice) return false;
@@ -3759,10 +3776,12 @@ function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
     <button class="mjmi" id="mmRules">📖<span>台數表</span></button>
     <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
+    <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
   $('mmRules').onclick = mjRules;
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
+  $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', mjMe); mjMenu(); };
   $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
   $('mmExit').onclick = ()=>{ mjPanelClose(); mjLeave(); };
 }
@@ -3858,7 +3877,11 @@ function mjRender(first){
   $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div>
     <div class="mjbme${myOn?' on':''}"><img src="${avSrc(me.av)}" alt=""><span class="mjbw">${MJ.WIND[me.wind]}</span>${me.ting?'<span class="mjbd" style="background:#F08A1C">聽</span>':''}${V.dealer===ME?`<span class="mjbd">莊${V.lian?V.lian:''}</span>`:''}<b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
     <div class="mjbf">${me.flowers.map(t=>mjTile(t,'xs')).join('')}</div><div class="mjbt r">${T.name}・第 ${V.handNo} 局</div>`;
-  $('mjEnd').innerHTML = V.phase==='end' ? mjResultHtml(V) : '';
+  // 結算視窗：第一次出現時等慶祝動畫播完才淡入；之後畫面更新不要重播
+  const endKey = V.phase==='end' ? V.handNo + ':' + (V.result && V.result.draw ? 'd' : 'w') : '';
+  const endHtml = V.phase==='end' ? mjResultHtml(V) : '';
+  $('mjEnd').innerHTML = endKey && endKey === mjAnimKey.end ? endHtml.replace('class="mjres"', 'class="mjres still"') : (V.result && V.result.draw ? endHtml.replace('class="mjres"', 'class="mjres fast"') : endHtml);
+  mjAnimKey.end = endKey;
 
   if($('mjAuto')) $('mjAuto').onclick = ()=>{ if(MJO) return mjOnline('auto', {on:false}); MJG.seats[0].auto=false; mjMiss=0; mjTick(); };
   document.querySelectorAll('#mj .mjhand .mt.hd').forEach(el=>el.onclick=()=>{
@@ -3980,7 +4003,21 @@ function mjShout(j, txt, small){
   d.className = `mjsh mjsh-${pos}${small?' sm':''}${big?' big':''}`;
   d.innerHTML = `<span>${txt.replace('！','')}</span>${pet && typeof chrSrc==='function' ? `<img src="${chrSrc(pet)}" alt="">` : ''}`;
   box.appendChild(d); setTimeout(()=>d.remove(), 1400);
+  if(big){ d.remove(); return mjCelebrate(j, txt); }
   if(!small){ mjSfx(big ? 'win' : 'call'); const w = {'碰！':'碰','吃！':'吃','槓！':'槓','暗槓！':'槓','加槓！':'槓','胡了！':'胡啦','自摸！':'自摸','聽！':'聽'}[txt] || txt; if(!mjPlayVoice(w, j)) mjSay(w); }
+}
+// 胡牌／自摸：全螢幕慶祝（金光、大字、寵物、彩帶），結算視窗晚一點才出來
+function mjCelebrate(j, txt){
+  const box = $('mj'); if(!box) return;
+  box.querySelectorAll('.mjwin').forEach(x=>x.remove());
+  const self = /自摸/.test(txt), mine = j === mjMe, V = mjCurView() || { seats: [] }, who = mine ? '你' : ((V.seats[j]||{}).name || '');
+  const pet = self ? 'phoenix1' : 'dragon1', cols = ['#FFD43B','#FF6B6B','#4ECDC4','#FF9F43','#A55EEA','#26DE81','#fff'];
+  const conf = Array.from({length: 46}, (_, i)=>`<i style="left:${(Math.random()*100).toFixed(1)}%;background:${cols[i%cols.length]};animation-delay:${(Math.random()*0.6).toFixed(2)}s;animation-duration:${(1.6+Math.random()*1.2).toFixed(2)}s;transform:rotate(${Math.floor(Math.random()*360)}deg)"></i>`).join('');
+  const d = document.createElement('div'); d.className = 'mjwin' + (mine ? ' mine' : '');
+  d.innerHTML = `<div class="mjwrays"></div><div class="mjwconf">${conf}</div>
+    <div class="mjwbox"><img src="${typeof chrSrc==='function' ? chrSrc(pet) : ''}" alt=""><div class="mjwt">${self ? '自摸' : '胡了'}</div><div class="mjwwho">${esc(who)}${mine ? ' 贏了！' : ''}</div></div>`;
+  box.appendChild(d); setTimeout(()=>d.remove(), 2600);
+  mjSfx('win'); setTimeout(()=>mjSfx('win'), 450); try{ if(mine && typeof vib==='function') vib([60,40,120]); }catch(e){}
 }
 function mjResultHtml(V){
   const r = V.result, T = MJ.TABLES[V.table];

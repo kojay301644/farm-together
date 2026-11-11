@@ -618,6 +618,23 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjbt1{font-size:30px;font-weight:900;color:#D3403A;margin-top:4px}
 .mjbt2{font-size:14px;font-weight:700;color:var(--ink2);margin:6px 0 14px}
 .mjbk .btn{width:100%}
+/* 胡牌慶祝 */
+.mjwin{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden;background:radial-gradient(circle at 50% 46%,rgba(255,220,120,.55),rgba(60,20,0,.55) 70%);animation:mjwbg 2.6s ease-out forwards}
+@keyframes mjwbg{0%{opacity:0}8%{opacity:1}80%{opacity:1}100%{opacity:0}}
+.mjwrays{position:absolute;left:50%;top:46%;width:1400px;height:1400px;margin:-700px 0 0 -700px;background:repeating-conic-gradient(rgba(255,230,140,.55) 0 8deg,transparent 8deg 20deg);animation:mjwspin 6s linear infinite;-webkit-mask:radial-gradient(circle,#000 10%,transparent 55%);mask:radial-gradient(circle,#000 10%,transparent 55%)}
+@keyframes mjwspin{to{transform:rotate(360deg)}}
+.mjwconf i{position:absolute;top:-20px;width:10px;height:16px;border-radius:2px;animation:mjwfall 2s ease-in forwards}
+@keyframes mjwfall{to{top:110%;transform:rotate(720deg) translateX(40px)}}
+.mjwbox{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;animation:mjwpop 2.6s ease-out forwards}
+@keyframes mjwpop{0%{scale:.2;opacity:0}12%{scale:1.25;opacity:1}22%{scale:.92}32%{scale:1.05}42%{scale:1}85%{opacity:1}100%{opacity:0;scale:1.1}}
+.mjwbox img{width:130px;height:130px;object-fit:contain;margin-bottom:-26px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4));animation:mjwpet 1s ease-in-out infinite}
+@keyframes mjwpet{50%{transform:translateY(-10px) rotate(-5deg)}}
+.mjwt{font-size:110px;font-weight:900;line-height:1;letter-spacing:8px;color:#FFE14D;background:linear-gradient(#FFF6A8,#FFC21A 45%,#FF7A00);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  -webkit-text-stroke:4px #8A2B00;paint-order:stroke fill;filter:drop-shadow(0 6px 0 #8A2B00) drop-shadow(0 0 24px rgba(255,200,0,.9))}
+.mjwwho{margin-top:6px;font-size:26px;font-weight:900;color:#fff;background:rgba(138,43,0,.85);border:3px solid #FFD43B;border-radius:999px;padding:2px 22px;box-shadow:0 0 18px rgba(255,200,0,.7)}
+.mjwin.mine .mjwt{font-size:124px}
+#mjEnd .mjres{animation:mjfade .35s 2.2s both}
+#mjEnd .mjres.still{animation:none}#mjEnd .mjres.fast{animation:mjfade .3s both}
 /* 輪到你了 */
 .mjturn{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font-size:60px;font-weight:900;color:#fff;letter-spacing:4px;
   background:linear-gradient(#FFC15A,#F0731C);border:5px solid #fff;border-radius:999px;padding:6px 40px 10px;white-space:nowrap;
