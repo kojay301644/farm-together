@@ -83,7 +83,7 @@ export function playerAct(T, uid, a, now) {
     if (!BC.AREAS[k]) throw new Error('沒有這個押注區');
     if (!TB.chips.includes(amt)) throw new Error('籌碼不對');
     const total = Object.values(me.bets).reduce((s, x) => s + x, 0) + amt;
-    if (total > TB.max) throw new Error(`這桌每局最多押 ${TB.max.toLocaleString()} 金`);
+    if ((me.bets[k] || 0) + amt > BC.LIMIT[k]) throw new Error(`${BC.AREAS[k].name}每局最多押 ${BC.LIMIT[k].toLocaleString()} 金`);
     if (total > (me.gold || 0)) throw new Error('金幣不夠');
     me.bets[k] = (me.bets[k] || 0) + amt;
     G.log.push({ k: 'bet', uid, area: k, amt });

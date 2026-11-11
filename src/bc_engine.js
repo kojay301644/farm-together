@@ -1,12 +1,9 @@
 /* 百家樂規則引擎：前端、伺服器共用
    牌的代號跟大老二一樣：c = 點數 × 4 + 花色；點數 0..12 = 3 4 5 6 7 8 9 10 J Q K A 2 */
 const BC = (() => {
-  const TABLES = {
-    n: { name: '新手桌', min: 2000, bet: 20, max: 2000, chips: [20, 50, 100, 500] },
-    m: { name: '中級桌', min: 10000, bet: 100, max: 10000, chips: [100, 500, 1000, 5000] },
-    h: { name: '高手桌', min: 40000, bet: 400, max: 40000, chips: [400, 2000, 5000, 20000] },
-    r: { name: '土豪桌', min: 100000, bet: 1000, max: 100000, chips: [1000, 5000, 20000, 50000] },
-  };
+  // 只有一種桌：單注最低 100；莊、閒每局最多押 2 萬，和、對子最多 1 萬
+  const TABLES = { n: { name: '百家樂', min: 100, bet: 100, chips: [100, 500, 1000, 5000, 10000] } };
+  const LIMIT = { p: 20000, b: 20000, t: 10000, pp: 10000, bp: 10000 };
   const AREAS = { p: { name: '閒', pay: 1 }, b: { name: '莊', pay: 0.95 }, t: { name: '和', pay: 8 }, pp: { name: '閒對', pay: 11 }, bp: { name: '莊對', pay: 11 } };
   const MAXP = 6;   // 一桌最多幾人
   const PETS = ['armad','bear','bunny','deer','dragon','ferret','fox','lizard','marten','mole','moth','mouse','otter','owl','pango','penguin','phoenix','seal'];
@@ -48,6 +45,6 @@ const BC = (() => {
     }
     return d;
   }
-  return { TABLES, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
+  return { TABLES, LIMIT, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
 })();
 if (typeof module !== 'undefined') module.exports = BC;

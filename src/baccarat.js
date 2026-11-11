@@ -5,11 +5,11 @@ const BC_ORDER = ['pp','p','t','b','bp'];
 
 function openBcLobby(){
   const gold = S.me.gold;
-  modal('🎴 百家樂', `<div class="rhint">押「莊」或「閒」誰的點數比較接近 9，跟娛樂廳對賭，輸贏用農場金幣。最多 ${BC.MAXP} 人同桌，大家一起看開牌</div>
+  modal('🎴 百家樂', `<div class="rhint">押「莊」或「閒」誰的點數比較接近 9，跟娛樂廳對賭，輸贏用農場金幣。進入系統桌，最多 ${BC.MAXP} 人同桌，大家一起看開牌</div>
     <div id="bcBack"></div>
-    ${Object.entries(BC.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${BC_ICON[k]}</div><div class="tx"><b>${t.name}</b>
-      <div>每局最多押 ${t.max.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
-      <div class="mjtbb"><button class="mini" data-bcq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'進入牌桌'}</button></div></div>`; }).join('')}
+    <div class="mjtb"><div class="mjtbi">🎴</div><div class="tx"><b>百家樂</b>
+      <div>莊、閒：每注 100～20,000 金</div><div>和、對子：每注 100～10,000 金</div></div>
+      <div class="mjtbb"><button class="mini" data-bcq="n">進入牌桌</button></div></div>
     <button class="link" id="bcRules">📖 怎麼玩、怎麼賠？</button>`, [['回寵物娛樂廳','sub',openHall]]);
   const busy = b => { document.querySelectorAll('#md .mini').forEach(x=>x.disabled = b); };
   const go = async (a, extra) => { busy(true); try{ const r = await mjCall(a, extra); if(!r.view) throw new Error('進不去，等等再試'); closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); busy(false); } };
@@ -24,7 +24,7 @@ function bcRules(){
     <p><b>補牌：</b>兩邊先各拿 2 張，誰拿到 8 或 9 點就直接比；不然照固定規則自動補第 3 張，不用自己決定。</p>
     <p><b>賠率：</b></p>
     <ul><li>閒：1 賠 1</li><li>莊：1 賠 0.95（贏了抽 5%）</li><li>和（兩邊一樣大）：1 賠 8；開和時押莊、閒的錢退回</li><li>閒對／莊對（那邊前兩張是對子）：1 賠 11</li></ul>
-    <p>每局可以押好幾個地方，合計不能超過這桌的上限。</p></div>`;
+    <p><b>下注限制：</b>每注最低 100 金；莊、閒每局最多各押 20,000 金，和、閒對、莊對每局最多各押 10,000 金。</p></div>`;
   if(mjOn()) return mjPanel('📖 百家樂怎麼玩', body, [['知道了','',mjPanelClose]]);
   modal('📖 百家樂怎麼玩', body, [['知道了','',openBcLobby]]);
 }
@@ -69,15 +69,15 @@ function bcRender(V){
   const areas = BC_ORDER.map(k=>{ const A = BC.AREAS[k], m = my[k]||0, all = tot[k]||0;
     const fk = V.round + ':' + k + ':' + m, flash = m && bcFlash[k] !== fk; bcFlash[k] = fk;
     return `<button class="bca bca-${k}${winArea(k)?' win':''}${res && !winArea(k) && m ? ' lose':''}" data-bca="${k}" ${bet?'':'disabled'}>
-      <b>${A.name}</b><small>1 賠 ${A.pay}</small>${all?`<span class="bcall">全桌 ${all.toLocaleString()}</span>`:''}${m?`<span class="bcmy${flash?' pop':''}">${m.toLocaleString()}</span>`:''}</button>`; }).join('');
+      <b>${A.name}</b><small>1 賠 ${A.pay}・上限 ${BC.LIMIT[k]/10000} 萬</small>${all?`<span class="bcall">全桌 ${all.toLocaleString()}</span>`:''}${m?`<span class="bcmy${flash?' pop':''}">${m.toLocaleString()}</span>`:''}</button>`; }).join('');
   const myTot = Object.values(my).reduce((s,x)=>s+x,0);
   const winTxt = V.phase==='end' && V.myWin!=null && myTot ? (V.myWin>0?`<span class="bcwin up">贏 +${V.myWin.toLocaleString()}</span>`:V.myWin<0?`<span class="bcwin dn">輸 ${V.myWin.toLocaleString()}</span>`:`<span class="bcwin">押注退回</span>`) : '';
   $('mjUi').innerHTML = `<div class="bcareas">${areas}</div>
-    <div class="bcchips">${T.chips.map(c=>`<button class="bcchip${c===bcChip?' on':''}" data-chip="${c}" ${bet?'':'disabled'}>${c>=1000?(c/1000)+'K':c}</button>`).join('')}
-      <button class="bcclr" id="bcClr" ${bet && myTot?'':'disabled'}>清除</button><span class="bcmine">這局押 <b>${myTot.toLocaleString()}</b> / ${T.max.toLocaleString()}</span>${winTxt}</div>`;
-  $('mjBar').innerHTML = `<div class="mjbt">每局最多押 ${T.max.toLocaleString()} 金</div>
+    <div class="bcchips">${T.chips.map(c=>`<button class="bcchip${c===bcChip?' on':''}" data-chip="${c}" ${bet?'':'disabled'}>${c>=10000?(c/10000)+'萬':c>=1000?(c/1000)+'K':c}</button>`).join('')}
+      <button class="bcclr" id="bcClr" ${bet && myTot?'':'disabled'}>清除</button><span class="bcmine">這局押 <b>${myTot.toLocaleString()}</b></span>${winTxt}</div>`;
+  $('mjBar').innerHTML = `<div class="mjbt">莊閒 100～2萬・和對 最高1萬</div>
     <div class="mjbme"><img src="${avSrc(S.me.avatar||11)}" alt=""><b>${esc(S.me.nickname||'')}</b><span class="mjbg">${(V.myGold||0).toLocaleString()}</span></div>
-    <div class="mjbt r">${T.name}・第 ${V.round} 局</div>`;
+    <div class="mjbt r">百家樂・第 ${V.round} 局</div>`;
   $('mjEnd').innerHTML = '';
 
   document.querySelectorAll('#mj [data-chip]').forEach(b=>b.onclick=()=>{ bcChip = +b.dataset.chip; mjSfx('pick'); bcRender(mjCurView()); });
@@ -102,7 +102,7 @@ function bcBet(k){
   const V = mjCurView(); if(!V || V.phase!=='bet' || !MJO) return;
   const T = BC.TABLES[V.lvl] || BC.TABLES.n, my = V.myBets || (V.myBets = {});
   const tot = Object.values(my).reduce((s,x)=>s+x,0) + bcChip;
-  if(tot > T.max) return mjToast(`每局最多押 ${T.max.toLocaleString()} 金`);
+  if((my[k]||0) + bcChip > BC.LIMIT[k]) return mjToast(`${BC.AREAS[k].name}每局最多押 ${BC.LIMIT[k].toLocaleString()} 金`);
   if(tot > (V.myGold||0)) return mjToast('金幣不夠');
   // 先顯示在畫面上，伺服器確認在背景做
   my[k] = (my[k]||0) + bcChip; V.totals = Object.assign({}, V.totals); V.totals[k] = (V.totals[k]||0) + bcChip;
