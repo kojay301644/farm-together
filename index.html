@@ -699,6 +699,52 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .bcclr:disabled{opacity:.45}
 .bcmine{font-size:12px;color:#BDF6FF;font-weight:900;margin-left:auto}.bcmine b{color:#FFE59A}
 .bcwin{font-size:16px;font-weight:900;padding:2px 12px;border-radius:999px;background:rgba(0,0,0,.4)}.bcwin.up{color:#7CFFB0}.bcwin.dn{color:#FF8A8A}
+/* ---------- 德州撲克 ---------- */
+.thtab{position:absolute;left:12%;right:12%;top:15%;bottom:16%;border-radius:999px;background:radial-gradient(ellipse at 50% 40%,rgba(0,229,255,.16),rgba(10,24,60,.5) 70%);border:3px solid rgba(0,229,255,.55);box-shadow:inset 0 0 30px rgba(0,229,255,.25),0 0 18px rgba(122,92,255,.4)}
+.thmid{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2}
+.thboard{display:flex;gap:5px}
+.b2c.thb{--w:var(--thbw,44px)}.b2c.thb.new{animation:bcflip .35s ease-out}
+.thpot{font-size:13px;font-weight:900;color:#BDF6FF;background:rgba(0,0,0,.35);border-radius:999px;padding:2px 12px}.thpot b{color:#FFE59A}
+.thrake{font-size:10px;color:#9FB8D6}
+.thinfo{font-size:12px;color:#BDF6FF;font-weight:900}
+.ths{position:absolute;display:flex;flex-direction:column;align-items:center;z-index:3;width:84px}
+.ths.empty i{font-size:11px;color:rgba(189,246,255,.35);font-style:normal;border:2px dashed rgba(0,229,255,.25);border-radius:12px;padding:12px 10px}
+.ths-0{left:50%;bottom:2%;transform:translateX(-50%)}
+.ths-1{left:3%;top:56%}.ths-2{left:3%;top:6%}.ths-3{left:50%;top:1%;transform:translateX(-50%)}.ths-4{right:62px;top:6%}.ths-5{right:3%;top:56%}
+.ths-0{left:calc(50% - 160px);bottom:3%;transform:none}
+.thbet-0{left:calc(100% - 6px);top:4px}
+.thav{position:relative;width:42px;height:42px;border-radius:12px;background:#0A1838;border:2px solid #5CF2FF;box-shadow:0 0 0 2px #7A5CFF}
+.thav img{width:100%;height:100%;border-radius:10px;object-fit:cover}
+.ths.turn .thav{border-color:#fff;box-shadow:0 0 0 3px #00E5FF,0 0 18px 6px #00E5FF;animation:mjpulse 1s ease-in-out infinite}
+.ths.won .thav{box-shadow:0 0 0 3px #FFD43B,0 0 22px 6px #FFD43B}
+.ths.folded{opacity:.55}.ths.out{opacity:.5}
+.thd{position:absolute;right:-8px;bottom:-6px;width:18px;height:18px;border-radius:50%;background:#fff;color:#22304A;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.thauto{position:absolute;left:-6px;top:-6px;font-size:9px;background:#7A8BA6;color:#fff;border-radius:6px;padding:1px 3px}
+.thnm{font-size:11px;font-weight:900;color:#DDF7FF;max-width:84px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin-top:2px}
+.thst{font-size:11px;font-weight:900;color:#FFE59A;background:rgba(0,0,0,.4);border-radius:8px;padding:0 6px}.thst small{color:#7CFFB0;margin-left:2px}
+.thla{font-size:10px;font-weight:900;color:#04122A;background:#BDF6FF;border-radius:6px;padding:0 6px;margin-top:2px;white-space:nowrap}
+.thwin{font-size:13px;font-weight:900;color:#04122A;background:#FFD43B;border-radius:8px;padding:1px 8px;margin-top:2px;white-space:nowrap;text-align:center;line-height:1.15;animation:mjin .3s ease-out}.thwin small{display:block;font-size:10px}
+.thh{display:flex;gap:2px;margin-bottom:2px}.thh.fold{opacity:.4}
+.b2c.tho{--w:24px}
+.thbet{position:absolute;font-size:11px;font-weight:900;color:#FFE59A;display:flex;align-items:center;gap:3px;white-space:nowrap;background:rgba(0,0,0,.45);border-radius:999px;padding:1px 7px 1px 2px}
+.thbet i{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle,#F0A21C 50%,#fff 52%,#fff 62%,#A85A08 64%)}
+.thbet-1{left:92px;top:30%}.thbet-5{right:92px;top:30%}.thbet-2{left:92px;top:60%}.thbet-4{right:92px;top:60%}.thbet-3{top:calc(100% + 4px);left:50%;transform:translateX(-50%)}
+.thmy{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);display:flex;gap:4px;align-items:flex-end}
+.thmy.fold{opacity:.45}.b2c.thm{--w:52px}
+.thmyh{position:absolute;left:50%;top:-22px;transform:translateX(-50%);font-size:12px;font-weight:900;color:#04122A;background:#FFD43B;border-radius:8px;padding:0 8px;white-space:nowrap}
+.thacts,.thraise{position:absolute;right:14px;bottom:calc(100% + 8px);display:flex;gap:8px;pointer-events:auto}
+.thraise{flex-direction:column;align-items:stretch;gap:6px;background:rgba(5,12,34,.92);border:2px solid #39F3FF;border-radius:14px;padding:8px;width:260px}
+.thrp{display:flex;gap:4px}.thrp button,.thrr button{flex:1;height:30px;border-radius:999px;font-family:inherit;font-weight:900;font-size:12px;color:#BDF6FF;background:rgba(8,20,48,.9);border:2px solid #39F3FF}
+.thrr{display:flex;align-items:center;gap:6px}.thrr input{flex:1}.thrr button{flex:none;width:34px}
+.thrb{display:flex;gap:6px}
+.thb2{min-width:72px;height:46px;border-radius:14px;font-family:inherit;font-size:16px;font-weight:900;color:#fff;border:2px solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;padding:0 12px}
+.thb2 small{font-size:11px;opacity:.9}
+.thb2.f{background:#EFE9DF;color:#22304A;box-shadow:0 4px 0 #CFC3AF}
+.thb2.c{background:radial-gradient(circle at 35% 30%,#7CC6FF,#2F86E0);box-shadow:0 4px 0 #1C5FA8}
+.thb2.r{background:radial-gradient(circle at 35% 30%,#FFC46B,#F08A1C);box-shadow:0 4px 0 #A85A08;flex:1}
+.thb2.x{background:#EFE9DF;color:#22304A;box-shadow:0 4px 0 #CFC3AF}
+.thb2:active{transform:translateY(2px)}
+.threbuy{height:22px;padding:0 10px;border-radius:999px;font-family:inherit;font-size:11px;font-weight:900;color:#04122A;background:#7CFFB0;border:none}
 /* 中間：方位盤＋四家打出的牌（以 .mjmid 為中心點） */
 .mjmid{position:absolute;left:50%;width:0;height:0;z-index:1}
 .mjc{position:absolute;left:-52px;top:-52px;width:104px;height:104px;transform:scale(var(--cs,1));background:var(--mjconsole) center/contain no-repeat;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3))}
@@ -987,21 +1033,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794425311" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794427030" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794425311" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794425311" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794427030" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794427030" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794425311" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794427030" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794425311" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794425311" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794427030" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794427030" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1018,11 +1064,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794425311" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794427030" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794425311";
+const BUILD="1794427030";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3838,12 +3884,12 @@ const HALL_GAMES = [
   {id:'mj', icon:'🀄', name:'麻將', desc:'台灣 16 張，跟朋友或電腦一起打', open:true},
   {id:'big2', icon:'🃏', name:'大老二', desc:'台灣玩法，四個人搶先出完', open:true},
   {id:'bc', icon:'🎴', name:'百家樂', desc:'押莊或閒，最多 6 人同桌', open:true},
-  {id:'holdem', icon:'♠️', name:'德州撲克', desc:'敬請期待'},
+  {id:'holdem', icon:'♠️', name:'德州撲克', desc:'6 人桌無限注，帶籌碼上桌', open:true},
 ];
 function openHall(){
   modal('🎰 寵物娛樂廳', `<div class="rhint">用農場金幣跟大家同樂！麻將、大老二每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費</div>
     <div class="hallg">${HALL_GAMES.map(g=>`<button class="hgc${g.open?'':' off'}" data-hg="${g.id}"><span class="hgi">${g.icon}</span><b>${g.name}</b><small>${g.desc}</small></button>`).join('')}</div>`);
-  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ if(b.dataset.hg==='mj') openMjLobby(); else if(b.dataset.hg==='big2') openB2Lobby(); else if(b.dataset.hg==='bc') openBcLobby(); else toast('這個遊戲還在做，敬請期待！'); });
+  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ if(b.dataset.hg==='mj') openMjLobby(); else if(b.dataset.hg==='big2') openB2Lobby(); else if(b.dataset.hg==='bc') openBcLobby(); else if(b.dataset.hg==='holdem') openThLobby(); else toast('這個遊戲還在做，敬請期待！'); });
 }
 function openMjLobby(){
   const gold = S.me.gold;
@@ -3887,7 +3933,7 @@ async function mjCall(a, extra){
 }
 /* 麻將背景音樂（Higgsfield 生成，20 秒無縫循環）：進牌桌換成這首，離開換回農場音樂 */
 let MJ_BGM = null, mjBgmOn = (()=>{ try{ return localStorage.getItem('ytzt_mjbgm')!=='0'; }catch(e){ return true; } })();
-const mjBgmKey = V => ({ b2:'b2_bgm', bc:'bc_bgm' })[(V||{}).game] || 'mj_bgm';
+const mjBgmKey = V => ({ b2:'b2_bgm', bc:'bc_bgm', th:'bc_bgm' })[(V||{}).game] || 'mj_bgm';
 function mjBgmSync(){
   const want = mjOn() && mjBgmOn && !document.hidden && (typeof BGM_ON==='undefined' || BGM_ON);
   if(want){
@@ -3955,7 +4001,7 @@ function mjApply(view, seq, first, own){
   if(seq!=null && seq < MJO.seq) return;
   if(seq!=null) MJO.seq = seq;
   MJO.V = view; MJO.at = Date.now(); MJO.off = Date.now() - (view.now || Date.now());
-  if(view.me!=null && view.seats){ const g = view.seats[view.me].gold; if(S && S.me && typeof g==='number') S.me.gold = g; }
+  if(view.me!=null && view.me>=0 && view.seats && view.seats[view.me]){ const g = view.seats[view.me].gold; if(S && S.me && typeof g==='number') S.me.gold = g; }
   mjRender(first);
   // 下一個事件（電腦出牌、超時、開局…）到的時候請伺服器推進；指定一個人負責，其他人晚一點當備援
   clearTimeout(MJO.tick);
@@ -3973,7 +4019,9 @@ function mjCurView(){ return MJG ? mjLocalView() : MJO && MJO.V; }
 
 function mjLeave(force){
   const V = mjCurView();
-  if(!force && V && V.game!=='bc' && V.phase && V.phase!=='end' && V.status==='play' && V.me!=null) return mjConfirmLeave();
+  if(!force && V && V.game==='th'){ const p = V.me>=0 && V.seats[V.me]; if(p && p.inHand && !p.folded && ['pre','flop','turn','river'].includes(V.street))
+      return mjPanel('要離開牌桌嗎？', `<div class="help"><p>這局你還在打，離開會自動棄牌（已經下注的籌碼拿不回來）。剩下的籌碼會換回金幣。</p></div>`, [['繼續打','sub',mjPanelClose],['離開','r',()=>{ mjPanelClose(); mjLeave(true); }]]); }
+  else if(!force && V && V.game!=='bc' && V.phase && V.phase!=='end' && V.status==='play' && V.me!=null) return mjConfirmLeave();
   if(MJO){ const o = MJO; o.busy = true; mjCall('leave').then(r=>{ if(typeof r.gold==='number' && S && S.me) S.me.gold = r.gold; try{ refresh(); }catch(e){} }).catch(()=>{}); mjClose(); return; }
   mjClose();
 }
@@ -4036,12 +4084,12 @@ function mjPanel(title, body, btns){
 function mjPanelClose(){ const p=$('mjPanel'); if(p) p.classList.remove('on'); }
 function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
-    <button class="mjmi" id="mmRules">📖<span>${['b2','bc'].includes((mjCurView()||{}).game)?'規則':'台數表'}</span></button>
+    <button class="mjmi" id="mmRules">📖<span>${['b2','bc','th'].includes((mjCurView()||{}).game)?'規則':'台數表'}</span></button>
     <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
-  $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else if(V && V.game==='bc') bcRules(); else mjRules(); };
+  $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else if(V && V.game==='bc') bcRules(); else if(V && V.game==='th') thRules(); else mjRules(); };
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
   $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', mjMe); mjMenu(); };
   $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
@@ -4053,6 +4101,7 @@ function mjRender(first){
   const V = mjCurView(); if(!V) return;
   if(MJ_BGM && MJ_BGM._k !== mjBgmKey(V)) mjBgmSync();   // 換遊戲就換音樂
   if(V.game==='bc' && V.status==='play' && V.phase) return bcRender(V);
+  if(V.game==='th' && V.status==='play' && V.seats) return thRender(V);
   if(V.status==='wait' || V.pending || V.me==null || V.me<0) return mjRenderWait(V);
   if(V.game==='b2') return b2Render(V);
   mjMe = V.me;
@@ -4252,7 +4301,7 @@ function mjTurnAlert(){
   const b2 = (mjCurView()||{}).game==='b2';
   const box = $('mjCall'); if(!box) return;   // 大老二：小小一條放在桌子正中間（寵物那裡），不擋到牌和按鈕
   box.querySelectorAll('.mjturn').forEach(x=>x.remove());
-  const d = document.createElement('div'); d.className = 'mjturn' + (b2 ? ' b2' : ''); d.textContent = '輪到你了！';
+  const d = document.createElement('div'); d.className = 'mjturn' + (b2 || (mjCurView()||{}).game==='th' ? ' b2' : ''); d.textContent = '輪到你了！';
   box.appendChild(d); setTimeout(()=>d.remove(), 1900);
   mjSfx('myturn'); try{ if(typeof vib==='function') vib(60); }catch(e){}
 }
@@ -4915,6 +4964,330 @@ function bcRoad(hist){
   const bigHtml = big.map(c=>`<div class="bcbc">${c.map(x=>`<i class="b-${x.w}">${x.t?`<s></s>${x.t>1?`<em>${x.t}</em>`:''}`:''}</i>`).join('')}</div>`).join('');
   return `<div class="bcroadw"><div class="bcrh"><b>牌路</b><span class="r-b">莊 ${n.b}</span><span class="r-p">閒 ${n.p}</span><span class="r-t">和 ${n.t}</span></div>
     <div class="bcroad">${beadHtml || '<small>還沒開過牌</small>'}</div><div class="bcbig">${bigHtml}</div></div>`;
+}
+/* 德州撲克引擎（無限注）：前端、伺服器共用
+   牌的代號跟大老二一樣：c = 點數 × 4 + 花色；大老二點數 0..12 = 3..2，這裡換成撲克大小 v = 0..12 = 2..A */
+const HOLD = (() => {
+  const TABLES = {
+    n: { name: '新手桌', sb: 10, bb: 20, min: 400 },
+    m: { name: '中級桌', sb: 50, bb: 100, min: 2000 },
+    h: { name: '高手桌', sb: 200, bb: 400, min: 8000 },
+    r: { name: '土豪桌', sb: 500, bb: 1000, min: 20000 },
+  };
+  Object.values(TABLES).forEach(t => { t.buyMin = t.bb * 20; t.buyMax = t.bb * 100; });
+  const SEATS = 6, RAKE = 0.05, RAKE_CAP_BB = 3;
+  const HAND = ['高牌', '一對', '兩對', '三條', '順子', '同花', '葫蘆', '鐵支', '同花順'];
+  const v = c => { const r = c >> 2; return r === 12 ? 0 : r + 1; };   // 2..A → 0..12
+  const su = c => c & 3;
+
+  // ---------- 牌力 ----------
+  function eval5(cs) {
+    const vs = cs.map(v).sort((a, b) => b - a), flush = cs.every(c => su(c) === su(cs[0]));
+    const cnt = {}; vs.forEach(x => cnt[x] = (cnt[x] || 0) + 1);
+    const g = Object.entries(cnt).map(([x, n]) => [+x, n]).sort((a, b) => b[1] - a[1] || b[0] - a[0]);
+    let st = -1; const u = [...new Set(vs)];
+    if (u.length === 5) { if (u[0] - u[4] === 4) st = u[0]; else if (u.join() === '12,3,2,1,0') st = 3; }   // A-2-3-4-5 算 5 最大
+    if (st >= 0 && flush) return [8, st];
+    if (g[0][1] === 4) return [7, g[0][0], g[1][0]];
+    if (g[0][1] === 3 && g[1][1] === 2) return [6, g[0][0], g[1][0]];
+    if (flush) return [5, ...vs];
+    if (st >= 0) return [4, st];
+    if (g[0][1] === 3) return [3, g[0][0], ...g.slice(1).map(x => x[0])];
+    if (g[0][1] === 2 && g[1][1] === 2) return [2, g[0][0], g[1][0], g[2][0]];
+    if (g[0][1] === 2) return [1, g[0][0], ...g.slice(1).map(x => x[0])];
+    return [0, ...vs];
+  }
+  const cmp = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++) { const d = (a[i] ?? -1) - (b[i] ?? -1); if (d) return d; } return 0; };
+  function best(cards) {   // 5～7 張裡挑最好的 5 張
+    let top = null, hand = null; const n = cards.length;
+    for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) for (let c = b + 1; c < n; c++) for (let d = c + 1; d < n; d++) for (let e = d + 1; e < n; e++) {
+      const h = [cards[a], cards[b], cards[c], cards[d], cards[e]], s = eval5(h);
+      if (!top || cmp(s, top) > 0) { top = s; hand = h; }
+    }
+    return { score: top, cards: hand, name: HAND[top[0]] };
+  }
+
+  // ---------- 牌局 ----------
+  function shuffle() { const d = Array.from({ length: 52 }, (_, i) => i); for (let i = 51; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [d[i], d[j]] = [d[j], d[i]]; } return d; }
+  function newTable(lvl) { return { table: lvl, seats: Array(SEATS).fill(null), button: -1, street: 'idle', board: [], handNo: 0, log: [], result: null, turn: -1 }; }
+  const live = (G, i) => { const p = G.seats[i]; return p && p.inHand && !p.folded; };
+  const canAct = (G, i) => live(G, i) && !G.seats[i].allin;
+  function nextFrom(G, i, ok) { for (let k = 1; k <= SEATS; k++) { const j = (i + k) % SEATS; if (ok(j)) return j; } return -1; }
+  function pay(G, i, amt) { const p = G.seats[i], x = Math.min(amt, p.stack); p.stack -= x; p.bet += x; p.put += x; if (p.stack === 0) p.allin = true; return x; }
+
+  function canStart(G) { return G.seats.filter(p => p && !p.sitOut && p.stack > 0).length >= 2; }
+  function startHand(G) {
+    const T = TABLES[G.table];
+    G.seats.forEach(p => { if (!p) return; Object.assign(p, { inHand: !p.sitOut && p.stack > 0, folded: false, allin: false, bet: 0, put: 0, hole: [], acted: false, last: null, start: p.stack, shown: false }); });
+    const inn = i => G.seats[i] && G.seats[i].inHand;
+    G.handNo++; G.board = []; G.result = null; G.deck = shuffle(); G.log = [{ k: 'hand' }];
+    G.button = nextFrom(G, G.button < 0 ? SEATS - 1 : G.button, inn);
+    const n = G.seats.filter((p, i) => inn(i)).length;
+    const sb = n === 2 ? G.button : nextFrom(G, G.button, inn), bb = nextFrom(G, sb, inn);
+    G.sbSeat = sb; G.bbSeat = bb;
+    pay(G, sb, T.sb); G.seats[sb].last = '小盲'; pay(G, bb, T.bb); G.seats[bb].last = '大盲';
+    for (let r = 0; r < 2; r++) for (let k = 0; k < SEATS; k++) { const i = (G.button + 1 + k) % SEATS; if (inn(i)) G.seats[i].hole.push(G.deck.pop()); }
+    G.street = 'pre'; G.curBet = T.bb; G.minRaise = T.bb;
+    G.turn = nextFrom(G, bb, i => canAct(G, i));
+    if (G.turn < 0 || roundDone(G)) return nextStreet(G);
+  }
+  function roundDone(G) {
+    const act = G.seats.map((p, i) => i).filter(i => canAct(G, i));
+    if (act.length === 0) return true;
+    if (act.length === 1 && G.seats[act[0]].bet >= G.curBet) return true;
+    return act.every(i => G.seats[i].acted && G.seats[i].bet === G.curBet);
+  }
+  function nextStreet(G) {
+    G.seats.forEach(p => { if (p) { p.bet = 0; p.acted = false; if (p.inHand && !p.folded && !p.allin) p.last = null; } });
+    G.curBet = 0; G.minRaise = TABLES[G.table].bb;
+    const deal = n => { for (let k = 0; k < n; k++) G.board.push(G.deck.pop()); };
+    if (G.street === 'pre') { deal(3); G.street = 'flop'; }
+    else if (G.street === 'flop') { deal(1); G.street = 'turn'; }
+    else if (G.street === 'turn') { deal(1); G.street = 'river'; }
+    else return showdown(G);
+    G.log.push({ k: 'street', st: G.street });
+    // 只剩一個人（或沒人）能下注：直接把公牌發完攤牌
+    const act = G.seats.map((p, i) => i).filter(i => canAct(G, i));
+    if (act.length <= 1) return nextStreet(G);
+    G.turn = nextFrom(G, G.button, i => canAct(G, i));
+  }
+  function act(G, si, a) {
+    if (!['pre', 'flop', 'turn', 'river'].includes(G.street)) throw new Error('這局還沒開始');
+    if (G.turn !== si) throw new Error('還沒輪到你');
+    const p = G.seats[si], toCall = G.curBet - p.bet;
+    if (a.a === 'fold') { p.folded = true; p.last = '棄牌'; }
+    else if (a.a === 'check') { if (toCall > 0) throw new Error('要跟注或棄牌'); p.last = '過牌'; }
+    else if (a.a === 'call') { if (toCall <= 0) { p.last = '過牌'; } else { pay(G, si, toCall); p.last = p.allin ? '全下' : '跟注'; } }
+    else if (a.a === 'raise') {
+      const to = Math.floor(+a.to || 0), maxTo = p.bet + p.stack;
+      if (to > maxTo) throw new Error('籌碼不夠');
+      if (to < G.curBet + G.minRaise && to < maxTo) throw new Error(`最少要加到 ${(G.curBet + G.minRaise).toLocaleString()}`);
+      if (to <= G.curBet) throw new Error('要比目前的注大');
+      const prev = G.curBet, raise = to - G.curBet;
+      pay(G, si, to - p.bet);
+      if (raise >= G.minRaise) G.minRaise = raise;
+      G.curBet = to;
+      G.seats.forEach((q, i) => { if (i !== si && canAct(G, i)) q.acted = false; });
+      p.last = p.allin ? '全下' : prev === 0 ? '下注' : '加注';
+    } else throw new Error('不支援的動作');
+    p.acted = true;
+    G.log.push({ k: 'act', s: si, a: p.last, amt: p.bet });
+    const alive = G.seats.map((q, i) => i).filter(i => live(G, i));
+    if (alive.length === 1) return finish(G, [{ s: alive[0] }], false);
+    if (roundDone(G)) return nextStreet(G);
+    G.turn = nextFrom(G, si, i => canAct(G, i));
+  }
+  // 抽成：看過翻牌才抽，底池 5%，最多 3 個大盲
+  function rakeOf(G, total) { return G.board.length >= 3 ? Math.min(Math.floor(total * RAKE), TABLES[G.table].bb * RAKE_CAP_BB) : 0; }
+  function showdown(G) {
+    while (G.board.length < 5) G.board.push(G.deck.pop());
+    const alive = G.seats.map((p, i) => i).filter(i => live(G, i));
+    const ev = {}; alive.forEach(i => { ev[i] = best(G.seats[i].hole.concat(G.board)); G.seats[i].shown = true; });
+    finish(G, alive.map(i => ({ s: i, ev: ev[i] })), true);
+  }
+  function finish(G, cands, show) {
+    const puts = G.seats.map(p => (p && p.inHand ? p.put : 0)), total = puts.reduce((a, b) => a + b, 0);
+    const rake = rakeOf(G, total);
+    const win = Array(SEATS).fill(0);
+    if (!show) win[cands[0].s] = total - rake;
+    else {
+      // 邊池：照每個人投入的多少分層
+      const levels = [...new Set(puts.filter(x => x > 0))].sort((a, b) => a - b);
+      let prev = 0, rakeLeft = rake;
+      for (const L of levels) {
+        let pot = puts.reduce((a, x) => a + Math.max(0, Math.min(x, L) - prev), 0);
+        const take = Math.min(rakeLeft, pot); pot -= take; rakeLeft -= take;
+        const el = cands.filter(c => puts[c.s] >= L);
+        if (el.length) {
+          let top = null; el.forEach(c => { if (!top || cmp(c.ev.score, top) > 0) top = c.ev.score; });
+          const ws = el.filter(c => cmp(c.ev.score, top) === 0).map(c => c.s).sort((a, b) => ((a - G.button + SEATS) % SEATS) - ((b - G.button + SEATS) % SEATS));
+          const each = Math.floor(pot / ws.length); ws.forEach(s => win[s] += each); win[ws[0]] += pot - each * ws.length;
+        } else { const back = G.seats.findIndex((p, i) => puts[i] >= L); if (back >= 0) win[back] += pot; }   // 沒人能拿就退回
+        prev = L;
+      }
+    }
+    G.seats.forEach((p, i) => { if (p) { p.stack += win[i]; p.bet = 0; } });
+    G.result = { show, rake, total, win, hands: show ? Object.fromEntries(cands.map(c => [c.s, { name: c.ev.name, cards: c.ev.cards }])) : {} };
+    G.street = 'show'; G.turn = -1; G.log.push({ k: 'win' });
+  }
+  function options(G, si) {
+    if (G.turn !== si || !['pre', 'flop', 'turn', 'river'].includes(G.street)) return null;
+    const p = G.seats[si], toCall = Math.max(0, G.curBet - p.bet), maxTo = p.bet + p.stack;
+    return { toCall: Math.min(toCall, p.stack), canCheck: toCall === 0, minTo: Math.min(G.curBet + G.minRaise, maxTo), maxTo, canRaise: maxTo > G.curBet,
+      pot: G.seats.reduce((a, q) => a + (q && q.inHand ? q.put || 0 : 0), 0) };
+  }
+
+  // ---------- 電腦：看自己的牌和公牌決定 ----------
+  function preScore(h) {
+    const [a, b] = h.map(v).sort((x, y) => y - x), suited = su(h[0]) === su(h[1]);
+    let s = a + b * 0.6;
+    if (a === b) s += 10 + a; if (suited) s += 2; if (a - b === 1) s += 1.5; else if (a - b === 2) s += 0.8;
+    return s;   // 大約 1～32
+  }
+  function botDecide(G, si) {
+    const o = options(G, si); if (!o) return null;
+    const p = G.seats[si], T = TABLES[G.table], r = Math.random();
+    let str;
+    if (G.street === 'pre') str = preScore(p.hole) / 30;
+    else {
+      const e = best(p.hole.concat(G.board)), cat = e.score[0];
+      str = [0.15, 0.45, 0.7, 0.8, 0.88, 0.9, 0.95, 0.99, 1][cat];
+      if (cat === 1 && e.score[1] >= 10) str += 0.12;   // 大對子
+      // 聽牌：同花差一張、順子差一張
+      const all = p.hole.concat(G.board), sc = [0, 0, 0, 0]; all.forEach(c => sc[su(c)]++);
+      if (G.street !== 'river' && cat < 4 && Math.max(...sc) === 4) str = Math.max(str, 0.5);
+    }
+    str += (r - 0.5) * 0.15;
+    const potOdds = o.toCall / Math.max(1, o.pot + o.toCall);
+    if (o.toCall === 0) {
+      if (str > 0.72 && o.canRaise && r < 0.7) return { a: 'raise', to: Math.min(o.maxTo, Math.max(o.minTo, G.curBet + Math.floor(o.pot * (0.5 + r * 0.5) / T.bb) * T.bb)) };
+      return { a: 'check' };
+    }
+    if (str > 0.85 && o.canRaise && r < 0.6) return { a: 'raise', to: Math.min(o.maxTo, Math.max(o.minTo, G.curBet * 2 + Math.floor(o.pot * 0.5 / T.bb) * T.bb)) };
+    if (str > potOdds + 0.25 || (o.toCall <= T.bb && str > 0.35)) return { a: 'call' };
+    return { a: 'fold' };
+  }
+  function autoAct(G, si, smart) {
+    if (G.turn !== si) return false;
+    if (smart) { act(G, si, botDecide(G, si)); return true; }
+    const o = options(G, si); act(G, si, { a: o && o.canCheck ? 'check' : 'fold' }); return true;   // 超時：能過牌就過，不然棄牌
+  }
+  function waitingOn(G) { return G.turn >= 0 && ['pre', 'flop', 'turn', 'river'].includes(G.street) ? [G.turn] : []; }
+  return { TABLES, SEATS, HAND, v, su, eval5, best, cmp, newTable, canStart, startHand, act, options, botDecide, autoAct, waitingOn };
+})();
+if (typeof module !== 'undefined') module.exports = HOLD;
+/* ---------- 德州撲克（6 人桌，無限注；共用麻將的牌桌外框、連線流程） ---------- */
+let thRaiseOpen = false, thRaiseTo = 0, thAnim = {};
+const TH_ICON = {n:'🌱',m:'🌻',h:'🏆',r:'💰'};
+
+function openThLobby(){
+  const gold = S.me.gold;
+  modal('♠️ 德州撲克', `<div class="rhint">6 人桌無限注德州撲克。坐下時把金幣換成籌碼帶上桌，離桌時剩下的籌碼自動換回金幣。人不夠時電腦補到 4 人，有真人加入電腦會讓位</div>
+    <div id="thBack"></div>
+    ${Object.entries(HOLD.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${TH_ICON[k]}</div><div class="tx"><b>${t.name}</b>
+      <div>盲注 ${t.sb.toLocaleString()} / ${t.bb.toLocaleString()}</div><div>帶入 ${t.buyMin.toLocaleString()}～${t.buyMax.toLocaleString()}・要 ${t.min.toLocaleString()} 金幣才能坐</div></div>
+      <div class="mjtbb"><button class="mini" data-thq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-thc="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
+    <div class="mjjoin"><input id="thCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="thJoin">加入朋友的房間</button></div>
+    <button class="link" id="thRules">📖 怎麼玩？</button>`, [['回寵物娛樂廳','sub',openHall]]);
+  document.querySelectorAll('#md [data-thq]').forEach(b=>b.onclick=()=>thBuyinAsk(b.dataset.thq, 'quick'));
+  document.querySelectorAll('#md [data-thc]').forEach(b=>b.onclick=()=>thBuyinAsk(b.dataset.thc, 'create'));
+  $('thJoin').onclick = async()=>{ const c = ($('thCode').value||'').trim(); if(!/^\d{4}$/.test(c)) return toast('房號是 4 位數字');
+    // 先問房間是哪一桌，才知道帶入範圍：用新手桌範圍以外的話伺服器會擋
+    thBuyinAsk(null, 'join', c); };
+  $('thRules').onclick = thRules;
+  mjCall('state').then(r=>{ if(r.view && r.view.status && $('thBack')) { $('thBack').innerHTML = `<button class="btn o" id="thBackB" style="width:100%;margin:6px 0">♠️ 你還有一桌在玩，回到牌桌</button>`; $('thBackB').onclick = ()=>{ closeModal(); mjOnlineEnter(r.view); }; } }).catch(()=>{});
+}
+// 帶入籌碼：選要帶多少上桌
+function thBuyinAsk(lvl, a, code){
+  const lv = lvl || 'n', T = HOLD.TABLES[lv], gold = S.me.gold;
+  const ranges = lvl ? `${T.buyMin.toLocaleString()}～${T.buyMax.toLocaleString()}` : '照朋友房間的桌別';
+  const max = lvl ? Math.min(T.buyMax, gold) : 0, def = lvl ? Math.min(max, T.bb*100) : 0;
+  modal('💰 帶多少籌碼上桌？', lvl ? `<div class="rhint">${T.name}・盲注 ${T.sb}/${T.bb}・可以帶 ${ranges}</div>
+    <div style="text-align:center;font-size:28px;font-weight:900;margin:8px 0" id="thBv">${def.toLocaleString()}</div>
+    <input type="range" id="thBr" min="${T.buyMin}" max="${max}" step="${T.bb}" value="${def}" style="width:100%">
+    <div class="row" style="justify-content:space-between;font-size:12px;color:var(--ink2)"><span>${T.buyMin.toLocaleString()}</span><span>你有 ${gold.toLocaleString()} 金</span><span>${max.toLocaleString()}</span></div>
+    <div class="rhint" style="margin-top:8px">離桌時剩下的籌碼會自動換回金幣</div>`
+    : `<div class="rhint">朋友房間的帶入範圍要看是哪一桌。輸入要帶的籌碼（例如新手桌 400～2,000）</div><input id="thBn" type="number" inputmode="numeric" value="2000" style="width:100%;font-size:20px;padding:8px;border-radius:10px;border:2px solid #E6D9C3">`,
+    [['取消','sub',openThLobby],['坐下','',async()=>{
+      const amt = lvl ? +$('thBr').value : +$('thBn').value;
+      try{ const r = await mjCall(a, Object.assign({ game:'th', buyin: amt }, lvl ? { lvl } : { code })); if(!r.view) throw new Error('進不去，等等再試');
+        S.me.gold = Math.max(0, S.me.gold - amt); try{ refresh(); }catch(e){} closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); } }]]);
+  if($('thBr')) $('thBr').oninput = ()=>{ $('thBv').textContent = (+$('thBr').value).toLocaleString(); };
+}
+function thRules(){
+  const body = `<div class="help">
+    <p><b>目標：</b>用自己 2 張手牌加上桌上 5 張公牌，組出最好的 5 張牌，或讓其他人都棄牌。</p>
+    <p><b>流程：</b>發 2 張手牌 → 下注 → 翻 3 張公牌 → 下注 → 第 4 張 → 下注 → 第 5 張 → 下注 → 攤牌比大小。</p>
+    <p><b>動作：</b>棄牌（不玩了）、過牌（不加錢，前面沒人下注才可以）、跟注（跟上目前的注）、加注（下更多）、全下（籌碼全押）。每次輪到你有 15 秒。</p>
+    <p><b>牌型由大到小：</b>同花順 &gt; 鐵支 &gt; 葫蘆 &gt; 同花 &gt; 順子 &gt; 三條 &gt; 兩對 &gt; 一對 &gt; 高牌。</p>
+    <p><b>籌碼：</b>坐下時從金幣換成籌碼（20～100 個大盲），離桌時換回金幣。輸光可以補籌碼。</p>
+    <p><b>場地費：</b>有翻牌的局，從底池抽 5%，最多 3 個大盲；沒翻牌就結束的局不抽。</p></div>`;
+  if(mjOn()) return mjPanel('📖 德州撲克怎麼玩', body, [['知道了','',mjPanelClose]]);
+  modal('📖 德州撲克怎麼玩', body, [['知道了','',openThLobby]]);
+}
+
+function thRender(V){
+  const T = HOLD.TABLES[V.lvl] || HOLD.TABLES.n, felt = $('mjFelt'); if(!felt) return;
+  const me = V.me, my = me >= 0 ? V.seats[me] : null, live = ['pre','flop','turn','river'].includes(V.street);
+  const pos = i => me >= 0 ? (i - me + 6) % 6 : i;   // 我永遠在正下方
+  const res = V.result, wonBy = res ? res.win : [];
+  const seat = (p, i) => { if(!p) return `<div class="ths ths-${pos(i)} empty"><i>空位</i></div>`;
+    const turn = live && V.turn === i, won = res && wonBy[i] > 0, hn = res && res.hands && res.hands[i];
+    const cards = (p.hole||[]).length ? `<div class="thh${p.folded?' fold':''}">${p.hole.map(c=>b2Card(c, i===me ? 'thm' : 'tho')).join('')}</div>` : '';
+    return `<div class="ths ths-${pos(i)}${turn?' turn':''}${won?' won':''}${p.folded?' folded':''}${p.sitOut?' out':''}">
+      ${i===me ? '' : cards}
+      <div class="thav"><img src="${avSrc(p.av)}" alt="">${V.button===i?'<span class="thd">D</span>':''}${p.auto&&!p.bot?'<span class="thauto">託</span>':''}</div>
+      <div class="thnm">${esc(p.name)}</div><div class="thst">${p.stack.toLocaleString()}${p.rebuy?`<small>＋${p.rebuy.toLocaleString()}</small>`:''}</div>
+      ${won ? `<div class="thwin">+${wonBy[i].toLocaleString()}${hn?`<small>${hn.name}</small>`:''}</div>` : p.last ? `<div class="thla">${esc(p.last)}</div>` : p.sitOut ? `<div class="thla">${p.stack<=0?'等補籌碼':'下局加入'}</div>` : ''}
+      ${p.bet ? `<div class="thbet thbet-${pos(i)}"><i></i>${p.bet.toLocaleString()}</div>` : ''}</div>`; };
+  const board = [0,1,2,3,4].map(k=> V.board && V.board[k]!=null ? b2Card(V.board[k], 'thb' + (thAnim['b'+k] !== V.handNo+':'+V.board[k] ? ' new' : '')) : `<i class="b2c thb ghost"></i>`).join('');
+  (V.board||[]).forEach((c,k)=>thAnim['b'+k] = V.handNo+':'+c);
+  const potTxt = V.pot ? `<div class="thpot">底池 <b>${V.pot.toLocaleString()}</b></div>` : '';
+  const info = V.queued ? '<div class="thinfo">座位滿了，等電腦讓位…</div>' : !live && !res ? '<div class="thinfo">等下一局開始…</div>' : '';
+  $('mj').style.setProperty('--b2pet', `url("${typeof chrSrc==='function' ? chrSrc('fox1') : ''}")`);
+  felt.innerHTML = `<div class="thtab"></div><div class="thmid"><div class="thboard">${board}</div>${potTxt}${res && res.rake ? `<div class="thrake">場地費 ${res.rake.toLocaleString()}</div>` : ''}${info}</div>
+    ${V.seats.map(seat).join('')}`;
+
+  // 我的手牌＋動作按鈕
+  const o = V.opts, myTurn = !!o && my && !my.auto;
+  if(!myTurn) thRaiseOpen = false;
+  if(myTurn && (!thRaiseTo || thRaiseTo < o.minTo || thRaiseTo > o.maxTo)) thRaiseTo = o.minTo;
+  const preset = f => Math.max(o.minTo, Math.min(o.maxTo, Math.round((V.curBet + f * (o.pot + o.toCall)) / T.bb) * T.bb));
+  const acts = myTurn ? (thRaiseOpen
+    ? `<div class="thraise"><div class="thrp">${[['最小',o.minTo],['½池',preset(0.5)],['1 池',preset(1)],['全下',o.maxTo]].map(([t,x])=>`<button data-thp="${x}">${t}</button>`).join('')}</div>
+        <div class="thrr"><button data-thd="-1">－</button><input type="range" id="thRg" min="${o.minTo}" max="${o.maxTo}" step="${T.bb}" value="${thRaiseTo}"><button data-thd="1">＋</button></div>
+        <div class="thrb"><button class="thb2 x" id="thRx">取消</button><button class="thb2 r" id="thRo">${thRaiseTo>=o.maxTo?'全下':'加注到'} ${thRaiseTo.toLocaleString()}</button></div></div>`
+    : `<div class="thacts"><button class="thb2 f" data-tha="fold">棄牌</button>${o.canCheck ? `<button class="thb2 c" data-tha="check">過牌</button>` : `<button class="thb2 c" data-tha="call">${o.toCall >= my.stack ? '全下' : '跟注'}<small>${o.toCall.toLocaleString()}</small></button>`}${o.canRaise && o.maxTo > V.curBet + (o.canCheck?0:0) && my.stack > o.toCall ? `<button class="thb2 r" data-tha="raise">${o.canCheck && !V.curBet ? '下注' : '加注'}</button>` : ''}</div>`) : '';
+  const myCards = my && (my.hole||[]).length ? `<div class="thmy${my.folded?' fold':''}">${my.hole.map(c=>b2Card(c,'thm')).join('')}${res && res.hands && res.hands[me] ? `<span class="thmyh">${res.hands[me].name}</span>` : ''}</div>` : '';
+  const canRebuy = my && !my.leaving && my.stack + (my.rebuy||0) < T.buyMax - T.bb && (!live || !my.inHand || my.folded || my.stack<=0);
+  $('mjUi').innerHTML = `${myCards}${acts}${my && my.auto ? `<button class="mjauto" id="thAuto" style="pointer-events:auto">🤖 託管中・點這裡自己打</button>` : ''}`;
+  $('mjBar').innerHTML = `<div class="mjbt">盲注 ${T.sb}/${T.bb}</div>
+    <div class="mjbme"><img src="${avSrc(S.me.avatar||11)}" alt=""><b>${esc(S.me.nickname||'')}</b><span class="mjbg">${(S.me.gold||0).toLocaleString()}</span></div>
+    ${canRebuy ? `<button class="threbuy" id="thRebuy">＋ 補籌碼</button>` : ''}
+    <div class="mjbt r">${T.name}${V.code?`・房號 ${esc(V.code)}`:''}・第 ${V.handNo} 局</div>`;
+  $('mjEnd').innerHTML = '';
+
+  document.querySelectorAll('#mj [data-tha]').forEach(b=>b.onclick=()=>{ const k = b.dataset.tha;
+    if(k==='raise'){ thRaiseOpen = true; thRaiseTo = Math.max(o.minTo, preset(0.5)); mjSfx('pick'); return thRender(mjCurView()); }
+    thDo({ a: k }); });
+  document.querySelectorAll('#mj [data-thp]').forEach(b=>b.onclick=()=>{ thRaiseTo = +b.dataset.thp; mjSfx('pick'); thRender(mjCurView()); });
+  document.querySelectorAll('#mj [data-thd]').forEach(b=>b.onclick=()=>{ thRaiseTo = Math.max(o.minTo, Math.min(o.maxTo, thRaiseTo + (+b.dataset.thd) * T.bb)); thRender(mjCurView()); });
+  if($('thRg')) $('thRg').oninput = ()=>{ thRaiseTo = +$('thRg').value; const b = $('thRo'); if(b) b.textContent = `${thRaiseTo>=o.maxTo?'全下':'加注到'} ${thRaiseTo.toLocaleString()}`; };
+  if($('thRx')) $('thRx').onclick = ()=>{ thRaiseOpen = false; thRender(mjCurView()); };
+  if($('thRo')) $('thRo').onclick = ()=>thDo({ a:'raise', to: thRaiseTo });
+  if($('thAuto')) $('thAuto').onclick = ()=>mjOnline('auto', { on:false });
+  if($('thRebuy')) $('thRebuy').onclick = thRebuyAsk;
+
+  // 輪到我：提醒；有人動作：音效
+  const turnKey = myTurn ? V.handNo + ':' + V.logN : '';
+  if(turnKey && turnKey !== mjAnimKey.turn) setTimeout(()=>{ const VV = mjCurView(); if(VV && VV.opts) mjTurnAlert(); }, 60);
+  mjAnimKey.turn = turnKey;
+  const L = V.log || [], N = V.logN || 0;
+  if(!mjLastLog || mjLastLog.h !== V.handNo || N < mjLastLog.n) mjLastLog = { h: V.handNo, n: Math.max(0, N - 1) };
+  const fresh = L.slice(Math.max(0, L.length - (N - mjLastLog.n))); mjLastLog.n = N;
+  for(const e of fresh){
+    if(e.k==='act'){ if(MJO && MJO.skipSig === 'th:' + e.s + ':' + e.a) MJO.skipSig = null; else mjSfx(e.a==='棄牌' || e.a==='過牌' ? 'pick' : 'tile'); }
+    else if(e.k==='street') mjSfx('tile');
+    else if(e.k==='win' && res && res.win && res.win[me] > 0){ mjSfx('win'); }
+  }
+}
+function thDo(a){
+  const V = mjCurView(); if(!V || !V.opts || !MJO || MJO.busy) return;
+  // 先在畫面上收起按鈕，伺服器確認在背景做
+  const p = V.seats[V.me]; p.last = { fold:'棄牌', check:'過牌', call:'跟注', raise:'加注' }[a.a]; if(a.a==='fold') p.folded = true;
+  MJO.skipSig = 'th:' + V.me + ':' + p.last; V.opts = null; thRaiseOpen = false; mjSfx(a.a==='fold'||a.a==='check' ? 'pick' : 'tile');
+  thRender(V);
+  mjOnline('act', { act: a });
+}
+function thRebuyAsk(){
+  const V = mjCurView(), T = HOLD.TABLES[V.lvl] || HOLD.TABLES.n, my = V.seats[V.me];
+  const room = T.buyMax - my.stack - (my.rebuy||0), max = Math.min(room, S.me.gold||0);
+  if(max < T.bb) return mjToast(room < T.bb ? '籌碼已經是上限了' : '金幣不夠');
+  mjPanel('＋ 補籌碼', `<div class="help"><p>最多可以補到 ${T.buyMax.toLocaleString()}（現在 ${my.stack.toLocaleString()}）。這局還在打的話，下一局開始前才會加上去。</p></div>
+    <div style="text-align:center;font-size:24px;font-weight:900" id="thRbv">${max.toLocaleString()}</div><input type="range" id="thRbr" min="${T.bb}" max="${max}" step="${T.bb}" value="${max}" style="width:100%">`,
+    [['取消','sub',mjPanelClose],['補籌碼','',async()=>{ const amt = +$('thRbr').value; mjPanelClose();
+      try{ const r = await mjCall('act', { act:{ a:'rebuy', amt } }); if(typeof r.gold==='number') S.me.gold = r.gold; if(MJO) mjApply(r.view, null, false, true); mjToast('籌碼補好了'); }catch(e){ mjToast(e.message); } }]]);
+  $('thRbr').oninput = ()=>{ $('thRbv').textContent = (+$('thRbr').value).toLocaleString(); };
 }
 
 /* ================= 連線設定 ================= */

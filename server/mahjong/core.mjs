@@ -2,6 +2,7 @@
 import MJ from './mj_engine.mjs';
 import B2 from './b2_engine.mjs';
 import * as BCC from './bc_core.mjs';
+import * as THC from './th_core.mjs';
 // 同一套牌桌流程給不同遊戲用：麻將（mj）、大老二（b2）
 const E = (T) => (T.game === 'b2' ? B2 : MJ);
 const turnMs = (T) => (T.game === 'b2' ? 20000 : TIME.TURN);
@@ -165,14 +166,14 @@ function _viewFor(T, uid, now) {
     ticker: G.uids.findIndex(Boolean) === j, pendingN: (G.pending || []).length };
 }
 
-// 依牌桌的遊戲分派：百家樂（bc）有自己的流程，麻將／大老二共用上面這套
-const isBC = (T) => T && T.game === 'bc';
-export function newTable(lvl, priv, host, me, now, game) { return game === 'bc' ? BCC.newTable(lvl, priv, host, me, now) : _newTable(lvl, priv, host, me, now, game); }
-export function humans(T) { return isBC(T) ? BCC.humans(T) : _humans(T); }
-export function seatOf(T, uid) { return isBC(T) ? -1 : _seatOf(T, uid); }
-export function addPlayer(T, me, now) { return isBC(T) ? BCC.addPlayer(T, me, now) : _addPlayer(T, me, now); }
-export function advance(T, now, gold) { return isBC(T) ? BCC.advance(T, now, gold) : _advance(T, now, gold); }
-export function dueAt(T) { return isBC(T) ? BCC.dueAt(T) : _dueAt(T); }
-export function playerAct(T, uid, a, now) { return isBC(T) ? BCC.playerAct(T, uid, a, now) : _playerAct(T, uid, a, now); }
-export function leave(T, uid, now) { return isBC(T) ? BCC.leave(T, uid, now) : _leave(T, uid, now); }
-export function viewFor(T, uid, now) { return isBC(T) ? BCC.viewFor(T, uid, now) : _viewFor(T, uid, now); }
+// 依牌桌的遊戲分派：百家樂（bc）、德州撲克（th）有自己的流程，麻將／大老二共用上面這套
+const X = (T) => (T && T.game === 'bc' ? BCC : T && T.game === 'th' ? THC : null);
+export function newTable(lvl, priv, host, me, now, game) { return game === 'bc' ? BCC.newTable(lvl, priv, host, me, now) : game === 'th' ? THC.newTable(lvl, priv, host, me, now) : _newTable(lvl, priv, host, me, now, game); }
+export function humans(T) { const x = X(T); return x ? x.humans(T) : _humans(T); }
+export function seatOf(T, uid) { return X(T) ? -1 : _seatOf(T, uid); }
+export function addPlayer(T, me, now) { const x = X(T); return x ? x.addPlayer(T, me, now) : _addPlayer(T, me, now); }
+export function advance(T, now, gold) { const x = X(T); return x ? x.advance(T, now, gold) : _advance(T, now, gold); }
+export function dueAt(T) { const x = X(T); return x ? x.dueAt(T) : _dueAt(T); }
+export function playerAct(T, uid, a, now) { const x = X(T); return x ? x.playerAct(T, uid, a, now) : _playerAct(T, uid, a, now); }
+export function leave(T, uid, now) { const x = X(T); return x ? x.leave(T, uid, now) : _leave(T, uid, now); }
+export function viewFor(T, uid, now) { const x = X(T); return x ? x.viewFor(T, uid, now) : _viewFor(T, uid, now); }

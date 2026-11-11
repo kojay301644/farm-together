@@ -3,7 +3,12 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import MJ from './mj_engine.mjs';
 import B2 from './b2_engine.mjs';
 import BC from './bc_engine.mjs';
-const ENG = (g: string) => (g === 'b2' ? B2 : g === 'bc' ? BC : MJ);
+import TH from './th_engine.mjs';
+const ENG = (g: string) => (g === 'b2' ? B2 : g === 'bc' ? BC : g === 'th' ? TH : MJ);
+// 德州撲克：帶入籌碼先扣金幣、離桌換回金幣
+async function thBuyin(uid: string, amt: number) { const { error } = await sb.rpc('th_buyin', { p_uid: uid, p_amt: amt }); if (error) throw new Fail(error.message.includes('gold') ? '金幣不夠' : '金幣不夠'); }
+async function thBank(d: Record<string, number>) { const k = Object.keys(d).filter(u => d[u] > 0); if (!k.length) return; const o: Record<string, number> = {}; k.forEach(u => o[u] = Math.floor(d[u])); await sb.rpc('th_bank', { p_delta: o }); }
+const thAmt = (lvl: string, x: any) => { const T = TH.TABLES[lvl]; const n = Math.floor(+x || T.buyMax); if (n < T.buyMin || n > T.buyMax) throw new Fail(`帶入籌碼要在 ${T.buyMin.toLocaleString()}～${T.buyMax.toLocaleString()} 之間`); return n; };
 import * as C from './core.mjs';
 
 const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
@@ -39,6 +44,8 @@ async function mutate(id: number, fn: (T: any, now: number) => Promise<any> | an
     if (!upd || !upd.length) { await new Promise(r => setTimeout(r, 40 + Math.random() * 80)); continue; }
     T.ver = before + 1;
     // 結算一定要先做完；推畫面給其他人改成回覆後在背景做，自己的回覆比較快
+    if (out.bank) await thBank(out.bank);
+    if (out.log) await sb.rpc('th_log', { p_tid: id, p_hand: out.log.hand, p_pay: out.log.delta, p_house: Math.round(out.log.house || 0) });
     if (out.settle) await sb.rpc('mj_settle2', { p_tid: id, p_hand: out.settle.hand, p_delta: out.settle.delta, p_game: T.game || 'mj', p_house: Math.round(out.settle.house || 0) });
     const push = pushViews(T, now, out.kicked || []);
     try { (globalThis as any).EdgeRuntime?.waitUntil ? (globalThis as any).EdgeRuntime.waitUntil(push) : await push; } catch { await push; }
@@ -83,25 +90,35 @@ async function handle(uid: string, b: any, test = false) {
       if (!L || !L.length) throw new Fail('找不到這個房號');
       const TB = ENG(L[0].game).TABLES[L[0].lvl];
       if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
+      if (L[0].game === 'th') {
+        const amt = thAmt(L[0].lvl, b.buyin); await thBuyin(uid, amt);
+        try { const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av, buyin: amt }, now)); return { view: viewOf(T, uid) }; }
+        catch (e) { await thBank({ [uid]: amt }); throw e; }
+      }
       const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now));
       return { view: viewOf(T, uid) };
     }
-    const game = ['b2', 'bc'].includes(b.game) ? b.game : 'mj', lvl = b.lvl;
+    const game = ['b2', 'bc', 'th'].includes(b.game) ? b.game : 'mj', lvl = b.lvl;
     if (game === 'bc' && a === 'create') throw new Fail('百家樂不能開房，請直接進入牌桌'); const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
     if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
     if (a === 'quick') {
-      const { data: L } = await sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', game === 'bc' ? BC.MAXP : 4).gt('nh', 0)
+      const { data: L } = await sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', game === 'bc' ? BC.MAXP : game === 'th' ? TH.SEATS : 4).gt('nh', 0)
         .gt('updated_at', new Date(Date.now() - 120e3).toISOString()).order('status', { ascending: false }).order('nh', { ascending: false }).limit(5);
+      const amt0 = game === 'th' ? thAmt(lvl, b.buyin) : 0;
+      if (game === 'th') await thBuyin(uid, amt0);
       for (const t of (L || [])) {
-        try { const { T } = await mutate(t.id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now)); return { view: viewOf(T, uid) }; } catch (e) { if (!(e instanceof Fail) && !(e instanceof Error)) throw e; }
+        try { const { T } = await mutate(t.id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av, buyin: amt0 }, now)); return { view: viewOf(T, uid) }; } catch (e) { if (!(e instanceof Fail) && !(e instanceof Error)) throw e; }
       }
+      if (game === 'th') await thBank({ [uid]: amt0 });   // 沒找到桌：先退回，下面開新桌再扣
     }
     const now = NOW(), priv = a === 'create';
     let code = null;
     if (priv) for (let k = 0; k < 20; k++) { const c = String(1000 + Math.floor(Math.random() * 9000)); const { data: ex } = await sb.from('mj_tables').select('id').eq('code', c).in('status', ['wait', 'play']).limit(1); if (!ex || !ex.length) { code = c; break; } }
-    const T = C.newTable(lvl, priv, uid, { uid, name: p.name, av: p.av }, now, game);
+    const buyin = game === 'th' ? thAmt(lvl, b.buyin) : 0;
+    if (game === 'th') await thBuyin(uid, buyin);
+    const T = C.newTable(lvl, priv, uid, { uid, name: p.name, av: p.av, buyin }, now, game);
     const { data: ins, error } = await sb.from('mj_tables').insert({ game, lvl, priv, code, host: uid, status: T.status, state: T.state, nh: 1 }).select('*').single();
-    if (error) throw new Fail('開桌失敗');
+    if (error) { if (game === 'th') await thBank({ [uid]: buyin }); throw new Fail('開桌失敗'); }
     await pushViews(ins, now, []);
     return { view: viewOf(ins, uid) };
   }
@@ -112,6 +129,16 @@ async function handle(uid: string, b: any, test = false) {
     return { view: null, gold: (await golds([uid]))[uid] };
   }
   if (a === 'start') { const { T } = await mutate(tid, (T: any, now: number) => { if (T.status !== 'wait' || T.host !== uid) throw new Fail('只有房主可以開始'); T.state.wait.startAt = now; }); return { view: viewOf(T, uid) }; }
+  if (a === 'act' && b.act && b.act.a === 'rebuy') {   // 德州撲克補籌碼
+    const T0 = await load(tid); if (!T0 || T0.game !== 'th') throw new Fail('不支援的動作');
+    const TB = TH.TABLES[T0.lvl], me0 = (T0.state.seats || []).find((x: any) => x && x.uid === uid);
+    if (!me0) throw new Fail('你不在座位上');
+    const room = TB.buyMax - me0.stack - (me0.rebuy || 0), amt = Math.min(room, Math.floor(+b.act.amt || 0));
+    if (amt < TB.bb) throw new Fail('籌碼已經是上限了');
+    await thBuyin(uid, amt);
+    try { const { T } = await mutate(tid, (T: any, now: number) => C.playerAct(T, uid, { a: 'rebuy', amt }, now)); return { view: viewOf(T, uid), gold: (await golds([uid]))[uid] }; }
+    catch (e) { await thBank({ [uid]: amt }); throw e; }
+  }
   if (a === 'act' || a === 'ready' || a === 'auto') {
     const act = a === 'act' ? b.act : a === 'ready' ? { a: 'ready' } : { a: 'auto', on: !!b.on };
     const { T } = await mutate(tid, (T: any, now: number) => { try { C.playerAct(T, uid, act, now); } catch (e) { throw new Fail((e as Error).message); } });
