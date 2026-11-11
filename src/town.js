@@ -26,8 +26,12 @@ const INK='#4B3423';
 let HOME_LBL=null, homeLblCur='', BIN_LBL=null, binLblCur='';
 const binItems = () => (mode==='visit' && typeof V!=='undefined' && V) ? ((V.bin||{}).items||{}) : ((typeof S!=='undefined' && S && S.me && S.me.bin)||{});
 const binCount = b => ['c','g'].reduce((a,t)=>a+Object.values((b||{})[t]||{}).reduce((x,y)=>x+(+y||0),0),0);
-const binLblText = () => { const n=binCount(binItems()); return n ? `🧺 收集倉 ${n}` : '🧺 收集倉'; };
-function setBinLabel(){ const el=$('binLbl'), t=binLblText(); if(!el||!BIN_LBL||t===binLblCur) return; binLblCur=t; el.innerHTML=labelPill(BIN_LBL[0], BIN_LBL[1], t, {bg:'#FFF1DC'}); }
+/* 拜訪別人時，收集倉有東西可以偷 → 顯示會跳動的「可以偷」大標籤 */
+const binStealable = () => { if(!(mode==='visit' && typeof V!=='undefined' && V)) return 0; const vb=V.bin||{}, n=binCount(vb.items);
+  return (n>0 && !vb.mine && (vb.left==null || vb.left>0) && !V.protected) ? n : 0; };
+const binLblText = () => { const k=binStealable(); if(k) return `✋ 收集倉可以偷！`; const n=binCount(binItems()); return n ? `🧺 收集倉 ${n}` : '🧺 收集倉'; };
+function setBinLabel(){ const el=$('binLbl'), t=binLblText(); if(!el||!BIN_LBL||t===binLblCur) return; binLblCur=t;
+  el.innerHTML = binStealable() ? labelPill(BIN_LBL[0], BIN_LBL[1]-6, t, {big:1}) : labelPill(BIN_LBL[0], BIN_LBL[1], t, {bg:'#FFF1DC'}); }
 const homeLblName = () => (mode==='visit' && typeof V!=='undefined' && V) ? V.owner.nickname : (typeof S!=='undefined' && S && S.me ? S.me.nickname : '我的家');
 function setHomeLabel(){ const el=$('homeLbl'), n=homeLblName(); if(!el||!HOME_LBL||n===homeLblCur) return; homeLblCur=n; el.innerHTML=labelPill(HOME_LBL[0], HOME_LBL[1], '🏠 '+esc(n)+'的家', {big:1}); }
 function labelPill(x,y,text,opt={}){

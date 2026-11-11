@@ -536,21 +536,21 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794370011" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794370330" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794370011" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794370011" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794370330" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794370330" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794370011" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794370330" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794370011" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794370011" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794370330" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794370330" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -566,11 +566,11 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794370011" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794370330" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794370011";
+const BUILD="1794370330";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -758,8 +758,12 @@ const INK='#4B3423';
 let HOME_LBL=null, homeLblCur='', BIN_LBL=null, binLblCur='';
 const binItems = () => (mode==='visit' && typeof V!=='undefined' && V) ? ((V.bin||{}).items||{}) : ((typeof S!=='undefined' && S && S.me && S.me.bin)||{});
 const binCount = b => ['c','g'].reduce((a,t)=>a+Object.values((b||{})[t]||{}).reduce((x,y)=>x+(+y||0),0),0);
-const binLblText = () => { const n=binCount(binItems()); return n ? `🧺 收集倉 ${n}` : '🧺 收集倉'; };
-function setBinLabel(){ const el=$('binLbl'), t=binLblText(); if(!el||!BIN_LBL||t===binLblCur) return; binLblCur=t; el.innerHTML=labelPill(BIN_LBL[0], BIN_LBL[1], t, {bg:'#FFF1DC'}); }
+/* 拜訪別人時，收集倉有東西可以偷 → 顯示會跳動的「可以偷」大標籤 */
+const binStealable = () => { if(!(mode==='visit' && typeof V!=='undefined' && V)) return 0; const vb=V.bin||{}, n=binCount(vb.items);
+  return (n>0 && !vb.mine && (vb.left==null || vb.left>0) && !V.protected) ? n : 0; };
+const binLblText = () => { const k=binStealable(); if(k) return `✋ 收集倉可以偷！`; const n=binCount(binItems()); return n ? `🧺 收集倉 ${n}` : '🧺 收集倉'; };
+function setBinLabel(){ const el=$('binLbl'), t=binLblText(); if(!el||!BIN_LBL||t===binLblCur) return; binLblCur=t;
+  el.innerHTML = binStealable() ? labelPill(BIN_LBL[0], BIN_LBL[1]-6, t, {big:1}) : labelPill(BIN_LBL[0], BIN_LBL[1], t, {bg:'#FFF1DC'}); }
 const homeLblName = () => (mode==='visit' && typeof V!=='undefined' && V) ? V.owner.nickname : (typeof S!=='undefined' && S && S.me ? S.me.nickname : '我的家');
 function setHomeLabel(){ const el=$('homeLbl'), n=homeLblName(); if(!el||!HOME_LBL||n===homeLblCur) return; homeLblCur=n; el.innerHTML=labelPill(HOME_LBL[0], HOME_LBL[1], '🏠 '+esc(n)+'的家', {big:1}); }
 function labelPill(x,y,text,opt={}){
