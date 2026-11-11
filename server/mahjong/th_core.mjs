@@ -8,11 +8,23 @@ const BOT_TOTAL = 4;   // 人不夠時，電腦補到 4 人
 
 const inHand = (G) => ['pre', 'flop', 'turn', 'river'].includes(G.street);
 const humansIn = (G) => G.seats.filter(p => p && p.uid).length;
+// 農場電腦（core.mjs 放進來）：金幣有帶入下限的 2 倍才上桌，帶入一半金幣（最多上限），離桌時剩下的換回他的金幣
+let POOL = [];
+export function setBots(list) { POOL = list || []; }
+const bq = (G, id, x) => { G.bq = G.bq || {}; G.bq[id] = (G.bq[id] || 0) + x; };   // 電腦金幣的進出，advance 時交給 index.ts
 function addBot(G) {
-  const used = G.seats.filter(Boolean).map(p => p.name), L = BOTS.filter(b => !used.includes(b.name)), b = L[Math.floor(Math.random() * L.length)] || BOTS[0];
+  const used = G.seats.filter(Boolean).map(p => p.name), ids = G.seats.filter(Boolean).map(p => p.bid).filter(Boolean);
   const i = G.seats.findIndex(p => !p); if (i < 0) return;
   const T = TH.TABLES[G.table];
-  G.seats[i] = { uid: null, bot: true, name: b.name, av: b.av, stack: T.buyMax, sitOut: true, auto: false, miss: 0 };   // 下一局才加入
+  const F = POOL.filter(b => b.gold >= T.buyMin * 2 && !ids.includes(b.id) && !used.includes(b.name));
+  if (F.length) {
+    const b = F[Math.floor(Math.random() * F.length)], stack = Math.min(T.buyMax, Math.floor(b.gold / 2));
+    bq(G, b.id, -stack); b.gold -= stack;
+    G.seats[i] = { uid: null, bid: b.id, bot: true, name: b.name, av: b.av, stack, sitOut: true, auto: false, miss: 0 };   // 下一局才加入
+    return;
+  }
+  const L = BOTS.filter(b => !used.includes(b.name)), b = L[Math.floor(Math.random() * L.length)] || BOTS[0];
+  G.seats[i] = { uid: null, bot: true, name: b.name, av: b.av, stack: T.buyMax, sitOut: true, auto: false, miss: 0 };
 }
 // 電腦數量：真人越多，電腦越少（總共補到 4 人）；多的電腦這局結束就離開
 function balanceBots(G) {
@@ -43,7 +55,8 @@ export function addPlayer(T, me, now) {
 function cleanup(G, now, out) {
   G.seats.forEach((p, i) => {
     if (!p) return;
-    if (p.leaving) { if (p.uid) out.bank[p.uid] = (out.bank[p.uid] || 0) + p.stack + (p.rebuy || 0); G.seats[i] = null; return; }
+    if (p.bid && !p.leaving && p.stack < TH.TABLES[G.table].bb * 10) p.leaving = true;   // 農場電腦籌碼快沒了：下桌，換別人來
+    if (p.leaving) { if (p.uid) out.bank[p.uid] = (out.bank[p.uid] || 0) + p.stack + (p.rebuy || 0); if (p.bid && p.stack > 0) bq(G, p.bid, p.stack); G.seats[i] = null; return; }
     if (p.rebuy) { p.stack += p.rebuy; p.rebuy = 0; }
     p.sitOut = p.stack <= 0;   // 沒籌碼：坐著等補籌碼
     if (p.bot && p.stack < TH.TABLES[G.table].bb * 10) p.stack = TH.TABLES[G.table].buyMax;
@@ -52,7 +65,8 @@ function cleanup(G, now, out) {
   balanceBots(G);
   G.seats.forEach(p => { if (p && !p.leaving && p.stack > 0) p.sitOut = false; });
 }
-export function advance(T, now) {
+export function advance(T, now) { const o = _adv(T, now); const G = T.state; if (G && G.bq) { o.botBank = G.bq; G.bq = null; } return o; }
+function _adv(T, now) {
   const out = { settle: null, kicked: [], bank: {}, log: null };
   const G = T.state;
   // 剛才的動作已經結束這局／有人離桌：把紀錄和要換回的金幣交給 index.ts
@@ -85,7 +99,7 @@ export function advance(T, now) {
 }
 function endHand(G, now, out) {
   // 這局每個真人贏輸多少（只記錄，金幣在離桌時才換）；娛樂廳抽成
-  const d = {}; G.seats.forEach(p => { if (p && p.uid && p.startStack != null) { const x = p.stack - p.startStack; if (x) d[p.uid] = x; } });
+  const d = {}; G.seats.forEach(p => { const k = p && (p.uid || p.bid); if (k && p.startStack != null) { const x = p.stack - p.startStack; if (x) d[k] = x; } });
   out.log = { hand: G.handNo, delta: d, house: G.result ? G.result.rake : 0 };
   G.nextAt = now + TT.SHOW;
 }

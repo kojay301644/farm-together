@@ -9,7 +9,16 @@ const turnMs = (T) => (T.game === 'b2' ? 20000 : TIME.TURN);
 
 export const TIME = { TURN: 15000, CLAIM: 5000, BOT_PLAY: 900, BOT_CLAIM: 450, WAIT_START: 8000, NEXT_WAIT: 12000, DICE: 2300 };
 const BOTS = [{ name: '小兔', av: 3 }, { name: '阿熊', av: 7 }, { name: '狐狸妹', av: 15 }, { name: '企鵝哥', av: 21 }, { name: '水獺', av: 24 }, { name: '小鼠', av: 9 }, { name: '刺蝟', av: 5 }, { name: '浣熊', av: 13 }];
-const pickBot = (used) => { const L = BOTS.filter(b => !used.includes(b.name)); return L[Math.floor(Math.random() * L.length)] || BOTS[0]; };
+// 農場裡會種菜的電腦玩家（index.ts 每次推進前放進來；已排除正坐在別桌的）：[{id,name,av,gold}]
+// 金幣夠坐這桌的優先上桌，輸贏算進他們農場的金幣；都不夠（例如土豪桌）才用小動物電腦
+let POOL = [];
+export function setBots(list) { POOL = list || []; THC.setBots(POOL); }
+const pickBot = (used, min = 0, usedIds = []) => {
+  const F = POOL.filter(b => b.gold >= min && !usedIds.includes(b.id) && !used.includes(b.name));
+  if (F.length) { const b = F[Math.floor(Math.random() * F.length)]; return { id: b.id, name: b.name, av: b.av, gold: b.gold }; }
+  const L = BOTS.filter(b => !used.includes(b.name)); const b = L[Math.floor(Math.random() * L.length)] || BOTS[0];
+  return { id: null, name: b.name, av: b.av, gold: null };
+};
 const botGold = (T) => E(T).TABLES[T.lvl].min * 4 + Math.floor(Math.random() * E(T).TABLES[T.lvl].min * 2);
 
 // T: { id, lvl, priv, code, host, status:'wait'|'play'|'closed', state }
@@ -34,14 +43,14 @@ function _addPlayer(T, me, now) {
 
 function startGame(T, gold, now) {
   const P = T.state.wait.players.slice().sort(() => Math.random() - 0.5);
-  const used = P.map(p => p.name), list = [];
+  const used = P.map(p => p.name), usedIds = [], list = [], min = E(T).TABLES[T.lvl].min;
   for (let i = 0; i < 4; i++) {
     const p = P[i];
     if (p) list.push({ id: p.uid, name: p.name, av: p.av, gold: gold[p.uid] ?? 0 });
-    else { const b = pickBot(used); used.push(b.name); list.push({ id: null, name: b.name, av: b.av, bot: true, gold: botGold(T) }); }
+    else { const b = pickBot(used, min, usedIds); used.push(b.name); if (b.id) usedIds.push(b.id); list.push({ id: b.id, name: b.name, av: b.av, bot: true, gold: b.gold ?? botGold(T) }); }
   }
   const G = E(T).newGame(list, { table: T.lvl, dealer: Math.floor(Math.random() * 4) });
-  G.uids = list.map(p => p.id || null); G.miss = [0, 0, 0, 0]; G.ready = []; G.leaving = []; G.pending = [];
+  G.uids = list.map(p => (p.bot ? null : p.id || null)); G.miss = [0, 0, 0, 0]; G.ready = []; G.leaving = []; G.pending = [];
   G.tAct = G.tWait = now + TIME.DICE; G.wKey = '';
   T.state = G; T.status = 'play';
 }
@@ -49,8 +58,8 @@ function startGame(T, gold, now) {
 // 這局結束後：處理離開／排隊的人、檢查金幣、開下一局
 function nextHandServer(T, gold, now) {
   const G = T.state, min = E(T).TABLES[T.lvl].min;
-  const used = () => G.seats.map(s => s.name);
-  const toBot = (j) => { const b = pickBot(used()); G.uids[j] = null; Object.assign(G.seats[j], { id: null, name: b.name, av: b.av, bot: true, auto: false, gold: botGold(T) }); G.miss[j] = 0; };
+  const used = () => G.seats.map(s => s.name), usedIds = () => G.seats.map(s => s.id).filter(Boolean);
+  const toBot = (j) => { const b = pickBot(used(), min, usedIds()); G.uids[j] = null; Object.assign(G.seats[j], { id: b.id, name: b.name, av: b.av, bot: true, auto: false, gold: b.gold ?? botGold(T) }); G.miss[j] = 0; };
   G.kicked = [];
   const BROKE = '你輸光了……回去種田吧！';
   for (let j = 0; j < 4; j++) {
@@ -66,7 +75,13 @@ function nextHandServer(T, gold, now) {
     G.uids[j] = p.uid; Object.assign(G.seats[j], { id: p.uid, name: p.name, av: p.av, bot: false, auto: false, gold: gold[p.uid] });
   }
   if (!G.uids.some(Boolean)) { T.status = 'closed'; return; }
-  G.seats.forEach((s, j) => { if (!G.uids[j] && s.gold < min) s.gold = botGold(T); });
+  // 電腦：農場電腦用他現在農場的金幣，不夠坐這桌就換人；小動物電腦有農場電腦可以換就換上來
+  G.seats.forEach((s, j) => {
+    if (G.uids[j]) return;
+    if (s.id) { s.gold = gold[s.id] ?? s.gold; if (s.gold < min) toBot(j); }
+    else if (POOL.some(b => b.gold >= min && !usedIds().includes(b.id))) toBot(j);
+    else if (s.gold < min) s.gold = botGold(T);
+  });
   E(T).nextHand(G); G.ready = []; G.settled = false; G.broke = []; G.miss = [0, 0, 0, 0];
   G.tAct = G.tWait = now + TIME.DICE; G.wKey = '';
 }
@@ -88,7 +103,7 @@ function _advance(T, now, gold) {
     if (G.phase === 'end') {
       if (!G.settled) {
         G.settled = true; G.endAt = now;
-        const d = {}; G.uids.forEach((u, j) => { if (u && G.result.pay[j]) d[u] = (d[u] || 0) + G.result.pay[j]; });
+        const d = {}; G.uids.forEach((u, j) => { const k = u || G.seats[j].id; if (k && G.result.pay[j]) d[k] = (d[k] || 0) + G.result.pay[j]; });   // 農場電腦的輸贏也算進他的金幣
         out.settle = { hand: G.handNo, delta: d, house: (G.result && G.result.rake) || 0 };   // 娛樂廳這局抽了多少
         // 輸光（金幣變 0）：直接請他離桌
         G.broke = [];
@@ -172,6 +187,13 @@ function _viewFor(T, uid, now) {
 const X = (T) => (T && T.game === 'bc' ? BCC : T && T.game === 'th' ? THC : null);
 export function newTable(lvl, priv, host, me, now, game) { return game === 'bc' ? BCC.newTable(lvl, priv, host, me, now) : game === 'th' ? THC.newTable(lvl, priv, host, me, now) : _newTable(lvl, priv, host, me, now, game); }
 export function humans(T) { const x = X(T); return x ? x.humans(T) : _humans(T); }
+// 坐在這桌的農場電腦（要讀他們現在的金幣）
+export function botIds(T) {
+  if (T.status !== 'play' || !T.state) return [];
+  if (T.game === 'th') return (T.state.seats || []).filter(p => p && p.bid).map(p => p.bid);
+  if (T.game === 'bc') return [];
+  return (T.state.seats || []).map((s, j) => (!T.state.uids[j] && s.id ? s.id : null)).filter(Boolean);
+}
 export function seatOf(T, uid) { return X(T) ? -1 : _seatOf(T, uid); }
 export function addPlayer(T, me, now) { const x = X(T); return x ? x.addPlayer(T, me, now) : _addPlayer(T, me, now); }
 export function advance(T, now, gold) { const x = X(T); return x ? x.advance(T, now, gold) : _advance(T, now, gold); }

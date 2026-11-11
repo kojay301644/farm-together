@@ -31,20 +31,38 @@ async function golds(uids: string[]) {
 async function load(id: number) { const { data } = await sb.from('mj_tables').select('*').eq('id', id).maybeSingle(); return data; }
 async function myTableId(uid: string) { const { data } = await sb.from('mj_views').select('table_id').eq('uid', uid).maybeSingle(); return data?.table_id || null; }
 
+// 農場電腦名單（會種菜的那些）：金幣是農場的真金幣；正坐在別桌的不能再上桌。快取 15 秒
+let POOLC: { at: number, list: any[], busy: Record<string, number> } = { at: 0, list: [], busy: {} };
+async function botPool(tid: number) {
+  if (Date.now() - POOLC.at > 15000) {
+    const { data: B } = await sb.from('bots').select('id').eq('active', true);
+    const ids = (B || []).map((b: any) => b.id);
+    const { data: P } = ids.length ? await sb.from('players').select('id,nickname,avatar,gold').in('id', ids) : { data: [] as any[] };
+    const { data: L } = await sb.from('mj_tables').select('id,game,state').in('status', ['wait', 'play']).in('game', ['mj', 'b2', 'th']);
+    const busy: Record<string, number> = {};
+    for (const t of L || []) for (const id of C.botIds({ ...t, status: 'play' })) busy[id] = t.id;
+    POOLC = { at: Date.now(), busy, list: (P || []).map((p: any) => ({ id: p.id, name: p.nickname || '農夫', av: p.avatar || 11, gold: p.gold || 0 })) };
+  }
+  return POOLC.list.filter(b => !POOLC.busy[b.id] || POOLC.busy[b.id] === tid).map(b => ({ ...b }));
+}
+
 // 讀 → 改 → 存（版本衝突就重來）
 async function mutate(id: number, fn: (T: any, now: number) => Promise<any> | any) {
   for (let k = 0; k < 6; k++) {
     const T = await load(id); if (!T) throw new Fail('牌桌不存在');
     const now = NOW(), before = T.ver;
+    if (T.game !== 'bc') { try { C.setBots(await botPool(id)); } catch { C.setBots([]); } }
     const r = await fn(T, now);
     let out = C.advance(T, now, null);
-    if (out.needGold) { const g = await golds(C.humans(T).concat((T.state.pending || []).map((p: any) => p.uid))); out = { ...C.advance(T, now, g), settle: out.settle || null }; }
+    if (out.needGold) { const g = await golds(C.humans(T).concat((T.state.pending || []).map((p: any) => p.uid), C.botIds(T))); out = { ...C.advance(T, now, g), settle: out.settle || null, botBank: out.botBank }; }
     const nh = C.humans(T).length;
     const { data: upd } = await sb.from('mj_tables').update({ state: T.state, status: T.status, host: T.host, ver: before + 1, nh, updated_at: new Date().toISOString() }).eq('id', id).eq('ver', before).select('id');
     if (!upd || !upd.length) { await new Promise(r => setTimeout(r, 40 + Math.random() * 80)); continue; }
     T.ver = before + 1;
     // 結算一定要先做完；推畫面給其他人改成回覆後在背景做，自己的回覆比較快
     if (out.bank) await thBank(out.bank);
+    if (out.botBank && Object.keys(out.botBank).length) { await sb.rpc('mj_bot_gold', { p_delta: out.botBank }); POOLC.at = 0; }   // 農場電腦德州帶入／換回
+    for (const b of C.botIds(T)) POOLC.busy[b] = T.id;   // 剛坐下的電腦先記著，別桌不要再拉他
     if (out.log) await sb.rpc('th_log', { p_tid: id, p_hand: out.log.hand, p_pay: out.log.delta, p_house: Math.round(out.log.house || 0) });
     if (out.settle) await sb.rpc('mj_settle2', { p_tid: id, p_hand: out.settle.hand, p_delta: out.settle.delta, p_game: T.game || 'mj', p_house: Math.round(out.settle.house || 0) });
     const push = pushViews(T, now, out.kicked || []);
