@@ -374,7 +374,7 @@ function mjRender(first){
   cScale = Math.max(0.7, Math.min(cScale, (halfW - 8 - sc*(rv+1)) / 52));
   const cy = TOPH + avail/2;
   // 有人打牌、我可以吃／碰時：把手上能配的牌標出來
-  const oo = V.phase==='claim' && wl.includes(0) ? (V.opts||{}) : {}, lt = V.last && V.last.t;
+  const oo = V.phase==='claim' && wl.includes(ME) ? (V.opts||{}) : {}, lt = V.last && V.last.t;
   const chiSet = new Set((oo.chi||[]).flat()), ponOn = oo.pon || oo.kan;
   const marked = {};   // 每種牌只標一張（碰標兩張）
   const mark = t => { if(ponOn && t===lt && (marked[t]||0) < 2){ marked[t]=(marked[t]||0)+1; return ' hp'; } return ''; };   // 吃不標在手牌上，改成上面的吃法按鈕
@@ -389,13 +389,13 @@ function mjRender(first){
 
   const o = V.opts || {}, acts = [];
   if(o.canTing && !me.auto) acts.push(['ting','聽','t']);   // 打出去之後聽牌了：按「聽」就報聽，不按就不聽
-  if(V.phase==='claim' && wl.includes(0)){
+  if(V.phase==='claim' && wl.includes(ME)){
     if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']);    // 沒有「過」：不點就是不要；吃法另外畫成按鈕
   } else if(V.phase==='play' && V.turn===ME && !me.auto){
     if(o.zimo) acts.push(['zimo','自摸','w']); if(o.ankan) acts.push(['ankan','暗槓','k']); if(o.kakan) acts.push(['kakan','加槓','k']);   // 不想胡就直接打牌
 
   }
-  const claimTile = V.phase==='claim' && V.last && wl.includes(0) ? `<div class="mjct">${esc(V.seats[V.last.from].name)} 打出 ${mjTile(V.last.t,'md')}</div>` : '';
+  const claimTile = V.phase==='claim' && V.last && wl.includes(ME) ? `<div class="mjct">${esc(V.seats[V.last.from].name)} 打出 ${mjTile(V.last.t,'md')}</div>` : '';
   const selT = mjSel==null ? null : (mjSel==='d' ? drawn : hand[+String(mjSel).slice(1)]);
   const hint = me.auto ? `<button class="mjauto" id="mjAuto">🤖 託管中・點這裡自己打</button>`
     : me.ting ? `<div class="mjhint ting">🀄 已報聽・聽：${waitTxt(myWaits) || '—'}</div>`
@@ -404,7 +404,7 @@ function mjRender(first){
     : claimMine ? `<div class="mjhint${o.chi?' up':''}">要的話點${o.chi?'上面的吃法':'按鈕'}，不要就把手牌點兩下</div>`
     : !canDis && myWaits.length ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}</div>`
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
-  const myOn = wl.includes(0) && V.phase!=='end';
+  const myOn = wl.includes(ME) && V.phase!=='end';
 
   $('mjFelt').innerHTML = [1,2,3].map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)};--sc:${sc}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
   // 輪到自己：跳出「輪到你了！」＋提示音＋震動（每次輪到只提醒一次）
@@ -414,7 +414,7 @@ function mjRender(first){
   const actKey = acts.map(a=>a[0]).join(',') + '|' + V.handNo + ':' + V.phase + ':' + (V.last ? V.last.t + ':' + V.last.from : '') + ':' + me.river.length;
   const actStill = actKey === mjAnimKey.acts; mjAnimKey.acts = actKey;
   const hintKey = hint.replace(/<[^>]+>/g,''); const hintStill = hintKey === mjAnimKey.hint; mjAnimKey.hint = hintKey;
-  const chiBtns = V.phase==='claim' && wl.includes(0) && o.chi && V.last ? o.chi.map((u,i)=>{ const ts = sortChi(u, V.last.t); let lit = false;
+  const chiBtns = V.phase==='claim' && wl.includes(ME) && o.chi && V.last ? o.chi.map((u,i)=>{ const ts = sortChi(u, V.last.t); let lit = false;
       return `<button class="mjcb" data-mc="${i}"><span class="mjcbt">${ts.map(t=>{ const g = !lit && t===V.last.t; if(g) lit = true; return mjTile(t,'sm'+(g?' got':'')); }).join('')}</span><b>吃 ${ts.map(t=>MJ.name(t).slice(0,1)).join('')}</b></button>`; }).join('') : '';
   const cw = MJO && MJO.claimWait && V.phase==='claim' && MJO.claimWait.hand===V.handNo ? `<div class="mjwaitb">等待中⋯</div>` : '';
   $('mjUi').innerHTML = `<div class="mjacts${actStill?' still':''}">${claimTile}${cw}${acts.map(([k,t,c])=>`<button class="mja mja-${c}" data-ma="${k}">${t}</button>`).join('')}${chiBtns}</div><div class="mjchi" id="mjChi"></div>${hintStill ? hint.replace('class="mjhint', 'class="mjhint still').replace('class="mjauto', 'class="mjauto still') : hint}
