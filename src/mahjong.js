@@ -159,7 +159,11 @@ async function mjCall(a, extra){
 let MJ_BGM = null, mjBgmOn = (()=>{ try{ return localStorage.getItem('ytzt_mjbgm')!=='0'; }catch(e){ return true; } })();
 function mjBgmSync(){
   const want = mjOn() && mjBgmOn && !document.hidden && (typeof BGM_ON==='undefined' || BGM_ON);
-  if(want){ if(!MJ_BGM){ MJ_BGM = new Audio(mjArt('mj_bgm').replace('.webp','.mp3')); MJ_BGM.loop = true; MJ_BGM.volume = 0.4; } const p = MJ_BGM.play(); if(p && p.catch) p.catch(()=>{}); }
+  if(want){
+    const k = (mjCurView()||{}).game==='b2' ? 'b2_bgm' : 'mj_bgm';   // 大老二、麻將各自的音樂
+    if(MJ_BGM && MJ_BGM._k !== k){ MJ_BGM.pause(); MJ_BGM = null; }
+    if(!MJ_BGM){ MJ_BGM = new Audio(mjArt(k).replace('.webp','.mp3')); MJ_BGM._k = k; MJ_BGM.loop = true; MJ_BGM.volume = 0.4; }
+    const p = MJ_BGM.play(); if(p && p.catch) p.catch(()=>{}); }
   else if(MJ_BGM) MJ_BGM.pause();
   if(typeof BGM!=='undefined' && BGM){ if(mjOn()) BGM.pause(); }
 }
@@ -316,6 +320,7 @@ function mjMenu(){
 function mjRender(first){
   if(first || !$('mjFelt')) mjShell();
   const V = mjCurView(); if(!V) return;
+  if(MJ_BGM && MJ_BGM._k !== (V.game==='b2' ? 'b2_bgm' : 'mj_bgm')) mjBgmSync();   // 換遊戲就換音樂
   if(V.status==='wait' || V.pending || V.me==null || V.me<0) return mjRenderWait(V);
   if(V.game==='b2') return b2Render(V);
   mjMe = V.me;
