@@ -418,12 +418,14 @@ function mjRender(first){
 function mjRenderWait(V){
   const T = MJ.TABLES[V.lvl] || MJ.TABLES.n;
   let inner;
+  const shoutN = (S && S.me && S.me.items && S.me.items.shout) || 0;
   if(V.status==='wait'){
     const P = (V.wait && V.wait.players) || [];
     inner = `<div class="mjwt">${V.priv ? '🏠 朋友房間' : '🔍 正在找牌友…'}</div>
       ${V.priv ? `<div class="mjcode">房號 <b>${esc(V.code||'')}</b><small>把房號告訴朋友，在「麻將」輸入就能加入</small></div>` : ''}
       <div class="mjwp">${[0,1,2,3].map(i=>{ const p=P[i]; return p ? `<div class="mjwq"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span></div>` : `<div class="mjwq e"><i>？</i><span>${V.priv?'等朋友加入':'等待中'}</span></div>`; }).join('')}</div>
       <div class="mjws" id="mjWs"></div>
+      ${V.priv && P.length < 4 ? `<button class="btn o mjshb" id="mjShout" ${shoutN>0?'':'disabled'}>📢 用大聲公找人${shoutN>0?`（剩 ${shoutN} 個）`:'（沒有大聲公，可到綜合商店買）'}</button>` : ''}
       <div class="mjwb">${V.priv && V.host ? `<button class="btn" id="mjStart">立即開始（空位由電腦補）</button>` : ''}<button class="btn sub" id="mjWl">離開</button></div>`;
   } else {
     inner = `<div class="mjwt">⏳ 牌桌正在打</div><div class="mjws">這一局結束後你就會入座，請稍等…</div><div class="mjwb"><button class="btn sub" id="mjWl">離開</button></div>`;
@@ -432,6 +434,14 @@ function mjRenderWait(V){
   $('mjUi').innerHTML = ''; $('mjEnd').innerHTML = '';
   $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div><div class="mjbt r">${T.name}</div>`;
   if($('mjStart')) $('mjStart').onclick = ()=>mjOnline('start');
+  if($('mjShout')) $('mjShout').onclick = ()=>{
+    const miss = 4 - ((V.wait && V.wait.players) || []).length;
+    const def = `麻將缺${miss}!!! 房號:${V.code}`;
+    mjPanel('📢 大聲公找人', `<div class="help"><p>會放上全服跑馬燈，大家都看得到。可以改字（最多 30 字）</p></div>
+      <input id="mjShTx" maxlength="30" value="${esc(def)}" style="width:100%;font-family:inherit;font-size:17px;font-weight:900;padding:10px 12px;border-radius:12px;border:2px solid #E6D9C3;margin-top:6px">`,
+      [['取消','sub',mjPanelClose],['📢 送出','o',async()=>{ const t = ($('mjShTx').value||'').trim(); if(!t) return mjToast('請輸入內容');
+        try{ const r = await rpc('farm_item_use', { p_id:'shout', p_arg:t }); applyState(r.state); try{ refresh(); }catch(e){} mjPanelClose(); mjToast('大聲公已送出！'); mjRender(); }catch(e){ mjToast(e.message); } }]]);
+  };
   $('mjWl').onclick = ()=>mjLeave(true);
 }
 function mjShell(){

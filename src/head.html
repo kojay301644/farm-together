@@ -594,17 +594,18 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjsh-l{left:16%;top:22%}.mjsh-r{right:16%;top:22%}
 @keyframes mjshout{0%{opacity:0;scale:.3}14%{opacity:1;scale:1.2}28%{scale:1}82%{opacity:1}100%{opacity:0;translate:0 -18px}}
 /* 等待開局 */
-.mjwait{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,86%);background:rgba(255,253,244,.96);border-radius:22px;padding:16px 18px;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.2)}
-.mjwt{font-size:20px;font-weight:900}
-.mjcode{margin:6px 0;font-weight:900;font-size:14px}.mjcode b{font-size:30px;letter-spacing:6px;color:var(--orange-d);display:block;line-height:1.2}.mjcode small{display:block;font-size:11px;color:var(--ink2)}
-.mjwp{display:flex;justify-content:center;gap:12px;margin:10px 0}
+.mjwait{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,86%);max-height:96%;overflow:auto;background:rgba(255,253,244,.96);border-radius:22px;padding:10px 16px 12px;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.2)}
+.mjwt{font-size:18px;font-weight:900}
+.mjcode{margin:2px 0;font-weight:900;font-size:14px}.mjcode b{font-size:26px;letter-spacing:6px;color:var(--orange-d);display:block;line-height:1.2}.mjcode small{display:block;font-size:11px;color:var(--ink2)}
+.mjwp{display:flex;justify-content:center;gap:12px;margin:6px 0}
 .mjwq{display:flex;flex-direction:column;align-items:center;gap:4px;width:70px;font-size:12px;font-weight:900}
-.mjwq img,.mjwq i{width:52px;height:52px;border-radius:12px;border:3px solid #fff;box-shadow:0 0 0 2px #A9733F}
+.mjwq img,.mjwq i{width:44px;height:44px;border-radius:12px;border:3px solid #fff;box-shadow:0 0 0 2px #A9733F}
 .mjwq i{display:grid;place-items:center;background:#EFE9DF;color:#B9AC98;font-style:normal;font-size:22px;animation:mjpulse4 1.2s ease-in-out infinite}
 @keyframes mjpulse4{50%{opacity:.5}}
 .mjwq.e span{color:var(--ink2)}
 .mjws{font-size:13px;font-weight:700;color:var(--ink2);min-height:18px}
-.mjwb{display:flex;gap:8px;margin-top:12px}
+.mjwb{display:flex;gap:8px;margin-top:8px}
+.mjshb{width:100%;margin-top:8px;font-size:14px;padding:9px}
 .mjtbb{display:flex;flex-direction:column;gap:6px}
 .mjjoin{display:flex;gap:8px;align-items:center;margin:8px 0}
 .mjjoin input{flex:1;min-width:0;font-family:inherit;font-size:16px;font-weight:900;padding:9px 12px;border-radius:12px;border:2px solid var(--line);text-align:center;letter-spacing:4px}
