@@ -46,21 +46,22 @@ function nextHandServer(T, gold, now) {
   const used = () => G.seats.map(s => s.name);
   const toBot = (j) => { const b = pickBot(used()); G.uids[j] = null; Object.assign(G.seats[j], { id: null, name: b.name, av: b.av, bot: true, auto: false, gold: botGold(T.lvl) }); G.miss[j] = 0; };
   G.kicked = [];
+  const BROKE = '你輸光了……金幣不夠坐這桌了，回去種田吧！';
   for (let j = 0; j < 4; j++) {
     const u = G.uids[j]; if (!u) continue;
-    if (G.leaving.includes(u)) { toBot(j); continue; }
+    if (G.leaving.includes(u)) { G.kicked.push({ uid: u, msg: (G.broke || []).includes(u) ? BROKE : '已經離開牌桌', broke: (G.broke || []).includes(u) }); toBot(j); continue; }
     G.seats[j].gold = gold[u] ?? G.seats[j].gold;
-    if (G.seats[j].gold < min) { G.kicked.push(u); toBot(j); }
+    if (G.seats[j].gold < min) { G.kicked.push({ uid: u, msg: BROKE, broke: true }); toBot(j); }
   }
   G.leaving = [];
   for (const p of (G.pending || []).splice(0)) {
-    if ((gold[p.uid] ?? 0) < min) { G.kicked.push(p.uid); continue; }
+    if ((gold[p.uid] ?? 0) < min) { G.kicked.push({ uid: p.uid, msg: '金幣不夠坐這桌了', broke: false }); continue; }
     const j = G.uids.findIndex(x => !x); if (j < 0) break;
     G.uids[j] = p.uid; Object.assign(G.seats[j], { id: p.uid, name: p.name, av: p.av, bot: false, auto: false, gold: gold[p.uid] });
   }
   if (!G.uids.some(Boolean)) { T.status = 'closed'; return; }
   G.seats.forEach((s, j) => { if (!G.uids[j] && s.gold < min) s.gold = botGold(T.lvl); });
-  MJ.nextHand(G); G.ready = []; G.settled = false; G.miss = [0, 0, 0, 0];
+  MJ.nextHand(G); G.ready = []; G.settled = false; G.broke = []; G.miss = [0, 0, 0, 0];
   G.tAct = G.tWait = now + TIME.DICE; G.wKey = '';
 }
 
@@ -81,6 +82,9 @@ export function advance(T, now, gold) {
         G.settled = true; G.endAt = now;
         const d = {}; G.uids.forEach((u, j) => { if (u && G.result.pay[j]) d[u] = (d[u] || 0) + G.result.pay[j]; });
         out.settle = { hand: G.handNo, delta: d };
+        // 輸光（金幣少於這桌最低金額）：直接請他離桌
+        const min = MJ.TABLES[T.lvl].min; G.broke = [];
+        G.uids.forEach((u, j) => { if (u && G.seats[j].gold < min) { G.broke.push(u); if (!G.leaving.includes(u)) G.leaving.push(u); G.seats[j].auto = true; } });
       }
       const act = G.uids.map((u, j) => u && !G.leaving.includes(u) && !G.seats[j].auto ? j : -1).filter(j => j >= 0);
       const allReady = act.every(j => G.ready.includes(j));
@@ -112,7 +116,7 @@ export function dueAt(T) {
   if (T.status === 'wait') return T.state.wait.startAt;
   if (T.status !== 'play') return null;
   const G = T.state;
-  if (G.phase === 'end') return G.endAt + TIME.NEXT_WAIT;
+  if (G.phase === 'end') return G.settled ? G.endAt + TIME.NEXT_WAIT : 0;
   let best = Infinity;
   for (const j of MJ.waitingOn(G)) {
     const bot = !G.uids[j] || G.seats[j].auto;
@@ -151,6 +155,6 @@ export function viewFor(T, uid, now) {
   let deadline = null;
   if (V.waiting.includes(j) && !G.seats[j].auto) deadline = G.tWait + (G.phase === 'claim' ? TIME.CLAIM : TIME.TURN);
   return { ...base, ...V, dice: G.dice, firstDealer: G.firstDealer, humans: hum, deadline, startAt: G.tAct > now ? G.tAct : null,
-    ready: G.ready, endAt: G.phase === 'end' ? G.endAt + TIME.NEXT_WAIT : null, leaving: G.leaving.includes(uid),
+    broke: (G.broke || []).includes(uid), ready: G.ready, endAt: G.phase === 'end' ? G.endAt + TIME.NEXT_WAIT : null, leaving: G.leaving.includes(uid),
     ticker: G.uids.findIndex(Boolean) === j, pendingN: (G.pending || []).length };
 }

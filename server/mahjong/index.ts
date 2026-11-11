@@ -43,7 +43,7 @@ async function mutate(id: number, fn: (T: any, now: number) => Promise<any> | an
 }
 async function pushViews(T: any, now: number, kicked: string[]) {
   const rows = C.humans(T).map(u => ({ uid: u, table_id: T.status === 'closed' ? null : T.id, view: C.viewFor(T, u, now), seq: T.ver, updated_at: new Date().toISOString() }));
-  for (const u of kicked) rows.push({ uid: u, table_id: null, view: { status: 'kicked', msg: '金幣不夠，已經離開牌桌', tid: T.id }, seq: T.ver, updated_at: new Date().toISOString() });
+  for (const k of kicked as any[]) rows.push({ uid: k.uid, table_id: null, view: { status: 'kicked', msg: k.msg, broke: !!k.broke, tid: T.id }, seq: T.ver, updated_at: new Date().toISOString() });
   if (rows.length) await sb.from('mj_views').upsert(rows);
 }
 const viewOf = (T: any, uid: string) => C.viewFor(T, uid, NOW());

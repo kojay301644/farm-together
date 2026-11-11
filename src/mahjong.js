@@ -55,6 +55,7 @@ function mjSfx(n){ if(typeof SFX_ON!=='undefined' && !SFX_ON) return; try{
   else if(n==='call'){ tone(660, 990, 0.12, 'triangle', 0.16); tone(990, 0, 0.14, 'triangle', 0.12, 0.1); }
   else if(n==='win'){ [523,659,784,1047,1319].forEach((f,k)=>tone(f, 0, 0.25, 'triangle', 0.15, k*0.09)); }
   else if(n==='dice'){ for(let k=0;k<7;k++) noise(0.04, 2400+Math.random()*1200, 0.12, k*0.09); }
+  else if(n==='lose'){ [523,440,349,262].forEach((f,k)=>tone(f, 0, 0.32, 'triangle', 0.14, k*0.22)); }
   else if(n==='pick'){ tone(1200, 0, 0.04, 'sine', 0.07); }
   else if(n==='turn'){ tone(880, 0, 0.06, 'sine', 0.08); }
 }catch(e){} }
@@ -179,6 +180,7 @@ async function mjOnlineEnter(view){
 function mjApply(view, seq, first){
   if(!MJO) return;
   if(!view){ mjClose(); toast('已經離開牌桌'); sync && sync(); return; }
+  if(view.status==='kicked' && view.broke) return mjBroke();
   if(view.status==='kicked' || view.status==='closed'){ mjClose(); toast(view.msg || '牌桌已經關了'); sync && sync(); return; }
   if(seq!=null && seq < MJO.seq) return;
   if(seq!=null) MJO.seq = seq;
@@ -421,7 +423,19 @@ function mjTotalTxt(r){
   if(r.self) return `共 <b>${r.total}</b> 台（莊家多付 ${dt} 台）`;
   return `共 <b>${r.total}</b> 台`;
 }
+// 輸光了：強制離桌，回去種田
+function mjBroke(){
+  if(!$('mj').classList.contains('on')) return;
+  if($('mjBroke')) return;
+  if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); MJO.busy = true; }
+  const d = document.createElement('div'); d.id = 'mjBroke'; d.className = 'mjbroke';
+  d.innerHTML = `<div class="mjbk"><img src="${typeof chrSrc==='function' ? chrSrc('bunny1') : ''}" alt=""><div class="mjbt1">你輸光了……</div>
+    <div class="mjbt2">金幣不夠坐這桌了，回去種田吧！🌾</div><button class="btn" id="mjBrokeGo">🌾 回去種田</button></div>`;
+  $('mj').appendChild(d); mjSfx('lose');
+  $('mjBrokeGo').onclick = ()=>{ if(MJO) mjCall('leave').catch(()=>{}); mjClose(); try{ sync(); }catch(e){} try{ if(typeof FARM_C!=='undefined') centerOn(...FARM_C); }catch(e){} };
+}
 function mjBindResult(V){
+  if(MJO && V.broke){ setTimeout(mjBroke, 1800); }
   $('mjOut').onclick = ()=>mjLeave(true);
   const T = MJ.TABLES[V.table], go = ()=>{ clearTimeout(mjNextT);
     if(MJO){ const b=$('mjNext'); if(b){ b.disabled=true; b.textContent='等其他人…'; } return mjOnline('ready'); }

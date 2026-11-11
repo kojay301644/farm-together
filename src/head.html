@@ -609,6 +609,14 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjjoin{display:flex;gap:8px;align-items:center;margin:8px 0}
 .mjjoin input{flex:1;min-width:0;font-family:inherit;font-size:16px;font-weight:900;padding:9px 12px;border-radius:12px;border:2px solid var(--line);text-align:center;letter-spacing:4px}
 .mjtb.prac{background:#F1F7EC}
+/* 輸光了 */
+.mjbroke{position:absolute;inset:0;z-index:60;background:rgba(20,16,12,.78);display:grid;place-items:center;animation:mjfade .4s}
+.mjbk{background:#fff;border-radius:24px;padding:18px 26px 20px;text-align:center;width:min(420px,86%);box-shadow:0 8px 0 rgba(0,0,0,.3);animation:mjin .35s ease-out}
+.mjbk img{width:96px;height:96px;object-fit:contain;filter:grayscale(.35) drop-shadow(0 4px 4px rgba(0,0,0,.25));animation:mjsad 1.6s ease-in-out infinite}
+@keyframes mjsad{50%{transform:translateY(4px) rotate(-4deg)}}
+.mjbt1{font-size:30px;font-weight:900;color:#D3403A;margin-top:4px}
+.mjbt2{font-size:14px;font-weight:700;color:var(--ink2);margin:6px 0 14px}
+.mjbk .btn{width:100%}
 /* 擲骰子 */
 .mjdice{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(20,40,28,.55);border-radius:20px;padding:14px 20px;animation:mjin .25s ease-out}
 .mjdr{display:flex;gap:10px}

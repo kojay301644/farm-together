@@ -609,6 +609,14 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjjoin{display:flex;gap:8px;align-items:center;margin:8px 0}
 .mjjoin input{flex:1;min-width:0;font-family:inherit;font-size:16px;font-weight:900;padding:9px 12px;border-radius:12px;border:2px solid var(--line);text-align:center;letter-spacing:4px}
 .mjtb.prac{background:#F1F7EC}
+/* 輸光了 */
+.mjbroke{position:absolute;inset:0;z-index:60;background:rgba(20,16,12,.78);display:grid;place-items:center;animation:mjfade .4s}
+.mjbk{background:#fff;border-radius:24px;padding:18px 26px 20px;text-align:center;width:min(420px,86%);box-shadow:0 8px 0 rgba(0,0,0,.3);animation:mjin .35s ease-out}
+.mjbk img{width:96px;height:96px;object-fit:contain;filter:grayscale(.35) drop-shadow(0 4px 4px rgba(0,0,0,.25));animation:mjsad 1.6s ease-in-out infinite}
+@keyframes mjsad{50%{transform:translateY(4px) rotate(-4deg)}}
+.mjbt1{font-size:30px;font-weight:900;color:#D3403A;margin-top:4px}
+.mjbt2{font-size:14px;font-weight:700;color:var(--ink2);margin:6px 0 14px}
+.mjbk .btn{width:100%}
 /* 擲骰子 */
 .mjdice{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(20,40,28,.55);border-radius:20px;padding:14px 20px;animation:mjin .25s ease-out}
 .mjdr{display:flex;gap:10px}
@@ -738,21 +746,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794410017" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794410317" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794410017" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794410017" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794410317" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794410317" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794410017" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794410317" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794410017" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794410017" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794410317" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794410317" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -769,11 +777,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794410017" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794410317" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794410017";
+const BUILD="1794410317";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3464,6 +3472,7 @@ function mjSfx(n){ if(typeof SFX_ON!=='undefined' && !SFX_ON) return; try{
   else if(n==='call'){ tone(660, 990, 0.12, 'triangle', 0.16); tone(990, 0, 0.14, 'triangle', 0.12, 0.1); }
   else if(n==='win'){ [523,659,784,1047,1319].forEach((f,k)=>tone(f, 0, 0.25, 'triangle', 0.15, k*0.09)); }
   else if(n==='dice'){ for(let k=0;k<7;k++) noise(0.04, 2400+Math.random()*1200, 0.12, k*0.09); }
+  else if(n==='lose'){ [523,440,349,262].forEach((f,k)=>tone(f, 0, 0.32, 'triangle', 0.14, k*0.22)); }
   else if(n==='pick'){ tone(1200, 0, 0.04, 'sine', 0.07); }
   else if(n==='turn'){ tone(880, 0, 0.06, 'sine', 0.08); }
 }catch(e){} }
@@ -3588,6 +3597,7 @@ async function mjOnlineEnter(view){
 function mjApply(view, seq, first){
   if(!MJO) return;
   if(!view){ mjClose(); toast('已經離開牌桌'); sync && sync(); return; }
+  if(view.status==='kicked' && view.broke) return mjBroke();
   if(view.status==='kicked' || view.status==='closed'){ mjClose(); toast(view.msg || '牌桌已經關了'); sync && sync(); return; }
   if(seq!=null && seq < MJO.seq) return;
   if(seq!=null) MJO.seq = seq;
@@ -3830,7 +3840,19 @@ function mjTotalTxt(r){
   if(r.self) return `共 <b>${r.total}</b> 台（莊家多付 ${dt} 台）`;
   return `共 <b>${r.total}</b> 台`;
 }
+// 輸光了：強制離桌，回去種田
+function mjBroke(){
+  if(!$('mj').classList.contains('on')) return;
+  if($('mjBroke')) return;
+  if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); MJO.busy = true; }
+  const d = document.createElement('div'); d.id = 'mjBroke'; d.className = 'mjbroke';
+  d.innerHTML = `<div class="mjbk"><img src="${typeof chrSrc==='function' ? chrSrc('bunny1') : ''}" alt=""><div class="mjbt1">你輸光了……</div>
+    <div class="mjbt2">金幣不夠坐這桌了，回去種田吧！🌾</div><button class="btn" id="mjBrokeGo">🌾 回去種田</button></div>`;
+  $('mj').appendChild(d); mjSfx('lose');
+  $('mjBrokeGo').onclick = ()=>{ if(MJO) mjCall('leave').catch(()=>{}); mjClose(); try{ sync(); }catch(e){} try{ if(typeof FARM_C!=='undefined') centerOn(...FARM_C); }catch(e){} };
+}
 function mjBindResult(V){
+  if(MJO && V.broke){ setTimeout(mjBroke, 1800); }
   $('mjOut').onclick = ()=>mjLeave(true);
   const T = MJ.TABLES[V.table], go = ()=>{ clearTimeout(mjNextT);
     if(MJO){ const b=$('mjNext'); if(b){ b.disabled=true; b.textContent='等其他人…'; } return mjOnline('ready'); }
