@@ -85,9 +85,9 @@ function mjSay(txt){
 /* ---------- 遊戲廳大廳 ---------- */
 const HALL_GAMES = [
   {id:'mj', icon:'🀄', name:'麻將', desc:'台灣 16 張，跟朋友或電腦一起打', open:true},
-  {id:'fish', icon:'🎣', name:'池塘釣魚', desc:'敬請期待'},
-  {id:'match', icon:'🍓', name:'農場消消樂', desc:'敬請期待'},
-  {id:'race', icon:'🏁', name:'寵物賽跑', desc:'敬請期待'},
+  {id:'big2', icon:'🃏', name:'大老二', desc:'敬請期待'},
+  {id:'niu', icon:'🐮', name:'妞妞', desc:'敬請期待'},
+  {id:'holdem', icon:'♠️', name:'德州撲克', desc:'敬請期待'},
 ];
 function openHall(){
   modal('🎰 寵物娛樂廳', `<div class="rhint">用農場金幣跟大家同樂！每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費</div>
