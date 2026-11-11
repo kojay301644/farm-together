@@ -580,7 +580,13 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2b.pass{background:#EFE9DF;color:#22304A;box-shadow:0 4px 0 #CFC3AF}
 .b2b.hint{background:radial-gradient(circle at 35% 30%,#7CC6FF,#2F86E0);box-shadow:0 4px 0 #1C5FA8}
 .b2b:active{transform:translateY(2px)}
-.mjhint.b2hint{left:24px;transform:none}
+.b2types{position:absolute;left:110px;right:260px;bottom:calc(100% + 8px);display:flex;flex-wrap:wrap-reverse;gap:6px;pointer-events:auto}
+.b2t{height:38px;padding:0 12px;border-radius:999px;font-family:inherit;font-size:15px;font-weight:900;color:#BDF6FF;background:rgba(8,20,48,.9);border:2px solid #39F3FF;box-shadow:0 0 10px rgba(0,229,255,.35);display:flex;align-items:center;gap:4px}
+.b2t small{font-size:10px;color:#7FF6FF;opacity:.9}
+.b2t.on{background:#00E5FF;color:#04122A;border-color:#fff}.b2t.on small{color:#04122A}
+.b2t:active{transform:translateY(2px)}
+.mjhint.b2hint.hi{bottom:calc(100% + 52px)}
+.mjhint.b2hint{left:110px;transform:none;bottom:calc(100% + 8px)}
 .b2o{position:absolute;display:flex;align-items:center;gap:4px;z-index:3}
 .b2o-t{top:6px;left:50%;transform:translateX(-50%);flex-direction:row;gap:8px}
 .b2o-t .mjs{flex-direction:row;width:auto;gap:6px}.b2o-t .mjav{width:38px;height:38px;border-radius:10px}.b2o-t .mjtx{align-items:flex-start}.b2o-t .mjnm{margin:0}
@@ -895,21 +901,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794420752" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794421064" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794420752" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794420752" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794421064" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794421064" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794420752" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794421064" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794420752" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794420752" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794421064" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794421064" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -926,11 +932,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794420752" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794421064" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794420752";
+const BUILD="1794421064";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -4258,18 +4264,21 @@ const B2 = (() => {
     const rs = cs.map(rk), cnt = {}; rs.forEach(r => cnt[r] = (cnt[r] || 0) + 1);
     const groups = Object.entries(cnt).map(([r, k]) => [+r, k]).sort((a, b) => b[1] - a[1] || b[0] - a[0]);
     const flush = cs.every(c => st(c) === st(cs[0]));
-    let straight = false;
+    // 順子：A2345 最小、23456 最大，其他照最前面那張排（3-7 < 4-8 < … < 10-A）；一樣的話比最前面那張的花色
+    let straight = false, skey = 0;
     if (groups.length === 5) {
       const f = rs.map(r => r + 3).sort((a, b) => a - b);   // 3..15（14 = A，15 = 2）
-      const s = f.join(',');
-      straight = (f[4] - f[0] === 4 && f[4] <= 14) || s === '3,4,5,14,15' || s === '3,4,5,6,15';
+      const s = f.join(','), find = r => cs.find(c => rk(c) === r);
+      if (f[4] - f[0] === 4 && f[4] <= 14) { straight = true; skey = (f[0] - 2) * 4 + st(find(f[0] - 3)); }   // 3-7 → 1 … 10-A → 8
+      else if (s === '3,4,5,14,15') { straight = true; skey = 0 * 4 + st(find(11)); }                        // A2345：看 A
+      else if (s === '3,4,5,6,15') { straight = true; skey = 9 * 4 + st(find(12)); }                          // 23456：看 2
     }
     const top = cs[4];
-    if (straight && flush) return { ty: 'five', kind: 5, key: top };
+    if (straight && flush) return { ty: 'five', kind: 5, key: skey };
     if (groups[0][1] === 4) return { ty: 'five', kind: 4, key: groups[0][0] };
     if (groups[0][1] === 3 && groups[1][1] === 2) return { ty: 'five', kind: 3, key: groups[0][0] };
     if (flush) return { ty: 'five', kind: 2, key: top };
-    if (straight) return { ty: 'five', kind: 1, key: top };
+    if (straight) return { ty: 'five', kind: 1, key: skey };
     return null;
   }
   function beats(a, b) {   // a 能不能壓過 b
@@ -4362,9 +4371,10 @@ const B2 = (() => {
       for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) for (let c = b + 1; c < n; c++) for (let d = c + 1; d < n; d++) for (let e = d + 1; e < n; e++) fives.push([L[a], L[b], L[c], L[d], L[e]]); });
     // 葫蘆、鐵支
     const R = Object.keys(byR).map(Number);
+    const pick = (L, k) => { const out = []; const go = (i, acc) => { if (acc.length === k) { out.push(acc); return; } for (let j = i; j < L.length; j++) go(j + 1, acc.concat([L[j]])); }; go(0, []); return out; };
     R.forEach(r => { const L = byR[r];
-      if (L.length >= 3) R.forEach(q => { if (q !== r && byR[q].length >= 2) fives.push(L.slice(0, 3).concat(byR[q].slice(0, 2))); });
-      if (L.length === 4) { const k = hand.find(c => rk(c) !== r); if (k != null) fives.push(L.concat([k])); } });
+      if (L.length >= 3) pick(L, 3).forEach(t3 => R.forEach(q => { if (q !== r && byR[q].length >= 2) pick(byR[q], 2).forEach(p2 => fives.push(t3.concat(p2))); }));
+      if (L.length === 4) hand.filter(c => rk(c) !== r).forEach(k => fives.push(L.concat([k]))); });
     const seen = new Set();
     fives.forEach(f => { const k = f.slice().sort((a, b) => a - b).join(','); if (seen.has(k)) return; seen.add(k); if (classify(f)) out.push(f); });
     return out.map(cs => ({ cards: cs.slice().sort((a, b) => a - b), cb: classify(cs) })).filter(x => x.cb);
@@ -4438,7 +4448,7 @@ const B2 = (() => {
 })();
 if (typeof module !== 'undefined') module.exports = B2;
 /* ---------- 大老二（連線；跟麻將共用牌桌外框、連線流程、結算） ---------- */
-let b2Sel = new Set(), b2HandKey = '', b2Hint = -1, b2Busy = false;
+let b2Groups = {}, b2Sel = new Set(), b2HandKey = '', b2Hint = {}, b2Busy = false;
 const B2_ICON = {n:'🌱',m:'🌻',h:'🏆',r:'💰'};
 
 function openB2Lobby(){
@@ -4462,7 +4472,7 @@ function b2Rules(){
   const body = `<div class="help">
     <p><b>目標：</b>最先把 13 張牌出完的人贏。</p>
     <p><b>大小：</b>3 最小，2 最大（3 4 5 6 7 8 9 10 J Q K A 2）。一樣大時比花色：♠ 黑桃 &gt; ♥ 紅心 &gt; ♦ 方塊 &gt; ♣ 梅花。</p>
-    <p><b>能出的牌：</b>單張、對子、五張牌型（順子、同花、葫蘆、鐵支、同花順）。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、同花、葫蘆；同花順可以壓所有五張牌型。</p>
+    <p><b>能出的牌：</b>單張、對子、五張牌型（順子、同花、葫蘆、鐵支、同花順）。</p><p><b>順子比大小：</b>看最前面那張：3‑4‑5‑6‑7 &lt; 4‑5‑6‑7‑8 &lt; … &lt; 10‑J‑Q‑K‑A；A‑2‑3‑4‑5 最小，2‑3‑4‑5‑6 最大。一樣的話比最前面那張的花色。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、同花、葫蘆；同花順可以壓所有五張牌型。</p>
     <p><b>怎麼出：</b>第一局拿到梅花 3 的人先出，而且要出到梅花 3；之後每局由上一局贏家先出。輪到你時要出同樣張數、比較大的牌，或按「過」。其他三家都過，就由最後出牌的人重新出任何牌型。</p>
     <p><b>怎麼算：</b>有人出完，其他三家照手上剩幾張付錢，每張 × 桌上的「每張」金額：</p>
     <ul><li>手上的 2，每張多算一張</li><li>剩 10 張以上：加倍</li><li>13 張都沒出：3 倍</li></ul>
@@ -4486,7 +4496,7 @@ function b2Render(V){
   $('mj').style.setProperty('--b2pet', `url("${typeof chrSrc==='function' ? chrSrc((V.pet||'bunny')+'1') : ''}")`);
   // 換了一副手牌就清掉選牌
   const hk = V.handNo + ':' + (me.hand||[]).join(',');
-  if(hk !== b2HandKey){ const keep = new Set([...b2Sel].filter(c=>(me.hand||[]).includes(c))); b2Sel = keep; b2HandKey = hk; b2Hint = -1; }
+  if(hk !== b2HandKey){ const keep = new Set([...b2Sel].filter(c=>(me.hand||[]).includes(c))); b2Sel = keep; b2HandKey = hk; b2Hint = {}; }
   const myTurn = V.phase==='play' && V.turn===ME && !me.auto;
   const seatCard = j => { const s = V.seats[j], on = wl.includes(j) && V.phase==='play';
     return `<div class="mjs mjs-${mjSeatPos(j)}${on?' on':''}"><div class="mjav"><img src="${avSrc(s.av)}" alt="">${s.auto&&!s.bot?'<span class="mjtg" style="background:#7A8BA6">託</span>':''}</div>
@@ -4515,6 +4525,15 @@ function b2Render(V){
   const selArr = [...b2Sel].sort((a,b)=>a-b), cb = selArr.length ? B2.classify(selArr) : null;
   const lead = !V.cur || V.cur.by===ME;
   const canPlay = myTurn && cb && (V.must==null || selArr.includes(V.must)) && (lead || B2.beats(cb, curCb(V)));
+  // 現在能出的牌，依牌型分組（對子、順子、同花、葫蘆、鐵支、同花順）
+  b2Groups = {};
+  if(myTurn){
+    const all = B2.combos(hand).filter(x=> x.cards.length > 1 && (V.must==null || x.cards.includes(V.must)) && (lead || B2.beats(x.cb, curCb(V))));
+    all.forEach(x=>{ const n = B2.comboName(x.cb); (b2Groups[n] = b2Groups[n] || []).push(x); });
+    Object.values(b2Groups).forEach(L=>L.sort((a,b)=>a.cb.key-b.cb.key || a.cards[0]-b.cards[0]));
+  }
+  const typeBtns = ['對子','順子','同花','葫蘆','鐵支','同花順'].filter(n=>b2Groups[n]).map(n=>{ const L = b2Groups[n], i = b2Hint[n];
+    return `<button class="b2t${i!=null?' on':''}" data-b2t="${n}">${n}${L.length>1?`<small>${i!=null?`${i+1}/`:''}${L.length}</small>`:''}</button>`; }).join('');
   let hint = '';
   if(myTurn){
     if(V.must!=null && lead) hint = '第一手要出到 ♣3';
@@ -4523,8 +4542,9 @@ function b2Render(V){
     if(selArr.length && !cb) hint = '這幾張組不成牌型';
     else if(selArr.length && cb && !canPlay && !lead) hint = cb.ty !== curCb(V).ty ? '張數要跟上一手一樣' : cb.ty==='five' && cb.kind !== curCb(V).kind && cb.kind < 4 ? `要出${esc(V.cur.ty)}才能壓（或鐵支、同花順）` : '不夠大';
   }
-  $('mjUi').innerHTML = `${hint?`<div class="mjhint still b2hint">${hint}</div>`:''}
-    ${myTurn ? `<div class="b2btns"><button class="b2b hint" id="b2Hint">提示</button>${V.opts && V.opts.pass ? `<button class="b2b pass" id="b2Pass">過</button>` : ''}<button class="b2b go" id="b2Go" ${canPlay?'':'disabled'}>出牌${cb?`<small>${B2.comboName(cb)}</small>`:''}</button></div>` : ''}
+  $('mjUi').innerHTML = `${hint?`<div class="mjhint still b2hint${myTurn && typeBtns ? ' hi' : ''}">${hint}</div>`:''}
+    ${myTurn && typeBtns ? `<div class="b2types">${typeBtns}</div>` : ''}
+    ${myTurn ? `<div class="b2btns">${V.opts && V.opts.pass ? `<button class="b2b pass" id="b2Pass">過</button>` : ''}<button class="b2b go" id="b2Go" ${canPlay?'':'disabled'}>出牌${cb?`<small>${B2.comboName(cb)}</small>`:''}</button></div>` : ''}
     <div class="b2hand${myTurn?' can':''}" style="--cw:${cw}px">${hand.map(c=>b2Card(c, 'hd'+(b2Sel.has(c)?' sel':''))).join('')}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">每張 ${T.per.toLocaleString()} 金</div>
     <div class="mjbme${wl.includes(ME)&&V.phase==='play'?' on':''}"><img src="${avSrc(me.av)}" alt=""><b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
@@ -4544,17 +4564,17 @@ function b2Render(V){
 
   // 點牌：選起來／放下
   document.querySelectorAll('#mj .b2hand .b2c').forEach(el=>el.onclick=()=>{
-    const c = +el.dataset.c; if(b2Sel.has(c)) b2Sel.delete(c); else b2Sel.add(c); b2Hint = -1; mjSfx('pick'); b2Render(mjCurView());
+    const c = +el.dataset.c; if(b2Sel.has(c)) b2Sel.delete(c); else b2Sel.add(c); b2Hint = {}; mjSfx('pick'); b2Render(mjCurView());
   });
   if($('b2Go')) $('b2Go').onclick = ()=>{ const cs = [...b2Sel].sort((a,b)=>a-b); if(cs.length) b2Do({a:'play', cards:cs}); };
   if($('b2Pass')) $('b2Pass').onclick = ()=>b2Do({a:'pass'});
-  if($('b2Hint')) $('b2Hint').onclick = ()=>{
-    // 依序提示能出的牌（由小到大）
-    const all = B2.combos(hand).filter(x=> (V.must==null || x.cards.includes(V.must)) && (lead || B2.beats(x.cb, curCb(V))));
-    if(!all.length){ mjToast('沒有比較大的牌，只能過'); return; }
-    all.sort((a,b)=> (lead ? a.cards[0]-b.cards[0] || b.cards.length-a.cards.length : 0) || (a.cb.kind||0)-(b.cb.kind||0) || a.cb.key-b.cb.key);
-    b2Hint = (b2Hint + 1) % all.length; b2Sel = new Set(all[b2Hint].cards); mjSfx('pick'); b2Render(mjCurView());
-  };
+  // 牌型按鈕：點一下選出那種牌型最小的一組，再點換下一組
+  document.querySelectorAll('#mj [data-b2t]').forEach(el=>el.onclick=()=>{
+    const ty = el.dataset.b2t, L = b2Groups[ty] || []; if(!L.length) return;
+    const i = ((b2Hint[ty] ?? -1) + 1) % L.length; b2Hint = { [ty]: i };
+    b2Sel = new Set(L[i].cards); mjSfx('pick'); b2Render(mjCurView()); b2Hint = { [ty]: i };
+  });
+
 
   // 新事件：出牌音效、五張牌型喊出來、有人出完
   const L = V.log || [], N = V.logN != null ? V.logN : L.length;

@@ -24,18 +24,21 @@ const B2 = (() => {
     const rs = cs.map(rk), cnt = {}; rs.forEach(r => cnt[r] = (cnt[r] || 0) + 1);
     const groups = Object.entries(cnt).map(([r, k]) => [+r, k]).sort((a, b) => b[1] - a[1] || b[0] - a[0]);
     const flush = cs.every(c => st(c) === st(cs[0]));
-    let straight = false;
+    // 順子：A2345 最小、23456 最大，其他照最前面那張排（3-7 < 4-8 < … < 10-A）；一樣的話比最前面那張的花色
+    let straight = false, skey = 0;
     if (groups.length === 5) {
       const f = rs.map(r => r + 3).sort((a, b) => a - b);   // 3..15（14 = A，15 = 2）
-      const s = f.join(',');
-      straight = (f[4] - f[0] === 4 && f[4] <= 14) || s === '3,4,5,14,15' || s === '3,4,5,6,15';
+      const s = f.join(','), find = r => cs.find(c => rk(c) === r);
+      if (f[4] - f[0] === 4 && f[4] <= 14) { straight = true; skey = (f[0] - 2) * 4 + st(find(f[0] - 3)); }   // 3-7 → 1 … 10-A → 8
+      else if (s === '3,4,5,14,15') { straight = true; skey = 0 * 4 + st(find(11)); }                        // A2345：看 A
+      else if (s === '3,4,5,6,15') { straight = true; skey = 9 * 4 + st(find(12)); }                          // 23456：看 2
     }
     const top = cs[4];
-    if (straight && flush) return { ty: 'five', kind: 5, key: top };
+    if (straight && flush) return { ty: 'five', kind: 5, key: skey };
     if (groups[0][1] === 4) return { ty: 'five', kind: 4, key: groups[0][0] };
     if (groups[0][1] === 3 && groups[1][1] === 2) return { ty: 'five', kind: 3, key: groups[0][0] };
     if (flush) return { ty: 'five', kind: 2, key: top };
-    if (straight) return { ty: 'five', kind: 1, key: top };
+    if (straight) return { ty: 'five', kind: 1, key: skey };
     return null;
   }
   function beats(a, b) {   // a 能不能壓過 b
@@ -128,9 +131,10 @@ const B2 = (() => {
       for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) for (let c = b + 1; c < n; c++) for (let d = c + 1; d < n; d++) for (let e = d + 1; e < n; e++) fives.push([L[a], L[b], L[c], L[d], L[e]]); });
     // 葫蘆、鐵支
     const R = Object.keys(byR).map(Number);
+    const pick = (L, k) => { const out = []; const go = (i, acc) => { if (acc.length === k) { out.push(acc); return; } for (let j = i; j < L.length; j++) go(j + 1, acc.concat([L[j]])); }; go(0, []); return out; };
     R.forEach(r => { const L = byR[r];
-      if (L.length >= 3) R.forEach(q => { if (q !== r && byR[q].length >= 2) fives.push(L.slice(0, 3).concat(byR[q].slice(0, 2))); });
-      if (L.length === 4) { const k = hand.find(c => rk(c) !== r); if (k != null) fives.push(L.concat([k])); } });
+      if (L.length >= 3) pick(L, 3).forEach(t3 => R.forEach(q => { if (q !== r && byR[q].length >= 2) pick(byR[q], 2).forEach(p2 => fives.push(t3.concat(p2))); }));
+      if (L.length === 4) hand.filter(c => rk(c) !== r).forEach(k => fives.push(L.concat([k]))); });
     const seen = new Set();
     fives.forEach(f => { const k = f.slice().sort((a, b) => a - b).join(','); if (seen.has(k)) return; seen.add(k); if (classify(f)) out.push(f); });
     return out.map(cs => ({ cards: cs.slice().sort((a, b) => a - b), cb: classify(cs) })).filter(x => x.cb);

@@ -1,5 +1,5 @@
 /* ---------- 大老二（連線；跟麻將共用牌桌外框、連線流程、結算） ---------- */
-let b2Sel = new Set(), b2HandKey = '', b2Hint = -1, b2Busy = false;
+let b2Groups = {}, b2Sel = new Set(), b2HandKey = '', b2Hint = {}, b2Busy = false;
 const B2_ICON = {n:'🌱',m:'🌻',h:'🏆',r:'💰'};
 
 function openB2Lobby(){
@@ -23,7 +23,7 @@ function b2Rules(){
   const body = `<div class="help">
     <p><b>目標：</b>最先把 13 張牌出完的人贏。</p>
     <p><b>大小：</b>3 最小，2 最大（3 4 5 6 7 8 9 10 J Q K A 2）。一樣大時比花色：♠ 黑桃 &gt; ♥ 紅心 &gt; ♦ 方塊 &gt; ♣ 梅花。</p>
-    <p><b>能出的牌：</b>單張、對子、五張牌型（順子、同花、葫蘆、鐵支、同花順）。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、同花、葫蘆；同花順可以壓所有五張牌型。</p>
+    <p><b>能出的牌：</b>單張、對子、五張牌型（順子、同花、葫蘆、鐵支、同花順）。</p><p><b>順子比大小：</b>看最前面那張：3‑4‑5‑6‑7 &lt; 4‑5‑6‑7‑8 &lt; … &lt; 10‑J‑Q‑K‑A；A‑2‑3‑4‑5 最小，2‑3‑4‑5‑6 最大。一樣的話比最前面那張的花色。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、同花、葫蘆；同花順可以壓所有五張牌型。</p>
     <p><b>怎麼出：</b>第一局拿到梅花 3 的人先出，而且要出到梅花 3；之後每局由上一局贏家先出。輪到你時要出同樣張數、比較大的牌，或按「過」。其他三家都過，就由最後出牌的人重新出任何牌型。</p>
     <p><b>怎麼算：</b>有人出完，其他三家照手上剩幾張付錢，每張 × 桌上的「每張」金額：</p>
     <ul><li>手上的 2，每張多算一張</li><li>剩 10 張以上：加倍</li><li>13 張都沒出：3 倍</li></ul>
@@ -47,7 +47,7 @@ function b2Render(V){
   $('mj').style.setProperty('--b2pet', `url("${typeof chrSrc==='function' ? chrSrc((V.pet||'bunny')+'1') : ''}")`);
   // 換了一副手牌就清掉選牌
   const hk = V.handNo + ':' + (me.hand||[]).join(',');
-  if(hk !== b2HandKey){ const keep = new Set([...b2Sel].filter(c=>(me.hand||[]).includes(c))); b2Sel = keep; b2HandKey = hk; b2Hint = -1; }
+  if(hk !== b2HandKey){ const keep = new Set([...b2Sel].filter(c=>(me.hand||[]).includes(c))); b2Sel = keep; b2HandKey = hk; b2Hint = {}; }
   const myTurn = V.phase==='play' && V.turn===ME && !me.auto;
   const seatCard = j => { const s = V.seats[j], on = wl.includes(j) && V.phase==='play';
     return `<div class="mjs mjs-${mjSeatPos(j)}${on?' on':''}"><div class="mjav"><img src="${avSrc(s.av)}" alt="">${s.auto&&!s.bot?'<span class="mjtg" style="background:#7A8BA6">託</span>':''}</div>
@@ -76,6 +76,15 @@ function b2Render(V){
   const selArr = [...b2Sel].sort((a,b)=>a-b), cb = selArr.length ? B2.classify(selArr) : null;
   const lead = !V.cur || V.cur.by===ME;
   const canPlay = myTurn && cb && (V.must==null || selArr.includes(V.must)) && (lead || B2.beats(cb, curCb(V)));
+  // 現在能出的牌，依牌型分組（對子、順子、同花、葫蘆、鐵支、同花順）
+  b2Groups = {};
+  if(myTurn){
+    const all = B2.combos(hand).filter(x=> x.cards.length > 1 && (V.must==null || x.cards.includes(V.must)) && (lead || B2.beats(x.cb, curCb(V))));
+    all.forEach(x=>{ const n = B2.comboName(x.cb); (b2Groups[n] = b2Groups[n] || []).push(x); });
+    Object.values(b2Groups).forEach(L=>L.sort((a,b)=>a.cb.key-b.cb.key || a.cards[0]-b.cards[0]));
+  }
+  const typeBtns = ['對子','順子','同花','葫蘆','鐵支','同花順'].filter(n=>b2Groups[n]).map(n=>{ const L = b2Groups[n], i = b2Hint[n];
+    return `<button class="b2t${i!=null?' on':''}" data-b2t="${n}">${n}${L.length>1?`<small>${i!=null?`${i+1}/`:''}${L.length}</small>`:''}</button>`; }).join('');
   let hint = '';
   if(myTurn){
     if(V.must!=null && lead) hint = '第一手要出到 ♣3';
@@ -84,8 +93,9 @@ function b2Render(V){
     if(selArr.length && !cb) hint = '這幾張組不成牌型';
     else if(selArr.length && cb && !canPlay && !lead) hint = cb.ty !== curCb(V).ty ? '張數要跟上一手一樣' : cb.ty==='five' && cb.kind !== curCb(V).kind && cb.kind < 4 ? `要出${esc(V.cur.ty)}才能壓（或鐵支、同花順）` : '不夠大';
   }
-  $('mjUi').innerHTML = `${hint?`<div class="mjhint still b2hint">${hint}</div>`:''}
-    ${myTurn ? `<div class="b2btns"><button class="b2b hint" id="b2Hint">提示</button>${V.opts && V.opts.pass ? `<button class="b2b pass" id="b2Pass">過</button>` : ''}<button class="b2b go" id="b2Go" ${canPlay?'':'disabled'}>出牌${cb?`<small>${B2.comboName(cb)}</small>`:''}</button></div>` : ''}
+  $('mjUi').innerHTML = `${hint?`<div class="mjhint still b2hint${myTurn && typeBtns ? ' hi' : ''}">${hint}</div>`:''}
+    ${myTurn && typeBtns ? `<div class="b2types">${typeBtns}</div>` : ''}
+    ${myTurn ? `<div class="b2btns">${V.opts && V.opts.pass ? `<button class="b2b pass" id="b2Pass">過</button>` : ''}<button class="b2b go" id="b2Go" ${canPlay?'':'disabled'}>出牌${cb?`<small>${B2.comboName(cb)}</small>`:''}</button></div>` : ''}
     <div class="b2hand${myTurn?' can':''}" style="--cw:${cw}px">${hand.map(c=>b2Card(c, 'hd'+(b2Sel.has(c)?' sel':''))).join('')}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">每張 ${T.per.toLocaleString()} 金</div>
     <div class="mjbme${wl.includes(ME)&&V.phase==='play'?' on':''}"><img src="${avSrc(me.av)}" alt=""><b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
@@ -105,17 +115,17 @@ function b2Render(V){
 
   // 點牌：選起來／放下
   document.querySelectorAll('#mj .b2hand .b2c').forEach(el=>el.onclick=()=>{
-    const c = +el.dataset.c; if(b2Sel.has(c)) b2Sel.delete(c); else b2Sel.add(c); b2Hint = -1; mjSfx('pick'); b2Render(mjCurView());
+    const c = +el.dataset.c; if(b2Sel.has(c)) b2Sel.delete(c); else b2Sel.add(c); b2Hint = {}; mjSfx('pick'); b2Render(mjCurView());
   });
   if($('b2Go')) $('b2Go').onclick = ()=>{ const cs = [...b2Sel].sort((a,b)=>a-b); if(cs.length) b2Do({a:'play', cards:cs}); };
   if($('b2Pass')) $('b2Pass').onclick = ()=>b2Do({a:'pass'});
-  if($('b2Hint')) $('b2Hint').onclick = ()=>{
-    // 依序提示能出的牌（由小到大）
-    const all = B2.combos(hand).filter(x=> (V.must==null || x.cards.includes(V.must)) && (lead || B2.beats(x.cb, curCb(V))));
-    if(!all.length){ mjToast('沒有比較大的牌，只能過'); return; }
-    all.sort((a,b)=> (lead ? a.cards[0]-b.cards[0] || b.cards.length-a.cards.length : 0) || (a.cb.kind||0)-(b.cb.kind||0) || a.cb.key-b.cb.key);
-    b2Hint = (b2Hint + 1) % all.length; b2Sel = new Set(all[b2Hint].cards); mjSfx('pick'); b2Render(mjCurView());
-  };
+  // 牌型按鈕：點一下選出那種牌型最小的一組，再點換下一組
+  document.querySelectorAll('#mj [data-b2t]').forEach(el=>el.onclick=()=>{
+    const ty = el.dataset.b2t, L = b2Groups[ty] || []; if(!L.length) return;
+    const i = ((b2Hint[ty] ?? -1) + 1) % L.length; b2Hint = { [ty]: i };
+    b2Sel = new Set(L[i].cards); mjSfx('pick'); b2Render(mjCurView()); b2Hint = { [ty]: i };
+  });
+
 
   // 新事件：出牌音效、五張牌型喊出來、有人出完
   const L = V.log || [], N = V.logN != null ? V.logN : L.length;
