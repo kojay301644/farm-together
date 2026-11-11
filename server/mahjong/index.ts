@@ -7,6 +7,7 @@ const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SE
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-mj-test', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
 const J = (o: any, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { ...CORS, 'Content-Type': 'application/json' } });
 class Fail extends Error {}
+let OFF = 0; const NOW = () => Date.now() + OFF;   // OFF 只在測試模擬時使用
 
 async function me(uid: string) {
   const { data } = await sb.from('players').select('id,nickname,avatar,gold,banned').eq('id', uid).maybeSingle();
@@ -26,7 +27,7 @@ async function myTableId(uid: string) { const { data } = await sb.from('mj_views
 async function mutate(id: number, fn: (T: any, now: number) => Promise<any> | any) {
   for (let k = 0; k < 6; k++) {
     const T = await load(id); if (!T) throw new Fail('牌桌不存在');
-    const now = Date.now(), before = T.ver;
+    const now = NOW(), before = T.ver;
     const r = await fn(T, now);
     let out = C.advance(T, now, null);
     if (out.needGold) { const g = await golds(C.humans(T).concat((T.state.pending || []).map((p: any) => p.uid))); out = { ...C.advance(T, now, g), settle: out.settle || null }; }
@@ -45,15 +46,27 @@ async function pushViews(T: any, now: number, kicked: string[]) {
   for (const u of kicked) rows.push({ uid: u, table_id: null, view: { status: 'kicked', msg: '金幣不夠，已經離開牌桌', tid: T.id }, seq: T.ver, updated_at: new Date().toISOString() });
   if (rows.length) await sb.from('mj_views').upsert(rows);
 }
-const viewOf = (T: any, uid: string) => C.viewFor(T, uid, Date.now());
+const viewOf = (T: any, uid: string) => C.viewFor(T, uid, NOW());
 
-async function handle(uid: string, b: any) {
+async function handle(uid: string, b: any, test = false) {
   const a = b.a;
+  if (a === 'sim' && test) {   // 測試：把時間快轉到下一個事件，連跑 n 步
+    const tid = await myTableId(uid); if (!tid) throw new Fail('no table');
+    const log: any[] = [];
+    for (let k = 0; k < Math.min(400, b.steps || 50); k++) {
+      const T0 = await load(tid); if (!T0 || T0.status === 'closed') break;
+      const due = C.dueAt(T0); if (due != null && due > NOW()) OFF += due - NOW() + 1;
+      const { T } = await mutate(tid, () => {});
+      if (T.status === 'play' && T.state.phase === 'end' && !log.some(x => x.hand === T.state.handNo)) log.push({ hand: T.state.handNo, pay: T.state.result.pay, uids: T.state.uids, draw: !!T.state.result.draw });
+    }
+    OFF = 0; const T = await load(tid);
+    return { log, gold: await golds([uid]), view: viewOf(T, uid), ver: T.ver };
+  }
   if (a === 'state' || a === 'tick') {
     const tid = await myTableId(uid); if (!tid) return { view: null };
     const T0 = await load(tid); if (!T0 || T0.status === 'closed') { await sb.from('mj_views').upsert({ uid, table_id: null, view: null, seq: 0 }); return { view: null }; }
     const due = C.dueAt(T0);
-    if (a === 'state' && (due == null || due > Date.now())) return { view: viewOf(T0, uid) };
+    if (a === 'state' && (due == null || due > NOW())) return { view: viewOf(T0, uid) };
     const { T } = await mutate(tid, () => {}); return { view: viewOf(T, uid) };
   }
   if (a === 'quick' || a === 'create' || a === 'join') {
@@ -76,7 +89,7 @@ async function handle(uid: string, b: any) {
         try { const { T } = await mutate(t.id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now)); return { view: viewOf(T, uid) }; } catch (e) { if (!(e instanceof Fail) && !(e instanceof Error)) throw e; }
       }
     }
-    const now = Date.now(), priv = a === 'create';
+    const now = NOW(), priv = a === 'create';
     let code = null;
     if (priv) for (let k = 0; k < 20; k++) { const c = String(1000 + Math.floor(Math.random() * 9000)); const { data: ex } = await sb.from('mj_tables').select('id').eq('code', c).in('status', ['wait', 'play']).limit(1); if (!ex || !ex.length) { code = c; break; } }
     const T = C.newTable(lvl, priv, uid, { uid, name: p.name, av: p.av }, now);
@@ -111,7 +124,7 @@ Deno.serve(async (req) => {
     if (!uid) return J({ error: '請先登入' }, 401);
     const { data: on } = await sb.from('settings').select('value').eq('key', 'mj_on').maybeSingle();
     if (on && String(on.value) === '0') return J({ error: '麻將維護中，等等再來' }, 200);
-    return J(await handle(uid, b));
+    return J(await handle(uid, b, !!tk && b.as === uid));
   } catch (e) {
     if (e instanceof Fail) return J({ error: e.message });
     console.error(e); return J({ error: (e as Error).message || '伺服器錯誤' });
