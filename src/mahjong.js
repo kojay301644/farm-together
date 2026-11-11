@@ -57,6 +57,7 @@ function mjSfx(n){ if(typeof SFX_ON!=='undefined' && !SFX_ON) return; try{
   else if(n==='dice'){ for(let k=0;k<7;k++) noise(0.04, 2400+Math.random()*1200, 0.12, k*0.09); }
   else if(n==='lose'){ [523,440,349,262].forEach((f,k)=>tone(f, 0, 0.32, 'triangle', 0.14, k*0.22)); }
   else if(n==='pick'){ tone(1200, 0, 0.04, 'sine', 0.07); }
+  else if(n==='myturn'){ tone(784, 0, 0.12, 'triangle', 0.16); tone(1175, 0, 0.18, 'triangle', 0.14, 0.11); }
   else if(n==='turn'){ tone(880, 0, 0.06, 'sine', 0.08); }
 }catch(e){} }
 
@@ -170,7 +171,7 @@ function mjTick(first){
   const w = MJ.waitingOn(MJG), bots = w.filter(j=>MJG.seats[j].bot || MJG.seats[j].auto || MJG.seats[j].ting);
   const wait0 = Math.max(0, mjDiceUntil - Date.now());
   const due = w.includes(0) ? MJG.phase+':'+MJG.handNo+':'+MJG.log.length : '';
-  if(due && due!==mjDue){ mjDeadline = Date.now() + wait0 + (MJG.phase==='play'?MJ_TURN_SEC:MJ_CLAIM_SEC)*1000; if(MJG.phase==='play') setTimeout(()=>mjSfx('turn'), wait0); }
+  if(due && due!==mjDue){ mjDeadline = Date.now() + wait0 + (MJG.phase==='play'?MJ_TURN_SEC:MJ_CLAIM_SEC)*1000; }
   mjDue = due;
   if(bots.length){ const j = bots[0], fast = MJG.phase==='claim';
     mjBotT = setTimeout(()=>{ if(!MJG) return; try{ MJ.autoAct(MJG, j, true); }catch(e){ console.warn(e); } mjTick(); }, wait0 + (fast ? 380 : 650 + Math.random()*450)); }
@@ -364,6 +365,10 @@ function mjRender(first){
   const myOn = wl.includes(0) && V.phase!=='end';
 
   $('mjFelt').innerHTML = [1,2,3].map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
+  // 輪到自己：跳出「輪到你了！」＋提示音＋震動（每次輪到只提醒一次）
+  const turnKey = canDis ? V.handNo + ':' + (V.logN != null ? V.logN : (V.log||[]).length) : '';
+  if(turnKey && turnKey !== mjAnimKey.turn){ const d = Math.max(0, mjDiceUntil - Date.now()); setTimeout(()=>{ const VV = mjCurView(); if(VV && VV.phase==='play' && VV.turn===VV.me) mjTurnAlert(); }, d + 50); }
+  mjAnimKey.turn = turnKey;
   const actKey = acts.map(a=>a[0]).join(',') + '|' + V.handNo + ':' + V.phase + ':' + (V.last ? V.last.t + ':' + V.last.from : '') + ':' + me.river.length;
   const actStill = actKey === mjAnimKey.acts; mjAnimKey.acts = actKey;
   const hintKey = hint.replace(/<[^>]+>/g,''); const hintStill = hintKey === mjAnimKey.hint; mjAnimKey.hint = hintKey;
@@ -440,6 +445,13 @@ function mjDice(d, dealer){
     el.querySelectorAll('.mjdi').forEach(x=>x.innerHTML = mjDie(+x.dataset.n)); el.classList.add('done');
     el.querySelector('.mjdt').textContent = `${dealer===mjMe?'你':((mjCurView()||{seats:[]}).seats[dealer]||{}).name||''}（莊家）擲出 ${d[0]+d[1]+d[2]} 點`; } }, 90);
   setTimeout(()=>el.remove(), 2200);
+}
+function mjTurnAlert(){
+  const box = $('mjCall'); if(!box) return;
+  box.querySelectorAll('.mjturn').forEach(x=>x.remove());
+  const d = document.createElement('div'); d.className = 'mjturn'; d.textContent = '輪到你了！';
+  box.appendChild(d); setTimeout(()=>d.remove(), 1900);
+  mjSfx('myturn'); try{ if(typeof vib==='function') vib(60); }catch(e){}
 }
 const sortChi = (u, t) => [u[0], u[1], t].sort((a,b)=>a-b);
 function mjPick(list){
