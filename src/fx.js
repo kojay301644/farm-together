@@ -7,6 +7,7 @@ let SFX_ON = PREF('sfx', true), VIB_ON = PREF('vib', true), BGM_ON = PREF('bgm',
 /* 背景音樂：第一次點畫面後開始播（瀏覽器規定），切到背景自動暫停 */
 let BGM = null;
 function bgmSync(){
+  if(typeof mjOn==='function' && mjOn()){ if(BGM) BGM.pause(); return; }   // 在麻將桌上：換成麻將音樂
   if(!BGM_ON || document.hidden){ if(BGM) BGM.pause(); return; }
   if(!BGM){ BGM = new Audio('assets/bgm.mp3?v='+(typeof BUILD!=='undefined'?BUILD:'')); BGM.loop = true; BGM.volume = 0.35; }
   const p = BGM.play(); if(p && p.catch) p.catch(()=>{});

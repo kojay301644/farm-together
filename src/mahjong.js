@@ -65,7 +65,7 @@ let mjVoice = null, mjVoiceOn = (()=>{ try{ return localStorage.getItem('ytzt_mj
 function mjPickVoice(){ try{ const vs = speechSynthesis.getVoices(); mjVoice = vs.find(v=>/zh[-_]TW/i.test(v.lang)) || vs.find(v=>/zh[-_](HK|Hant)/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang)) || null; }catch(e){} }
 try{ mjPickVoice(); speechSynthesis.onvoiceschanged = mjPickVoice; }catch(e){}
 /* 錄好的男女聲（Higgsfield 生成）：每個座位固定一種聲音；放不出來才改用瀏覽器語音 */
-const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','胡啦':'hu','自摸':'zimo'};
+const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','胡啦':'hu','自摸':'zimo','聽':'ting'};
 let mjMyGender = (()=>{ try{ return localStorage.getItem('ytzt_mjvg')||'f'; }catch(e){ return 'f'; } })();
 const mjVsrc = (g,k) => (window.MJ_VBASE||'assets/voice/') + g + '_' + k + '.mp3' + (typeof BUILD!=='undefined' ? '?v='+BUILD : '');
 const mjVcache = {};
@@ -135,11 +135,22 @@ async function mjCall(a, extra){
   if(data && data.error) throw new Error(data.error);
   return data || {};
 }
-function mjOpen(){ $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; }
+/* 麻將背景音樂（Higgsfield 生成，20 秒無縫循環）：進牌桌換成這首，離開換回農場音樂 */
+let MJ_BGM = null, mjBgmOn = (()=>{ try{ return localStorage.getItem('ytzt_mjbgm')!=='0'; }catch(e){ return true; } })();
+function mjBgmSync(){
+  const want = mjOn() && mjBgmOn && !document.hidden && (typeof BGM_ON==='undefined' || BGM_ON);
+  if(want){ if(!MJ_BGM){ MJ_BGM = new Audio(mjArt('mj_bgm').replace('.webp','.mp3')); MJ_BGM.loop = true; MJ_BGM.volume = 0.4; } const p = MJ_BGM.play(); if(p && p.catch) p.catch(()=>{}); }
+  else if(MJ_BGM) MJ_BGM.pause();
+  if(typeof BGM!=='undefined' && BGM){ if(mjOn()) BGM.pause(); }
+}
+document.addEventListener('visibilitychange', mjBgmSync);
+addEventListener('pointerdown', ()=>{ if(mjOn() && MJ_BGM && MJ_BGM.paused && mjBgmOn) mjBgmSync(); }, {passive:true});
+function mjOpen(){ $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; mjBgmSync(); }
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
   MJG = null; MJO = null; $('mj').classList.remove('on'); document.body.classList.remove('mjon');
+  mjBgmSync(); try{ if(typeof bgmSync==='function') bgmSync(); }catch(e){}
 }
 
 // 練習場
@@ -265,11 +276,13 @@ function mjPanelClose(){ const p=$('mjPanel'); if(p) p.classList.remove('on'); }
 function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
     <button class="mjmi" id="mmRules">📖<span>台數表</span></button>
+    <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
   $('mmRules').onclick = mjRules;
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
+  $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
   $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', 0); mjMenu(); };
   $('mmExit').onclick = ()=>{ mjPanelClose(); mjLeave(); };
 }
@@ -427,7 +440,7 @@ function mjShout(j, txt, small){
   d.className = `mjsh mjsh-${pos}${small?' sm':''}${big?' big':''}`;
   d.innerHTML = `<span>${txt.replace('！','')}</span>${pet && typeof chrSrc==='function' ? `<img src="${chrSrc(pet)}" alt="">` : ''}`;
   box.appendChild(d); setTimeout(()=>d.remove(), 1400);
-  if(!small){ mjSfx(big ? 'win' : 'call'); const w = {'碰！':'碰','吃！':'吃','槓！':'槓','暗槓！':'槓','加槓！':'槓','胡了！':'胡啦','自摸！':'自摸'}[txt] || txt; if(!mjPlayVoice(w, j)) mjSay(w); }
+  if(!small){ mjSfx(big ? 'win' : 'call'); const w = {'碰！':'碰','吃！':'吃','槓！':'槓','暗槓！':'槓','加槓！':'槓','胡了！':'胡啦','自摸！':'自摸','聽！':'聽'}[txt] || txt; if(!mjPlayVoice(w, j)) mjSay(w); }
 }
 function mjResultHtml(V){
   const r = V.result, T = MJ.TABLES[V.table];

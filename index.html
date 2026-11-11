@@ -751,21 +751,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794412553" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794412801" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794412553" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794412553" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794412801" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794412801" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794412553" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794412801" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794412553" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794412553" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794412801" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794412801" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -782,11 +782,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794412553" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794412801" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794412553";
+const BUILD="1794412801";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1460,6 +1460,7 @@ let SFX_ON = PREF('sfx', true), VIB_ON = PREF('vib', true), BGM_ON = PREF('bgm',
 /* 背景音樂：第一次點畫面後開始播（瀏覽器規定），切到背景自動暫停 */
 let BGM = null;
 function bgmSync(){
+  if(typeof mjOn==='function' && mjOn()){ if(BGM) BGM.pause(); return; }   // 在麻將桌上：換成麻將音樂
   if(!BGM_ON || document.hidden){ if(BGM) BGM.pause(); return; }
   if(!BGM){ BGM = new Audio('assets/bgm.mp3?v='+(typeof BUILD!=='undefined'?BUILD:'')); BGM.loop = true; BGM.volume = 0.35; }
   const p = BGM.play(); if(p && p.catch) p.catch(()=>{});
@@ -3518,7 +3519,7 @@ let mjVoice = null, mjVoiceOn = (()=>{ try{ return localStorage.getItem('ytzt_mj
 function mjPickVoice(){ try{ const vs = speechSynthesis.getVoices(); mjVoice = vs.find(v=>/zh[-_]TW/i.test(v.lang)) || vs.find(v=>/zh[-_](HK|Hant)/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang)) || null; }catch(e){} }
 try{ mjPickVoice(); speechSynthesis.onvoiceschanged = mjPickVoice; }catch(e){}
 /* 錄好的男女聲（Higgsfield 生成）：每個座位固定一種聲音；放不出來才改用瀏覽器語音 */
-const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','胡啦':'hu','自摸':'zimo'};
+const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','胡啦':'hu','自摸':'zimo','聽':'ting'};
 let mjMyGender = (()=>{ try{ return localStorage.getItem('ytzt_mjvg')||'f'; }catch(e){ return 'f'; } })();
 const mjVsrc = (g,k) => (window.MJ_VBASE||'assets/voice/') + g + '_' + k + '.mp3' + (typeof BUILD!=='undefined' ? '?v='+BUILD : '');
 const mjVcache = {};
@@ -3588,11 +3589,22 @@ async function mjCall(a, extra){
   if(data && data.error) throw new Error(data.error);
   return data || {};
 }
-function mjOpen(){ $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; }
+/* 麻將背景音樂（Higgsfield 生成，20 秒無縫循環）：進牌桌換成這首，離開換回農場音樂 */
+let MJ_BGM = null, mjBgmOn = (()=>{ try{ return localStorage.getItem('ytzt_mjbgm')!=='0'; }catch(e){ return true; } })();
+function mjBgmSync(){
+  const want = mjOn() && mjBgmOn && !document.hidden && (typeof BGM_ON==='undefined' || BGM_ON);
+  if(want){ if(!MJ_BGM){ MJ_BGM = new Audio(mjArt('mj_bgm').replace('.webp','.mp3')); MJ_BGM.loop = true; MJ_BGM.volume = 0.4; } const p = MJ_BGM.play(); if(p && p.catch) p.catch(()=>{}); }
+  else if(MJ_BGM) MJ_BGM.pause();
+  if(typeof BGM!=='undefined' && BGM){ if(mjOn()) BGM.pause(); }
+}
+document.addEventListener('visibilitychange', mjBgmSync);
+addEventListener('pointerdown', ()=>{ if(mjOn() && MJ_BGM && MJ_BGM.paused && mjBgmOn) mjBgmSync(); }, {passive:true});
+function mjOpen(){ $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; mjBgmSync(); }
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
   MJG = null; MJO = null; $('mj').classList.remove('on'); document.body.classList.remove('mjon');
+  mjBgmSync(); try{ if(typeof bgmSync==='function') bgmSync(); }catch(e){}
 }
 
 // 練習場
@@ -3718,11 +3730,13 @@ function mjPanelClose(){ const p=$('mjPanel'); if(p) p.classList.remove('on'); }
 function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
     <button class="mjmi" id="mmRules">📖<span>台數表</span></button>
+    <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
   $('mmRules').onclick = mjRules;
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
+  $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
   $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', 0); mjMenu(); };
   $('mmExit').onclick = ()=>{ mjPanelClose(); mjLeave(); };
 }
@@ -3880,7 +3894,7 @@ function mjShout(j, txt, small){
   d.className = `mjsh mjsh-${pos}${small?' sm':''}${big?' big':''}`;
   d.innerHTML = `<span>${txt.replace('！','')}</span>${pet && typeof chrSrc==='function' ? `<img src="${chrSrc(pet)}" alt="">` : ''}`;
   box.appendChild(d); setTimeout(()=>d.remove(), 1400);
-  if(!small){ mjSfx(big ? 'win' : 'call'); const w = {'碰！':'碰','吃！':'吃','槓！':'槓','暗槓！':'槓','加槓！':'槓','胡了！':'胡啦','自摸！':'自摸'}[txt] || txt; if(!mjPlayVoice(w, j)) mjSay(w); }
+  if(!small){ mjSfx(big ? 'win' : 'call'); const w = {'碰！':'碰','吃！':'吃','槓！':'槓','暗槓！':'槓','加槓！':'槓','胡了！':'胡啦','自摸！':'自摸','聽！':'聽'}[txt] || txt; if(!mjPlayVoice(w, j)) mjSay(w); }
 }
 function mjResultHtml(V){
   const r = V.result, T = MJ.TABLES[V.table];
