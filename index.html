@@ -593,12 +593,12 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2p.still{animation:none}
 .b2p .b2c+.b2c{margin-left:calc(var(--pw,38px) * -0.4)}
 .b2p.top .b2c{box-shadow:0 0 0 2px #FFD43B,0 0 12px #FFD43B}
-.b2p-t{top:58px;left:50%;transform:translateX(-50%)}
-.b2p-l{left:max(120px,15%);top:40%;transform:translateY(-50%)}
-.b2p-r{right:max(140px,17%);top:40%;transform:translateY(-50%)}
-.b2p-b{left:50%;top:54%;transform:translateX(-50%)}
+.b2p-t{top:24%;left:50%;transform:translateX(-50%)}
+.b2p-l{left:max(130px,21%);top:47%;transform:translateY(-50%)}
+.b2p-r{right:max(150px,23%);top:47%;transform:translateY(-50%)}
+.b2p-b{left:50%;top:60%;transform:translateX(-50%)}
 .b2pass{font-weight:900;color:#9FEFFF;background:rgba(8,20,48,.88);border:1px solid #39F3FF;border-radius:999px;padding:4px 16px;font-size:16px;box-shadow:0 0 10px rgba(0,229,255,.4)}
-.b2mid{position:absolute;left:50%;top:43%;width:58px;height:58px;transform:translate(-50%,-50%);z-index:1}
+.b2mid{position:absolute;left:50%;top:47%;width:50px;height:50px;transform:translate(-50%,-50%);z-index:1}
 .b2pet{position:absolute;inset:0;border-radius:50%;background:var(--b2pet) center/86% no-repeat,radial-gradient(circle,#123A7A,#0A1B44);box-shadow:0 0 0 2px #00E5FF,0 0 0 4px #0A1B44,0 0 0 5px #B26BFF,0 0 16px rgba(0,229,255,.5);opacity:.85}
 .b2sec{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-start;white-space:nowrap}
 .b2sec b{font-size:20px;font-weight:900;color:#FFE59A;min-height:0;line-height:1}.b2sec b.hurry{color:#FF8A8A;animation:mjpulse2 .5s ease-in-out infinite}
@@ -895,21 +895,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794420218" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794420365" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794420218" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794420218" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794420365" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794420365" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794420218" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794420365" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794420218" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794420218" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794420365" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794420365" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -926,11 +926,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794420218" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794420365" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794420218";
+const BUILD="1794420365";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
