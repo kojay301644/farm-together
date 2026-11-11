@@ -91,6 +91,7 @@ const MJ = (() => {
     n: { name: '新手桌', base: 100, tai: 20, min: 2000 },
     m: { name: '中級桌', base: 500, tai: 100, min: 10000 },
     h: { name: '高手桌', base: 2000, tai: 400, min: 40000 },
+    r: { name: '土豪桌', base: 5000, tai: 1000, min: 100000 },
   };
   const RAKE = 0.05;
   function newGame(players, opt = {}) {      // players: [{id,name,av,bot,gold}] ×4

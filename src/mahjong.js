@@ -119,7 +119,7 @@ function openMjLobby(){
   const gold = S.me.gold;
   modal('🀄 麻將', `<div class="rhint">台灣 16 張麻將，輸贏用農場金幣。人不夠時由電腦補位；中途離開，這局由電腦代打、輸贏照算</div>
     <div id="mjBack"></div>
-    ${Object.entries(MJ.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${{n:'🌱',m:'🌻',h:'🏆'}[k]}</div><div class="tx"><b>${t.name}</b>
+    ${Object.entries(MJ.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${{n:'🌱',m:'🌻',h:'🏆',r:'💰'}[k]}</div><div class="tx"><b>${t.name}</b>
       <div>底 ${t.base.toLocaleString()}・每台 ${t.tai.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
       <div class="mjtbb"><button class="mini" data-mjq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-mjc="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
     <div class="mjjoin"><input id="mjCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="mjJoin">加入朋友的房間</button></div>
