@@ -37,11 +37,13 @@ function mjFace(t){
   return MJ_BAM[n].map(([x,y,h,r])=>{ const c=r?MJC.red:MJC.green, w=5.6;
     return `<rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="2.6" fill="${c}"/><rect x="${x-w/2-0.6}" y="${y-0.9}" width="${w+1.2}" height="1.8" rx=".9" fill="${c}" opacity=".7"/><line x1="${x}" y1="${y-h/2+2.5}" x2="${x}" y2="${y+h/2-2.5}" stroke="#fff" stroke-width=".9" opacity=".55"/>`; }).join('');
 }
+// 牌的底圖（Higgsfield 生成：空白正面、背面），牌面上的字和圖案用程式畫，保證正確
+const mjArt = n => (window.MJ_ABASE||'assets/') + n + '.webp' + (typeof BUILD!=='undefined' ? '?v='+BUILD : '');
 function mjTile(t, cls=''){
   const k = t==null ? 'back' : t;
   if(!mjCache[k]) mjCache[k] = t==null
-    ? `<svg viewBox="0 0 44 60"><rect x="0" y="3" width="44" height="57" rx="6" fill="#1F7A4A"/><rect x="0" y="0" width="44" height="56" rx="6" fill="#3BB273"/><rect x="5" y="5" width="34" height="46" rx="4" fill="none" stroke="#7FD6A3" stroke-width="1.6"/><circle cx="22" cy="28" r="6" fill="#7FD6A3" opacity=".7"/></svg>`
-    : `<svg viewBox="0 0 44 60"><rect x="0" y="3" width="44" height="57" rx="6" fill="#3BB273"/><rect x="0" y="0" width="44" height="56" rx="6" fill="#FFFDF4" stroke="#D9CBAA" stroke-width="1"/><rect x="0" y="50" width="44" height="6" fill="#F3EAD5" opacity=".7"/>${mjFace(t)}</svg>`;
+    ? `<svg viewBox="0 0 44 58"><image href="${mjArt('mj_back')}" x="0" y="0" width="44" height="58" preserveAspectRatio="none"/></svg>`
+    : `<svg viewBox="0 0 44 61"><image href="${mjArt('mj_front')}" x="0" y="0" width="44" height="61" preserveAspectRatio="none"/><g transform="translate(0 0.5)">${mjFace(t)}</g></svg>`;
   return `<i class="mt ${cls}" ${t!=null?`data-t="${t}"`:''}>${mjCache[k]}</i>`;
 }
 const mjMeldTiles = m => m.k==='chi' ? [m.t,m.t+1,m.t+2] : m.k==='pon' ? [m.t,m.t,m.t] : m.k==='ankan' ? [null,m.t,m.t,null] : [m.t,m.t,m.t,m.t];
@@ -61,6 +63,19 @@ function mjSfx(n){ if(typeof SFX_ON!=='undefined' && !SFX_ON) return; try{
 let mjVoice = null, mjVoiceOn = (()=>{ try{ return localStorage.getItem('ytzt_mjvoice')!=='0'; }catch(e){ return true; } })();
 function mjPickVoice(){ try{ const vs = speechSynthesis.getVoices(); mjVoice = vs.find(v=>/zh[-_]TW/i.test(v.lang)) || vs.find(v=>/zh[-_](HK|Hant)/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang)) || null; }catch(e){} }
 try{ mjPickVoice(); speechSynthesis.onvoiceschanged = mjPickVoice; }catch(e){}
+/* 錄好的男女聲（Higgsfield 生成）：每個座位固定一種聲音；放不出來才改用瀏覽器語音 */
+const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','胡啦':'hu','自摸':'zimo'};
+let mjMyGender = (()=>{ try{ return localStorage.getItem('ytzt_mjvg')||'f'; }catch(e){ return 'f'; } })();
+const mjVsrc = (g,k) => (window.MJ_VBASE||'assets/voice/') + g + '_' + k + '.mp3' + (typeof BUILD!=='undefined' ? '?v='+BUILD : '');
+const mjVcache = {};
+function mjSeatGender(j){ return j===0 ? mjMyGender : (j===2 ? (mjMyGender==='f'?'m':'f') : (j===1 ? 'm' : 'f')); }
+function mjPlayVoice(word, j){
+  if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON)) return true;
+  const k = MJ_VKEY[word]; if(!k) return false;
+  const src = mjVsrc(mjSeatGender(j||0), k);
+  try{ const a = mjVcache[src] || (mjVcache[src] = new Audio(src)); a.currentTime = 0; a.volume = 1; const p = a.play(); if(p && p.catch) p.catch(()=>mjSay(word)); return true; }catch(e){ return false; }
+}
+function mjPreloadVoice(){ ['m','f'].forEach(g=>Object.values(MJ_VKEY).forEach(k=>{ const s=mjVsrc(g,k); if(!mjVcache[s]){ const a=new Audio(); a.preload='auto'; a.src=s; mjVcache[s]=a; } })); }
 function mjSay(txt){
   if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON) || !window.speechSynthesis) return false;
   if(!mjVoice) mjPickVoice(); if(!mjVoice) return false;
@@ -109,7 +124,7 @@ function mjEnter(table){
   const me = {id:'me', name:S.me.nickname, av:S.me.avatar||11, gold:S.me.gold};
   MJG = MJ.newGame([me, ...bots.map((b,i)=>({id:'b'+i, name:b.name, av:b.av, bot:true, gold:Math.max(MJ.TABLES[table].min*3, 30000)+Math.floor(Math.random()*20000)}))], {table, dealer:Math.floor(Math.random()*4)});
   mjSel = null; mjMiss = 0; mjLastLog = 0; mjDiceHand = 0;
-  $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit();
+  $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice();
   mjTick(true);
 }
 function mjLeave(force){
@@ -177,9 +192,11 @@ function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
     <button class="mjmi" id="mmRules">📖<span>台數表</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
+    <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
   $('mmRules').onclick = mjRules;
-  $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjSay('碰'); mjMenu(); };
+  $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
+  $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', 0); mjMenu(); };
   $('mmExit').onclick = ()=>{ mjPanelClose(); mjLeave(); };
 }
 
@@ -209,9 +226,9 @@ function mjRender(first){
   const tw = Math.max(24, Math.min(58, Math.floor(mjH*0.19*44/60), Math.floor((mjW - 30) / Math.max(units, 12))));
   // 中間（方位盤＋四家打出的牌）夾在對家那排和我的手牌之間，依螢幕高度自動算大小
   const Fh = mjH - 36, handTop = Fh - tw*60/44 - 6, TOPH = 50, avail = handTop - TOPH;
-  const rv = Math.max(13, Math.min(25, Math.floor(((avail - 8 - 92) / 4 - 1) * 44 / 60)));
-  const rowH = rv*60/44 + 1, cScale = Math.min(1, Math.max(0.7, (avail - 4*rowH - 8) / 92));
-  const cy = TOPH + 2*rowH + 4 + 46*cScale;
+  const rv = Math.max(13, Math.min(25, Math.floor(((avail - 8 - 104) / 4 - 1) * 44 / 61)));
+  const rowH = rv*61/44 + 1, cScale = Math.min(1, Math.max(0.65, (avail - 4*rowH - 8) / 104));
+  const cy = TOPH + 2*rowH + 4 + 52*cScale;
   // 有人打牌、我可以吃／碰時：把手上能配的牌標出來
   const oo = V.phase==='claim' && wl.includes(0) ? (V.opts||{}) : {}, lt = V.last && V.last.t;
   const chiSet = new Set((oo.chi||[]).flat()), ponOn = oo.pon || oo.kan;
@@ -267,6 +284,7 @@ function mjRender(first){
   }
 }
 function mjShell(){
+  $('mj').style.setProperty('--mjtable', `url("${mjArt('mj_table')}")`); $('mj').style.setProperty('--mjconsole', `url("${mjArt('mj_console')}")`);
   $('mj').innerHTML = `<div class="mjfelt" id="mjFelt"></div><button class="mjmenu" id="mjMenuB">☰</button>
     <div class="mjcall" id="mjCall"></div><div class="mjui" id="mjUi"></div><div class="mjbar2" id="mjBar"></div>
     <div id="mjEnd"></div><div class="mjpanel" id="mjPanel"></div><div class="mjtoast" id="mjToast"></div>`;
@@ -296,7 +314,7 @@ function mjShout(j, txt, small){
   d.className = `mjsh mjsh-${pos}${small?' sm':''}${big?' big':''}`;
   d.innerHTML = `<span>${txt.replace('！','')}</span>${pet && typeof chrSrc==='function' ? `<img src="${chrSrc(pet)}" alt="">` : ''}`;
   box.appendChild(d); setTimeout(()=>d.remove(), 1400);
-  if(!small){ mjSfx(big ? 'win' : 'call'); mjSay({'碰！':'碰','吃！':'吃','槓！':'槓','暗槓！':'槓','加槓！':'槓','胡了！':'胡啦','自摸！':'自摸'}[txt] || txt); }
+  if(!small){ mjSfx(big ? 'win' : 'call'); const w = {'碰！':'碰','吃！':'吃','槓！':'槓','暗槓！':'槓','加槓！':'槓','胡了！':'胡啦','自摸！':'自摸'}[txt] || txt; if(!mjPlayVoice(w, j)) mjSay(w); }
 }
 function mjResultHtml(V){
   const r = V.result, T = MJ.TABLES[V.table];
