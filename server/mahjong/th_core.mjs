@@ -2,7 +2,7 @@
 // 金幣：坐下時先從金幣扣「帶入籌碼」（index.ts 做），離桌時剩下的籌碼換回金幣（out.bank）；每局輸贏只記錄（out.log）
 import TH from './th_engine.mjs';
 
-export const TT = { TURN: 15000, BOT: 1100, SHOW: 5500, IDLE: 3000, START: 2500 };
+export const TT = { TURN: 10000, BOT: 1100, SHOW: 5500, IDLE: 3000, START: 2500 };
 const BOTS = [{ name: '小兔', av: 3 }, { name: '阿熊', av: 7 }, { name: '狐狸妹', av: 15 }, { name: '企鵝哥', av: 21 }, { name: '水獺', av: 24 }, { name: '小鼠', av: 9 }, { name: '刺蝟', av: 5 }, { name: '浣熊', av: 13 }];
 const BOT_TOTAL = 4;   // 人不夠時，電腦補到 4 人
 
