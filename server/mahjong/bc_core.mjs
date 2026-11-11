@@ -27,6 +27,20 @@ function startRound(G, now) {
 export function advance(T, now, gold) {
   const out = { settle: null, kicked: [] };
   const G = T.state;
+  // 系統桌一直在發牌：沒人看的時候不會有人推進，有人進來時把這段時間該開的局一次補上（照樣用同一副牌靴、記進牌路）
+  const ROUND = BT.BET + 7500 + BT.END;
+  const noBets = G.players.filter(p => p.gold != null).every(p => !Object.values(p.bets || {}).some(Boolean));
+  if (G.phase !== 'start' && noBets && now - G.tEnd > 30000) {
+    const n = Math.min(80, Math.floor((now - G.tEnd) / ROUND));
+    for (let k = 0; k < n; k++) {
+      if (G.shoe.length < 60) { G.shoe = BC.newShoe(); G.hist = []; }
+      const r = BC.deal(G.shoe); G.round++;
+      G.hist.push(r.win + (r.pp ? 'P' : '') + (r.bp ? 'B' : '')); if (G.hist.length > 60) G.hist.splice(0, G.hist.length - 60);
+    }
+    G.phase = 'end'; G.tEnd = now; G.result = null; G.cards = null;
+    // 這段時間沒人推進＝桌上的人都已經不在了：請他們離桌（剛進來的人金幣還沒讀到，留著）
+    G.players = G.players.filter(p => { if (p.gold == null) return true; out.kicked.push({ uid: p.uid, msg: '太久沒動作，已離開百家樂', broke: false }); return false; });
+  }
   for (let i = 0; i < 10; i++) {
     if (T.status !== 'play') break;
     // 新來的人、或每局開始前：先拿到最新金幣
@@ -57,12 +71,12 @@ export function advance(T, now, gold) {
       const BROKE = '你輸光了……回去種田吧！';
       G.players = G.players.filter(p => {
         if (G.leaving.includes(p.uid)) { out.kicked.push({ uid: p.uid, msg: '已經離開牌桌', broke: false }); return false; }
-        if ((p.gold ?? 0) <= 0) { out.kicked.push({ uid: p.uid, msg: BROKE, broke: true }); return false; }
+        if (p.gold != null && p.gold <= 0) { out.kicked.push({ uid: p.uid, msg: BROKE, broke: true }); return false; }
         return true;
       });
       G.leaving = [];
-      if (!G.players.length) { T.status = 'closed'; break; }
-      if (!G.players.some(p => p.uid === T.host)) T.host = G.players[0].uid;
+      // 沒人也不關桌：系統桌一直開著，牌靴和牌路接著用
+      if (G.players.length && !G.players.some(p => p.uid === T.host)) T.host = G.players[0].uid;
       startRound(G, now); continue;
     }
     break;
@@ -97,7 +111,7 @@ export function leave(T, uid, now) {
   const G = T.state, me = G.players.find(p => p.uid === uid); if (!me) return;
   const has = Object.values(me.bets || {}).some(Boolean);
   // 還在下注、或這局沒押：直接離開（押的退回）；已經開牌而且有押：等結算完再離開
-  if (G.phase === 'bet' || G.phase === 'start' || !has) { G.players = G.players.filter(p => p.uid !== uid); if (!G.players.length) T.status = 'closed'; else if (T.host === uid) T.host = G.players[0].uid; return; }
+  if (G.phase === 'bet' || G.phase === 'start' || !has) { G.players = G.players.filter(p => p.uid !== uid); if (G.players.length && T.host === uid) T.host = G.players[0].uid; return; }
   if (!G.leaving.includes(uid)) G.leaving.push(uid);
 }
 export function viewFor(T, uid, now) {

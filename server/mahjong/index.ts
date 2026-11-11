@@ -102,8 +102,10 @@ async function handle(uid: string, b: any, test = false) {
     if (game === 'bc' && a === 'create') throw new Fail('百家樂不能開房，請直接進入牌桌'); const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
     if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
     if (a === 'quick') {
-      const { data: L } = await sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', game === 'bc' ? BC.MAXP : game === 'th' ? TH.SEATS : 4).gt('nh', 0)
-        .gt('updated_at', new Date(Date.now() - 120e3).toISOString()).order('status', { ascending: false }).order('nh', { ascending: false }).limit(5);
+      // 百家樂：系統桌一直開著（就算沒人），先進最早開的那桌
+      const q0 = sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', game === 'bc' ? BC.MAXP : game === 'th' ? TH.SEATS : 4);
+      const { data: L } = game === 'bc' ? await q0.order('id', { ascending: true }).limit(5)
+        : await q0.gt('nh', 0).gt('updated_at', new Date(Date.now() - 120e3).toISOString()).order('status', { ascending: false }).order('nh', { ascending: false }).limit(5);
       const amt0 = game === 'th' ? thAmt(lvl, b.buyin) : 0;
       if (game === 'th') await thBuyin(uid, amt0);
       for (const t of (L || [])) {
