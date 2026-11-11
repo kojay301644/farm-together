@@ -70,14 +70,14 @@ const MJ_VKEY = {'碰':'pon','吃':'chi','槓':'kan','胡啦':'hu','自摸':'zim
 let mjMyGender = (()=>{ try{ return localStorage.getItem('ytzt_mjvg')||'f'; }catch(e){ return 'f'; } })();
 const mjVsrc = (g,k) => (window.MJ_VBASE||'assets/voice/') + g + '_' + k + '.mp3' + (typeof BUILD!=='undefined' ? '?v='+BUILD : '');
 const mjVcache = {};
-function mjSeatGender(j){ return j===0 ? mjMyGender : (j===2 ? (mjMyGender==='f'?'m':'f') : (j===1 ? 'm' : 'f')); }
+function mjSeatGender(j){ return 'f'; }   // 語音統一用女聲
 function mjPlayVoice(word, j){
   if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON)) return true;
   const k = MJ_VKEY[word]; if(!k) return false;
   const src = mjVsrc(mjSeatGender(j||0), k);
   try{ const a = mjVcache[src] || (mjVcache[src] = new Audio(src)); a.currentTime = 0; a.volume = 1; const p = a.play(); if(p && p.catch) p.catch(()=>mjSay(word)); return true; }catch(e){ return false; }
 }
-function mjPreloadVoice(){ ['m','f'].forEach(g=>Object.values(MJ_VKEY).forEach(k=>{ const s=mjVsrc(g,k); if(!mjVcache[s]){ const a=new Audio(); a.preload='auto'; a.src=s; mjVcache[s]=a; } })); }
+function mjPreloadVoice(){ ['f'].forEach(g=>Object.values(MJ_VKEY).forEach(k=>{ const s=mjVsrc(g,k); if(!mjVcache[s]){ const a=new Audio(); a.preload='auto'; a.src=s; mjVcache[s]=a; } })); }
 function mjSay(txt){
   if(!mjVoiceOn || (typeof SFX_ON!=='undefined' && !SFX_ON) || !window.speechSynthesis) return false;
   if(!mjVoice) mjPickVoice(); if(!mjVoice) return false;
@@ -280,12 +280,10 @@ function mjMenu(){
     <button class="mjmi" id="mmRules">📖<span>台數表</span></button>
     <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
-    <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
   $('mmRules').onclick = mjRules;
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
   $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
-  $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', 0); mjMenu(); };
   $('mmExit').onclick = ()=>{ mjPanelClose(); mjLeave(); };
 }
 
