@@ -521,7 +521,7 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mt{display:inline-block;width:var(--w,22px);line-height:0;flex:none;position:relative}
 .mt svg{width:100%;height:auto;display:block;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))}
-.mt.xs{--w:17px}.mt.sm{--w:24px}.mt.rv{--w:25px}.mt.md{--w:28px}.mt.hd{--w:var(--tw)}.mt.mm{--w:var(--mw)}
+.mt.xxs{--w:14px}.mt.xs{--w:17px}.mt.sm{--w:24px}.mt.rv{--w:25px}.mt.md{--w:28px}.mt.hd{--w:var(--tw)}.mt.mm{--w:var(--mw)}
 .mt.got svg{filter:sepia(.35) brightness(.95) drop-shadow(0 1px 1px rgba(0,0,0,.25))}
 .mt.win svg{filter:drop-shadow(0 0 4px #FFC93C) drop-shadow(0 0 2px #FF9F43)}
 .mmeld{display:inline-flex;margin-right:3px;flex:none}
@@ -554,9 +554,9 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjsz-l{left:12px;align-items:flex-start}.mjsz-r{right:62px;align-items:flex-end}
 .mjsz .mjx{display:flex;flex-direction:column;gap:4px}
 .mjsz-r .mjx{align-items:flex-end}
-.mjhid-l,.mjhid-r{position:absolute;flex-direction:column;top:50%;transform:translateY(-50%);z-index:2}
+.mjhid-l,.mjhid-r{position:absolute;flex-direction:column;top:45%;transform:translateY(-50%);z-index:2}
 .mjhid-l{left:94px}.mjhid-r{right:144px}
-.mjbar{display:block;width:13px;height:12px;margin-bottom:-1px;border-radius:3px;background:linear-gradient(90deg,#FFF3DC 0 38%,#F59A2A 38%);box-shadow:0 1px 0 rgba(0,0,0,.35),inset 0 0 0 1px rgba(0,0,0,.08)}
+.mjbar{display:block;width:18px;height:15px;margin-bottom:-1px;border-radius:3px;background:linear-gradient(90deg,#FFF3DC 0 38%,#F59A2A 38%);box-shadow:0 1px 0 rgba(0,0,0,.35),inset 0 0 0 1px rgba(0,0,0,.08)}
 .mjhid-r .mjbar{background:linear-gradient(270deg,#FFF3DC 0 38%,#F59A2A 38%)}
 .mjfl{display:inline-flex;gap:1px;flex:none;background:rgba(255,255,255,.18);border-radius:6px;padding:2px}
 /* 中間：方位盤＋四家打出的牌（以 .mjmid 為中心點） */
@@ -573,10 +573,10 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjcc small{font-size:10px;font-weight:700;opacity:.9;white-space:nowrap}
 .mjr{position:absolute;display:flex;flex-wrap:wrap;gap:1px;align-content:flex-start}
 .mjr .mt.rv{--w:var(--rv)}
-.mjr-b{top:calc(52px * var(--cs) + 4px);left:calc(var(--rv) * -6 - 6px);width:calc((var(--rv) + 1px) * 12)}
-.mjr-t{bottom:calc(52px * var(--cs) + 4px);left:calc(var(--rv) * -6 - 6px);width:calc((var(--rv) + 1px) * 12);flex-direction:row-reverse;flex-wrap:wrap-reverse}
-.mjr-l{right:calc(52px * var(--cs) + 8px);top:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * 4);flex-direction:row-reverse}
-.mjr-r{left:calc(52px * var(--cs) + 8px);top:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * 4)}
+.mjr-b{top:calc(52px * var(--cs) + 4px);left:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * 9)}
+.mjr-t{bottom:calc(52px * var(--cs) + 4px);right:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * 9);flex-direction:row-reverse;flex-wrap:wrap-reverse}
+.mjr-l{right:calc(52px * var(--cs) + 8px);top:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * var(--sc,7));flex-direction:row-reverse}
+.mjr-r{left:calc(52px * var(--cs) + 8px);bottom:calc(-52px * var(--cs));width:calc((var(--rv) + 1px) * var(--sc,7));flex-wrap:wrap-reverse}
 .mt.last svg{filter:drop-shadow(0 0 3px #FFD43B) drop-shadow(0 0 2px #FFD43B)}
 
 .mt.last:after{content:"";position:absolute;left:50%;top:-9px;margin-left:-4px;border:4px solid transparent;border-top:6px solid #FFD43B}
@@ -649,8 +649,8 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 #mj.tech .mjbt{background:rgba(0,229,255,.1);color:#9FEFFF;border:1px solid rgba(0,229,255,.25)}
 #mj.tech .mjbg{background:rgba(0,229,255,.12);color:#7FF6FF}
 #mj.tech .mjmenu{background:#0A1838;color:#5CF2FF;box-shadow:0 0 0 2px #00E5FF,0 0 14px rgba(0,229,255,.6)}
-#mj.tech .mjbar{background:linear-gradient(90deg,#DDF7FF 0 38%,#7A5CFF 38%);box-shadow:0 0 4px rgba(122,92,255,.7)}
-#mj.tech .mjhid-r .mjbar{background:linear-gradient(270deg,#DDF7FF 0 38%,#7A5CFF 38%)}
+#mj.tech .mjbar{background:linear-gradient(90deg,#DDF7FF 0 38%,#2F8BFF 38%);box-shadow:0 0 4px rgba(0,229,255,.6)}
+#mj.tech .mjhid-r .mjbar{background:linear-gradient(270deg,#DDF7FF 0 38%,#2F8BFF 38%)}
 #mj.tech .mt:not([data-t]) svg{filter:hue-rotate(185deg) saturate(1.3) drop-shadow(0 0 3px rgba(0,229,255,.6))}
 #mj.tech .mt.last svg{filter:drop-shadow(0 0 4px #00E5FF) drop-shadow(0 0 2px #00E5FF)}
 #mj.tech .mt.last:after{border-top-color:#00E5FF}
@@ -846,21 +846,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794416803" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794417516" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794416803" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794416803" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794417516" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794417516" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794416803" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794417516" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794416803" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794416803" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794417516" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794417516" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -877,11 +877,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794416803" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794417516" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794416803";
+const BUILD="1794417516";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3876,8 +3876,8 @@ function mjRender(first){
       <div class="mjtx"><div class="mjnm">${esc(s.name)}</div><div class="mjgd">${s.gold.toLocaleString()}</div></div></div>`; };
   // 對手：頭像、沒打的牌、吃碰的牌放在同一個區塊裡排好，不會疊到桌上的牌
   const others = j => { const s = V.seats[j], p = mjSeatPos(j);
-    const ml = s.melds.map(m=>mjMeld(m,'xs')).join('') + (s.flowers.length?`<span class="mjfl">${s.flowers.map(t=>mjTile(t,'xs')).join('')}</span>`:'');
-    if(p==='t') return `<div class="mjtz">${seatCard(j)}<div class="mjhid">${Array.from({length:s.n},()=>mjTile(null,'xs')).join('')}</div>${ml?`<div class="mjx">${ml}</div>`:''}</div>`;
+    const big = p!=='t' || mjW >= 760, ml = s.melds.map(m=>mjMeld(m,'xs')).join('') + (s.flowers.length?`<span class="mjfl">${s.flowers.map(t=>mjTile(t,'xs')).join('')}</span>`:'');
+    if(p==='t') return `<div class="mjtz">${seatCard(j)}<div class="mjhid">${Array.from({length:s.n},()=>mjTile(null, big?'sm':'xxs')).join('')}</div>${ml?`<div class="mjx">${ml}</div>`:''}</div>`;
     return `<div class="mjsz mjsz-${p}">${seatCard(j)}<div class="mjx">${ml}</div></div><div class="mjhid mjhid-${p}">${Array.from({length:s.n},()=>'<i class="mjbar"></i>').join('')}</div>`; };
   const dropKey = V.last ? `${V.handNo}:${V.last.from}:${V.last.t}:${(V.seats[V.last.from]||{river:[]}).river.length}` : '';
   const dropAnim = dropKey && dropKey !== mjAnimKey.drop; mjAnimKey.drop = dropKey;
@@ -3897,15 +3897,20 @@ function mjRender(first){
   const tt = canDis && !me.ting ? MJ.tingTiles({ hand: me.hand }) : null;
   if(!tt) mjTingMode = false;
   const myWaits = me.ting || (!canDis && me.hand.length % 3 === 1) ? MJ.waits(me.hand.length % 3 === 2 && drawn!=null ? (()=>{ const h=me.hand.slice(); h.splice(h.lastIndexOf(drawn),1); return h; })() : me.hand) : [];
-  const waitTxt = w => w.map(t=>`${MJ.name(t)}<small>剩${leftOf(t)}</small>`).join('、');
+  const waitTxt = w => w.map(t=>MJ.name(t)).join("、");   // 只寫聽什麼，不寫剩幾張
   const meldN = me.melds.reduce((a,m)=>a+(m.k==='chi'||m.k==='pon'?3:4),0);
   const units = hand.length + (drawn!=null?1.3:0) + meldN*0.62 + me.melds.length*0.2;
   const tw = Math.max(24, Math.min(58, Math.floor(mjH*0.19*44/60), Math.floor((mjW - 30) / Math.max(units, 17.6))));   // 固定用 17 張＋間隔來算，摸牌打牌時牌的大小和桌面位置才不會跳
   // 中間（方位盤＋四家打出的牌）夾在對家那排和我的手牌之間，依螢幕高度自動算大小
   const Fh = mjH - 36, handTop = Fh - tw*60/44 - 6, TOPH = 50, avail = handTop - TOPH;
-  const rv = Math.max(13, Math.min(25, Math.floor(((avail - 8 - 104) / 4 - 1) * 44 / 61)));
-  const rowH = rv*61/44 + 1, cScale = Math.min(1, Math.max(0.65, (avail - 4*rowH - 8) / 104));
-  const cy = TOPH + 2*rowH + 4 + 52*cScale;
+  // 打出的牌盡量放大（方位盤可以縮小一點），整組放在上排和手牌中間的正中央
+  // 四家打出的牌像風車一樣繞著方位盤排；也不能寬到碰到左右兩家
+  const halfW = mjW/2 - 165, sc = mjW >= 760 ? 7 : 5;   // 左右兩家打出的牌每排幾張（窄螢幕排少一點、排多幾排）
+  const rv = Math.max(13, Math.min(32, Math.floor(((avail - 8 - 104*0.7) / 4 - 1) * 44 / 61), Math.floor((halfW - 8 - 52*0.7) / sc - 1)));
+  const rowH = rv*61/44 + 1;
+  let cScale = Math.min(1, Math.max(0.7, (avail - 4*rowH - 8) / 104));
+  cScale = Math.max(0.7, Math.min(cScale, (halfW - 8 - sc*(rv+1)) / 52));
+  const cy = TOPH + avail/2;
   // 有人打牌、我可以吃／碰時：把手上能配的牌標出來
   const oo = V.phase==='claim' && wl.includes(0) ? (V.opts||{}) : {}, lt = V.last && V.last.t;
   const chiSet = new Set((oo.chi||[]).flat()), ponOn = oo.pon || oo.kan;
@@ -3939,7 +3944,7 @@ function mjRender(first){
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
   const myOn = wl.includes(0) && V.phase!=='end';
 
-  $('mjFelt').innerHTML = [1,2,3].map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
+  $('mjFelt').innerHTML = [1,2,3].map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)};--sc:${sc}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
   // 輪到自己：跳出「輪到你了！」＋提示音＋震動（每次輪到只提醒一次）
   const turnKey = canDis ? V.handNo + ':' + (V.logN != null ? V.logN : (V.log||[]).length) : '';
   if(turnKey && turnKey !== mjAnimKey.turn){ const d = Math.max(0, mjDiceUntil - Date.now()); setTimeout(()=>{ const VV = mjCurView(); if(VV && VV.phase==='play' && VV.turn===VV.me) mjTurnAlert(); }, d + 50); }

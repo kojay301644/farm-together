@@ -327,8 +327,8 @@ function mjRender(first){
       <div class="mjtx"><div class="mjnm">${esc(s.name)}</div><div class="mjgd">${s.gold.toLocaleString()}</div></div></div>`; };
   // 對手：頭像、沒打的牌、吃碰的牌放在同一個區塊裡排好，不會疊到桌上的牌
   const others = j => { const s = V.seats[j], p = mjSeatPos(j);
-    const ml = s.melds.map(m=>mjMeld(m,'xs')).join('') + (s.flowers.length?`<span class="mjfl">${s.flowers.map(t=>mjTile(t,'xs')).join('')}</span>`:'');
-    if(p==='t') return `<div class="mjtz">${seatCard(j)}<div class="mjhid">${Array.from({length:s.n},()=>mjTile(null,'xs')).join('')}</div>${ml?`<div class="mjx">${ml}</div>`:''}</div>`;
+    const big = p!=='t' || mjW >= 760, ml = s.melds.map(m=>mjMeld(m,'xs')).join('') + (s.flowers.length?`<span class="mjfl">${s.flowers.map(t=>mjTile(t,'xs')).join('')}</span>`:'');
+    if(p==='t') return `<div class="mjtz">${seatCard(j)}<div class="mjhid">${Array.from({length:s.n},()=>mjTile(null, big?'sm':'xxs')).join('')}</div>${ml?`<div class="mjx">${ml}</div>`:''}</div>`;
     return `<div class="mjsz mjsz-${p}">${seatCard(j)}<div class="mjx">${ml}</div></div><div class="mjhid mjhid-${p}">${Array.from({length:s.n},()=>'<i class="mjbar"></i>').join('')}</div>`; };
   const dropKey = V.last ? `${V.handNo}:${V.last.from}:${V.last.t}:${(V.seats[V.last.from]||{river:[]}).river.length}` : '';
   const dropAnim = dropKey && dropKey !== mjAnimKey.drop; mjAnimKey.drop = dropKey;
@@ -348,15 +348,20 @@ function mjRender(first){
   const tt = canDis && !me.ting ? MJ.tingTiles({ hand: me.hand }) : null;
   if(!tt) mjTingMode = false;
   const myWaits = me.ting || (!canDis && me.hand.length % 3 === 1) ? MJ.waits(me.hand.length % 3 === 2 && drawn!=null ? (()=>{ const h=me.hand.slice(); h.splice(h.lastIndexOf(drawn),1); return h; })() : me.hand) : [];
-  const waitTxt = w => w.map(t=>`${MJ.name(t)}<small>剩${leftOf(t)}</small>`).join('、');
+  const waitTxt = w => w.map(t=>MJ.name(t)).join("、");   // 只寫聽什麼，不寫剩幾張
   const meldN = me.melds.reduce((a,m)=>a+(m.k==='chi'||m.k==='pon'?3:4),0);
   const units = hand.length + (drawn!=null?1.3:0) + meldN*0.62 + me.melds.length*0.2;
   const tw = Math.max(24, Math.min(58, Math.floor(mjH*0.19*44/60), Math.floor((mjW - 30) / Math.max(units, 17.6))));   // 固定用 17 張＋間隔來算，摸牌打牌時牌的大小和桌面位置才不會跳
   // 中間（方位盤＋四家打出的牌）夾在對家那排和我的手牌之間，依螢幕高度自動算大小
   const Fh = mjH - 36, handTop = Fh - tw*60/44 - 6, TOPH = 50, avail = handTop - TOPH;
-  const rv = Math.max(13, Math.min(25, Math.floor(((avail - 8 - 104) / 4 - 1) * 44 / 61)));
-  const rowH = rv*61/44 + 1, cScale = Math.min(1, Math.max(0.65, (avail - 4*rowH - 8) / 104));
-  const cy = TOPH + 2*rowH + 4 + 52*cScale;
+  // 打出的牌盡量放大（方位盤可以縮小一點），整組放在上排和手牌中間的正中央
+  // 四家打出的牌像風車一樣繞著方位盤排；也不能寬到碰到左右兩家
+  const halfW = mjW/2 - 165, sc = mjW >= 760 ? 7 : 5;   // 左右兩家打出的牌每排幾張（窄螢幕排少一點、排多幾排）
+  const rv = Math.max(13, Math.min(32, Math.floor(((avail - 8 - 104*0.7) / 4 - 1) * 44 / 61), Math.floor((halfW - 8 - 52*0.7) / sc - 1)));
+  const rowH = rv*61/44 + 1;
+  let cScale = Math.min(1, Math.max(0.7, (avail - 4*rowH - 8) / 104));
+  cScale = Math.max(0.7, Math.min(cScale, (halfW - 8 - sc*(rv+1)) / 52));
+  const cy = TOPH + avail/2;
   // 有人打牌、我可以吃／碰時：把手上能配的牌標出來
   const oo = V.phase==='claim' && wl.includes(0) ? (V.opts||{}) : {}, lt = V.last && V.last.t;
   const chiSet = new Set((oo.chi||[]).flat()), ponOn = oo.pon || oo.kan;
@@ -390,7 +395,7 @@ function mjRender(first){
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
   const myOn = wl.includes(0) && V.phase!=='end';
 
-  $('mjFelt').innerHTML = [1,2,3].map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
+  $('mjFelt').innerHTML = [1,2,3].map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)};--sc:${sc}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
   // 輪到自己：跳出「輪到你了！」＋提示音＋震動（每次輪到只提醒一次）
   const turnKey = canDis ? V.handNo + ':' + (V.logN != null ? V.logN : (V.log||[]).length) : '';
   if(turnKey && turnKey !== mjAnimKey.turn){ const d = Math.max(0, mjDiceUntil - Date.now()); setTimeout(()=>{ const VV = mjCurView(); if(VV && VV.phase==='play' && VV.turn===VV.me) mjTurnAlert(); }, d + 50); }
