@@ -361,7 +361,7 @@ function mjRender(first){
     : me.ting ? `<div class="mjhint ting">🀄 已報聽・聽：${waitTxt(myWaits) || '—'}</div>`
     : canDis && tt && selT!=null && tt[selT] ? `<div class="mjhint ting">聽：${waitTxt(tt[selT])}</div>`
     : o.canTing ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}　按「聽」報聽多 1 台</div>`
-    : claimMine ? `<div class="mjhint">不要的話，直接點手牌就好</div>`
+    : claimMine ? `<div class="mjhint">要的話點按鈕或亮起來的牌，不要就點其他手牌</div>`
     : !canDis && myWaits.length ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}</div>`
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
   const myOn = wl.includes(0) && V.phase!=='end';
@@ -383,7 +383,13 @@ function mjRender(first){
 
   if($('mjAuto')) $('mjAuto').onclick = ()=>{ if(MJO) return mjOnline('auto', {on:false}); MJG.seats[0].auto=false; mjMiss=0; mjTick(); };
   document.querySelectorAll('#mj .mjhand .mt.hd').forEach(el=>el.onclick=()=>{
-    if(claimMine){ mjSel = el.dataset.k; mjSfx('pick'); return mjDo({a:'pass'}); }   // 不吃不碰：當作「過」，並先把這張牌選起來
+    if(claimMine){
+      const tt0 = +el.dataset.t;
+      // 點有標「碰」「吃」的牌：直接碰／吃
+      if(el.classList.contains('hp') && o.pon) return mjDo({a:'pon'});
+      if(el.classList.contains('hc') && o.chi){ const u = o.chi.find(c=>c.includes(tt0)); if(u) return mjDo({a:'chi', use:u}); }
+      mjSel = el.dataset.k; mjSfx('pick'); return mjDo({a:'pass'});   // 點其他牌：當作不要，並先把這張牌選起來
+    }
     if(!canDis) return;
     const k = el.dataset.k, t = +el.dataset.t;
     if(mjSel===k){ if(!MJO) mjSfx('tile'); return mjDo({a:'discard', t}); }
@@ -396,7 +402,7 @@ function mjRender(first){
     if(k==='zimo') return mjDo({a:'zimo'});
     if(k==='pon'||k==='kan') return mjDo({a:k});
     if(k==='ankan'||k==='kakan'){ const L=o[k]; if(L.length===1) return mjDo({a:k, t:L[0]}); return mjPick(L.map(t=>({h:[t,t,t,t].map(x=>mjTile(x,'sm')).join(''), a:{a:k,t}}))); }
-    if(k==='chi'){ const L=o.chi; return mjPick(L.map(u=>({h:sortChi(u, V.last.t).map(t=>mjTile(t,'sm'+(t===V.last.t?' got':''))).join(''), a:{a:'chi', use:u}}))); }
+    if(k==='chi'){ const L=o.chi; if(L.length===1) return mjDo({a:'chi', use:L[0]}); return mjPick(L.map(u=>({h:sortChi(u, V.last.t).map(t=>mjTile(t,'sm'+(t===V.last.t?' got':''))).join(''), a:{a:'chi', use:u}}))); }
   });
   if(V.phase==='end') mjBindResult(V);
   // 把這次更新新增的事件都播出來（槓之後會馬上補牌，只看最後一筆會漏掉「槓」）
