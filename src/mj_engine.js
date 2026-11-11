@@ -341,18 +341,52 @@ const MJ = (() => {
   }
 
   /* ---------- 電腦玩家 ---------- */
-  function bestDiscard(s) {
-    const N = s.melds.length, cand = [...new Set(s.hand)];
-    let best = null;
+  // 電腦打牌：只用桌上看得到的資訊（自己的手牌、大家打出的牌、吃碰槓），不偷看別人的牌
+  function seenCount(G, si) {
+    const c = {}, add = (t, n = 1) => { c[t] = (c[t] || 0) + n; };
+    G.seats.forEach((p, j) => { p.river.forEach(t => add(t));
+      p.melds.forEach(m => { if (m.k === 'chi') { add(m.t); add(m.t + 1); add(m.t + 2); } else if (m.k === 'pon') add(m.t, 3); else if (m.k === 'ankan') { if (j === si) add(m.t, 4); } else add(m.t, 4); }); });
+    G.seats[si].hand.forEach(t => add(t));
+    return c;
+  }
+  // 危險度：對已報聽、吃碰很多的人，這張牌有多可能放槍（0 = 安全）
+  function dangerOf(G, si, t, seen) {
+    let d = 0;
+    G.seats.forEach((p, j) => {
+      if (j === si) return;
+      const w = p.ting ? 1.5 : p.melds.length >= 3 ? 1 : (p.melds.length >= 2 && G.wall.length < 40) ? 0.6 : 0;
+      if (!w || p.river.includes(t)) return;
+      let r;
+      if (isHonor(t)) r = (seen[t] || 0) >= 3 ? 0.05 : (seen[t] || 0) === 2 ? 0.3 : 0.6;
+      else { const n = t % 10; r = (seen[t] || 0) >= 3 ? 0.15 : n === 1 || n === 9 ? 0.5 : n === 2 || n === 8 ? 0.75 : 1;
+        if ((n > 3 && p.river.includes(t - 3)) || (n < 7 && p.river.includes(t + 3))) r *= 0.5; }
+      d += w * r;
+    });
+    return d;
+  }
+  function bestDiscard(s, G, si) {
+    const N = s.melds.length, cand = [...new Set(s.hand)], seen = G ? seenCount(G, si) : {};
+    const left = k => Math.max(0, 4 - (seen[k] || 0));
+    const list = [];
     for (const t of cand) {
       const h = s.hand.slice(); removeN(h, t); const sh = shanten(h, N);
-      // 同向聽：比有效牌種類，再優先丟字牌、么九
-      let uk = 0; if (!best || sh <= best.sh) { for (const k of KINDS) { if (shanten(h.concat([k]), N) < sh) uk++; } }
-      const lone = isHonor(t) ? 2 : (t % 10 === 1 || t % 10 === 9) ? 1 : 0;
-      const v = { t, sh, uk, lone };
-      if (!best || sh < best.sh || (sh === best.sh && (uk > best.uk || (uk === best.uk && lone > best.lone)))) best = v;
+      list.push({ t, h, sh, lone: isHonor(t) ? 2 : (t % 10 === 1 || t % 10 === 9) ? 1 : 0, dg: G ? dangerOf(G, si, t, seen) : 0 });
     }
-    return best;
+    const minSh = Math.min(...list.map(v => v.sh));
+    // 同向聽的牌：算還有幾張有效牌（扣掉桌上看得到的）
+    list.forEach(v => { v.uk = 0; if (v.sh <= minSh + (G ? 1 : 0)) for (const k of KINDS) { if (shanten(v.h.concat([k]), N) < v.sh) v.uk += G ? left(k) : 1; } });
+    const pick = (arr, f) => arr.reduce((a, b) => f(b, a) < 0 ? b : a);
+    const attack = (a, b) => a.sh - b.sh || b.uk - a.uk || b.lone - a.lone || a.dg - b.dg;
+    const safest = (a, b) => a.dg - b.dg || a.sh - b.sh || b.uk - a.uk;
+    const threat = G && list.some(v => v.dg > 0);
+    if (!threat) return pick(list, attack);
+    const keep = list.filter(v => v.sh === minSh), kSafe = pick(keep, safest);
+    const tingThreat = G.seats.some((p, j) => j !== si && p.ting);
+    // 有人報聽、自己離聽牌還遠：改打安全牌；其他時候照樣進攻，只是同樣好的牌裡挑比較安全的
+    if (tingThreat && minSh >= 2 && kSafe.dg >= 0.5) return pick(list, safest);
+    if (minSh >= 1 && kSafe.dg >= 1.2 && tingThreat) return pick(list, safest);
+    const ok = keep.filter(v => v.dg <= kSafe.dg + 0.3);
+    return pick(ok, attack);
   }
   function botDecide(G, si) {
     const s = G.seats[si];
@@ -362,14 +396,19 @@ const MJ = (() => {
       if (s.ting) return { a: 'discard', t: G.drawn != null ? G.drawn : s.hand[s.hand.length - 1] };
       if (o.ankan) return { a: 'ankan', t: o.ankan[0] };
       if (o.kakan) return { a: 'kakan', t: o.kakan[0] };
-      const bd = bestDiscard(s);
-      return { a: 'discard', t: bd.t, ting: bd.sh === 0 };
+      const bd = bestDiscard(s, G, si);
+      // 報聽：聽的牌外面還剩夠多才報（報了手牌就鎖住，不能再防守）
+      let ting = false;
+      if (bd.sh === 0) { const seen = seenCount(G, si), w = waits(bd.h), out = w.reduce((n, k) => n + Math.max(0, 4 - (seen[k] || 0)), 0);
+        const threat = G.seats.some((p, j) => j !== si && (p.ting || p.melds.length >= 3));
+        ting = out >= 4 || (out >= 2 && !threat); }
+      return { a: 'discard', t: bd.t, ting };
     }
     if (G.phase === 'claim' && G.pend && G.pend[si] && G.pend[si].pick == null) {
       const o = G.pend[si].opts, t = G.last.t, N = s.melds.length;
       if (o.hu) return { a: 'hu' };
       const sh0 = shanten(s.hand, N);
-      const after = (h) => bestDiscard({ hand: h, melds: new Array(N + 1) }).sh;
+      const after = (h) => bestDiscard({ hand: h, melds: new Array(N + 1) }).sh;   // 只算向聽數，不用看桌面
       if (o.kan) { const h = s.hand.slice(); removeN(h, t, 3); if (shanten(h, N + 1) <= sh0) return { a: 'kan' }; }
       if (o.pon) { const h = s.hand.slice(); removeN(h, t, 2); const sh1 = after(h); const yaku = t >= 45 || t === 41 + G.wind || t === 41 + (si - G.dealer + 4) % 4;
         if (sh1 < sh0 || (yaku && sh1 <= sh0)) return { a: 'pon' }; }
