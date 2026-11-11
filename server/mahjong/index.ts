@@ -2,7 +2,8 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import MJ from './mj_engine.mjs';
 import B2 from './b2_engine.mjs';
-const ENG = (g: string) => (g === 'b2' ? B2 : MJ);
+import BC from './bc_engine.mjs';
+const ENG = (g: string) => (g === 'b2' ? B2 : g === 'bc' ? BC : MJ);
 import * as C from './core.mjs';
 
 const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
@@ -85,10 +86,10 @@ async function handle(uid: string, b: any, test = false) {
       const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now));
       return { view: viewOf(T, uid) };
     }
-    const game = b.game === 'b2' ? 'b2' : 'mj', lvl = b.lvl; const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
+    const game = ['b2', 'bc'].includes(b.game) ? b.game : 'mj', lvl = b.lvl; const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
     if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
     if (a === 'quick') {
-      const { data: L } = await sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', 4).gt('nh', 0)
+      const { data: L } = await sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', game === 'bc' ? BC.MAXP : 4).gt('nh', 0)
         .gt('updated_at', new Date(Date.now() - 120e3).toISOString()).order('status', { ascending: false }).order('nh', { ascending: false }).limit(5);
       for (const t of (L || [])) {
         try { const { T } = await mutate(t.id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now)); return { view: viewOf(T, uid) }; } catch (e) { if (!(e instanceof Fail) && !(e instanceof Error)) throw e; }

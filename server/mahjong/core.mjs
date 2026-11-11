@@ -1,6 +1,7 @@
 // 麻將連線版：牌桌狀態機（純邏輯，不碰資料庫；index.ts 負責讀寫）
 import MJ from './mj_engine.mjs';
 import B2 from './b2_engine.mjs';
+import * as BCC from './bc_core.mjs';
 // 同一套牌桌流程給不同遊戲用：麻將（mj）、大老二（b2）
 const E = (T) => (T.game === 'b2' ? B2 : MJ);
 const turnMs = (T) => (T.game === 'b2' ? 20000 : TIME.TURN);
@@ -11,20 +12,20 @@ const pickBot = (used) => { const L = BOTS.filter(b => !used.includes(b.name)); 
 const botGold = (T) => E(T).TABLES[T.lvl].min * 4 + Math.floor(Math.random() * E(T).TABLES[T.lvl].min * 2);
 
 // T: { id, lvl, priv, code, host, status:'wait'|'play'|'closed', state }
-export function newTable(lvl, priv, host, me, now, game) {
+function _newTable(lvl, priv, host, me, now, game) {
   return { lvl, priv, host, game: game || 'mj', status: 'wait', state: { wait: { players: [me], startAt: priv ? now + 3600e3 : now + TIME.WAIT_START } } };
 }
-export function humans(T) {
+function _humans(T) {
   const G = T.state;
   if (T.status === 'wait') return G.wait.players.map(p => p.uid);
   if (T.status !== 'play') return [];
   return [...new Set(G.uids.filter(Boolean).concat((G.pending || []).map(p => p.uid)))];
 }
-export function seatOf(T, uid) { return T.status === 'play' ? T.state.uids.indexOf(uid) : -1; }
+function _seatOf(T, uid) { return T.status === 'play' ? T.state.uids.indexOf(uid) : -1; }
 
-export function addPlayer(T, me, now) {
+function _addPlayer(T, me, now) {
   const G = T.state;
-  if (humans(T).includes(me.uid)) return;
+  if (_humans(T).includes(me.uid)) return;
   if (T.status === 'wait') { if (G.wait.players.length >= 4) throw new Error('這桌滿了'); G.wait.players.push(me); return; }
   if (T.status === 'play') { if (G.uids.filter(Boolean).length + (G.pending || []).length >= 4) throw new Error('這桌滿了'); (G.pending = G.pending || []).push(me); return; }
   throw new Error('這桌已經關了');
@@ -70,7 +71,7 @@ function nextHandServer(T, gold, now) {
 }
 
 // 推進：開局、電腦出牌、超時代打、結算、下一局。回傳 {settle:{uid:delta}|null, needGold:[uid]}
-export function advance(T, now, gold) {
+function _advance(T, now, gold) {
   const out = { settle: null, kicked: [] };
   for (let i = 0; i < 80; i++) {
     if (T.status === 'wait') {
@@ -117,7 +118,7 @@ export function advance(T, now, gold) {
   return out;
 }
 
-export function dueAt(T) {
+function _dueAt(T) {
   if (T.status === 'wait') return T.state.wait.startAt;
   if (T.status !== 'play') return null;
   const G = T.state;
@@ -131,7 +132,7 @@ export function dueAt(T) {
   return best === Infinity ? null : best;
 }
 
-export function playerAct(T, uid, a, now) {
+function _playerAct(T, uid, a, now) {
   if (T.status !== 'play') throw new Error('牌局還沒開始');
   const G = T.state, j = G.uids.indexOf(uid); if (j < 0) throw new Error('你不在這桌');
   if (a.a === 'ready') { if (!G.ready.includes(j)) G.ready.push(j); return; }
@@ -139,7 +140,7 @@ export function playerAct(T, uid, a, now) {
   E(T).act(G, j, a); G.miss[j] = 0; G.tAct = now;
 }
 
-export function leave(T, uid, now) {
+function _leave(T, uid, now) {
   if (T.status === 'wait') { T.state.wait.players = T.state.wait.players.filter(p => p.uid !== uid); if (T.host === uid && T.priv && T.state.wait.players.length) T.host = T.state.wait.players[0].uid; return; }
   if (T.status !== 'play') return;
   const G = T.state;
@@ -149,8 +150,8 @@ export function leave(T, uid, now) {
   G.seats[j].auto = true;
 }
 
-export function viewFor(T, uid, now) {
-  const base = { tid: T.id, ver: T.ver || 0, game: T.game || 'mj', lvl: T.lvl, priv: T.priv, code: T.priv ? T.code : null, host: T.host === uid, status: T.status, now, due: dueAt(T) };
+function _viewFor(T, uid, now) {
+  const base = { tid: T.id, ver: T.ver || 0, game: T.game || 'mj', lvl: T.lvl, priv: T.priv, code: T.priv ? T.code : null, host: T.host === uid, status: T.status, now, due: _dueAt(T) };
   if (T.status === 'wait') return { ...base, wait: { players: T.state.wait.players.map(p => ({ name: p.name, av: p.av })), startAt: T.state.wait.startAt } };
   if (T.status !== 'play') return base;
   const G = T.state, j = G.uids.indexOf(uid);
@@ -163,3 +164,15 @@ export function viewFor(T, uid, now) {
     broke: (G.broke || []).includes(uid), ready: G.ready, endAt: G.phase === 'end' ? G.endAt + TIME.NEXT_WAIT : null, leaving: G.leaving.includes(uid),
     ticker: G.uids.findIndex(Boolean) === j, pendingN: (G.pending || []).length };
 }
+
+// 依牌桌的遊戲分派：百家樂（bc）有自己的流程，麻將／大老二共用上面這套
+const isBC = (T) => T && T.game === 'bc';
+export function newTable(lvl, priv, host, me, now, game) { return game === 'bc' ? BCC.newTable(lvl, priv, host, me, now) : _newTable(lvl, priv, host, me, now, game); }
+export function humans(T) { return isBC(T) ? BCC.humans(T) : _humans(T); }
+export function seatOf(T, uid) { return isBC(T) ? -1 : _seatOf(T, uid); }
+export function addPlayer(T, me, now) { return isBC(T) ? BCC.addPlayer(T, me, now) : _addPlayer(T, me, now); }
+export function advance(T, now, gold) { return isBC(T) ? BCC.advance(T, now, gold) : _advance(T, now, gold); }
+export function dueAt(T) { return isBC(T) ? BCC.dueAt(T) : _dueAt(T); }
+export function playerAct(T, uid, a, now) { return isBC(T) ? BCC.playerAct(T, uid, a, now) : _playerAct(T, uid, a, now); }
+export function leave(T, uid, now) { return isBC(T) ? BCC.leave(T, uid, now) : _leave(T, uid, now); }
+export function viewFor(T, uid, now) { return isBC(T) ? BCC.viewFor(T, uid, now) : _viewFor(T, uid, now); }

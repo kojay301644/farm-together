@@ -107,13 +107,13 @@ function mjSay(txt){
 const HALL_GAMES = [
   {id:'mj', icon:'🀄', name:'麻將', desc:'台灣 16 張，跟朋友或電腦一起打', open:true},
   {id:'big2', icon:'🃏', name:'大老二', desc:'台灣玩法，四個人搶先出完', open:true},
-  {id:'niu', icon:'🐮', name:'妞妞', desc:'敬請期待'},
+  {id:'bc', icon:'🎴', name:'百家樂', desc:'押莊或閒，最多 6 人同桌', open:true},
   {id:'holdem', icon:'♠️', name:'德州撲克', desc:'敬請期待'},
 ];
 function openHall(){
-  modal('🎰 寵物娛樂廳', `<div class="rhint">用農場金幣跟大家同樂！每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費</div>
+  modal('🎰 寵物娛樂廳', `<div class="rhint">用農場金幣跟大家同樂！麻將、大老二每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費</div>
     <div class="hallg">${HALL_GAMES.map(g=>`<button class="hgc${g.open?'':' off'}" data-hg="${g.id}"><span class="hgi">${g.icon}</span><b>${g.name}</b><small>${g.desc}</small></button>`).join('')}</div>`);
-  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ if(b.dataset.hg==='mj') openMjLobby(); else if(b.dataset.hg==='big2') openB2Lobby(); else toast('這個遊戲還在做，敬請期待！'); });
+  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ if(b.dataset.hg==='mj') openMjLobby(); else if(b.dataset.hg==='big2') openB2Lobby(); else if(b.dataset.hg==='bc') openBcLobby(); else toast('這個遊戲還在做，敬請期待！'); });
 }
 function openMjLobby(){
   const gold = S.me.gold;
@@ -157,10 +157,11 @@ async function mjCall(a, extra){
 }
 /* 麻將背景音樂（Higgsfield 生成，20 秒無縫循環）：進牌桌換成這首，離開換回農場音樂 */
 let MJ_BGM = null, mjBgmOn = (()=>{ try{ return localStorage.getItem('ytzt_mjbgm')!=='0'; }catch(e){ return true; } })();
+const mjBgmKey = V => ({ b2:'b2_bgm', bc:'bc_bgm' })[(V||{}).game] || 'mj_bgm';
 function mjBgmSync(){
   const want = mjOn() && mjBgmOn && !document.hidden && (typeof BGM_ON==='undefined' || BGM_ON);
   if(want){
-    const k = (mjCurView()||{}).game==='b2' ? 'b2_bgm' : 'mj_bgm';   // 大老二、麻將各自的音樂
+    const k = mjBgmKey(mjCurView());   // 每個遊戲各自的音樂
     if(MJ_BGM && MJ_BGM._k !== k){ MJ_BGM.pause(); MJ_BGM = null; }
     if(!MJ_BGM){ MJ_BGM = new Audio(mjArt(k).replace('.webp','.mp3')); MJ_BGM._k = k; MJ_BGM.loop = true; MJ_BGM.volume = 0.4; }
     const p = MJ_BGM.play(); if(p && p.catch) p.catch(()=>{}); }
@@ -242,7 +243,7 @@ function mjCurView(){ return MJG ? mjLocalView() : MJO && MJO.V; }
 
 function mjLeave(force){
   const V = mjCurView();
-  if(!force && V && V.phase && V.phase!=='end' && V.status==='play' && V.me!=null) return mjConfirmLeave();
+  if(!force && V && V.game!=='bc' && V.phase && V.phase!=='end' && V.status==='play' && V.me!=null) return mjConfirmLeave();
   if(MJO){ const o = MJO; o.busy = true; mjCall('leave').then(r=>{ if(typeof r.gold==='number' && S && S.me) S.me.gold = r.gold; try{ refresh(); }catch(e){} }).catch(()=>{}); mjClose(); return; }
   mjClose();
 }
@@ -305,12 +306,12 @@ function mjPanel(title, body, btns){
 function mjPanelClose(){ const p=$('mjPanel'); if(p) p.classList.remove('on'); }
 function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
-    <button class="mjmi" id="mmRules">📖<span>${(mjCurView()||{}).game==='b2'?'規則':'台數表'}</span></button>
+    <button class="mjmi" id="mmRules">📖<span>${['b2','bc'].includes((mjCurView()||{}).game)?'規則':'台數表'}</span></button>
     <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
-  $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else mjRules(); };
+  $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else if(V && V.game==='bc') bcRules(); else mjRules(); };
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
   $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', mjMe); mjMenu(); };
   $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
@@ -320,7 +321,8 @@ function mjMenu(){
 function mjRender(first){
   if(first || !$('mjFelt')) mjShell();
   const V = mjCurView(); if(!V) return;
-  if(MJ_BGM && MJ_BGM._k !== (V.game==='b2' ? 'b2_bgm' : 'mj_bgm')) mjBgmSync();   // 換遊戲就換音樂
+  if(MJ_BGM && MJ_BGM._k !== mjBgmKey(V)) mjBgmSync();   // 換遊戲就換音樂
+  if(V.game==='bc' && V.status==='play' && V.phase) return bcRender(V);
   if(V.status==='wait' || V.pending || V.me==null || V.me<0) return mjRenderWait(V);
   if(V.game==='b2') return b2Render(V);
   mjMe = V.me;

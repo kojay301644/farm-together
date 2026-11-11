@@ -616,6 +616,59 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2rls{display:flex;flex-direction:column;gap:6px;margin:8px 0}
 .b2rl{display:flex;align-items:center;gap:8px}.b2rl>span{font-size:12px;font-weight:900;min-width:52px;color:#5A4A36}
 .b2rh{display:flex}.b2rh .b2c+.b2c{margin-left:-8px}
+/* ---------- 百家樂 ---------- */
+.bcroad{position:absolute;left:14px;top:10px;display:grid;grid-template-rows:repeat(6,15px);grid-auto-flow:column;grid-auto-columns:15px;gap:2px;padding:5px;border-radius:10px;background:rgba(8,20,48,.75);border:1px solid rgba(0,229,255,.35);z-index:2;min-width:60px;min-height:100px}
+.bcroad i{position:relative;width:15px;height:15px;border-radius:50%;font-size:9px;font-weight:900;font-style:normal;color:#fff;display:grid;place-items:center;line-height:1}
+.bcroad .r-b{background:#E2364B}.bcroad .r-p{background:#2F7BFF}.bcroad .r-t{background:#2EAE60}
+.bcroad u{position:absolute;width:5px;height:5px;border-radius:50%;border:1px solid #fff}.bcroad u.pp{right:-1px;bottom:-1px;background:#2F7BFF}.bcroad u.bp{left:-1px;top:-1px;background:#E2364B}
+.bcpl{position:absolute;right:62px;top:8px;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:52%;z-index:2}
+.bcpp{display:flex;align-items:center;gap:4px;padding:2px 8px 2px 2px;border-radius:999px;background:rgba(8,20,48,.8);border:1px solid rgba(0,229,255,.35);font-size:11px;font-weight:900;color:#DDF7FF}
+.bcpp.me{border-color:#FFD43B}
+.bcpp img{width:24px;height:24px;border-radius:50%}.bcpp span{max-width:56px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.bcpp b{color:#FFE59A}.bcpp em{font-style:normal}.bcpp em.up{color:#7CFFB0}.bcpp em.dn{color:#FF8A8A}
+.bctable{position:absolute;left:50%;top:27%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;z-index:1}
+.bcside{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 10px 8px;border-radius:16px;border:2px solid;min-width:150px}
+.bc-p{border-color:#2F7BFF;background:rgba(47,123,255,.12)}.bc-b{border-color:#E2364B;background:rgba(226,54,75,.12)}
+.bcside.won{box-shadow:0 0 0 2px #fff,0 0 22px 6px #FFD43B;animation:mjpulse 1s ease-in-out infinite}
+.bcsh{display:flex;align-items:center;gap:8px;font-weight:900}.bcsh b{font-size:20px;color:#fff}
+.bc-p .bcsh b{color:#8EC2FF}.bc-b .bcsh b{color:#FF8E9B}
+.bcpt{font-size:16px;color:#FFE59A;background:rgba(0,0,0,.35);border-radius:8px;padding:0 8px}
+.bccs{display:flex;gap:4px;min-height:calc(var(--bcw,46px) * 1.4)}
+.b2c.bcc{--w:var(--bcw,46px);animation:bcflip .35s ease-out}
+.b2c.bcc.third{transform:rotate(90deg);margin:0 8px}
+.b2c.ghost{background:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18);animation:none}
+@keyframes bcflip{0%{transform:rotateY(90deg)}100%{transform:none}}
+.b2c.bcc.third{animation:none}
+.bcst{display:flex;flex-direction:column;align-items:center;min-width:110px;text-align:center;font-weight:900}
+.bcst b{font-size:34px;line-height:1;color:#FFE59A}.bcst b.hurry{color:#FF8A8A;animation:mjpulse2 .5s ease-in-out infinite}
+.bcst span{font-size:13px;color:#BDF6FF;white-space:nowrap}
+.bcst.deal span{font-size:15px;color:#FFE59A}
+.bcst.res b{font-size:28px}.bcst.r-b b{color:#FF8E9B}.bcst.r-p b{color:#8EC2FF}.bcst.r-t b{color:#7CFFB0}
+.bcareas{position:absolute;left:14px;right:14px;bottom:calc(100% + 6px);display:flex;gap:6px;pointer-events:auto}
+.bca{position:relative;flex:2;height:74px;border-radius:14px;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#fff;border:2px solid;background:rgba(8,20,48,.7);cursor:pointer}
+.bca-pp,.bca-bp{flex:1.2}.bca-t{flex:1.5}
+.bca b{font-size:22px;font-weight:900;line-height:1}.bca-pp b,.bca-bp b{font-size:16px}
+.bca small{font-size:10px;opacity:.85;font-weight:700}
+.bca-p,.bca-pp{border-color:#2F7BFF;background:linear-gradient(rgba(47,123,255,.28),rgba(8,20,48,.75))}
+.bca-b,.bca-bp{border-color:#E2364B;background:linear-gradient(rgba(226,54,75,.28),rgba(8,20,48,.75))}
+.bca-t{border-color:#2EAE60;background:linear-gradient(rgba(46,174,96,.28),rgba(8,20,48,.75))}
+.bca:disabled{cursor:default}
+.bca.win{box-shadow:0 0 0 2px #fff,0 0 18px 4px #FFD43B}.bca.lose{opacity:.55}
+.bcall{font-size:10px;color:#BDF6FF;font-weight:700}
+.bcmy{position:absolute;right:-6px;top:-10px;z-index:2;min-width:28px;height:28px;padding:0 6px;border-radius:999px;background:radial-gradient(circle at 40% 35%,#FFE59A,#F0A21C);color:#5B3A00;font-size:11px;font-weight:900;display:grid;place-items:center;border:2px dashed #fff;box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.bcmy.pop{animation:bcpop .25s ease-out}
+@keyframes bcpop{0%{transform:scale(.4) translateY(-20px)}100%{transform:none}}
+.bcchips{display:flex;align-items:center;gap:8px;padding:0 14px 4px;pointer-events:auto;height:44px}
+.bcchip{width:40px;height:40px;border-radius:50%;font-family:inherit;font-size:12px;font-weight:900;color:#fff;border:3px dashed rgba(255,255,255,.85);background:radial-gradient(circle,#2F86E0 55%,#1C5FA8 56%);box-shadow:0 3px 0 #0E3A70;flex:none}
+.bcchip:nth-child(2){background:radial-gradient(circle,#2EAE60 55%,#1E6E42 56%);box-shadow:0 3px 0 #164E2E}
+.bcchip:nth-child(3){background:radial-gradient(circle,#A55EEA 55%,#6B2FB0 56%);box-shadow:0 3px 0 #4A1F7A}
+.bcchip:nth-child(4){background:radial-gradient(circle,#F0A21C 55%,#A85A08 56%);box-shadow:0 3px 0 #6E3A04}
+.bcchip.on{transform:translateY(-6px);box-shadow:0 0 0 3px #fff,0 0 16px #00E5FF}
+.bcchip:disabled{filter:grayscale(.7) brightness(.7)}
+.bcclr{height:34px;padding:0 14px;border-radius:999px;font-family:inherit;font-weight:900;font-size:13px;color:#22304A;background:#EFE9DF;border:2px solid #fff}
+.bcclr:disabled{opacity:.45}
+.bcmine{font-size:12px;color:#BDF6FF;font-weight:900;margin-left:auto}.bcmine b{color:#FFE59A}
+.bcwin{font-size:16px;font-weight:900;padding:2px 12px;border-radius:999px;background:rgba(0,0,0,.4)}.bcwin.up{color:#7CFFB0}.bcwin.dn{color:#FF8A8A}
 /* 中間：方位盤＋四家打出的牌（以 .mjmid 為中心點） */
 .mjmid{position:absolute;left:50%;width:0;height:0;z-index:1}
 .mjc{position:absolute;left:-52px;top:-52px;width:104px;height:104px;transform:scale(var(--cs,1));background:var(--mjconsole) center/contain no-repeat;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3))}
@@ -904,21 +957,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794422713" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794423757" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794422713" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794422713" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794423757" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794423757" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794422713" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794423757" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794422713" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794422713" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794423757" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794423757" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -935,11 +988,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794422713" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794423757" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794422713";
+const BUILD="1794423757";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1757,7 +1810,7 @@ const TUT_STEPS = [
   {text:'白蘿蔔大約 <b>2 分鐘</b>成熟。成熟後選「收成」點它，作物就會收進穀倉', target:()=>plotEls[S.plots.findIndex(p=>p.s==='grow')], done:()=>Object.values(S.me.crops||{}).some(n=>n>0), next:true},
   {text:'點<b>穀倉</b>可以把作物賣掉換金幣；穀倉裡的<b>種子商店</b>可以買更多、更高級的種子', target:()=>bEl('barn'), next:true},
   {text:'這是<b>你的家</b>：可以<b>擺放城鎮</b>裝飾、換<b>稱號・頭像框</b>，還有<b>成就</b>可以拿鑽石 💎。下面工具列上方的「🎒 背包」「🐾 我的夥伴」可以打開背包、換夥伴、插裝備和設定自動農場', target:()=>bEl('home'), next:true},
-  {text:'<b>寵物娛樂廳</b>是遊戲廳，可以用金幣跟大家同樂！遊戲有<b>麻將</b>、<b>大老二</b>、<b>妞妞</b>、<b>德州撲克</b>，陸續新增中！', target:()=>bEl('pen'), next:true},
+  {text:'<b>寵物娛樂廳</b>是遊戲廳，可以用金幣跟大家同樂！遊戲有<b>麻將</b>、<b>大老二</b>、<b>百家樂</b>、<b>德州撲克</b>，陸續新增中！', target:()=>bEl('pen'), next:true},
   {text:'<b>綜合商店</b>賣寵物、寵物造型、寵物裝備和道具。裝備會自動播種、澆水、收成、除草、除蟲…插滿 9 種就是<b>全自動農場</b>，休息時間也在賺錢！', target:()=>bEl('decor'), next:true},
   {text:'上面的功能條：點<b>頭像</b>換頭像，📬 <b>禮物信箱</b>收獎勵，📖 <b>遊戲說明</b>，⚙️ 設定（可以開關🎵音樂）。左邊 ✍️ <b>每日簽到</b>（連續 7 天有大獎）和 🎟️ <b>每日轉盤</b>（每天免費轉 1 次）！', target:()=>$('bGift'), next:true},
   {text:'最後，點中間的<b>好友廣場</b>用暱稱加好友、拜訪鄰居，成熟的菜可以偷喔！被偷或被惡作劇時，好友廣場會出現<b>紅點</b>，可以去「動態」看是誰還能<b>復仇</b>。按「開始玩！」還有一隻<b>寵物夥伴</b>送給你 🎁', target:()=>bEl('board'), next:true, last:true},
@@ -3754,13 +3807,13 @@ function mjSay(txt){
 const HALL_GAMES = [
   {id:'mj', icon:'🀄', name:'麻將', desc:'台灣 16 張，跟朋友或電腦一起打', open:true},
   {id:'big2', icon:'🃏', name:'大老二', desc:'台灣玩法，四個人搶先出完', open:true},
-  {id:'niu', icon:'🐮', name:'妞妞', desc:'敬請期待'},
+  {id:'bc', icon:'🎴', name:'百家樂', desc:'押莊或閒，最多 6 人同桌', open:true},
   {id:'holdem', icon:'♠️', name:'德州撲克', desc:'敬請期待'},
 ];
 function openHall(){
-  modal('🎰 寵物娛樂廳', `<div class="rhint">用農場金幣跟大家同樂！每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費</div>
+  modal('🎰 寵物娛樂廳', `<div class="rhint">用農場金幣跟大家同樂！麻將、大老二每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費</div>
     <div class="hallg">${HALL_GAMES.map(g=>`<button class="hgc${g.open?'':' off'}" data-hg="${g.id}"><span class="hgi">${g.icon}</span><b>${g.name}</b><small>${g.desc}</small></button>`).join('')}</div>`);
-  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ if(b.dataset.hg==='mj') openMjLobby(); else if(b.dataset.hg==='big2') openB2Lobby(); else toast('這個遊戲還在做，敬請期待！'); });
+  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ if(b.dataset.hg==='mj') openMjLobby(); else if(b.dataset.hg==='big2') openB2Lobby(); else if(b.dataset.hg==='bc') openBcLobby(); else toast('這個遊戲還在做，敬請期待！'); });
 }
 function openMjLobby(){
   const gold = S.me.gold;
@@ -3804,10 +3857,11 @@ async function mjCall(a, extra){
 }
 /* 麻將背景音樂（Higgsfield 生成，20 秒無縫循環）：進牌桌換成這首，離開換回農場音樂 */
 let MJ_BGM = null, mjBgmOn = (()=>{ try{ return localStorage.getItem('ytzt_mjbgm')!=='0'; }catch(e){ return true; } })();
+const mjBgmKey = V => ({ b2:'b2_bgm', bc:'bc_bgm' })[(V||{}).game] || 'mj_bgm';
 function mjBgmSync(){
   const want = mjOn() && mjBgmOn && !document.hidden && (typeof BGM_ON==='undefined' || BGM_ON);
   if(want){
-    const k = (mjCurView()||{}).game==='b2' ? 'b2_bgm' : 'mj_bgm';   // 大老二、麻將各自的音樂
+    const k = mjBgmKey(mjCurView());   // 每個遊戲各自的音樂
     if(MJ_BGM && MJ_BGM._k !== k){ MJ_BGM.pause(); MJ_BGM = null; }
     if(!MJ_BGM){ MJ_BGM = new Audio(mjArt(k).replace('.webp','.mp3')); MJ_BGM._k = k; MJ_BGM.loop = true; MJ_BGM.volume = 0.4; }
     const p = MJ_BGM.play(); if(p && p.catch) p.catch(()=>{}); }
@@ -3889,7 +3943,7 @@ function mjCurView(){ return MJG ? mjLocalView() : MJO && MJO.V; }
 
 function mjLeave(force){
   const V = mjCurView();
-  if(!force && V && V.phase && V.phase!=='end' && V.status==='play' && V.me!=null) return mjConfirmLeave();
+  if(!force && V && V.game!=='bc' && V.phase && V.phase!=='end' && V.status==='play' && V.me!=null) return mjConfirmLeave();
   if(MJO){ const o = MJO; o.busy = true; mjCall('leave').then(r=>{ if(typeof r.gold==='number' && S && S.me) S.me.gold = r.gold; try{ refresh(); }catch(e){} }).catch(()=>{}); mjClose(); return; }
   mjClose();
 }
@@ -3952,12 +4006,12 @@ function mjPanel(title, body, btns){
 function mjPanelClose(){ const p=$('mjPanel'); if(p) p.classList.remove('on'); }
 function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
-    <button class="mjmi" id="mmRules">📖<span>${(mjCurView()||{}).game==='b2'?'規則':'台數表'}</span></button>
+    <button class="mjmi" id="mmRules">📖<span>${['b2','bc'].includes((mjCurView()||{}).game)?'規則':'台數表'}</span></button>
     <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
-  $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else mjRules(); };
+  $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else if(V && V.game==='bc') bcRules(); else mjRules(); };
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
   $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', mjMe); mjMenu(); };
   $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
@@ -3967,7 +4021,8 @@ function mjMenu(){
 function mjRender(first){
   if(first || !$('mjFelt')) mjShell();
   const V = mjCurView(); if(!V) return;
-  if(MJ_BGM && MJ_BGM._k !== (V.game==='b2' ? 'b2_bgm' : 'mj_bgm')) mjBgmSync();   // 換遊戲就換音樂
+  if(MJ_BGM && MJ_BGM._k !== mjBgmKey(V)) mjBgmSync();   // 換遊戲就換音樂
+  if(V.game==='bc' && V.status==='play' && V.phase) return bcRender(V);
   if(V.status==='wait' || V.pending || V.me==null || V.me<0) return mjRenderWait(V);
   if(V.game==='b2') return b2Render(V);
   mjMe = V.me;
@@ -4630,6 +4685,182 @@ function b2ResultHtml(V){
   return `<div class="mjres"><div class="mjrc${r.winner===V.me?' mine':''}"><div class="mjrl1"><div class="mjrt">${esc(w.name)} 出完了！</div>
     <div class="b2rls">${left}</div><div class="mjrs">每張 ${T.per.toLocaleString()} 金・手上的 2 多算一張・剩 10 張以上加倍・13 張都沒出 3 倍</div></div>
     <div class="mjrl2"><div class="mjpay">${rows}</div>${r.rake?`<div class="mjrk">娛樂廳場地費 ${Math.round(B2.RAKE*100)}%：${r.rake.toLocaleString()} 金</div>`:''}${btns}</div></div></div>`;
+}
+/* 百家樂規則引擎：前端、伺服器共用
+   牌的代號跟大老二一樣：c = 點數 × 4 + 花色；點數 0..12 = 3 4 5 6 7 8 9 10 J Q K A 2 */
+const BC = (() => {
+  const TABLES = {
+    n: { name: '新手桌', min: 2000, bet: 20, max: 2000, chips: [20, 50, 100, 500] },
+    m: { name: '中級桌', min: 10000, bet: 100, max: 10000, chips: [100, 500, 1000, 5000] },
+    h: { name: '高手桌', min: 40000, bet: 400, max: 40000, chips: [400, 2000, 5000, 20000] },
+    r: { name: '土豪桌', min: 100000, bet: 1000, max: 100000, chips: [1000, 5000, 20000, 50000] },
+  };
+  const AREAS = { p: { name: '閒', pay: 1 }, b: { name: '莊', pay: 0.95 }, t: { name: '和', pay: 8 }, pp: { name: '閒對', pay: 11 }, bp: { name: '莊對', pay: 11 } };
+  const MAXP = 6;   // 一桌最多幾人
+  const PETS = ['armad','bear','bunny','deer','dragon','ferret','fox','lizard','marten','mole','moth','mouse','otter','owl','pango','penguin','phoenix','seal'];
+  const rk = c => c >> 2;
+  // 點數：A=1、2～9 照數字、10 J Q K = 0
+  const val = c => { const r = rk(c); return r === 11 ? 1 : r === 12 ? 2 : r <= 6 ? r + 3 : 0; };
+  const pts = cs => cs.reduce((s, c) => s + val(c), 0) % 10;
+  function newShoe() {   // 8 副牌
+    const s = []; for (let d = 0; d < 8; d++) for (let c = 0; c < 52; c++) s.push(c);
+    for (let i = s.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [s[i], s[j]] = [s[j], s[i]]; }
+    return s;
+  }
+  // 發一局：照標準補牌規則
+  function deal(shoe) {
+    const p = [shoe.pop(), shoe.pop()], b = [shoe.pop(), shoe.pop()];
+    [p[1], b[0]] = [b[0], p[1]];   // 發牌順序：閒、莊、閒、莊
+    let pt = pts(p), bt = pts(b);
+    if (pt < 8 && bt < 8) {        // 有天牌（8、9）就不補
+      let p3 = null;
+      if (pt <= 5) { p3 = shoe.pop(); p.push(p3); }
+      const v3 = p3 == null ? null : val(p3);
+      const bDraw = v3 == null ? bt <= 5
+        : bt <= 2 ? true : bt === 3 ? v3 !== 8 : bt === 4 ? v3 >= 2 && v3 <= 7 : bt === 5 ? v3 >= 4 && v3 <= 7 : bt === 6 ? v3 === 6 || v3 === 7 : false;
+      if (bDraw) b.push(shoe.pop());
+      pt = pts(p); bt = pts(b);
+    }
+    const win = pt > bt ? 'p' : bt > pt ? 'b' : 't';
+    return { p, b, pt, bt, win, pp: rk(p[0]) === rk(p[1]), bp: rk(b[0]) === rk(b[1]) };
+  }
+  // 一個人押的錢這局輸贏多少（不含本金）
+  function payout(bets, r) {
+    let d = 0;
+    for (const [k, a] of Object.entries(bets || {})) {
+      if (!a) continue;
+      if (k === 'p' || k === 'b') d += r.win === 't' ? 0 : r.win === k ? Math.floor(a * AREAS[k].pay) : -a;   // 開和：押莊閒退回
+      else if (k === 't') d += r.win === 't' ? a * 8 : -a;
+      else if (k === 'pp') d += r.pp ? a * 11 : -a;
+      else if (k === 'bp') d += r.bp ? a * 11 : -a;
+    }
+    return d;
+  }
+  return { TABLES, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
+})();
+if (typeof module !== 'undefined') module.exports = BC;
+/* ---------- 百家樂（多人同桌，跟系統對賭；共用麻將的牌桌外框、連線流程） ---------- */
+let bcChip = 0, bcTimer = 0, bcStage = '', bcFlash = {};
+const BC_ICON = {n:'🌱',m:'🌻',h:'🏆',r:'💰'};
+const BC_ORDER = ['pp','p','t','b','bp'];
+
+function openBcLobby(){
+  const gold = S.me.gold;
+  modal('🎴 百家樂', `<div class="rhint">押「莊」或「閒」誰的點數比較接近 9，跟娛樂廳對賭，輸贏用農場金幣。最多 ${BC.MAXP} 人同桌，大家一起看開牌</div>
+    <div id="bcBack"></div>
+    ${Object.entries(BC.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${BC_ICON[k]}</div><div class="tx"><b>${t.name}</b>
+      <div>每局最多押 ${t.max.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
+      <div class="mjtbb"><button class="mini" data-bcq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'進入牌桌'}</button><button class="mini sub" data-bcc="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
+    <div class="mjjoin"><input id="bcCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="bcJoin">加入朋友的房間</button></div>
+    <button class="link" id="bcRules">📖 怎麼玩、怎麼賠？</button>`, [['回寵物娛樂廳','sub',openHall]]);
+  const busy = b => { document.querySelectorAll('#md .mini').forEach(x=>x.disabled = b); };
+  const go = async (a, extra) => { busy(true); try{ const r = await mjCall(a, extra); if(!r.view) throw new Error('進不去，等等再試'); closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); busy(false); } };
+  document.querySelectorAll('#md [data-bcq]').forEach(b=>b.onclick=()=>go('quick', {lvl:b.dataset.bcq, game:'bc'}));
+  document.querySelectorAll('#md [data-bcc]').forEach(b=>b.onclick=()=>go('create', {lvl:b.dataset.bcc, game:'bc'}));
+  $('bcJoin').onclick = ()=>{ const c = ($('bcCode').value||'').trim(); if(!/^\d{4}$/.test(c)) return toast('房號是 4 位數字'); go('join', {code:c}); };
+  $('bcRules').onclick = bcRules;
+  mjCall('state').then(r=>{ if(r.view && r.view.status && $('bcBack')) { $('bcBack').innerHTML = `<button class="btn o" id="bcBackB" style="width:100%;margin:6px 0">🎴 你還有一桌在玩，回到牌桌</button>`; $('bcBackB').onclick = ()=>{ closeModal(); mjOnlineEnter(r.view); }; } }).catch(()=>{});
+}
+function bcRules(){
+  const body = `<div class="help">
+    <p><b>怎麼玩：</b>每局有 ${BC_BET_SEC} 秒下注，押「莊」或「閒」哪一邊的點數比較大（最大 9），時間到就開牌。</p>
+    <p><b>點數：</b>A 算 1，2～9 照數字，10、J、Q、K 算 0，加起來只看個位數（例如 7＋8＝15 算 5 點）。</p>
+    <p><b>補牌：</b>兩邊先各拿 2 張，誰拿到 8 或 9 點就直接比；不然照固定規則自動補第 3 張，不用自己決定。</p>
+    <p><b>賠率：</b></p>
+    <ul><li>閒：1 賠 1</li><li>莊：1 賠 0.95（贏了抽 5%）</li><li>和（兩邊一樣大）：1 賠 8；開和時押莊、閒的錢退回</li><li>閒對／莊對（那邊前兩張是對子）：1 賠 11</li></ul>
+    <p>每局可以押好幾個地方，合計不能超過這桌的上限。</p></div>`;
+  if(mjOn()) return mjPanel('📖 百家樂怎麼玩', body, [['知道了','',mjPanelClose]]);
+  modal('📖 百家樂怎麼玩', body, [['知道了','',openBcLobby]]);
+}
+const BC_BET_SEC = 15;
+
+// 開牌動畫：照時間一張一張翻（閒、莊、閒、莊，再補牌）
+function bcReveal(V){
+  if(!V.cards) return { p:0, b:0, done:false };
+  const t = Date.now() - ((V.dealAt||0) + (MJO ? MJO.off : 0));
+  const seq = [['p',0],['b',0],['p',1],['b',1]]; if(V.cards.p.length>2) seq.push(['p',2]); if(V.cards.b.length>2) seq.push(['b',2]);
+  const times = [0,700,1400,2100]; let last = 2100; for(let i=4;i<seq.length;i++){ last += 1000; times.push(last); }
+  if(V.phase==='end') return { p:V.cards.p.length, b:V.cards.b.length, done:true };
+  const n = times.filter(x=>t >= x + 300).length, shown = { p:0, b:0 };
+  seq.slice(0, n).forEach(([s])=>shown[s]++);
+  return { ...shown, done: n >= seq.length };
+}
+function bcRender(V){
+  const T = BC.TABLES[V.lvl] || BC.TABLES.n;
+  if(!T.chips.includes(bcChip)) bcChip = T.chips[0];
+  if(S && S.me && typeof V.myGold==='number') S.me.gold = V.myGold;
+  $('mj').style.setProperty('--b2pet', `url("${typeof chrSrc==='function' ? chrSrc((V.pet||'bunny')+'1') : ''}")`);
+  const felt = $('mjFelt'); if(!felt) return;
+  const rv = bcReveal(V), bet = V.phase==='bet';
+  const cards = side => { const cs = (V.cards && V.cards[side]) || [], n = side==='p' ? rv.p : rv.b;
+    const shown = cs.slice(0, n), pt = shown.length ? BC.pts(shown) : null;
+    const slots = [0,1,2].map(i=> i < cs.length ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'')) : b2Card(null, 'bcc' + (i===2?' third':''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
+    const won = V.result && (V.result.win===side);
+    return `<div class="bcside bc-${side}${won?' won':''}"><div class="bcsh"><b>${side==='p'?'閒':'莊'}</b>${pt!=null?`<span class="bcpt">${pt} 點</span>`:''}</div><div class="bccs">${slots}</div></div>`; };
+  // 路單：最近的結果（紅＝莊、藍＝閒、綠＝和）
+  const hist = (V.hist||[]).slice(-36);
+  const road = `<div class="bcroad">${hist.map(h=>`<i class="r-${h[0]}">${h[0]==='b'?'莊':h[0]==='p'?'閒':'和'}${/P/.test(h)?'<u class="pp"></u>':''}${/B/.test(h)?'<u class="bp"></u>':''}</i>`).join('')}</div>`;
+  const players = `<div class="bcpl">${(V.players||[]).map(p=>`<div class="bcpp${p.me?' me':''}"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span><b>${p.win!=null && p.bet ? (p.win>0?`<em class="up">+${p.win.toLocaleString()}</em>`:p.win<0?`<em class="dn">${p.win.toLocaleString()}</em>`:'退回') : p.bet ? p.bet.toLocaleString() : '—'}</b></div>`).join('')}</div>`;
+  const left = Math.max(0, Math.ceil(((V.tEnd||0) + (MJO?MJO.off:0) - Date.now())/1000));
+  const status = bet ? `<div class="bcst bet"><b id="bcSec">${left}</b><span>請下注</span></div>`
+    : V.phase==='deal' ? `<div class="bcst deal"><span>停止下注・開牌中</span></div>`
+    : V.result ? `<div class="bcst res r-${V.result.win}"><b>${V.result.win==='t'?'和局':V.result.win==='b'?'莊贏':'閒贏'}</b><span>${V.result.pt} : ${V.result.bt}${V.result.pp?'・閒對':''}${V.result.bp?'・莊對':''}</span></div>` : '';
+  felt.innerHTML = `${road}${players}<div class="bctable">${cards('p')}${status}${cards('b')}</div>`;
+
+  // 押注區
+  const my = V.myBets || {}, tot = V.totals || {};
+  const res = V.result, winArea = k => res && (k===res.win || (k==='pp'&&res.pp) || (k==='bp'&&res.bp));
+  const areas = BC_ORDER.map(k=>{ const A = BC.AREAS[k], m = my[k]||0, all = tot[k]||0;
+    const fk = V.round + ':' + k + ':' + m, flash = m && bcFlash[k] !== fk; bcFlash[k] = fk;
+    return `<button class="bca bca-${k}${winArea(k)?' win':''}${res && !winArea(k) && m ? ' lose':''}" data-bca="${k}" ${bet?'':'disabled'}>
+      <b>${A.name}</b><small>1 賠 ${A.pay}</small>${all?`<span class="bcall">全桌 ${all.toLocaleString()}</span>`:''}${m?`<span class="bcmy${flash?' pop':''}">${m.toLocaleString()}</span>`:''}</button>`; }).join('');
+  const myTot = Object.values(my).reduce((s,x)=>s+x,0);
+  const winTxt = V.phase==='end' && V.myWin!=null && myTot ? (V.myWin>0?`<span class="bcwin up">贏 +${V.myWin.toLocaleString()}</span>`:V.myWin<0?`<span class="bcwin dn">輸 ${V.myWin.toLocaleString()}</span>`:`<span class="bcwin">押注退回</span>`) : '';
+  $('mjUi').innerHTML = `<div class="bcareas">${areas}</div>
+    <div class="bcchips">${T.chips.map(c=>`<button class="bcchip${c===bcChip?' on':''}" data-chip="${c}" ${bet?'':'disabled'}>${c>=1000?(c/1000)+'K':c}</button>`).join('')}
+      <button class="bcclr" id="bcClr" ${bet && myTot?'':'disabled'}>清除</button><span class="bcmine">這局押 <b>${myTot.toLocaleString()}</b> / ${T.max.toLocaleString()}</span>${winTxt}</div>`;
+  $('mjBar').innerHTML = `<div class="mjbt">每局最多押 ${T.max.toLocaleString()} 金</div>
+    <div class="mjbme"><img src="${avSrc(S.me.avatar||11)}" alt=""><b>${esc(S.me.nickname||'')}</b><span class="mjbg">${(V.myGold||0).toLocaleString()}</span></div>
+    <div class="mjbt r">${T.name}${V.code?`・房號 ${esc(V.code)}`:''}・第 ${V.round} 局</div>`;
+  $('mjEnd').innerHTML = '';
+
+  document.querySelectorAll('#mj [data-chip]').forEach(b=>b.onclick=()=>{ bcChip = +b.dataset.chip; mjSfx('pick'); bcRender(mjCurView()); });
+  document.querySelectorAll('#mj [data-bca]').forEach(b=>b.onclick=()=>bcBet(b.dataset.bca));
+  if($('bcClr')) $('bcClr').onclick = ()=>{ const VV = mjCurView(); if(!VV || !MJO) return; VV.myBets = {}; mjSfx('pick'); bcRender(VV); bcSend({ a:'clear' }); };
+
+  // 開牌：照時間重畫；有人中獎放音效
+  const stage = V.round + ':' + V.phase + ':' + rv.p + ':' + rv.b;
+  if(stage !== bcStage){
+    if(V.phase==='deal' && (rv.p + rv.b) > 0) mjSfx('tile');
+    if(V.phase==='end' && bcStage.indexOf(V.round + ':end') !== 0 && V.myWin > 0){ mjSfx('win'); }
+    bcStage = stage;
+  }
+  clearInterval(bcTimer);
+  bcTimer = setInterval(()=>{
+    const VV = mjCurView(); if(!VV || VV.game!=='bc' || !mjOn()){ clearInterval(bcTimer); return; }
+    if(VV.phase==='bet'){ const el = $('bcSec'); if(el){ const l = Math.max(0, Math.ceil(((VV.tEnd||0) + (MJO?MJO.off:0) - Date.now())/1000)); el.textContent = l; el.classList.toggle('hurry', l<=5); } return; }
+    if(VV.phase==='deal'){ const r = bcReveal(VV); if(VV.round + ':deal:' + r.p + ':' + r.b !== bcStage) bcRender(VV); }
+  }, 200);
+}
+function bcBet(k){
+  const V = mjCurView(); if(!V || V.phase!=='bet' || !MJO) return;
+  const T = BC.TABLES[V.lvl] || BC.TABLES.n, my = V.myBets || (V.myBets = {});
+  const tot = Object.values(my).reduce((s,x)=>s+x,0) + bcChip;
+  if(tot > T.max) return mjToast(`每局最多押 ${T.max.toLocaleString()} 金`);
+  if(tot > (V.myGold||0)) return mjToast('金幣不夠');
+  // 先顯示在畫面上，伺服器確認在背景做
+  my[k] = (my[k]||0) + bcChip; V.totals = Object.assign({}, V.totals); V.totals[k] = (V.totals[k]||0) + bcChip;
+  mjSfx('pick'); try{ if(typeof vib==='function') vib(15); }catch(e){}
+  bcRender(V);
+  bcSend({ a:'bet', k, amt: bcChip });
+}
+
+// 下注可以連點：每一下都直接送，不用等上一下回來（伺服器用版本號排隊）
+let bcPend = 0;
+function bcSend(act){
+  bcPend++;
+  mjCall('act', { act }).then(r=>{ bcPend--; if(MJO && bcPend===0) mjApply(r.view, null, false, true); })
+    .catch(e=>{ bcPend--; mjToast(e.message); if(MJO) mjCall('state').then(r=>MJO && mjApply(r.view, null, false, true)).catch(()=>{}); });
 }
 
 /* ================= 連線設定 ================= */
