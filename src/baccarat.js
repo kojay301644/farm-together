@@ -59,7 +59,7 @@ function bcRender(V){
   const slide = V.phase==='deal' && rv.p + rv.b === 0 && bcSlid !== V.round;   // 這局第一次畫：牌從牌靴滑出來
   const cards = side => { const cs = (V.cards && V.cards[side]) || [], n = side==='p' ? rv.p : rv.b;
     const shown = cs.slice(0, n), pt = shown.length ? BC.pts(shown) : null;
-    const slots = [0,1,2].map(i=> i < cs.length && (i < 2 || rv.dl[side]) ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'') + (i >= prev[side] ? ' new' : '')) : b2Card(null, 'bcc' + (i===2?' third' + (bcDl3[V.round+side] ? '' : (bcDl3[V.round+side]=1, ' in')):'') + (i<2 && slide ? ` in d${side==='p'?i*2:i*2+1}` : ''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
+    const slots = [0,1,2].map(i=> i < cs.length && (i < 2 || rv.dl[side]) ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'') + (i >= prev[side] ? ' new' : '')) : b2Card(null, 'bcc' + (i===2?' third' + (bcDl3[V.round+side] ? '' : (bcDl3[V.round+side]=1, ' in3')):'') + (i<2 && slide ? ` in d${side==='p'?i*2:i*2+1}` : ''))) : `<i class="b2c bcc ghost${i===2?' third':''}"></i>`).join('');   // 沒牌的格子畫虛線，第三張補進來時牌不會跳
     const won = V.result && (V.result.win===side);
     return `<div class="bcside bc-${side}${won?' won':''}"><div class="bcsh"><b>${side==='p'?'閒':'莊'}</b>${pt!=null?`<span class="bcpt">${pt} 點</span>`:''}</div><div class="bccs">${slots}</div></div>`; };
   const road = bcRoad(V.hist||[]);
