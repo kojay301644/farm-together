@@ -484,7 +484,7 @@ function mjRenderWait(V){
   if($('mjStart')) $('mjStart').onclick = ()=>mjOnline('start');
   if($('mjShout')) $('mjShout').onclick = ()=>{
     const miss = 4 - ((V.wait && V.wait.players) || []).length;
-    const def = `${gname}缺${miss}!!! 房號:${V.code}`;
+    const def = `${gname} ${T.name} ${b2 ? `每張${T.per}` : `${T.base}/${T.tai}`} 缺${miss}!!! 房號:${V.code}`;   // 寫上哪種桌、打多大，大家才知道
     mjPanel('📢 大聲公找人', `<div class="help"><p>會放上全服跑馬燈，大家都看得到。可以改字（最多 30 字）</p></div>
       <input id="mjShTx" maxlength="30" value="${esc(def)}" style="width:100%;font-family:inherit;font-size:17px;font-weight:900;padding:10px 12px;border-radius:12px;border:2px solid #E6D9C3;margin-top:6px">`,
       [['取消','sub',mjPanelClose],['📢 送出','o',async()=>{ const t = ($('mjShTx').value||'').trim(); if(!t) return mjToast('請輸入內容');
