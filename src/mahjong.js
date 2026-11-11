@@ -246,6 +246,12 @@ function mjDo(a){
     if(a.a==='discard'){ const i = me.hand.lastIndexOf(a.t);
       if(i>=0){ me.hand.splice(i,1); me.n = me.hand.length; me.river.push(a.t); if(a.ting) me.ting = true; V.last = { t:a.t, from:V.me }; V.drawn = null; V.waiting = []; V.opts = {}; V.turn = -1;
         mjSfx('tile'); MJO.skipSig = 'discard:' + V.me + ':' + a.t; mjRender(); } }
+    else if(['chi','pon','kan','hu'].includes(a.a)){
+      // 馬上喊出來、按鈕收掉；伺服器確認在背景做（之後同一個事件不再重播）
+      V.waiting = (V.waiting||[]).filter(j=>j!==V.me); V.opts = {};
+      mjShout(V.me, {chi:'吃！',pon:'碰！',kan:'槓！',hu:'胡了！'}[a.a]); MJO.skipShout = a.a + ':' + V.me;
+      const ui = $('mjUi'); if(ui){ const ac = ui.querySelector('.mjacts'); if(ac) ac.innerHTML = ''; const ch = $('mjChi'); if(ch) ch.innerHTML = ''; }
+    }
     else if(a.a==='ting'){ me.ting = true; V.opts = Object.assign({}, V.opts, { canTing:false }); mjRender(); }
     else if(a.a==='pass'){ V.waiting = (V.waiting||[]).filter(j=>j!==V.me); V.opts = {}; mjRender(); }
     return mjOnline('act', { act: a });
@@ -400,7 +406,11 @@ function mjRender(first){
     if(!canDis) return;
     const k = el.dataset.k, t = +el.dataset.t;
     if(mjSel===k){ if(!MJO) mjSfx('tile'); return mjDo({a:'discard', t}); }
-    mjSel = k; mjSfx('pick'); mjRender();
+    mjSel = k; mjSfx('pick');
+    document.querySelectorAll('#mj .mjhand .mt.hd').forEach(x=>x.classList.toggle('sel', x.dataset.k===k));
+    const hEl = document.querySelector('#mjUi .mjhint');
+    if(tt && tt[t]){ const html = `聽：${waitTxt(tt[t])}`; if(hEl){ hEl.className = 'mjhint ting still'; hEl.innerHTML = html; } else $('mjUi').insertAdjacentHTML('afterbegin', `<div class="mjhint ting still">${html}</div>`); }
+    else if(hEl && hEl.classList.contains('ting') && !me.ting) hEl.remove();
   });
   document.querySelectorAll('#mj [data-ma]').forEach(b=>b.onclick=()=>{
     const k = b.dataset.ma;
@@ -419,7 +429,7 @@ function mjRender(first){
   mjLastLog.n = N;
   let shouted = false;
   for(const e of fresh){
-    if(['pon','chi','kan','ankan','kakan','hu','zimo','ting'].includes(e.k)){ mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！',ting:'聽！'}[e.k]); shouted = true; }
+    if(['pon','chi','kan','ankan','kakan','hu','zimo','ting'].includes(e.k)){ if(MJO && MJO.skipShout === e.k + ':' + e.s){ MJO.skipShout = null; shouted = true; continue; } mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！',ting:'聽！'}[e.k]); shouted = true; }
     else if(e.k==='discard'){ const k = 'discard:' + e.s + ':' + e.t; if(MJO && MJO.skipSig === k) MJO.skipSig = null; else mjSfx('tile'); }
     else if(e.k==='flower' && !shouted) mjShout(e.s, '補花', true);
   }

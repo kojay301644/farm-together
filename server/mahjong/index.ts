@@ -35,8 +35,10 @@ async function mutate(id: number, fn: (T: any, now: number) => Promise<any> | an
     const { data: upd } = await sb.from('mj_tables').update({ state: T.state, status: T.status, host: T.host, ver: before + 1, nh, updated_at: new Date().toISOString() }).eq('id', id).eq('ver', before).select('id');
     if (!upd || !upd.length) { await new Promise(r => setTimeout(r, 40 + Math.random() * 80)); continue; }
     T.ver = before + 1;
+    // 結算一定要先做完；推畫面給其他人改成回覆後在背景做，自己的回覆比較快
     if (out.settle) await sb.rpc('mj_settle', { p_tid: id, p_hand: out.settle.hand, p_delta: out.settle.delta });
-    await pushViews(T, now, out.kicked || []);
+    const push = pushViews(T, now, out.kicked || []);
+    try { (globalThis as any).EdgeRuntime?.waitUntil ? (globalThis as any).EdgeRuntime.waitUntil(push) : await push; } catch { await push; }
     return { T, r };
   }
   throw new Fail('太多人同時操作，請再試一次');
