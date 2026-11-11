@@ -400,7 +400,7 @@ const MJ = (() => {
       left: Math.max(0, G.wall.length - RESERVE), last: G.last, dice: G.dice,
       seats: G.seats.map((s, j) => ({ name: s.name, av: s.av, bot: s.bot, gold: s.gold, auto: s.auto, ting: !!s.ting, n: s.hand.length, melds: s.melds, flowers: s.flowers, river: s.river,
         hand: (j === me || end) ? sortT(s.hand.slice()) : null, wind: (j - G.dealer + 4) % 4 })),
-      drawn: G.turn === me ? G.drawn : null, opts: Object.assign({}, options(G, me), (me >= 0 && G.seats[me] && canTing(G, me)) ? { canTing: true } : {}), waiting: waitingOn(G), result: G.result, log: G.log.slice(-6),
+      drawn: G.turn === me ? G.drawn : null, opts: Object.assign({}, options(G, me), (me >= 0 && G.seats[me] && canTing(G, me)) ? { canTing: true } : {}), waiting: waitingOn(G), result: G.result, log: G.log.slice(-6), logN: G.log.length,
     };
   }
 

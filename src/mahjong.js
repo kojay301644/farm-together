@@ -146,7 +146,7 @@ function mjBgmSync(){
 document.addEventListener('visibilitychange', mjBgmSync);
 addEventListener('pointerdown', ()=>{ if(mjOn() && MJ_BGM && MJ_BGM.paused && mjBgmOn) mjBgmSync(); }, {passive:true});
 function mjOpenReset(){ mjAnimKey = {}; }
-function mjOpen(){ mjOpenReset(); $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; mjBgmSync(); }
+function mjOpen(){ mjOpenReset(); $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = null; mjDiceHand = 0; mjBgmSync(); }
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
@@ -391,11 +391,16 @@ function mjRender(first){
     if(k==='chi'){ const L=o.chi; return mjPick(L.map(u=>({h:sortChi(u, V.last.t).map(t=>mjTile(t,'sm'+(t===V.last.t?' got':''))).join(''), a:{a:'chi', use:u}}))); }
   });
   if(V.phase==='end') mjBindResult(V);
-  const e = (V.log||[])[(V.log||[]).length-1], sig = V.handNo + ':' + V.seq + ':' + (e?e.k:'');
-  if(e && sig!==mjLastLog){ mjLastLog = sig;
-    if(['pon','chi','kan','ankan','kakan','hu','zimo','ting'].includes(e.k)) mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！',ting:'聽！'}[e.k]);
+  // 把這次更新新增的事件都播出來（槓之後會馬上補牌，只看最後一筆會漏掉「槓」）
+  const L = V.log || [], N = V.logN != null ? V.logN : L.length;
+  if(!mjLastLog || mjLastLog.h !== V.handNo || N < mjLastLog.n) mjLastLog = { h: V.handNo, n: Math.max(0, N - 1) };
+  const fresh = L.slice(Math.max(0, L.length - (N - mjLastLog.n)));
+  mjLastLog.n = N;
+  let shouted = false;
+  for(const e of fresh){
+    if(['pon','chi','kan','ankan','kakan','hu','zimo','ting'].includes(e.k)){ mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！',ting:'聽！'}[e.k]); shouted = true; }
     else if(e.k==='discard'){ const k = 'discard:' + e.s + ':' + e.t; if(MJO && MJO.skipSig === k) MJO.skipSig = null; else mjSfx('tile'); }
-    else if(e.k==='flower') mjShout(e.s, '補花', true);
+    else if(e.k==='flower' && !shouted) mjShout(e.s, '補花', true);
   }
 }
 function mjRenderWait(V){
