@@ -86,7 +86,7 @@ function _advance(T, now, gold) {
       if (!G.settled) {
         G.settled = true; G.endAt = now;
         const d = {}; G.uids.forEach((u, j) => { if (u && G.result.pay[j]) d[u] = (d[u] || 0) + G.result.pay[j]; });
-        out.settle = { hand: G.handNo, delta: d };
+        out.settle = { hand: G.handNo, delta: d, house: (G.result && G.result.rake) || 0 };   // 娛樂廳這局抽了多少
         // 輸光（金幣變 0）：直接請他離桌
         G.broke = [];
         G.uids.forEach((u, j) => { if (u && G.seats[j].gold <= 0) { G.broke.push(u); if (!G.leaving.includes(u)) G.leaving.push(u); G.seats[j].auto = true; } });

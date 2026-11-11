@@ -60,7 +60,7 @@ button.ok{background:#3BB273!important;color:#fff!important}button.bad{backgroun
 <body>
 <header><h1>🌱 一起種田吧｜營運後台</h1><span class="who" id="who"></span><a href="./" target="_blank">開啟遊戲</a></header>
 <nav id="nav" style="display:none">
-  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="pl">玩家管理</button><button data-t="nt">公告</button>
+  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="pl">玩家管理</button><button data-t="cs">🎰 娛樂廳</button><button data-t="nt">公告</button>
   <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="gf">發獎／兌換碼</button><button data-t="ev">活動／維護</button><button data-t="bt">電腦玩家</button><button data-t="lg">操作紀錄</button>
 </nav>
 <main id="main"><div class="center"><div class="muted">讀取中…</div></div></main>
@@ -121,6 +121,39 @@ async function pageRp(){
   document.querySelectorAll('[data-rs]').forEach(b=>b.onclick=async()=>{ const [id,st]=b.dataset.rs.split('|'); const ta=$('rr_'+id);
     try{ await rpc('adm_report_set', {p_id:+id, p_status:st, p_reply: ta ? ta.value : null}); toast('已更新'); pageRp(); }catch(e){ toast(e.message); } });
 }
+// ---------- 娛樂廳輸贏紀錄 ----------
+const CSG = { mj:'🀄 麻將', b2:'🃏 大老二', bc:'🎴 百家樂' }, CS_BIG = 100000;
+let csDays = 1, csGame = '', csQ = '';
+const csAmt = v => `<b style="color:${v>0?'#1E9E55':v<0?'#D3403A':'#666'}">${v>0?'+':''}${(v||0).toLocaleString()}</b>`;
+async function pageCs(){
+  M(`<div class="card"><div class="muted">讀取中…</div></div>`);
+  let R; try{ R = await rpc('adm_casino', { p_days: csDays, p_game: csGame || null, p_q: csQ || null }); }catch(e){ return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+  const btn = (on, attr, t) => `<button class="btn ${on?'':'g'}" ${attr}>${t}</button>`;
+  const filt = `<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">${[[1,'今天'],[7,'7 天'],[30,'30 天'],[0,'全部']].map(([d,t])=>btn(csDays===d,`data-cd="${d}"`,t)).join('')}
+    <span style="width:12px"></span>${[['','全部遊戲'],['mj',CSG.mj],['b2',CSG.b2],['bc',CSG.bc]].map(([g,t])=>btn(csGame===g,`data-cg="${g}"`,t)).join('')}</div>`;
+  const sum = R.summary.length ? `<table class="tb"><tr><th>遊戲</th><th>局數</th><th>玩家總輸贏</th><th>娛樂廳收入</th></tr>${R.summary.map(x=>`<tr><td>${CSG[x.game]||esc(x.game)}</td><td>${x.hands.toLocaleString()}</td><td>${csAmt(x.net)}</td><td>${csAmt(x.house)}</td></tr>`).join('')}
+    <tr><td><b>合計</b></td><td>${R.summary.reduce((a,x)=>a+x.hands,0).toLocaleString()}</td><td>${csAmt(R.summary.reduce((a,x)=>a+x.net,0))}</td><td>${csAmt(R.summary.reduce((a,x)=>a+x.house,0))}</td></tr></table>
+    <div class="muted" style="margin-top:6px">娛樂廳收入：麻將、大老二是 5% 場地費；百家樂是莊家（系統）的賺賠。這兩欄從 ${'2026/11/12'} 之後才開始記，之前的局只有玩家輸贏。</div>` : '<div class="muted">這段時間沒有紀錄</div>';
+  const rank = (L, k) => L.length ? `<table class="tb"><tr><th>#</th><th>玩家</th><th>總輸贏</th><th>局數</th><th>${k==='best'?'單局最多贏':'單局最多輸'}</th></tr>${L.map((x,i)=>`<tr><td>${i+1}</td><td><a href="#" data-cp="${x.uid}">${esc(x.nick||'')}</a></td><td>${csAmt(x.net)}</td><td>${x.n}</td><td>${csAmt(x[k])}</td></tr>`).join('')}</table>` : '<div class="muted">沒有</div>';
+  const recent = R.recent.length ? `<table class="tb"><tr><th>時間</th><th>遊戲</th><th>桌／局</th><th>玩家</th><th>輸贏</th></tr>${R.recent.map(x=>`<tr${Math.abs(x.amt)>=CS_BIG?' style="background:#FFE9E9"':''}><td>${dt(x.at)}</td><td>${CSG[x.game]||esc(x.game)}</td><td>#${x.tid}／${x.hand}</td><td><a href="#" data-cp="${x.uid}">${esc(x.nick||'')}</a></td><td>${csAmt(x.amt)}${Math.abs(x.amt)>=CS_BIG?' ⚠️':''}</td></tr>`).join('')}</table>` : '<div class="muted">沒有紀錄</div>';
+  M(`<div class="card"><h2>🎰 娛樂廳輸贏</h2>${filt}${sum}</div>
+    <div class="row" style="gap:12px;align-items:flex-start;flex-wrap:wrap"><div class="card" style="flex:1;min-width:300px"><h2>🏆 贏最多</h2>${rank(R.winners,'best')}</div><div class="card" style="flex:1;min-width:300px"><h2>💸 輸最多</h2>${rank(R.losers,'worst')}</div></div>
+    <div class="card"><h2>📜 最近紀錄</h2><div class="row" style="gap:6px;margin-bottom:8px"><input id="csQ" placeholder="搜尋玩家名字" value="${esc(csQ)}"><button class="btn" id="csGo">搜尋</button></div>
+      <div class="muted" style="margin-bottom:6px">單局輸贏超過 ${CS_BIG.toLocaleString()} 會標紅 ⚠️</div>${recent}</div>`);
+  document.querySelectorAll('[data-cd]').forEach(b=>b.onclick=()=>{ csDays=+b.dataset.cd; pageCs(); });
+  document.querySelectorAll('[data-cg]').forEach(b=>b.onclick=()=>{ csGame=b.dataset.cg; pageCs(); });
+  $('csGo').onclick = ()=>{ csQ = $('csQ').value.trim(); pageCs(); };
+  $('csQ').onkeydown = e=>{ if(e.key==='Enter') $('csGo').click(); };
+  document.querySelectorAll('[data-cp]').forEach(a=>a.onclick=e=>{ e.preventDefault(); csPlayer(a.dataset.cp); });
+}
+async function csPlayer(id){
+  M(`<div class="card"><div class="muted">讀取中…</div></div>`);
+  let P; try{ P = await rpc('adm_casino_player', { p_id: id }); }catch(e){ return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+  M(`<div class="card"><button class="btn g" id="csBack">← 返回</button> <button class="btn g" id="csPl">看玩家資料</button><h2 style="margin-top:10px">🎰 ${esc(P.nick||'')} 的娛樂廳紀錄</h2>
+    <table class="tb"><tr><th>遊戲</th><th>局數</th><th>總輸贏</th></tr>${P.by_game.map(x=>`<tr><td>${CSG[x.game]||esc(x.game)}</td><td>${x.n}</td><td>${csAmt(x.net)}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">沒有紀錄</td></tr>'}</table></div>
+    <div class="card"><h2>每一局（最近 200 局）</h2><table class="tb"><tr><th>時間</th><th>遊戲</th><th>桌／局</th><th>輸贏</th></tr>${P.list.map(x=>`<tr${Math.abs(x.amt)>=CS_BIG?' style="background:#FFE9E9"':''}><td>${dt(x.at)}</td><td>${CSG[x.game]||esc(x.game)}</td><td>#${x.tid}／${x.hand}</td><td>${csAmt(x.amt)}</td></tr>`).join('')}</table></div>`);
+  $('csBack').onclick = pageCs; $('csPl').onclick = ()=>showPlayer(id);
+}
 function showLogin(){
   $('main').innerHTML = `<div class="center"><div class="login"><h2>管理員登入</h2>
     <input id="em" type="email" placeholder="Email"><input id="pw" type="password" placeholder="密碼">
@@ -130,7 +163,7 @@ function showLogin(){
   $('li').onclick = async()=>{ const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('pw').value}); if(error) return toast('登入失敗：'+error.message); location.reload(); };
   $('gl').onclick = ()=>sb.auth.signInWithOAuth({provider:'google', options:{redirectTo: location.origin+location.pathname}});
 }
-function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({rp:pageRp,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
+function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({rp:pageRp,cs:pageCs,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
 const M = h => $('main').innerHTML = h;
 
 /* 總覽 */

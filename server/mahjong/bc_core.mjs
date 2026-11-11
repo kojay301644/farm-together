@@ -46,7 +46,7 @@ export function advance(T, now, gold) {
       if (now < G.tEnd) break;
       const r = G.result, d = {};
       G.players.forEach(p => { const w = BC.payout(p.bets, r); p.win = w; if (w) { d[p.uid] = w; p.gold = Math.max(0, p.gold + w); } });
-      out.settle = { hand: G.round, delta: d };
+      out.settle = { hand: G.round, delta: d, house: -Object.values(d).reduce((a, b) => a + b, 0) };   // 娛樂廳（莊家）這局賺賠
       G.hist.push(r.win + (r.pp ? 'P' : '') + (r.bp ? 'B' : '')); if (G.hist.length > 60) G.hist.splice(0, G.hist.length - 60);
       G.phase = 'end'; G.tEnd = now + BT.END;
       continue;
