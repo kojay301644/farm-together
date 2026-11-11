@@ -60,6 +60,50 @@ async function pushViews(T: any, now: number, kicked: string[]) {
 }
 const viewOf = (T: any, uid: string) => C.viewFor(T, uid, NOW());
 
+async function joinTable(uid: string, a: string, b: any) {
+  const cur = await myTableId(uid);
+  if (cur) { const T = await load(cur); if (T && T.status !== 'closed' && C.humans(T).includes(uid)) return { view: viewOf(T, uid) }; }
+  const p = await me(uid);
+  if (a === 'join') {
+    const { data: L } = await sb.from('mj_tables').select('id,lvl,game').eq('code', String(b.code || '')).in('status', ['wait', 'play']).limit(1);
+    if (!L || !L.length) throw new Fail('找不到這個房號');
+    const TB = ENG(L[0].game).TABLES[L[0].lvl];
+    if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
+    if (L[0].game === 'th') {
+      const amt = thAmt(L[0].lvl, b.buyin); await thBuyin(uid, amt);
+      try { const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av, buyin: amt }, now)); return { view: viewOf(T, uid) }; }
+      catch (e) { await thBank({ [uid]: amt }); throw e; }
+    }
+    const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now));
+    return { view: viewOf(T, uid) };
+  }
+  const game = ['b2', 'bc', 'th'].includes(b.game) ? b.game : 'mj', lvl = b.lvl;
+  if (game === 'bc' && a === 'create') throw new Fail('百家樂不能開房，請直接進入牌桌'); const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
+  if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
+  if (a === 'quick') {
+    // 百家樂：系統桌一直開著（就算沒人），先進最早開的那桌
+    const q0 = sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', game === 'bc' ? BC.MAXP : game === 'th' ? TH.SEATS : 4);
+    const { data: L } = game === 'bc' ? await q0.order('id', { ascending: true }).limit(5)
+      : await q0.gt('nh', 0).gt('updated_at', new Date(Date.now() - 120e3).toISOString()).order('status', { ascending: false }).order('nh', { ascending: false }).limit(5);
+    const amt0 = game === 'th' ? thAmt(lvl, b.buyin) : 0;
+    if (game === 'th') await thBuyin(uid, amt0);
+    for (const t of (L || [])) {
+      try { const { T } = await mutate(t.id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av, buyin: amt0 }, now)); return { view: viewOf(T, uid) }; } catch (e) { if (!(e instanceof Fail) && !(e instanceof Error)) throw e; }
+    }
+    if (game === 'th') await thBank({ [uid]: amt0 });   // 沒找到桌：先退回，下面開新桌再扣
+  }
+  const now = NOW(), priv = a === 'create';
+  let code = null;
+  if (priv) for (let k = 0; k < 20; k++) { const c = String(1000 + Math.floor(Math.random() * 9000)); const { data: ex } = await sb.from('mj_tables').select('id').eq('code', c).in('status', ['wait', 'play']).limit(1); if (!ex || !ex.length) { code = c; break; } }
+  const buyin = game === 'th' ? thAmt(lvl, b.buyin) : 0;
+  if (game === 'th') await thBuyin(uid, buyin);
+  const T = C.newTable(lvl, priv, uid, { uid, name: p.name, av: p.av, buyin }, now, game);
+  const { data: ins, error } = await sb.from('mj_tables').insert({ game, lvl, priv, code, host: uid, status: T.status, state: T.state, nh: 1 }).select('*').single();
+  if (error) { if (game === 'th') await thBank({ [uid]: buyin }); throw new Fail('開桌失敗'); }
+  await pushViews(ins, now, []);
+  return { view: viewOf(ins, uid) };
+}
+
 async function handle(uid: string, b: any, test = false) {
   const a = b.a;
   if (a === 'sim' && test) {   // 測試：把時間快轉到下一個事件，連跑 n 步
@@ -82,47 +126,10 @@ async function handle(uid: string, b: any, test = false) {
     const { T } = await mutate(tid, () => {}); return { view: viewOf(T, uid) };
   }
   if (a === 'quick' || a === 'create' || a === 'join') {
-    const cur = await myTableId(uid);
-    if (cur) { const T = await load(cur); if (T && T.status !== 'closed' && C.humans(T).includes(uid)) return { view: viewOf(T, uid) }; }
-    const p = await me(uid);
-    if (a === 'join') {
-      const { data: L } = await sb.from('mj_tables').select('id,lvl,game').eq('code', String(b.code || '')).in('status', ['wait', 'play']).limit(1);
-      if (!L || !L.length) throw new Fail('找不到這個房號');
-      const TB = ENG(L[0].game).TABLES[L[0].lvl];
-      if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
-      if (L[0].game === 'th') {
-        const amt = thAmt(L[0].lvl, b.buyin); await thBuyin(uid, amt);
-        try { const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av, buyin: amt }, now)); return { view: viewOf(T, uid) }; }
-        catch (e) { await thBank({ [uid]: amt }); throw e; }
-      }
-      const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now));
-      return { view: viewOf(T, uid) };
-    }
-    const game = ['b2', 'bc', 'th'].includes(b.game) ? b.game : 'mj', lvl = b.lvl;
-    if (game === 'bc' && a === 'create') throw new Fail('百家樂不能開房，請直接進入牌桌'); const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
-    if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
-    if (a === 'quick') {
-      // 百家樂：系統桌一直開著（就算沒人），先進最早開的那桌
-      const q0 = sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', game === 'bc' ? BC.MAXP : game === 'th' ? TH.SEATS : 4);
-      const { data: L } = game === 'bc' ? await q0.order('id', { ascending: true }).limit(5)
-        : await q0.gt('nh', 0).gt('updated_at', new Date(Date.now() - 120e3).toISOString()).order('status', { ascending: false }).order('nh', { ascending: false }).limit(5);
-      const amt0 = game === 'th' ? thAmt(lvl, b.buyin) : 0;
-      if (game === 'th') await thBuyin(uid, amt0);
-      for (const t of (L || [])) {
-        try { const { T } = await mutate(t.id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av, buyin: amt0 }, now)); return { view: viewOf(T, uid) }; } catch (e) { if (!(e instanceof Fail) && !(e instanceof Error)) throw e; }
-      }
-      if (game === 'th') await thBank({ [uid]: amt0 });   // 沒找到桌：先退回，下面開新桌再扣
-    }
-    const now = NOW(), priv = a === 'create';
-    let code = null;
-    if (priv) for (let k = 0; k < 20; k++) { const c = String(1000 + Math.floor(Math.random() * 9000)); const { data: ex } = await sb.from('mj_tables').select('id').eq('code', c).in('status', ['wait', 'play']).limit(1); if (!ex || !ex.length) { code = c; break; } }
-    const buyin = game === 'th' ? thAmt(lvl, b.buyin) : 0;
-    if (game === 'th') await thBuyin(uid, buyin);
-    const T = C.newTable(lvl, priv, uid, { uid, name: p.name, av: p.av, buyin }, now, game);
-    const { data: ins, error } = await sb.from('mj_tables').insert({ game, lvl, priv, code, host: uid, status: T.status, state: T.state, nh: 1 }).select('*').single();
-    if (error) { if (game === 'th') await thBank({ [uid]: buyin }); throw new Fail('開桌失敗'); }
-    await pushViews(ins, now, []);
-    return { view: viewOf(ins, uid) };
+    // 連點兩下：第二下要等第一下做完，避免同時坐進兩桌（德州撲克會被扣兩次帶入籌碼）
+    const { data: okLock } = await sb.rpc('mj_join_lock', { p_uid: uid });
+    if (!okLock) throw new Fail('正在進入牌桌，請稍等');
+    try { return await joinTable(uid, a, b); } finally { await sb.rpc('mj_join_unlock', { p_uid: uid }); }
   }
   const tid = await myTableId(uid); if (!tid) throw new Fail('你不在牌桌上');
   if (a === 'leave') {

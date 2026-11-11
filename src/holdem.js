@@ -30,10 +30,11 @@ function thBuyinAsk(lvl, a, code){
     <div class="row" style="justify-content:space-between;font-size:12px;color:var(--ink2)"><span>${T.buyMin.toLocaleString()}</span><span>你有 ${gold.toLocaleString()} 金</span><span>${max.toLocaleString()}</span></div>
     <div class="rhint" style="margin-top:8px">離桌時剩下的籌碼會自動換回金幣</div>`
     : `<div class="rhint">朋友房間的帶入範圍要看是哪一桌。輸入要帶的籌碼（例如新手桌 400～2,000）</div><input id="thBn" type="number" inputmode="numeric" value="2000" style="width:100%;font-size:20px;padding:8px;border-radius:10px;border:2px solid #E6D9C3">`,
-    [['取消','sub',openThLobby],['坐下','',async()=>{
+    [['取消','sub',openThLobby],['坐下','',async e=>{
+      const btn = e && e.currentTarget; if(btn){ if(btn.disabled) return; btn.disabled = true; }   // 不要連點兩下
       const amt = lvl ? +$('thBr').value : +$('thBn').value;
       try{ const r = await mjCall(a, Object.assign({ game:'th', buyin: amt }, lvl ? { lvl } : { code })); if(!r.view) throw new Error('進不去，等等再試');
-        S.me.gold = Math.max(0, S.me.gold - amt); try{ refresh(); }catch(e){} closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); } }]]);
+        S.me.gold = Math.max(0, S.me.gold - amt); try{ refresh(); }catch(e){} closeModal(); mjOnlineEnter(r.view); }catch(err){ toast(err.message); if(btn) btn.disabled = false; } }]]);
   if($('thBr')) $('thBr').oninput = ()=>{ $('thBv').textContent = (+$('thBr').value).toLocaleString(); };
 }
 function thRules(){
