@@ -157,27 +157,49 @@ const HOLD = (() => {
     if (a === b) s += 10 + a; if (suited) s += 2; if (a - b === 1) s += 1.5; else if (a - b === 2) s += 0.8;
     return s;   // 大約 1～32
   }
+  // 勝率估算：隨機發對手的牌和剩下的公牌，模擬 N 次（只用看得到的牌）
+  function equity(hole, board, nOpp, N) {
+    const used = new Set(hole.concat(board)), deck = []; for (let c = 0; c < 52; c++) if (!used.has(c)) deck.push(c);
+    let win = 0;
+    for (let t = 0; t < N; t++) {
+      for (let i = deck.length - 1; i > deck.length - 1 - (nOpp * 2 + 5 - board.length) && i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+      let k = deck.length - 1; const bd = board.slice(); while (bd.length < 5) bd.push(deck[k--]);
+      const me = best(hole.concat(bd)).score; let res = 1;
+      for (let o = 0; o < nOpp && res > 0; o++) { const sc = best([deck[k--], deck[k--]].concat(bd)).score, c = cmp(me, sc); if (c < 0) res = 0; else if (c === 0) res = Math.min(res, 0.5); }
+      win += res;
+    }
+    return win / N;
+  }
   function botDecide(G, si) {
     const o = options(G, si); if (!o) return null;
-    const p = G.seats[si], T = TABLES[G.table], r = Math.random();
-    let str;
-    if (G.street === 'pre') str = preScore(p.hole) / 30;
-    else {
-      const e = best(p.hole.concat(G.board)), cat = e.score[0];
-      str = [0.15, 0.45, 0.7, 0.8, 0.88, 0.9, 0.95, 0.99, 1][cat];
-      if (cat === 1 && e.score[1] >= 10) str += 0.12;   // 大對子
-      // 聽牌：同花差一張、順子差一張
-      const all = p.hole.concat(G.board), sc = [0, 0, 0, 0]; all.forEach(c => sc[su(c)]++);
-      if (G.street !== 'river' && cat < 4 && Math.max(...sc) === 4) str = Math.max(str, 0.5);
+    const p = G.seats[si], T = TABLES[G.table], r = Math.random(), bb = T.bb;
+    const opp = G.seats.filter((q, i) => i !== si && q && q.inHand && !q.folded).length;
+    const nIn = G.seats.filter(q => q && q.inHand).length;
+    const posLate = ((si - G.button + SEATS) % SEATS) === 0 || ((si - G.button + SEATS) % SEATS) >= nIn - 1;   // 莊家位或最後幾個：可以玩鬆一點
+    const roundTo = x => Math.max(o.minTo, Math.min(o.maxTo, Math.round(x / bb) * bb));
+    const potAfter = o.pot + o.toCall, odds = o.toCall / Math.max(1, potAfter);
+    if (G.street === 'pre') {
+      const sc = preScore(p.hole) + (posLate ? 2 : 0), facing = G.curBet / bb;   // 前面加注幾個大盲
+      if (sc >= 24 || (sc >= 20 && facing <= 3)) {                                 // 好牌：加注
+        if (o.canRaise && (facing <= 4 || sc >= 26) && r < 0.85) return { a: 'raise', to: roundTo(facing <= 1 ? 3 * bb : G.curBet * 3) };
+        return { a: o.canCheck ? 'check' : 'call' };
+      }
+      if (o.canCheck) return { a: 'check' };
+      if (sc >= 15 && facing <= 3) return { a: 'call' };
+      if (sc >= 12 && facing <= 1.01 && r < 0.6) return { a: 'call' };            // 便宜進場
+      if (sc >= 19 && facing <= 8) return { a: 'call' };
+      return { a: 'fold' };
     }
-    str += (r - 0.5) * 0.15;
-    const potOdds = o.toCall / Math.max(1, o.pot + o.toCall);
-    if (o.toCall === 0) {
-      if (str > 0.72 && o.canRaise && r < 0.7) return { a: 'raise', to: Math.min(o.maxTo, Math.max(o.minTo, G.curBet + Math.floor(o.pot * (0.5 + r * 0.5) / T.bb) * T.bb)) };
+    const eq = equity(p.hole, G.board, Math.max(1, opp), 160);
+    const bet = f => roundTo(G.curBet + f * potAfter);
+    if (o.canCheck) {
+      if (eq > 0.72 && o.canRaise) return { a: 'raise', to: bet(0.55 + r * 0.3) };   // 牌好：下注拿價值
+      if (eq > 0.55 && o.canRaise && r < 0.5) return { a: 'raise', to: bet(0.4) };
+      if (eq < 0.3 && opp === 1 && G.street !== 'flop' && r < 0.12 && o.canRaise) return { a: 'raise', to: bet(0.5) };   // 偶爾詐唬
       return { a: 'check' };
     }
-    if (str > 0.85 && o.canRaise && r < 0.6) return { a: 'raise', to: Math.min(o.maxTo, Math.max(o.minTo, G.curBet * 2 + Math.floor(o.pot * 0.5 / T.bb) * T.bb)) };
-    if (str > potOdds + 0.25 || (o.toCall <= T.bb && str > 0.35)) return { a: 'call' };
+    if (eq > 0.8 && o.canRaise && r < 0.7) return { a: 'raise', to: roundTo(G.curBet * 2.5 + o.pot * 0.3) };
+    if (eq > odds + 0.08 || (o.toCall <= bb && eq > odds)) return { a: 'call' };
     return { a: 'fold' };
   }
   function autoAct(G, si, smart) {

@@ -144,45 +144,62 @@ const B2 = (() => {
     fives.forEach(f => { const k = f.slice().sort((a, b) => a - b).join(','); if (seen.has(k)) return; seen.add(k); if (classify(f)) out.push(f); });
     return out.map(cs => ({ cards: cs.slice().sort((a, b) => a - b), cb: classify(cs) })).filter(x => x.cb);
   }
-  // 電腦：只看自己的手牌和桌上出過的牌
+  // 電腦：只看自己的手牌和桌上出過的牌（會記牌、會規劃怎麼最快出完）
+  // 手上的牌最少要分幾手出完（五張牌型、對子先湊，剩下單張）；小單張越多越難出完
+  function plan(hand, bossFrom) {
+    const tryWith = useFive => {
+      let h = hand.slice(), n = 0;
+      if (useFive) for (let k = 0; k < 2; k++) {
+        const f = combos(h).filter(x => x.cb.ty === 'five').sort((a, b) => a.cb.kind - b.cb.kind || a.cb.key - b.cb.key)[0];
+        if (!f) break; h = h.filter(c => !f.cards.includes(c)); n++;
+      }
+      const cnt = {}; h.forEach(c => cnt[rk(c)] = (cnt[rk(c)] || 0) + 1);
+      let small = 0;
+      Object.entries(cnt).forEach(([r, k]) => { n += k >= 2 ? Math.ceil(k / 2) : 1; if (k === 1 && +r < 8) small++; if (k === 3) small += 0.5; });
+      const boss = h.filter(c => c >= bossFrom).length;
+      return n + small * 0.45 - boss * 0.35;
+    };
+    return Math.min(tryWith(false), tryWith(true));
+  }
   function botDecide(G, si) {
     if (G.phase !== 'play' || G.turn !== si) return null;
     const s = G.seats[si], all = combos(s.hand);
-    const opp = G.seats.filter((p, j) => j !== si).map(p => p.hand.length), danger = Math.min(...opp);
+    const opp = G.seats.map((p, j) => (j === si ? 99 : p.hand.length)), danger = Math.min(...opp);
     const nextN = G.seats[(si + 1) % 4].hand.length;
-    const win = all.find(x => x.cards.length === s.hand.length);
     const lead = isLead(G, si);
     let cand = lead ? all : all.filter(x => beats(x.cb, G.cur.cb));
     if (G.must != null) cand = cand.filter(x => x.cards.includes(G.must));
-    if (win && cand.includes(win)) return { a: 'play', cards: win.cards };
+    const win = cand.find(x => x.cards.length === s.hand.length);
+    if (win) return { a: 'play', cards: win.cards };
     if (!cand.length) return lead ? { a: 'play', cards: [s.hand[0]] } : { a: 'pass' };
-    // 一張牌被拆掉的代價：拆對子、拆葫蘆／順子、用掉 2
-    const cntR = {}; s.hand.forEach(c => cntR[rk(c)] = (cntR[rk(c)] || 0) + 1);
-    const inFive = new Set(); all.filter(x => x.cb.ty === 'five' && x.cb.kind <= 3).slice(0, 1).forEach(x => x.cards.forEach(c => inFive.add(c)));
-    const cost = x => {
-      let p = 0; const n = x.cards.length;
-      x.cards.forEach(c => { const r = rk(c);
-        if (n < cntR[r] && x.cb.ty !== 'five') p += 2.5;          // 拆對子／三條
-        if (n === 1 && inFive.has(c)) p += 1.5;                    // 拆五張牌型
-        if (r === 12 && danger > 3 && s.hand.length > 5) p += 4;   // 2 留到後面
-        if (r === 11 && danger > 5 && s.hand.length > 7) p += 1.2;
-      });
-      return p;
+    // 記牌：這局出過的牌、還在別人手上的牌；「最大的單張」＝外面已經沒有更大的
+    const played = new Set(); G.log.forEach(e => { if (e.k === 'play') e.cards.forEach(c => played.add(c)); });
+    const unseen = []; for (let c = 0; c < 52; c++) if (!played.has(c) && !s.hand.includes(c)) unseen.push(c);
+    const topOut = unseen.length ? Math.max(...unseen) : -1, bossFrom = topOut + 1;
+    const base = plan(s.hand, bossFrom);
+    const score = x => {
+      const rest = s.hand.filter(c => !x.cards.includes(c));
+      let v = plan(rest, bossFrom) - base;
+      const lo = x.cards[0];
+      v += (lead ? 0.04 : 0.02) * rk(lo);                                      // 先出小的
+      if (x.cards.some(c => c >= bossFrom) && rest.length > 3 && danger > 2) v += 0.6;   // 不急就不要把王牌用掉
+      if (x.cb.ty === 'single' && x.cards[0] >= bossFrom && rest.length && plan(rest, bossFrom) <= 1.6) v -= 1.5;   // 拿王牌搶回出牌權，再一次出完
+      return v;
     };
-    if (lead) {
-      // 先出：有人只剩 1 張就不要出小單張；其他時候把最小的牌帶出去（能組五張或對子就一起出）
-      const lo = s.hand[0];
-      if (danger === 1) { const multi = cand.filter(x => x.cards.length > 1).sort((a, b) => b.cards.length - a.cards.length || a.cb.key - b.cb.key);
+    // 有人快出完：不能讓他走
+    if (danger <= 2) {
+      if (lead) {
+        const multi = cand.filter(x => x.cards.length > danger).sort((a, b) => score(a) - score(b));
         if (multi.length) return { a: 'play', cards: multi[0].cards };
-        return { a: 'play', cards: [s.hand[s.hand.length - 1]] }; }
-      const withLo = cand.filter(x => x.cards.includes(lo));
-      const pick = withLo.sort((a, b) => b.cards.length - a.cards.length || cost(a) - cost(b) || a.cb.key - b.cb.key)[0] || cand[0];
-      return { a: 'play', cards: pick.cards };
+        return { a: 'play', cards: [s.hand[s.hand.length - 1]] };
+      }
+      if (G.cur.cb.ty === 'single' && (nextN === 1 || danger === 1)) return { a: 'play', cards: cand.sort((a, b) => b.cb.key - a.cb.key)[0].cards };
     }
-    // 跟牌：挑能壓過、代價最小、最小的那手；下一家只剩 1 張又是單張時，出最大的
-    if (G.cur.cb.ty === 'single' && nextN === 1) { const big = cand.sort((a, b) => b.cb.key - a.cb.key)[0]; return { a: 'play', cards: big.cards }; }
-    const best = cand.map(x => ({ x, c: cost(x) })).sort((a, b) => a.c - b.c || (a.x.cb.kind || 0) - (b.x.cb.kind || 0) || a.x.cb.key - b.x.cb.key)[0];
-    if (best.c >= 4 && danger > 2 && s.hand.length > 4) return { a: 'pass' };   // 代價太大（拆牌、用 2）又不急：先過
+    const ranked = cand.map(x => ({ x, v: score(x) })).sort((a, b) => a.v - b.v);
+    const best = ranked[0];
+    if (lead) return { a: 'play', cards: best.x.cards };
+    // 跟牌：出了會讓手牌更難出完（拆牌、浪費王牌）而且不急，就先過
+    if (best.v > 0.3 && danger > 3 && s.hand.length > 5) return { a: 'pass' };
     return { a: 'play', cards: best.x.cards };
   }
   function autoAct(G, si, smart) {
