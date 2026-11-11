@@ -553,7 +553,7 @@ function renderPlots(){
           else { txt='可以偷！'; bg='#F2545B'; fg='#fff'; }
         } else { txt='可收成！'; bg='#FF9F43'; fg='#fff'; }
       } else { txt = fmtS(leftSec(p)); if(p.dry) bg='#DDF0FF'; }
-      // 血條＝作物完整度：雜草、蟲越多收成越少（最多少 4 成），滿血＝沒被破壞
+      // 血條＝作物完整度：雜草、蟲越多收成越少（最多少 5 成），滿血＝沒被破壞
       if(!(mode==='visit' && st===4)){ const maxLoss=Math.max(1, c.yield - Math.ceil(c.yield*0.6)), lost=Math.min(maxLoss, (p.w||0)+(p.b||0)); pct = 1 - lost/maxLoss; }
     }
     if(t.textContent !== txt){ t.textContent = txt; const w=[...txt].reduce((a,ch)=>a+(ch.charCodeAt(0)>255?15:8.5),0)+20; r.setAttribute('width', w.toFixed(0)); r.setAttribute('x', (-w/2).toFixed(0)); }
@@ -587,7 +587,7 @@ function renderHUD(){
   if(hungry.length && crops < Math.min(...hungry) && bn>0) h=`🐔 穀倉的作物不夠餵牧場了！記得點<b>收集倉</b>把東西<b>收進穀倉</b>`;
   else if(bn>0) h=`🧺 <b>收集倉</b>有 ${bn} 個東西，記得點收集倉<b>收進穀倉</b>，避免被偷！`;
   else if(PL.some(p=>p.s==='grow'&&stageOf(p)===4)) h='有作物<b>成熟</b>了，快收成，小心被好友偷走！';
-  else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，不處理會減少收成';
+  else if(PL.some(p=>p.s==='grow'&&(p.w||p.b))) h='田裡長了<b>雜草或蟲</b>，會<b>減少收成</b>、讓作物長慢，快去清掉！';
   else if(PL.some(isDry)) h='有田地<b>缺水</b>了，澆水才能長得快';
   else if(PL.some(p=>p.s==='dead')) h='收成後的枯萎作物，用<b>鏟子</b>剷除就能再種';
   else if(PL.some(p=>p.s==='empty')) h = n?'點<b>空地</b>選種子種下去吧':'沒有種子了，到<b>穀倉的種子商店</b>買一些吧';
