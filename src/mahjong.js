@@ -406,7 +406,7 @@ function mjRender(first){
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
   const myOn = wl.includes(ME) && V.phase!=='end';
 
-  $('mjFelt').innerHTML = [1,2,3].map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)};--sc:${sc}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
+  $('mjFelt').innerHTML = [1,2,3].map(k=>(ME+k)%4).map(others).join('') + `<div class="mjmid" style="top:${cy.toFixed(0)}px;--rv:${rv}px;--cs:${cScale.toFixed(2)};--sc:${sc}">${compass}${[0,1,2,3].map(river).join('')}</div>`;
   // 輪到自己：跳出「輪到你了！」＋提示音＋震動（每次輪到只提醒一次）
   const turnKey = canDis ? V.handNo + ':' + (V.logN != null ? V.logN : (V.log||[]).length) : '';
   if(turnKey && turnKey !== mjAnimKey.turn){ const d = Math.max(0, mjDiceUntil - Date.now()); setTimeout(()=>{ const VV = mjCurView(); if(VV && VV.phase==='play' && VV.turn===VV.me) mjTurnAlert(); }, d + 50); }
