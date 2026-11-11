@@ -216,7 +216,7 @@ function mjConfirmLeave(){
 }
 function mjDo(a){
   const V = mjCurView(); if(!V || V.phase==='end') return;
-  mjSel = null;
+  if(a.a!=='ting') mjSel = null;
   if(MJO){
     // 自己的動作先顯示在畫面上，伺服器確認是在背景做
     if(MJO.busy) return;
@@ -224,6 +224,7 @@ function mjDo(a){
     if(a.a==='discard'){ const i = me.hand.lastIndexOf(a.t);
       if(i>=0){ me.hand.splice(i,1); me.n = me.hand.length; me.river.push(a.t); if(a.ting) me.ting = true; V.last = { t:a.t, from:V.me }; V.drawn = null; V.waiting = []; V.opts = {}; V.turn = -1;
         mjSfx('tile'); MJO.skipSig = 'discard:' + V.me + ':' + a.t; mjRender(); } }
+    else if(a.a==='ting'){ me.ting = true; V.opts = Object.assign({}, V.opts, { canTing:false }); mjRender(); }
     else if(a.a==='pass'){ V.waiting = (V.waiting||[]).filter(j=>j!==V.me); V.opts = {}; mjRender(); }
     return mjOnline('act', { act: a });
   }
@@ -321,24 +322,25 @@ function mjRender(first){
   const marked = {};   // 每種牌只標一張（碰標兩張）
   const mark = t => { if(ponOn && t===lt && (marked[t]||0) < 2){ marked[t]=(marked[t]||0)+1; return ' hp'; } if(chiSet.has(t) && !marked[t]){ marked[t]=1; return ' hc'; } return ''; };
   const tMarked = {};
-  const tingCls = t => { if(!tt) return ''; if(!tt[t]) return mjTingMode ? ' dim' : ''; if(tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
+  const tingCls = t => { if(!tt || !tt[t] || tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
   const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
   const handHtml = (me.melds.length?`<div class="mjmy">${me.melds.map(m=>mjMeld(m,'mm')).join('')}</div>`:'')
     + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d',' new') : '');
 
   const o = V.opts || {}, acts = [];
+  if(o.canTing && !me.auto) acts.push(['ting','聽','t']);   // 打出去之後聽牌了：按「聽」就報聽，不按就不聽
   if(V.phase==='claim' && wl.includes(0)){
     if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']); if(o.chi) acts.push(['chi', o.chi.length>1 ? `吃<small>${o.chi.length}種</small>` : '吃','c']);   // 沒有「過」：不點就是不要
   } else if(V.phase==='play' && V.turn===ME && !me.auto){
     if(o.zimo) acts.push(['zimo','自摸','w']); if(o.ankan) acts.push(['ankan','暗槓','k']); if(o.kakan) acts.push(['kakan','加槓','k']);   // 不想胡就直接打牌
-    if(tt && !me.ting) acts.push(['ting', mjTingMode ? '取消<small>報聽</small>' : '聽', 't']);
+
   }
   const claimTile = V.phase==='claim' && V.last && wl.includes(0) ? `<div class="mjct">${esc(V.seats[V.last.from].name)} 打出 ${mjTile(V.last.t,'md')}</div>` : '';
   const selT = mjSel==null ? null : (mjSel==='d' ? drawn : hand[+String(mjSel).slice(1)]);
   const hint = me.auto ? `<button class="mjauto" id="mjAuto">🤖 託管中・點這裡自己打</button>`
     : me.ting ? `<div class="mjhint ting">🀄 已報聽・聽：${waitTxt(myWaits) || '—'}</div>`
-    : canDis && tt && selT!=null && tt[selT] ? `<div class="mjhint ting">打${MJ.name(selT)}，聽：${waitTxt(tt[selT])}${mjTingMode?'（再點一次報聽）':''}</div>`
-    : canDis && mjTingMode ? `<div class="mjhint ting">選一張標「聽」的牌打出就是報聽（多 1 台）</div>`
+    : canDis && tt && selT!=null && tt[selT] ? `<div class="mjhint ting">聽：${waitTxt(tt[selT])}</div>`
+    : o.canTing ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}　按「聽」報聽多 1 台</div>`
     : !canDis && myWaits.length ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}</div>`
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
   const myOn = wl.includes(0) && V.phase!=='end';
@@ -355,13 +357,12 @@ function mjRender(first){
   document.querySelectorAll('#mj .mjhand .mt.hd').forEach(el=>el.onclick=()=>{
     if(!canDis) return;
     const k = el.dataset.k, t = +el.dataset.t;
-    if(mjTingMode && tt && !tt[t]) return mjToast('報聽要打標「聽」的牌');
-    if(mjSel===k){ const ting = mjTingMode && !!(tt && tt[t]); mjTingMode = false; if(!MJO) mjSfx('tile'); return mjDo({a:'discard', t, ting}); }
+    if(mjSel===k){ if(!MJO) mjSfx('tile'); return mjDo({a:'discard', t}); }
     mjSel = k; mjSfx('pick'); mjRender();
   });
   document.querySelectorAll('#mj [data-ma]').forEach(b=>b.onclick=()=>{
     const k = b.dataset.ma;
-    if(k==='ting'){ mjTingMode = !mjTingMode; mjSel = null; return mjRender(); }
+    if(k==='ting') return mjDo({a:'ting'});
     if(k==='hu') return mjDo({a:'hu'});
     if(k==='zimo') return mjDo({a:'zimo'});
     if(k==='pon'||k==='kan') return mjDo({a:k});

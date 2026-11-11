@@ -164,9 +164,24 @@ const MJ = (() => {
   }
 
   /* ---------- 動作 ---------- */
+  function canTing(G, si) {
+    const s = G.seats[si];
+    return !s.ting && G.phase !== 'end' && s.hand.length % 3 === 1 && !(G.phase === 'play' && G.turn === si) && waits(s.hand).length > 0;
+  }
   function act(G, si, a) {
     if (G.phase === 'end') throw new Error('這局已經結束');
     const s = G.seats[si];
+    // 報聽：打出牌之後、還沒輪到自己摸牌前，聽牌了就可以按
+    if (a.a === 'ting') {
+      if (!canTing(G, si)) throw new Error('現在不能報聽');
+      s.ting = true; G.log.push({ k: 'ting', s: si }); G.seq++;
+      if (G.phase === 'claim' && G.pend && G.pend[si] && G.pend[si].pick == null) {
+        const o = G.pend[si].opts;
+        if (o.hu) { G.pend[si].pick = { a: 'hu' }; return resolveClaims(G); }
+        G.pend[si].opts = {}; G.pend[si].pick = { a: 'pass' }; return resolveClaims(G);
+      }
+      return;
+    }
     if (G.phase === 'play') {
       if (G.turn !== si) throw new Error('還沒輪到你');
       const o = options(G, si);
@@ -385,10 +400,10 @@ const MJ = (() => {
       left: Math.max(0, G.wall.length - RESERVE), last: G.last, dice: G.dice,
       seats: G.seats.map((s, j) => ({ name: s.name, av: s.av, bot: s.bot, gold: s.gold, auto: s.auto, ting: !!s.ting, n: s.hand.length, melds: s.melds, flowers: s.flowers, river: s.river,
         hand: (j === me || end) ? sortT(s.hand.slice()) : null, wind: (j - G.dealer + 4) % 4 })),
-      drawn: G.turn === me ? G.drawn : null, opts: options(G, me), waiting: waitingOn(G), result: G.result, log: G.log.slice(-6),
+      drawn: G.turn === me ? G.drawn : null, opts: Object.assign({}, options(G, me), (me >= 0 && G.seats[me] && canTing(G, me)) ? { canTing: true } : {}), waiting: waitingOn(G), result: G.result, log: G.log.slice(-6),
     };
   }
 
-  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
+  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, canTing, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
 })();
 export default MJ;

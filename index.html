@@ -751,21 +751,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794412249" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794412553" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794412249" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794412249" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794412553" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794412553" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794412249" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794412553" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794412249" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794412249" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794412553" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794412553" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -782,11 +782,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794412249" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794412553" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794412249";
+const BUILD="1794412553";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3208,9 +3208,24 @@ const MJ = (() => {
   }
 
   /* ---------- 動作 ---------- */
+  function canTing(G, si) {
+    const s = G.seats[si];
+    return !s.ting && G.phase !== 'end' && s.hand.length % 3 === 1 && !(G.phase === 'play' && G.turn === si) && waits(s.hand).length > 0;
+  }
   function act(G, si, a) {
     if (G.phase === 'end') throw new Error('這局已經結束');
     const s = G.seats[si];
+    // 報聽：打出牌之後、還沒輪到自己摸牌前，聽牌了就可以按
+    if (a.a === 'ting') {
+      if (!canTing(G, si)) throw new Error('現在不能報聽');
+      s.ting = true; G.log.push({ k: 'ting', s: si }); G.seq++;
+      if (G.phase === 'claim' && G.pend && G.pend[si] && G.pend[si].pick == null) {
+        const o = G.pend[si].opts;
+        if (o.hu) { G.pend[si].pick = { a: 'hu' }; return resolveClaims(G); }
+        G.pend[si].opts = {}; G.pend[si].pick = { a: 'pass' }; return resolveClaims(G);
+      }
+      return;
+    }
     if (G.phase === 'play') {
       if (G.turn !== si) throw new Error('還沒輪到你');
       const o = options(G, si);
@@ -3429,11 +3444,11 @@ const MJ = (() => {
       left: Math.max(0, G.wall.length - RESERVE), last: G.last, dice: G.dice,
       seats: G.seats.map((s, j) => ({ name: s.name, av: s.av, bot: s.bot, gold: s.gold, auto: s.auto, ting: !!s.ting, n: s.hand.length, melds: s.melds, flowers: s.flowers, river: s.river,
         hand: (j === me || end) ? sortT(s.hand.slice()) : null, wind: (j - G.dealer + 4) % 4 })),
-      drawn: G.turn === me ? G.drawn : null, opts: options(G, me), waiting: waitingOn(G), result: G.result, log: G.log.slice(-6),
+      drawn: G.turn === me ? G.drawn : null, opts: Object.assign({}, options(G, me), (me >= 0 && G.seats[me] && canTing(G, me)) ? { canTing: true } : {}), waiting: waitingOn(G), result: G.result, log: G.log.slice(-6),
     };
   }
 
-  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
+  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, canTing, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
 })();
 if (typeof module !== 'undefined') module.exports = MJ;
 /* ================= 遊戲廳・麻將 ================= */
@@ -3654,7 +3669,7 @@ function mjConfirmLeave(){
 }
 function mjDo(a){
   const V = mjCurView(); if(!V || V.phase==='end') return;
-  mjSel = null;
+  if(a.a!=='ting') mjSel = null;
   if(MJO){
     // 自己的動作先顯示在畫面上，伺服器確認是在背景做
     if(MJO.busy) return;
@@ -3662,6 +3677,7 @@ function mjDo(a){
     if(a.a==='discard'){ const i = me.hand.lastIndexOf(a.t);
       if(i>=0){ me.hand.splice(i,1); me.n = me.hand.length; me.river.push(a.t); if(a.ting) me.ting = true; V.last = { t:a.t, from:V.me }; V.drawn = null; V.waiting = []; V.opts = {}; V.turn = -1;
         mjSfx('tile'); MJO.skipSig = 'discard:' + V.me + ':' + a.t; mjRender(); } }
+    else if(a.a==='ting'){ me.ting = true; V.opts = Object.assign({}, V.opts, { canTing:false }); mjRender(); }
     else if(a.a==='pass'){ V.waiting = (V.waiting||[]).filter(j=>j!==V.me); V.opts = {}; mjRender(); }
     return mjOnline('act', { act: a });
   }
@@ -3759,24 +3775,25 @@ function mjRender(first){
   const marked = {};   // 每種牌只標一張（碰標兩張）
   const mark = t => { if(ponOn && t===lt && (marked[t]||0) < 2){ marked[t]=(marked[t]||0)+1; return ' hp'; } if(chiSet.has(t) && !marked[t]){ marked[t]=1; return ' hc'; } return ''; };
   const tMarked = {};
-  const tingCls = t => { if(!tt) return ''; if(!tt[t]) return mjTingMode ? ' dim' : ''; if(tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
+  const tingCls = t => { if(!tt || !tt[t] || tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
   const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
   const handHtml = (me.melds.length?`<div class="mjmy">${me.melds.map(m=>mjMeld(m,'mm')).join('')}</div>`:'')
     + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d',' new') : '');
 
   const o = V.opts || {}, acts = [];
+  if(o.canTing && !me.auto) acts.push(['ting','聽','t']);   // 打出去之後聽牌了：按「聽」就報聽，不按就不聽
   if(V.phase==='claim' && wl.includes(0)){
     if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']); if(o.chi) acts.push(['chi', o.chi.length>1 ? `吃<small>${o.chi.length}種</small>` : '吃','c']);   // 沒有「過」：不點就是不要
   } else if(V.phase==='play' && V.turn===ME && !me.auto){
     if(o.zimo) acts.push(['zimo','自摸','w']); if(o.ankan) acts.push(['ankan','暗槓','k']); if(o.kakan) acts.push(['kakan','加槓','k']);   // 不想胡就直接打牌
-    if(tt && !me.ting) acts.push(['ting', mjTingMode ? '取消<small>報聽</small>' : '聽', 't']);
+
   }
   const claimTile = V.phase==='claim' && V.last && wl.includes(0) ? `<div class="mjct">${esc(V.seats[V.last.from].name)} 打出 ${mjTile(V.last.t,'md')}</div>` : '';
   const selT = mjSel==null ? null : (mjSel==='d' ? drawn : hand[+String(mjSel).slice(1)]);
   const hint = me.auto ? `<button class="mjauto" id="mjAuto">🤖 託管中・點這裡自己打</button>`
     : me.ting ? `<div class="mjhint ting">🀄 已報聽・聽：${waitTxt(myWaits) || '—'}</div>`
-    : canDis && tt && selT!=null && tt[selT] ? `<div class="mjhint ting">打${MJ.name(selT)}，聽：${waitTxt(tt[selT])}${mjTingMode?'（再點一次報聽）':''}</div>`
-    : canDis && mjTingMode ? `<div class="mjhint ting">選一張標「聽」的牌打出就是報聽（多 1 台）</div>`
+    : canDis && tt && selT!=null && tt[selT] ? `<div class="mjhint ting">聽：${waitTxt(tt[selT])}</div>`
+    : o.canTing ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}　按「聽」報聽多 1 台</div>`
     : !canDis && myWaits.length ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}</div>`
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
   const myOn = wl.includes(0) && V.phase!=='end';
@@ -3793,13 +3810,12 @@ function mjRender(first){
   document.querySelectorAll('#mj .mjhand .mt.hd').forEach(el=>el.onclick=()=>{
     if(!canDis) return;
     const k = el.dataset.k, t = +el.dataset.t;
-    if(mjTingMode && tt && !tt[t]) return mjToast('報聽要打標「聽」的牌');
-    if(mjSel===k){ const ting = mjTingMode && !!(tt && tt[t]); mjTingMode = false; if(!MJO) mjSfx('tile'); return mjDo({a:'discard', t, ting}); }
+    if(mjSel===k){ if(!MJO) mjSfx('tile'); return mjDo({a:'discard', t}); }
     mjSel = k; mjSfx('pick'); mjRender();
   });
   document.querySelectorAll('#mj [data-ma]').forEach(b=>b.onclick=()=>{
     const k = b.dataset.ma;
-    if(k==='ting'){ mjTingMode = !mjTingMode; mjSel = null; return mjRender(); }
+    if(k==='ting') return mjDo({a:'ting'});
     if(k==='hu') return mjDo({a:'hu'});
     if(k==='zimo') return mjDo({a:'zimo'});
     if(k==='pon'||k==='kan') return mjDo({a:k});
