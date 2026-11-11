@@ -411,11 +411,14 @@ function farmerStep(m, dt){
 let lastF=performance.now();
 /* 省電：畫面最多 30fps（省電模式 20fps），開著視窗或切到背景時整個停下來 */
 const FPS_CAP = () => (typeof LOWFX!=='undefined' && LOWFX) ? 20 : 30;
-const PAUSED = () => document.hidden || document.body.classList.contains('modalopen');
+const PAUSED = () => document.hidden || document.body.classList.contains('modalopen') || document.body.classList.contains('mjon');
+const IDLE = () => document.body.classList.contains('idle');
 function animate(now){
   if(PAUSED() || now-lastF < 1000/FPS_CAP()-2){ if(PAUSED()) lastF=now; requestAnimationFrame(animate); return; }
   const dt=Math.min(0.1,(now-lastF)/1000); lastF=now;
+  const idle = IDLE();
   for(const m of movers){
+    if(idle && !(m.farmer && (m.task || (m.jobs && m.jobs.length)))) continue;   // 閒置省電：只剩正在做事的農夫會動
     if(m.fly && LOWFX){ m.el.style.display='none'; continue; }
     if(m.farmer){ farmerStep(m, dt); continue; }
     let moving=false;

@@ -34,6 +34,9 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 #map{position:fixed;inset:0;overflow:auto;scrollbar-width:none;cursor:grab}
 #map::-webkit-scrollbar{display:none}
 #map.drag{cursor:grabbing}
+/* 省電：開視窗、在遊戲廳、閒置時，農場動畫暫停；遊戲廳裡整張農場地圖不畫 */
+body.modalopen #map *,body.mjon #map *,body.idle #map *,body.mjon .hud *,body.mjon .dock *,body.modalopen .hud *{animation-play-state:paused!important}
+body.mjon #map{visibility:hidden}
 #world{display:block}
 .tap{cursor:pointer}
 .tap.hit{animation:hit .25s ease-out}
@@ -533,8 +536,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjs{display:flex;flex-direction:column;align-items:center;width:72px;flex:none}
 .mjav{position:relative;width:48px;height:48px;border-radius:12px;background:#FFF8EC;border:3px solid #FFF3D6;box-shadow:0 0 0 2px #A9733F,0 3px 0 2px #7A4B25;flex:none}
 .mjav img{width:100%;height:100%;border-radius:9px;object-fit:cover}
-.mjs.on .mjav{border-color:#FFD43B;box-shadow:0 0 0 2px #FFB000,0 0 18px 4px #FFD43B;animation:mjpulse 1s ease-in-out infinite}
-@keyframes mjpulse{50%{box-shadow:0 0 0 3px #FFB000,0 0 26px 8px #FFD43B}}
+.mjs.on .mjav{border-color:#FFD43B;box-shadow:0 0 0 2px #FFB000,0 0 18px 4px #FFD43B}
+/* 輪到誰的發光：用透明度閃（手機用 GPU 處理，比動 box-shadow 省電很多） */
+.mjs.on .mjav::after,.ths.turn .thav::after,.bcside.won::after{content:'';position:absolute;inset:-3px;border-radius:inherit;pointer-events:none;box-shadow:0 0 22px 7px var(--glow,#FFD43B);opacity:.25;animation:mjglow 1s ease-in-out infinite;will-change:opacity}
+#mj.tech .mjs.on .mjav::after,.ths.turn .thav::after{--glow:#00E5FF}
+@keyframes mjglow{50%{opacity:1}}
 .mjdl{position:absolute;left:-9px;top:-8px;background:linear-gradient(#FF6B6B,#E0393F);color:#fff;font-size:11px;font-weight:900;border-radius:8px;padding:1px 5px;border:2px solid #fff;line-height:1.3}
 .mjdl small{font-size:9px;margin-left:1px}
 .mjwd{position:absolute;right:-8px;bottom:-6px;width:20px;height:20px;border-radius:50%;background:#2A2F45;color:#FFD97A;font-size:11px;font-weight:900;display:grid;place-items:center;border:2px solid #fff}
@@ -638,7 +644,7 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .bctable{position:absolute;left:calc(50% + 40px);top:27%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;z-index:1}
 .bcside{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 10px 8px;border-radius:16px;border:2px solid;min-width:120px}
 .bc-p{border-color:#2F7BFF;background:rgba(47,123,255,.12)}.bc-b{border-color:#E2364B;background:rgba(226,54,75,.12)}
-.bcside.won{box-shadow:0 0 0 2px #fff,0 0 22px 6px #FFD43B;animation:mjpulse 1s ease-in-out infinite}
+.bcside.won{position:relative;box-shadow:0 0 0 2px #fff,0 0 22px 6px #FFD43B}
 .bcsh{display:flex;align-items:center;gap:8px;font-weight:900}.bcsh b{font-size:20px;color:#fff}
 .bc-p .bcsh b{color:#8EC2FF}.bc-b .bcsh b{color:#FF8E9B}
 .bcpt{font-size:16px;color:#FFE59A;background:rgba(0,0,0,.35);border-radius:8px;padding:0 8px}
@@ -715,7 +721,7 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .thbet-0{left:calc(100% - 6px);top:4px}
 .thav{position:relative;width:42px;height:42px;border-radius:12px;background:#0A1838;border:2px solid #5CF2FF;box-shadow:0 0 0 2px #7A5CFF}
 .thav img{width:100%;height:100%;border-radius:10px;object-fit:cover}
-.ths.turn .thav{border-color:#fff;box-shadow:0 0 0 3px #00E5FF,0 0 18px 6px #00E5FF;animation:mjpulse 1s ease-in-out infinite}
+.ths.turn .thav{border-color:#fff;box-shadow:0 0 0 3px #00E5FF,0 0 18px 6px #00E5FF}
 .ths.won .thav{box-shadow:0 0 0 3px #FFD43B,0 0 22px 6px #FFD43B}
 .ths.folded{opacity:.55}.ths.out{opacity:.5}
 .thd{position:absolute;right:-8px;bottom:-6px;width:18px;height:18px;border-radius:50%;background:#fff;color:#22304A;font-size:11px;font-weight:900;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.5)}
@@ -1033,21 +1039,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794429461" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794429947" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794429461" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794429461" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794429947" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794429947" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794429461" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794429947" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794429461" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794429461" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794429947" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794429947" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1064,11 +1070,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794429461" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794429947" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794429461";
+const BUILD="1794429947";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1641,11 +1647,14 @@ function farmerStep(m, dt){
 let lastF=performance.now();
 /* 省電：畫面最多 30fps（省電模式 20fps），開著視窗或切到背景時整個停下來 */
 const FPS_CAP = () => (typeof LOWFX!=='undefined' && LOWFX) ? 20 : 30;
-const PAUSED = () => document.hidden || document.body.classList.contains('modalopen');
+const PAUSED = () => document.hidden || document.body.classList.contains('modalopen') || document.body.classList.contains('mjon');
+const IDLE = () => document.body.classList.contains('idle');
 function animate(now){
   if(PAUSED() || now-lastF < 1000/FPS_CAP()-2){ if(PAUSED()) lastF=now; requestAnimationFrame(animate); return; }
   const dt=Math.min(0.1,(now-lastF)/1000); lastF=now;
+  const idle = IDLE();
   for(const m of movers){
+    if(idle && !(m.farmer && (m.task || (m.jobs && m.jobs.length)))) continue;   // 閒置省電：只剩正在做事的農夫會動
     if(m.fly && LOWFX){ m.el.style.display='none'; continue; }
     if(m.farmer){ farmerStep(m, dt); continue; }
     let moving=false;
@@ -3951,7 +3960,7 @@ function mjOpen(){ mjOpenReset(); $('mj').classList.add('on', 'tech'); document.
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
-  MJG = null; MJO = null; $('mj').classList.remove('on'); document.body.classList.remove('mjon');
+  MJG = null; MJO = null; $('mj').classList.remove('on'); document.body.classList.remove('mjon'); try{ if(typeof sync==='function' && S) sync(); }catch(e){}
   mjBgmSync(); try{ if(typeof bgmSync==='function') bgmSync(); }catch(e){}
 }
 
@@ -5946,8 +5955,12 @@ async function sync(){
   }catch(e){ if(/還不是好友/.test(e.message)){ toast(e.message); goHome(); } }
   finally{ syncing = false; }
 }
-setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); try{ syncRanchMovers(); setCoopDot(); syncParkMovers(); }catch(e){} } }, 1000);
-setInterval(sync, 15000);
+/* 閒置省電：30 秒沒碰螢幕，農場裝飾動畫先停；一碰就恢復 */
+let lastTouch = Date.now();
+['pointerdown','keydown','wheel','touchstart'].forEach(ev=>addEventListener(ev, ()=>{ lastTouch = Date.now(); document.body.classList.remove('idle'); }, {passive:true, capture:true}));
+setInterval(()=>{ document.body.classList.toggle('idle', Date.now() - lastTouch > 30000); }, 1000);
+setInterval(()=>{ if(S && $('map').style.display!=='none' && !document.body.classList.contains('mjon')){ renderPlots(); renderHUD(); try{ syncRanchMovers(); setCoopDot(); syncParkMovers(); }catch(e){} } }, 1000);
+setInterval(()=>{ if(!document.body.classList.contains('mjon')) sync(); }, 15000);   // 在遊戲廳時不用一直更新農場
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sync(); });
 
 /* ================= 登入流程 ================= */

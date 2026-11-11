@@ -175,7 +175,7 @@ function mjOpen(){ mjOpenReset(); $('mj').classList.add('on', 'tech'); document.
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
-  MJG = null; MJO = null; $('mj').classList.remove('on'); document.body.classList.remove('mjon');
+  MJG = null; MJO = null; $('mj').classList.remove('on'); document.body.classList.remove('mjon'); try{ if(typeof sync==='function' && S) sync(); }catch(e){}
   mjBgmSync(); try{ if(typeof bgmSync==='function') bgmSync(); }catch(e){}
 }
 

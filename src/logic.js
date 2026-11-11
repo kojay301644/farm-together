@@ -615,8 +615,12 @@ async function sync(){
   }catch(e){ if(/還不是好友/.test(e.message)){ toast(e.message); goHome(); } }
   finally{ syncing = false; }
 }
-setInterval(()=>{ if(S && $('map').style.display!=='none'){ renderPlots(); renderHUD(); try{ syncRanchMovers(); setCoopDot(); syncParkMovers(); }catch(e){} } }, 1000);
-setInterval(sync, 15000);
+/* 閒置省電：30 秒沒碰螢幕，農場裝飾動畫先停；一碰就恢復 */
+let lastTouch = Date.now();
+['pointerdown','keydown','wheel','touchstart'].forEach(ev=>addEventListener(ev, ()=>{ lastTouch = Date.now(); document.body.classList.remove('idle'); }, {passive:true, capture:true}));
+setInterval(()=>{ document.body.classList.toggle('idle', Date.now() - lastTouch > 30000); }, 1000);
+setInterval(()=>{ if(S && $('map').style.display!=='none' && !document.body.classList.contains('mjon')){ renderPlots(); renderHUD(); try{ syncRanchMovers(); setCoopDot(); syncParkMovers(); }catch(e){} } }, 1000);
+setInterval(()=>{ if(!document.body.classList.contains('mjon')) sync(); }, 15000);   // 在遊戲廳時不用一直更新農場
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sync(); });
 
 /* ================= 登入流程 ================= */
