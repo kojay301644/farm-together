@@ -86,7 +86,8 @@ async function handle(uid: string, b: any, test = false) {
       const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now));
       return { view: viewOf(T, uid) };
     }
-    const game = ['b2', 'bc'].includes(b.game) ? b.game : 'mj', lvl = b.lvl; const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
+    const game = ['b2', 'bc'].includes(b.game) ? b.game : 'mj', lvl = b.lvl;
+    if (game === 'bc' && a === 'create') throw new Fail('百家樂不能開房，請直接進入牌桌'); const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
     if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
     if (a === 'quick') {
       const { data: L } = await sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', game === 'bc' ? BC.MAXP : 4).gt('nh', 0)

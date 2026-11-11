@@ -9,14 +9,11 @@ function openBcLobby(){
     <div id="bcBack"></div>
     ${Object.entries(BC.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${BC_ICON[k]}</div><div class="tx"><b>${t.name}</b>
       <div>每局最多押 ${t.max.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
-      <div class="mjtbb"><button class="mini" data-bcq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'進入牌桌'}</button><button class="mini sub" data-bcc="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
-    <div class="mjjoin"><input id="bcCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="bcJoin">加入朋友的房間</button></div>
+      <div class="mjtbb"><button class="mini" data-bcq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'進入牌桌'}</button></div></div>`; }).join('')}
     <button class="link" id="bcRules">📖 怎麼玩、怎麼賠？</button>`, [['回寵物娛樂廳','sub',openHall]]);
   const busy = b => { document.querySelectorAll('#md .mini').forEach(x=>x.disabled = b); };
   const go = async (a, extra) => { busy(true); try{ const r = await mjCall(a, extra); if(!r.view) throw new Error('進不去，等等再試'); closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); busy(false); } };
   document.querySelectorAll('#md [data-bcq]').forEach(b=>b.onclick=()=>go('quick', {lvl:b.dataset.bcq, game:'bc'}));
-  document.querySelectorAll('#md [data-bcc]').forEach(b=>b.onclick=()=>go('create', {lvl:b.dataset.bcc, game:'bc'}));
-  $('bcJoin').onclick = ()=>{ const c = ($('bcCode').value||'').trim(); if(!/^\d{4}$/.test(c)) return toast('房號是 4 位數字'); go('join', {code:c}); };
   $('bcRules').onclick = bcRules;
   mjCall('state').then(r=>{ if(r.view && r.view.status && $('bcBack')) { $('bcBack').innerHTML = `<button class="btn o" id="bcBackB" style="width:100%;margin:6px 0">🎴 你還有一桌在玩，回到牌桌</button>`; $('bcBackB').onclick = ()=>{ closeModal(); mjOnlineEnter(r.view); }; } }).catch(()=>{});
 }
@@ -80,7 +77,7 @@ function bcRender(V){
       <button class="bcclr" id="bcClr" ${bet && myTot?'':'disabled'}>清除</button><span class="bcmine">這局押 <b>${myTot.toLocaleString()}</b> / ${T.max.toLocaleString()}</span>${winTxt}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">每局最多押 ${T.max.toLocaleString()} 金</div>
     <div class="mjbme"><img src="${avSrc(S.me.avatar||11)}" alt=""><b>${esc(S.me.nickname||'')}</b><span class="mjbg">${(V.myGold||0).toLocaleString()}</span></div>
-    <div class="mjbt r">${T.name}${V.code?`・房號 ${esc(V.code)}`:''}・第 ${V.round} 局</div>`;
+    <div class="mjbt r">${T.name}・第 ${V.round} 局</div>`;
   $('mjEnd').innerHTML = '';
 
   document.querySelectorAll('#mj [data-chip]').forEach(b=>b.onclick=()=>{ bcChip = +b.dataset.chip; mjSfx('pick'); bcRender(mjCurView()); });

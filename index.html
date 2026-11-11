@@ -957,21 +957,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794423757" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794424156" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794423757" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794423757" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794424156" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794424156" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794423757" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794424156" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794423757" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794423757" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794424156" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794424156" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -988,11 +988,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794423757" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794424156" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794423757";
+const BUILD="1794424156";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -4750,14 +4750,11 @@ function openBcLobby(){
     <div id="bcBack"></div>
     ${Object.entries(BC.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${BC_ICON[k]}</div><div class="tx"><b>${t.name}</b>
       <div>每局最多押 ${t.max.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
-      <div class="mjtbb"><button class="mini" data-bcq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'進入牌桌'}</button><button class="mini sub" data-bcc="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
-    <div class="mjjoin"><input id="bcCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="bcJoin">加入朋友的房間</button></div>
+      <div class="mjtbb"><button class="mini" data-bcq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'進入牌桌'}</button></div></div>`; }).join('')}
     <button class="link" id="bcRules">📖 怎麼玩、怎麼賠？</button>`, [['回寵物娛樂廳','sub',openHall]]);
   const busy = b => { document.querySelectorAll('#md .mini').forEach(x=>x.disabled = b); };
   const go = async (a, extra) => { busy(true); try{ const r = await mjCall(a, extra); if(!r.view) throw new Error('進不去，等等再試'); closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); busy(false); } };
   document.querySelectorAll('#md [data-bcq]').forEach(b=>b.onclick=()=>go('quick', {lvl:b.dataset.bcq, game:'bc'}));
-  document.querySelectorAll('#md [data-bcc]').forEach(b=>b.onclick=()=>go('create', {lvl:b.dataset.bcc, game:'bc'}));
-  $('bcJoin').onclick = ()=>{ const c = ($('bcCode').value||'').trim(); if(!/^\d{4}$/.test(c)) return toast('房號是 4 位數字'); go('join', {code:c}); };
   $('bcRules').onclick = bcRules;
   mjCall('state').then(r=>{ if(r.view && r.view.status && $('bcBack')) { $('bcBack').innerHTML = `<button class="btn o" id="bcBackB" style="width:100%;margin:6px 0">🎴 你還有一桌在玩，回到牌桌</button>`; $('bcBackB').onclick = ()=>{ closeModal(); mjOnlineEnter(r.view); }; } }).catch(()=>{});
 }
@@ -4821,7 +4818,7 @@ function bcRender(V){
       <button class="bcclr" id="bcClr" ${bet && myTot?'':'disabled'}>清除</button><span class="bcmine">這局押 <b>${myTot.toLocaleString()}</b> / ${T.max.toLocaleString()}</span>${winTxt}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">每局最多押 ${T.max.toLocaleString()} 金</div>
     <div class="mjbme"><img src="${avSrc(S.me.avatar||11)}" alt=""><b>${esc(S.me.nickname||'')}</b><span class="mjbg">${(V.myGold||0).toLocaleString()}</span></div>
-    <div class="mjbt r">${T.name}${V.code?`・房號 ${esc(V.code)}`:''}・第 ${V.round} 局</div>`;
+    <div class="mjbt r">${T.name}・第 ${V.round} 局</div>`;
   $('mjEnd').innerHTML = '';
 
   document.querySelectorAll('#mj [data-chip]').forEach(b=>b.onclick=()=>{ bcChip = +b.dataset.chip; mjSfx('pick'); bcRender(mjCurView()); });
