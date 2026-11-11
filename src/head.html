@@ -580,11 +580,12 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2b.pass{background:#EFE9DF;color:#22304A;box-shadow:0 4px 0 #CFC3AF}
 .b2b.hint{background:radial-gradient(circle at 35% 30%,#7CC6FF,#2F86E0);box-shadow:0 4px 0 #1C5FA8}
 .b2b:active{transform:translateY(2px)}
-.b2types{position:absolute;left:110px;right:260px;bottom:calc(100% + 8px);display:flex;flex-wrap:wrap-reverse;gap:6px;pointer-events:auto}
-.b2t{height:38px;padding:0 12px;border-radius:999px;font-family:inherit;font-size:15px;font-weight:900;color:#BDF6FF;background:rgba(8,20,48,.9);border:2px solid #39F3FF;box-shadow:0 0 10px rgba(0,229,255,.35);display:flex;align-items:center;gap:4px}
+.b2types{position:absolute;left:14px;bottom:calc(100% + 8px);display:flex;flex-wrap:nowrap;gap:5px;pointer-events:auto}
+.b2t{height:36px;padding:0 10px;border-radius:999px;font-family:inherit;font-size:14px;white-space:nowrap;font-weight:900;color:#BDF6FF;background:rgba(8,20,48,.9);border:2px solid #39F3FF;box-shadow:0 0 10px rgba(0,229,255,.35);display:flex;align-items:center;gap:4px}
 .b2t small{font-size:10px;color:#7FF6FF;opacity:.9}
 .b2t.on{background:#00E5FF;color:#04122A;border-color:#fff}.b2t.on small{color:#04122A}
 .b2t:active{transform:translateY(2px)}
+.b2t:disabled{color:#5B6B86;border-color:#2A3A5C;background:rgba(8,20,48,.6);box-shadow:none}
 .mjhint.b2hint.hi{bottom:calc(100% + 52px)}
 .mjhint.b2hint{left:110px;transform:none;bottom:calc(100% + 8px)}
 .b2o{position:absolute;display:flex;align-items:center;gap:4px;z-index:3}

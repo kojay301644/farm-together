@@ -580,11 +580,12 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2b.pass{background:#EFE9DF;color:#22304A;box-shadow:0 4px 0 #CFC3AF}
 .b2b.hint{background:radial-gradient(circle at 35% 30%,#7CC6FF,#2F86E0);box-shadow:0 4px 0 #1C5FA8}
 .b2b:active{transform:translateY(2px)}
-.b2types{position:absolute;left:110px;right:260px;bottom:calc(100% + 8px);display:flex;flex-wrap:wrap-reverse;gap:6px;pointer-events:auto}
-.b2t{height:38px;padding:0 12px;border-radius:999px;font-family:inherit;font-size:15px;font-weight:900;color:#BDF6FF;background:rgba(8,20,48,.9);border:2px solid #39F3FF;box-shadow:0 0 10px rgba(0,229,255,.35);display:flex;align-items:center;gap:4px}
+.b2types{position:absolute;left:14px;bottom:calc(100% + 8px);display:flex;flex-wrap:nowrap;gap:5px;pointer-events:auto}
+.b2t{height:36px;padding:0 10px;border-radius:999px;font-family:inherit;font-size:14px;white-space:nowrap;font-weight:900;color:#BDF6FF;background:rgba(8,20,48,.9);border:2px solid #39F3FF;box-shadow:0 0 10px rgba(0,229,255,.35);display:flex;align-items:center;gap:4px}
 .b2t small{font-size:10px;color:#7FF6FF;opacity:.9}
 .b2t.on{background:#00E5FF;color:#04122A;border-color:#fff}.b2t.on small{color:#04122A}
 .b2t:active{transform:translateY(2px)}
+.b2t:disabled{color:#5B6B86;border-color:#2A3A5C;background:rgba(8,20,48,.6);box-shadow:none}
 .mjhint.b2hint.hi{bottom:calc(100% + 52px)}
 .mjhint.b2hint{left:110px;transform:none;bottom:calc(100% + 8px)}
 .b2o{position:absolute;display:flex;align-items:center;gap:4px;z-index:3}
@@ -901,21 +902,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794421064" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794421491" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794421064" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794421064" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794421491" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794421491" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794421064" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794421491" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794421064" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794421064" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794421491" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794421491" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -932,11 +933,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794421064" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794421491" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794421064";
+const BUILD="1794421491";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -4251,7 +4252,7 @@ const B2 = (() => {
   };
   const RAKE = 0.05;
   const PETS = ['armad','bear','bunny','deer','dragon','ferret','fox','lizard','marten','mole','moth','mouse','otter','owl','pango','penguin','phoenix','seal'];
-  const KIND = ['', '順子', '同花', '葫蘆', '鐵支', '同花順'];
+  const KIND = ['', '順子', '', '葫蘆', '鐵支', '同花順'];
   const rk = c => c >> 2, st = c => c & 3;
   const name = c => SUITS[st(c)] + RANKS[rk(c)];
 
@@ -4277,7 +4278,7 @@ const B2 = (() => {
     if (straight && flush) return { ty: 'five', kind: 5, key: skey };
     if (groups[0][1] === 4) return { ty: 'five', kind: 4, key: groups[0][0] };
     if (groups[0][1] === 3 && groups[1][1] === 2) return { ty: 'five', kind: 3, key: groups[0][0] };
-    if (flush) return { ty: 'five', kind: 2, key: top };
+    // 沒有「同花」這種牌型（只有同花順）
     if (straight) return { ty: 'five', kind: 1, key: skey };
     return null;
   }
@@ -4366,7 +4367,7 @@ const B2 = (() => {
     const wins = []; for (let f = 3; f <= 10; f++) wins.push([f, f + 1, f + 2, f + 3, f + 4]); wins.push([14, 15, 3, 4, 5], [15, 3, 4, 5, 6]);
     wins.forEach(w => { const Ls = w.map(f => byR[f - 3]); if (Ls.some(x => !x)) return;
       let acc = [[]]; for (const L of Ls) { const nx = []; for (const a of acc) for (const c of L) nx.push(a.concat([c])); acc = nx.slice(0, 64); } fives.push(...acc); });
-    // 同花
+    // 同花（只留下同花順）
     byS.forEach(L => { if (L.length < 5) return; const n = L.length;
       for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) for (let c = b + 1; c < n; c++) for (let d = c + 1; d < n; d++) for (let e = d + 1; e < n; e++) fives.push([L[a], L[b], L[c], L[d], L[e]]); });
     // 葫蘆、鐵支
@@ -4472,7 +4473,7 @@ function b2Rules(){
   const body = `<div class="help">
     <p><b>目標：</b>最先把 13 張牌出完的人贏。</p>
     <p><b>大小：</b>3 最小，2 最大（3 4 5 6 7 8 9 10 J Q K A 2）。一樣大時比花色：♠ 黑桃 &gt; ♥ 紅心 &gt; ♦ 方塊 &gt; ♣ 梅花。</p>
-    <p><b>能出的牌：</b>單張、對子、五張牌型（順子、同花、葫蘆、鐵支、同花順）。</p><p><b>順子比大小：</b>看最前面那張：3‑4‑5‑6‑7 &lt; 4‑5‑6‑7‑8 &lt; … &lt; 10‑J‑Q‑K‑A；A‑2‑3‑4‑5 最小，2‑3‑4‑5‑6 最大。一樣的話比最前面那張的花色。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、同花、葫蘆；同花順可以壓所有五張牌型。</p>
+    <p><b>能出的牌：</b>單張、對子、五張牌型（順子、葫蘆、鐵支、同花順，沒有同花）。</p><p><b>順子比大小：</b>看最前面那張：3‑4‑5‑6‑7 &lt; 4‑5‑6‑7‑8 &lt; … &lt; 10‑J‑Q‑K‑A；A‑2‑3‑4‑5 最小，2‑3‑4‑5‑6 最大。一樣的話比最前面那張的花色。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、葫蘆；同花順可以壓所有五張牌型。</p>
     <p><b>怎麼出：</b>第一局拿到梅花 3 的人先出，而且要出到梅花 3；之後每局由上一局贏家先出。輪到你時要出同樣張數、比較大的牌，或按「過」。其他三家都過，就由最後出牌的人重新出任何牌型。</p>
     <p><b>怎麼算：</b>有人出完，其他三家照手上剩幾張付錢，每張 × 桌上的「每張」金額：</p>
     <ul><li>手上的 2，每張多算一張</li><li>剩 10 張以上：加倍</li><li>13 張都沒出：3 倍</li></ul>
@@ -4532,8 +4533,9 @@ function b2Render(V){
     all.forEach(x=>{ const n = B2.comboName(x.cb); (b2Groups[n] = b2Groups[n] || []).push(x); });
     Object.values(b2Groups).forEach(L=>L.sort((a,b)=>a.cb.key-b.cb.key || a.cards[0]-b.cards[0]));
   }
-  const typeBtns = ['對子','順子','同花','葫蘆','鐵支','同花順'].filter(n=>b2Groups[n]).map(n=>{ const L = b2Groups[n], i = b2Hint[n];
-    return `<button class="b2t${i!=null?' on':''}" data-b2t="${n}">${n}${L.length>1?`<small>${i!=null?`${i+1}/`:''}${L.length}</small>`:''}</button>`; }).join('');
+  // 所有牌型一排列出來：能出的亮，沒有的變灰
+  const typeBtns = ['對子','順子','葫蘆','鐵支','同花順'].map(n=>{ const L = b2Groups[n] || [], i = b2Hint[n];
+    return `<button class="b2t${i!=null?' on':''}" data-b2t="${n}" ${L.length?'':'disabled'}>${n}${L.length>1?`<small>${i!=null?`${i+1}/`:''}${L.length}</small>`:''}</button>`; }).join('');
   let hint = '';
   if(myTurn){
     if(V.must!=null && lead) hint = '第一手要出到 ♣3';

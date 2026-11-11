@@ -23,7 +23,7 @@ function b2Rules(){
   const body = `<div class="help">
     <p><b>目標：</b>最先把 13 張牌出完的人贏。</p>
     <p><b>大小：</b>3 最小，2 最大（3 4 5 6 7 8 9 10 J Q K A 2）。一樣大時比花色：♠ 黑桃 &gt; ♥ 紅心 &gt; ♦ 方塊 &gt; ♣ 梅花。</p>
-    <p><b>能出的牌：</b>單張、對子、五張牌型（順子、同花、葫蘆、鐵支、同花順）。</p><p><b>順子比大小：</b>看最前面那張：3‑4‑5‑6‑7 &lt; 4‑5‑6‑7‑8 &lt; … &lt; 10‑J‑Q‑K‑A；A‑2‑3‑4‑5 最小，2‑3‑4‑5‑6 最大。一樣的話比最前面那張的花色。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、同花、葫蘆；同花順可以壓所有五張牌型。</p>
+    <p><b>能出的牌：</b>單張、對子、五張牌型（順子、葫蘆、鐵支、同花順，沒有同花）。</p><p><b>順子比大小：</b>看最前面那張：3‑4‑5‑6‑7 &lt; 4‑5‑6‑7‑8 &lt; … &lt; 10‑J‑Q‑K‑A；A‑2‑3‑4‑5 最小，2‑3‑4‑5‑6 最大。一樣的話比最前面那張的花色。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、葫蘆；同花順可以壓所有五張牌型。</p>
     <p><b>怎麼出：</b>第一局拿到梅花 3 的人先出，而且要出到梅花 3；之後每局由上一局贏家先出。輪到你時要出同樣張數、比較大的牌，或按「過」。其他三家都過，就由最後出牌的人重新出任何牌型。</p>
     <p><b>怎麼算：</b>有人出完，其他三家照手上剩幾張付錢，每張 × 桌上的「每張」金額：</p>
     <ul><li>手上的 2，每張多算一張</li><li>剩 10 張以上：加倍</li><li>13 張都沒出：3 倍</li></ul>
@@ -83,8 +83,9 @@ function b2Render(V){
     all.forEach(x=>{ const n = B2.comboName(x.cb); (b2Groups[n] = b2Groups[n] || []).push(x); });
     Object.values(b2Groups).forEach(L=>L.sort((a,b)=>a.cb.key-b.cb.key || a.cards[0]-b.cards[0]));
   }
-  const typeBtns = ['對子','順子','同花','葫蘆','鐵支','同花順'].filter(n=>b2Groups[n]).map(n=>{ const L = b2Groups[n], i = b2Hint[n];
-    return `<button class="b2t${i!=null?' on':''}" data-b2t="${n}">${n}${L.length>1?`<small>${i!=null?`${i+1}/`:''}${L.length}</small>`:''}</button>`; }).join('');
+  // 所有牌型一排列出來：能出的亮，沒有的變灰
+  const typeBtns = ['對子','順子','葫蘆','鐵支','同花順'].map(n=>{ const L = b2Groups[n] || [], i = b2Hint[n];
+    return `<button class="b2t${i!=null?' on':''}" data-b2t="${n}" ${L.length?'':'disabled'}>${n}${L.length>1?`<small>${i!=null?`${i+1}/`:''}${L.length}</small>`:''}</button>`; }).join('');
   let hint = '';
   if(myTurn){
     if(V.must!=null && lead) hint = '第一手要出到 ♣3';

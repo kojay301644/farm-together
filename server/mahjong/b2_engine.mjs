@@ -11,7 +11,7 @@ const B2 = (() => {
   };
   const RAKE = 0.05;
   const PETS = ['armad','bear','bunny','deer','dragon','ferret','fox','lizard','marten','mole','moth','mouse','otter','owl','pango','penguin','phoenix','seal'];
-  const KIND = ['', '順子', '同花', '葫蘆', '鐵支', '同花順'];
+  const KIND = ['', '順子', '', '葫蘆', '鐵支', '同花順'];
   const rk = c => c >> 2, st = c => c & 3;
   const name = c => SUITS[st(c)] + RANKS[rk(c)];
 
@@ -37,7 +37,7 @@ const B2 = (() => {
     if (straight && flush) return { ty: 'five', kind: 5, key: skey };
     if (groups[0][1] === 4) return { ty: 'five', kind: 4, key: groups[0][0] };
     if (groups[0][1] === 3 && groups[1][1] === 2) return { ty: 'five', kind: 3, key: groups[0][0] };
-    if (flush) return { ty: 'five', kind: 2, key: top };
+    // 沒有「同花」這種牌型（只有同花順）
     if (straight) return { ty: 'five', kind: 1, key: skey };
     return null;
   }
@@ -126,7 +126,7 @@ const B2 = (() => {
     const wins = []; for (let f = 3; f <= 10; f++) wins.push([f, f + 1, f + 2, f + 3, f + 4]); wins.push([14, 15, 3, 4, 5], [15, 3, 4, 5, 6]);
     wins.forEach(w => { const Ls = w.map(f => byR[f - 3]); if (Ls.some(x => !x)) return;
       let acc = [[]]; for (const L of Ls) { const nx = []; for (const a of acc) for (const c of L) nx.push(a.concat([c])); acc = nx.slice(0, 64); } fives.push(...acc); });
-    // 同花
+    // 同花（只留下同花順）
     byS.forEach(L => { if (L.length < 5) return; const n = L.length;
       for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) for (let c = b + 1; c < n; c++) for (let d = c + 1; d < n; d++) for (let e = d + 1; e < n; e++) fives.push([L[a], L[b], L[c], L[d], L[e]]); });
     // 葫蘆、鐵支
