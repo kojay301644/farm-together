@@ -721,7 +721,7 @@ async function loadConfig(){
   }catch(e){}
 }
 async function showNotices(){
-  if(MJG) return setTimeout(showNotices, 20000);
+  if(mjOn()) return setTimeout(showNotices, 20000);
   let L; try{ L = await rpc('farm_notices'); }catch(e){ return; }
   let seen = []; try{ seen = JSON.parse(localStorage.getItem('ytzt_seen_notices')||'[]'); }catch(e){}
   const n = L.find(x=>!seen.includes(x.id)); if(!n) return;
@@ -847,7 +847,7 @@ function rewardList(rw){ rw=rw||{}; const out=[];
   return out; }
 function rewardHTML(rw){ return rewardList(rw).map(([ic,t])=>`<span class="rw">${ic&&!/^[^a-z]/.test(ic)?`<img src="${A(ic)}" alt="">`:''}${esc(t)}</span>`).join(''); }
 async function openGifts(auto){
-  if(auto && MJG) return;
+  if(auto && mjOn()) return;
   let L=[]; try{ L=await rpc('farm_gifts'); }catch(e){ return; }
   if(!L.length){ if(!auto) modal('📬 禮物信箱', `<div class="empty">目前沒有禮物</div>`); return; }
   modal('📬 禮物信箱', L.map(g=>`<div class="gift"><b>${esc(g.title)}</b>${g.body?`<p>${esc(g.body)}</p>`:''}<div class="rwbox">${rewardHTML(g.reward)}</div>

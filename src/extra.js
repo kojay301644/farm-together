@@ -246,7 +246,7 @@ function openSign(){
 }
 let signAuto = false;
 function signMaybePop(){ // 每天第一次進遊戲自動跳出（教學進行中不跳）
-  signBadge(); if(MJG || signAuto || !S || signedToday() || tut || mode!=='home') return; signAuto = true;
+  signBadge(); if(mjOn() || signAuto || !S || signedToday() || tut || mode!=='home') return; signAuto = true;
   if(document.querySelector('#ov.show')) return;
   openSign();
 }

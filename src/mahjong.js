@@ -96,13 +96,22 @@ function openHall(){
 }
 function openMjLobby(){
   const gold = S.me.gold;
-  modal('🀄 麻將', `<div class="rhint">台灣 16 張麻將。人不夠時由電腦補位，隨時可以離開（打完這一局才會走）</div>
-    ${Object.entries(MJ.TABLES).map(([k,t])=>`<div class="mjtb"><div class="mjtbi">${{n:'🌱',m:'🌻',h:'🏆'}[k]}</div><div class="tx"><b>${t.name}</b>
+  modal('🀄 麻將', `<div class="rhint">台灣 16 張麻將，輸贏用農場金幣。人不夠時由電腦補位；中途離開，這局由電腦代打、輸贏照算</div>
+    <div id="mjBack"></div>
+    ${Object.entries(MJ.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${{n:'🌱',m:'🌻',h:'🏆'}[k]}</div><div class="tx"><b>${t.name}</b>
       <div>底 ${t.base.toLocaleString()}・每台 ${t.tai.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
-      <button class="mini" data-mjt="${k}" ${gold<t.min?'disabled':''}>${gold<t.min?'金幣不夠':'入座'}</button></div>`).join('')}
+      <div class="mjtbb"><button class="mini" data-mjq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-mjc="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
+    <div class="mjjoin"><input id="mjCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="mjJoin">加入朋友的房間</button></div>
+    <div class="mjtb prac"><div class="mjtbi">🎓</div><div class="tx"><b>練習場</b><div>跟電腦打，不用金幣，輸贏不算</div></div><button class="mini sub" id="mjPrac">練習</button></div>
     <button class="link" id="mjRules">📖 台數怎麼算？</button>`, [['回寵物娛樂廳','sub',openHall]]);
-  document.querySelectorAll('#md [data-mjt]').forEach(b=>b.onclick=()=>{ closeModal(); mjEnter(b.dataset.mjt); });
+  const busy = b => { document.querySelectorAll('#md .mini').forEach(x=>x.disabled = b); };
+  const go = async (a, extra) => { busy(true); try{ const r = await mjCall(a, extra); if(!r.view) throw new Error('進不去，等等再試'); closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); busy(false); } };
+  document.querySelectorAll('#md [data-mjq]').forEach(b=>b.onclick=()=>go('quick', {lvl:b.dataset.mjq}));
+  document.querySelectorAll('#md [data-mjc]').forEach(b=>b.onclick=()=>go('create', {lvl:b.dataset.mjc}));
+  $('mjJoin').onclick = ()=>{ const c = ($('mjCode').value||'').trim(); if(!/^\d{4}$/.test(c)) return toast('房號是 4 位數字'); go('join', {code:c}); };
+  $('mjPrac').onclick = ()=>{ closeModal(); mjEnter('n'); };
   $('mjRules').onclick = mjRules;
+  mjCall('state').then(r=>{ if(r.view && r.view.status && $('mjBack')) { $('mjBack').innerHTML = `<button class="btn o" id="mjBackB" style="width:100%;margin:6px 0">🀄 你還有一桌在打，回到牌桌</button>`; $('mjBackB').onclick = ()=>{ closeModal(); mjOnlineEnter(r.view); }; } }).catch(()=>{});
 }
 function mjRules(){
   const R = [['門清自摸',3],['門清（沒吃碰）',1],['自摸',1],['莊家',1],['連莊（每連一次）',2],['平胡',2],['全求人',2],['碰碰胡',4],['三暗刻',2],['四暗刻',5],['五暗刻',8],
@@ -110,47 +119,43 @@ function mjRules(){
     ['獨聽（單吊、邊張、中洞）',1],['槓上開花',1],['搶槓',1],['海底撈月／河底撈魚',1],['天胡／地胡',16]];
   const body = `<div class="help"><p>胡牌要有 5 組（順子或刻子）加 1 對眼睛，共 17 張。</p><p><b>每家要付：底 + 台數 × 每台</b>。自摸三家都付，放槍只有放槍的人付；莊家相關的台數只算在莊家那一家。</p></div>
     <div class="mjrl">${R.map(([n,v])=>`<div><span>${n}</span><b>${v} 台</b></div>`).join('')}</div>`;
-  if(MJG) return mjPanel('📖 台數表', body, [['知道了','',mjPanelClose]]);
+  if(mjOn()) return mjPanel('📖 台數表', body, [['知道了','',mjPanelClose]]);
   modal('📖 台數表', body, [['知道了','',openMjLobby]]);
 }
 
-/* ---------- 牌桌控制（本機版：跟 3 個電腦打；之後換成連線版） ---------- */
+/* ---------- 牌桌控制：練習場（本機跟電腦）／連線（伺服器） ---------- */
 const MJ_BOTS = [{name:'小兔',av:3},{name:'阿熊',av:7},{name:'狐狸妹',av:15},{name:'企鵝哥',av:21},{name:'水獺',av:24},{name:'小鼠',av:9}];
 const MJ_TURN_SEC = 15, MJ_CLAIM_SEC = 8;
-let mjDiceHand = 0, mjDiceUntil = 0;
-let MJG = null, mjSel = null, mjTimer = 0, mjDeadline = 0, mjDue = '', mjBotT = 0, mjMiss = 0, mjLastLog = 0, mjNextT = 0;
+let mjDiceHand = 0, mjDiceUntil = 0, mjMe = 0;
+let MJG = null, MJO = null, mjSel = null, mjTimer = 0, mjDeadline = 0, mjDue = '', mjBotT = 0, mjMiss = 0, mjLastLog = 0, mjNextT = 0;
+const mjOn = () => !!(MJG || MJO);
+async function mjCall(a, extra){
+  const { data, error } = await sb.functions.invoke('mahjong', { body: Object.assign({ a }, extra||{}) });
+  if(error) throw new Error('連線不穩，請再試一次');
+  if(data && data.error) throw new Error(data.error);
+  return data || {};
+}
+function mjOpen(){ $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = 0; mjDiceHand = 0; }
+function mjClose(){
+  clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
+  if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
+  MJG = null; MJO = null; $('mj').classList.remove('on'); document.body.classList.remove('mjon');
+}
+
+// 練習場
 function mjEnter(table){
   const bots = MJ_BOTS.slice().sort(()=>Math.random()-0.5).slice(0,3);
-  const me = {id:'me', name:S.me.nickname, av:S.me.avatar||11, gold:S.me.gold};
-  MJG = MJ.newGame([me, ...bots.map((b,i)=>({id:'b'+i, name:b.name, av:b.av, bot:true, gold:Math.max(MJ.TABLES[table].min*3, 30000)+Math.floor(Math.random()*20000)}))], {table, dealer:Math.floor(Math.random()*4)});
-  mjSel = null; mjMiss = 0; mjLastLog = 0; mjDiceHand = 0;
-  $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice();
-  mjTick(true);
+  const me = {id:'me', name:S.me.nickname, av:S.me.avatar||11, gold:50000};
+  MJG = MJ.newGame([me, ...bots.map((b,i)=>({id:'b'+i, name:b.name, av:b.av, bot:true, gold:50000}))], {table, dealer:Math.floor(Math.random()*4)});
+  MJG.practice = true; mjMiss = 0; mjOpen(); mjTick(true);
 }
-function mjLeave(force){
-  if(!force && MJG && MJG.phase!=='end') return mjConfirmLeave();
-  clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
-  if(MJG){ S.me.gold = MJG.seats[0].gold; if(typeof refresh==='function') try{ refresh(); }catch(e){} }
-  MJG = null; $('mj').classList.remove('on'); document.body.classList.remove('mjon');
-}
-function mjConfirmLeave(){
-  mjPanel('要離開牌桌嗎？', `<div class="help"><p>這一局還沒打完，現在離開會由電腦幫你打完這一局，輸贏照算。</p></div>`,
-    [['繼續打','sub',mjPanelClose],['離開','r',()=>{ mjPanelClose(); while(MJG && MJG.phase!=='end'){ const w=MJ.waitingOn(MJG); if(!w.length) break; MJ.autoAct(MJG, w[0], true); } mjLeave(true); }]]);
-}
-function mjDo(a){
-  if(!MJG || MJG.phase==='end') return;
-  try{ MJ.act(MJG, 0, a); mjSel = null; mjMiss = 0; mjTick(); }catch(e){ mjToast(e.message); }
-}
-// 每次狀態改變後：重畫、設定倒數、讓電腦動作
+function mjLocalView(){ return Object.assign(MJ.view(MJG, 0), { dice: MJG.dice, status:'play', practice:true }); }
 function mjTick(first){
   if(!MJG) return;
   mjRender(first);
   clearTimeout(mjBotT);
   if(MJG.phase==='end'){ mjDue=''; return; }
   const w = MJ.waitingOn(MJG), bots = w.filter(j=>MJG.seats[j].bot || MJG.seats[j].auto);
-  // 換到我：重設倒數
-  // 每局開始：莊家先擲骰子，動畫跑完才開始打
-  if(MJG.handNo !== mjDiceHand){ mjDiceHand = MJG.handNo; mjDiceUntil = Date.now() + 2200; mjDice(MJG.dice, MJG.dealer); }
   const wait0 = Math.max(0, mjDiceUntil - Date.now());
   const due = w.includes(0) ? MJG.phase+':'+MJG.handNo+':'+MJG.log.length : '';
   if(due && due!==mjDue){ mjDeadline = Date.now() + wait0 + (MJG.phase==='play'?MJ_TURN_SEC:MJ_CLAIM_SEC)*1000; if(MJG.phase==='play') setTimeout(()=>mjSfx('turn'), wait0); }
@@ -159,18 +164,71 @@ function mjTick(first){
     mjBotT = setTimeout(()=>{ if(!MJG) return; try{ MJ.autoAct(MJG, j, true); }catch(e){ console.warn(e); } mjTick(); }, wait0 + (fast ? 380 : 650 + Math.random()*450)); }
   if(!mjTimer) mjTimer = setInterval(mjClock, 250);
 }
+
+// 連線
+async function mjOnlineEnter(view){
+  mjClose();
+  MJO = { V: null, seq: -1, off: 0, tick: 0, poll: 0, ch: null, busy: false };
+  mjOpen(); mjApply(view, 0, true);
+  try{ const { data:{ user } } = await sb.auth.getUser();
+    if(user && MJO){ MJO.ch = sb.channel('mjv-' + user.id).on('postgres_changes', { event:'*', schema:'public', table:'mj_views', filter:'uid=eq.' + user.id },
+      p => { const r = p.new; if(MJO && r && r.seq >= MJO.seq) mjApply(r.view, r.seq); }).subscribe(); } }catch(e){}
+  MJO.poll = setInterval(()=>{ if(MJO && !MJO.busy && Date.now() - (MJO.at||0) > 5000) mjCall('state').then(r=>MJO && mjApply(r.view, null)).catch(()=>{}); }, 3000);
+  if(!mjTimer) mjTimer = setInterval(mjClock, 250);
+}
+function mjApply(view, seq, first){
+  if(!MJO) return;
+  if(!view){ mjClose(); toast('已經離開牌桌'); sync && sync(); return; }
+  if(view.status==='kicked' || view.status==='closed'){ mjClose(); toast(view.msg || '牌桌已經關了'); sync && sync(); return; }
+  if(seq!=null && seq < MJO.seq) return;
+  if(seq!=null) MJO.seq = seq;
+  MJO.V = view; MJO.at = Date.now(); MJO.off = Date.now() - (view.now || Date.now());
+  if(view.me!=null && view.seats){ const g = view.seats[view.me].gold; if(S && S.me && typeof g==='number') S.me.gold = g; }
+  mjRender(first);
+  // 下一個事件（電腦出牌、超時、開局…）到的時候請伺服器推進；指定一個人負責，其他人晚一點當備援
+  clearTimeout(MJO.tick);
+  if(view.due){ const wait = view.due + MJO.off - Date.now() + (view.ticker || view.status==='wait' || view.pending ? 60 : 1500);
+    MJO.tick = setTimeout(()=>{ if(!MJO) return; mjCall('tick').then(r=>MJO && mjApply(r.view, null)).catch(()=>{}); }, Math.max(60, wait)); }
+}
+async function mjOnline(a, extra){
+  if(!MJO || MJO.busy) return;
+  MJO.busy = true;
+  try{ const r = await mjCall(a, extra); MJO && mjApply(r.view, null); }catch(e){ mjToast(e.message); }
+  finally{ if(MJO) MJO.busy = false; }
+}
+function mjCurView(){ return MJG ? mjLocalView() : MJO && MJO.V; }
+
+function mjLeave(force){
+  const V = mjCurView();
+  if(!force && V && V.phase && V.phase!=='end' && V.status==='play' && V.me!=null) return mjConfirmLeave();
+  if(MJO){ const o = MJO; o.busy = true; mjCall('leave').then(r=>{ if(typeof r.gold==='number' && S && S.me) S.me.gold = r.gold; try{ refresh(); }catch(e){} }).catch(()=>{}); mjClose(); return; }
+  mjClose();
+}
+function mjConfirmLeave(){
+  mjPanel('要離開牌桌嗎？', `<div class="help"><p>這一局還沒打完，現在離開會由電腦幫你打完這一局，${MJG?'練習場不算輸贏。':'輸贏照算。'}</p></div>`,
+    [['繼續打','sub',mjPanelClose],['離開','r',()=>{ mjPanelClose(); mjLeave(true); }]]);
+}
+function mjDo(a){
+  const V = mjCurView(); if(!V || V.phase==='end') return;
+  mjSel = null;
+  if(MJO) return mjOnline('act', { act: a });
+  try{ MJ.act(MJG, 0, a); mjMiss = 0; mjTick(); }catch(e){ mjToast(e.message); }
+}
 function mjClock(){
-  if(!MJG){ clearInterval(mjTimer); mjTimer=0; return; }
-  const el = $('mjSec'), w = MJ.waitingOn(MJG);
-  if(!w.includes(0) || MJG.phase==='end'){ if(el) el.textContent=''; return; }
-  const left = Math.max(0, Math.ceil((mjDeadline-Date.now())/1000));
+  if(!mjOn()){ clearInterval(mjTimer); mjTimer=0; return; }
+  const V = mjCurView(), el = $('mjSec');
+  if(V && V.status==='wait' && $('mjWs') && MJO){ const sec = Math.max(0, Math.ceil((V.wait.startAt + MJO.off - Date.now())/1000)); $('mjWs').textContent = V.priv ? '人到齊或房主按開始就開打' : sec > 0 ? `${sec} 秒後開始，人不夠由電腦補位` : '準備開始…'; return; }
+  if(!V || !V.waiting) { if(el) el.textContent=''; return; }
+  if(!V.waiting.includes(V.me) || V.phase==='end'){ if(el) el.textContent=''; return; }
+  const dl = MJG ? mjDeadline : (V.deadline ? V.deadline + MJO.off : 0);
+  if(!dl){ if(el) el.textContent=''; return; }
+  const left = Math.max(0, Math.ceil((dl-Date.now())/1000));
   if(el){ el.textContent = left; el.classList.toggle('hurry', left<=5); }
-  if(left<=0){ mjMiss++; try{ MJ.autoAct(MJG, 0, false); }catch(e){} if(mjMiss>=2){ MJG.seats[0].auto = true; mjToast('超時太多次，先幫你託管'); } mjSel=null; mjTick(); }
+  if(MJG && left<=0){ mjMiss++; try{ MJ.autoAct(MJG, 0, false); }catch(e){} if(mjMiss>=2){ MJG.seats[0].auto = true; mjToast('超時太多次，先幫你託管'); } mjSel=null; mjTick(); }
 }
 
-
 /* ---------- 畫面（橫向牌桌；手機直拿時整桌轉 90 度） ---------- */
-const mjSeatPos = j => ['b','r','t','l'][(j + 4) % 4];   // 我永遠在下方；1=下家(右) 2=對家 3=上家(左)
+const mjSeatPos = j => ['b','r','t','l'][(j - mjMe + 8) % 4];   // 我永遠在下方；1=下家(右) 2=對家 3=上家(左)
 let mjW = 844, mjH = 390;
 function mjFit(){
   const el = $('mj'); if(!el) return;
@@ -202,8 +260,13 @@ function mjMenu(){
 
 function mjRender(first){
   if(first || !$('mjFelt')) mjShell();
-  const V = MJ.view(MJG, 0), T = MJ.TABLES[V.table], me = V.seats[0], wl = V.waiting;
-  const posOf = {b:0,r:1,t:2,l:3};
+  const V = mjCurView(); if(!V) return;
+  if(V.status==='wait' || V.pending || V.me==null || V.me<0) return mjRenderWait(V);
+  mjMe = V.me;
+  // 每局開始：莊家先擲骰子
+  if(V.dice && V.handNo !== mjDiceHand && V.phase!=='end' && (MJG || V.startAt)){ mjDiceHand = V.handNo; mjDiceUntil = Date.now() + 2200; setTimeout(()=>mjDice(V.dice, V.dealer), 30); }
+  const ME = V.me, T = MJ.TABLES[V.table], me = V.seats[ME], wl = V.waiting;
+  const posOf = {b:ME,r:(ME+1)%4,t:(ME+2)%4,l:(ME+3)%4};
   const seatCard = j => { const s = V.seats[j], on = wl.includes(j) && V.phase!=='end';
     return `<div class="mjs mjs-${mjSeatPos(j)}${on?' on':''}"><div class="mjav"><img src="${avSrc(s.av)}" alt="">${j===V.dealer?`<span class="mjdl">莊${V.lian?`<small>${V.lian}</small>`:''}</span>`:''}<span class="mjwd">${MJ.WIND[s.wind]}</span></div>
       <div class="mjtx"><div class="mjnm">${esc(s.name)}</div><div class="mjgd">${s.gold.toLocaleString()}</div></div></div>`; };
@@ -219,8 +282,8 @@ function mjRender(first){
 
   // 我的手牌（一排）：吃碰的牌在左邊，剛摸到的牌放最右邊
   let hand = me.hand.slice(), drawn = null;
-  if(V.drawn!=null && V.turn===0 && V.phase==='play'){ const i = hand.lastIndexOf(V.drawn); if(i>=0){ hand.splice(i,1); drawn = V.drawn; } }
-  const canDis = V.phase==='play' && V.turn===0 && V.opts.discard && !me.auto;
+  if(V.drawn!=null && V.turn===ME && V.phase==='play'){ const i = hand.lastIndexOf(V.drawn); if(i>=0){ hand.splice(i,1); drawn = V.drawn; } }
+  const canDis = V.phase==='play' && V.turn===ME && V.opts.discard && !me.auto;
   const meldN = me.melds.reduce((a,m)=>a+(m.k==='chi'||m.k==='pon'?3:4),0);
   const units = hand.length + (drawn!=null?1.3:0) + meldN*0.62 + me.melds.length*0.2;
   const tw = Math.max(24, Math.min(58, Math.floor(mjH*0.19*44/60), Math.floor((mjW - 30) / Math.max(units, 12))));
@@ -241,7 +304,7 @@ function mjRender(first){
   const o = V.opts || {}, acts = [];
   if(V.phase==='claim' && wl.includes(0)){
     if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']); if(o.chi) acts.push(['chi', o.chi.length>1 ? `吃<small>${o.chi.length}種</small>` : '吃','c']); acts.push(['pass','過','x']);
-  } else if(V.phase==='play' && V.turn===0 && !me.auto){
+  } else if(V.phase==='play' && V.turn===ME && !me.auto){
     if(o.zimo) acts.push(['zimo','自摸','w']); if(o.ankan) acts.push(['ankan','暗槓','k']); if(o.kakan) acts.push(['kakan','加槓','k']); if(acts.length) acts.push(['skip','過','x']);
   }
   const claimTile = V.phase==='claim' && V.last && wl.includes(0) ? `<div class="mjct">${esc(V.seats[V.last.from].name)} 打出 ${mjTile(V.last.t,'md')}</div>` : '';
@@ -253,11 +316,11 @@ function mjRender(first){
   $('mjUi').innerHTML = `<div class="mjacts">${claimTile}${acts.map(([k,t,c])=>`<button class="mja mja-${c}" data-ma="${k}">${t}</button>`).join('')}</div><div class="mjchi" id="mjChi"></div>${hint}
     <div class="mjhand${canDis?' can':''}" style="--tw:${tw}px;--mw:${Math.round(tw*0.62)}px">${handHtml}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div>
-    <div class="mjbme${myOn?' on':''}"><img src="${avSrc(me.av)}" alt=""><span class="mjbw">${MJ.WIND[me.wind]}</span>${V.dealer===0?`<span class="mjbd">莊${V.lian?V.lian:''}</span>`:''}<b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
+    <div class="mjbme${myOn?' on':''}"><img src="${avSrc(me.av)}" alt=""><span class="mjbw">${MJ.WIND[me.wind]}</span>${V.dealer===ME?`<span class="mjbd">莊${V.lian?V.lian:''}</span>`:''}<b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
     <div class="mjbf">${me.flowers.map(t=>mjTile(t,'xs')).join('')}</div><div class="mjbt r">${T.name}・第 ${V.handNo} 局</div>`;
   $('mjEnd').innerHTML = V.phase==='end' ? mjResultHtml(V) : '';
 
-  if($('mjAuto')) $('mjAuto').onclick = ()=>{ MJG.seats[0].auto=false; mjMiss=0; mjTick(); };
+  if($('mjAuto')) $('mjAuto').onclick = ()=>{ if(MJO) return mjOnline('auto', {on:false}); MJG.seats[0].auto=false; mjMiss=0; mjTick(); };
   document.querySelectorAll('#mj .mjhand .mt.hd').forEach(el=>el.onclick=()=>{
     if(!canDis) return;
     const k = el.dataset.k, t = +el.dataset.t;
@@ -276,12 +339,31 @@ function mjRender(first){
     if(k==='chi'){ const L=o.chi; return mjPick(L.map(u=>({h:sortChi(u, V.last.t).map(t=>mjTile(t,'sm'+(t===V.last.t?' got':''))).join(''), a:{a:'chi', use:u}}))); }
   });
   if(V.phase==='end') mjBindResult(V);
-  const e = MJG.log[MJG.log.length-1], sig = MJG.seq + ':' + (e?e.k:'');
+  const e = (V.log||[])[(V.log||[]).length-1], sig = V.handNo + ':' + V.seq + ':' + (e?e.k:'');
   if(e && sig!==mjLastLog){ mjLastLog = sig;
     if(['pon','chi','kan','ankan','kakan','hu','zimo'].includes(e.k)) mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！'}[e.k]);
     else if(e.k==='discard') mjSfx('tile');
     else if(e.k==='flower') mjShout(e.s, '補花', true);
   }
+}
+function mjRenderWait(V){
+  const T = MJ.TABLES[V.lvl] || MJ.TABLES.n;
+  let inner;
+  if(V.status==='wait'){
+    const P = (V.wait && V.wait.players) || [];
+    inner = `<div class="mjwt">${V.priv ? '🏠 朋友房間' : '🔍 正在找牌友…'}</div>
+      ${V.priv ? `<div class="mjcode">房號 <b>${esc(V.code||'')}</b><small>把房號告訴朋友，在「麻將」輸入就能加入</small></div>` : ''}
+      <div class="mjwp">${[0,1,2,3].map(i=>{ const p=P[i]; return p ? `<div class="mjwq"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span></div>` : `<div class="mjwq e"><i>？</i><span>${V.priv?'等朋友加入':'等待中'}</span></div>`; }).join('')}</div>
+      <div class="mjws" id="mjWs"></div>
+      <div class="mjwb">${V.priv && V.host ? `<button class="btn" id="mjStart">立即開始（空位由電腦補）</button>` : ''}<button class="btn sub" id="mjWl">離開</button></div>`;
+  } else {
+    inner = `<div class="mjwt">⏳ 牌桌正在打</div><div class="mjws">這一局結束後你就會入座，請稍等…</div><div class="mjwb"><button class="btn sub" id="mjWl">離開</button></div>`;
+  }
+  $('mjFelt').innerHTML = `<div class="mjwait">${inner}</div>`;
+  $('mjUi').innerHTML = ''; $('mjEnd').innerHTML = '';
+  $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div><div class="mjbt r">${T.name}</div>`;
+  if($('mjStart')) $('mjStart').onclick = ()=>mjOnline('start');
+  $('mjWl').onclick = ()=>mjLeave(true);
 }
 function mjShell(){
   $('mj').style.setProperty('--mjtable', `url("${mjArt('mj_table')}")`); $('mj').style.setProperty('--mjconsole', `url("${mjArt('mj_console')}")`);
@@ -299,7 +381,7 @@ function mjDice(d, dealer){
   box.appendChild(el); mjSfx('dice');
   let k = 0; const spin = setInterval(()=>{ el.querySelectorAll('.mjdi').forEach(x=>x.innerHTML = mjDie(1+Math.floor(Math.random()*6))); if(++k>=9){ clearInterval(spin);
     el.querySelectorAll('.mjdi').forEach(x=>x.innerHTML = mjDie(+x.dataset.n)); el.classList.add('done');
-    el.querySelector('.mjdt').textContent = `${dealer===0?'你':(MJG?MJG.seats[dealer].name:'')}（莊家）擲出 ${d[0]+d[1]+d[2]} 點`; } }, 90);
+    el.querySelector('.mjdt').textContent = `${dealer===mjMe?'你':((mjCurView()||{seats:[]}).seats[dealer]||{}).name||''}（莊家）擲出 ${d[0]+d[1]+d[2]} 點`; } }, 90);
   setTimeout(()=>el.remove(), 2200);
 }
 const sortChi = (u, t) => [u[0], u[1], t].sort((a,b)=>a-b);
@@ -325,8 +407,8 @@ function mjResultHtml(V){
   const dIn = r.win===r.dealer || r.lines.some(l=>l.s===r.dealer);
   const tai = r.tai.map(([n,v])=>`<span class="mjtai">${esc(n)} <b>${v}</b></span>`).join('') + (dIn ? `<span class="mjtai d">莊家${r.lian?`・連${r.lian}拉${r.lian}`:''} <b>${1+2*r.lian}</b></span>` : '');
   const rows = [0,1,2,3].map(j=>{ const s=V.seats[j], v=r.pay[j];
-    return `<div class="mjpr${j===0?' me':''}"><img src="${avSrc(s.av)}" alt=""><span>${esc(s.name)}${j===r.win?' 🏆':''}</span><b class="${v>0?'up':v<0?'dn':''}">${v>0?'+':''}${v.toLocaleString()}</b></div>`; }).join('');
-  return `<div class="mjres"><div class="mjrc${r.win===0?' mine':''}"><div class="mjrl1"><div class="mjrt">${title}</div>
+    return `<div class="mjpr${j===V.me?' me':''}"><img src="${avSrc(s.av)}" alt=""><span>${esc(s.name)}${j===r.win?' 🏆':''}</span><b class="${v>0?'up':v<0?'dn':''}">${v>0?'+':''}${v.toLocaleString()}</b></div>`; }).join('');
+  return `<div class="mjres"><div class="mjrc${r.win===V.me?' mine':''}"><div class="mjrl1"><div class="mjrt">${title}</div>
     <div class="mjrh">${w.melds.map(m=>mjMeld(m,'sm')).join('')}<span class="mmeld">${hand.map(t=>mjTile(t,'sm')).join('')}</span>${mjTile(r.t,'sm win')}</div>
     ${w.flowers.length?`<div class="mjrfl">${w.flowers.map(t=>mjTile(t,'xs')).join('')}</div>`:''}
     <div class="mjtais">${tai || '<span class="mjtai">屁胡 <b>0</b></span>'}</div>
@@ -341,10 +423,14 @@ function mjTotalTxt(r){
 }
 function mjBindResult(V){
   $('mjOut').onclick = ()=>mjLeave(true);
-  const T = MJ.TABLES[V.table], go = ()=>{ clearTimeout(mjNextT); if(!MJG) return; if(MJG.seats[0].gold < T.min){ toast(`金幣少於 ${T.min.toLocaleString()}，不能繼續坐這桌`); return mjLeave(true); }
+  const T = MJ.TABLES[V.table], go = ()=>{ clearTimeout(mjNextT);
+    if(MJO){ const b=$('mjNext'); if(b){ b.disabled=true; b.textContent='等其他人…'; } return mjOnline('ready'); }
+    if(!MJG) return; if(MJG.seats[0].gold < T.min){ toast(`金幣少於 ${T.min.toLocaleString()}，不能繼續坐這桌`); return mjLeave(true); }
     MJG.seats.forEach(s=>{ if(s.bot && s.gold < T.min) s.gold += T.min*5; }); MJ.nextHand(MJG); mjSel=null; mjTick(); };
   $('mjNext').onclick = go;
-  let n = 12; const tick = ()=>{ const el=$('mjNs'); if(!el) return; el.textContent = `(${n})`; if(n--<=0) return go(); mjNextT = setTimeout(tick, 1000); };
+  if(MJO && (V.ready||[]).includes(V.me)){ const b=$('mjNext'); b.disabled=true; b.textContent='等其他人…'; }
+  let n = MJO && V.endAt ? Math.ceil((V.endAt + MJO.off - Date.now())/1000) : 12;
+  const tick = ()=>{ const el=$('mjNs'); if(!el) return; el.textContent = `(${Math.max(0,n)})`; if(n--<=0){ if(!MJO) go(); return; } mjNextT = setTimeout(tick, 1000); };
   clearTimeout(mjNextT); tick();
 }
-addEventListener('resize', ()=>{ if(MJG){ mjFit(); mjRender(); } });
+addEventListener('resize', ()=>{ if(mjOn()){ mjFit(); mjRender(); } });
