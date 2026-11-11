@@ -1,7 +1,7 @@
 // 麻將連線版：牌桌狀態機（純邏輯，不碰資料庫；index.ts 負責讀寫）
 import MJ from './mj_engine.mjs';
 
-export const TIME = { TURN: 15000, CLAIM: 8000, BOT_PLAY: 900, BOT_CLAIM: 450, WAIT_START: 8000, NEXT_WAIT: 12000, DICE: 2300 };
+export const TIME = { TURN: 15000, CLAIM: 5000, BOT_PLAY: 900, BOT_CLAIM: 450, WAIT_START: 8000, NEXT_WAIT: 12000, DICE: 2300 };
 const BOTS = [{ name: '小兔', av: 3 }, { name: '阿熊', av: 7 }, { name: '狐狸妹', av: 15 }, { name: '企鵝哥', av: 21 }, { name: '水獺', av: 24 }, { name: '小鼠', av: 9 }, { name: '刺蝟', av: 5 }, { name: '浣熊', av: 13 }];
 const pickBot = (used) => { const L = BOTS.filter(b => !used.includes(b.name)); return L[Math.floor(Math.random() * L.length)] || BOTS[0]; };
 const botGold = (lvl) => MJ.TABLES[lvl].min * 4 + Math.floor(Math.random() * MJ.TABLES[lvl].min * 2);
@@ -99,10 +99,11 @@ export function advance(T, now, gold) {
     const w = MJ.waitingOn(G); if (!w.length) break;
     let acted = false;
     for (const j of w) {
-      const s = G.seats[j], bot = !G.uids[j] || s.auto;
+      const s = G.seats[j], bot = !G.uids[j] || s.auto || s.ting;   // 報聽的人由系統自動處理
       const due = bot ? G.tAct + (G.phase === 'claim' ? TIME.BOT_CLAIM : TIME.BOT_PLAY) : G.tWait + (G.phase === 'claim' ? TIME.CLAIM : TIME.TURN);
       if (now >= due) {
-        if (bot) MJ.autoAct(G, j, true);
+        if (bot) MJ.autoAct(G, j, !!(!G.uids[j] || s.auto || s.ting));
+        else if (G.phase === 'claim') MJ.autoAct(G, j, false);   // 吃碰胡沒點：當作不要，不算超時
         else { MJ.autoAct(G, j, false); G.miss[j]++; if (G.miss[j] >= 2) s.auto = true; }
         G.tAct = now; acted = true; break;
       }
@@ -119,7 +120,7 @@ export function dueAt(T) {
   if (G.phase === 'end') return G.settled ? G.endAt + TIME.NEXT_WAIT : 0;
   let best = Infinity;
   for (const j of MJ.waitingOn(G)) {
-    const bot = !G.uids[j] || G.seats[j].auto;
+    const bot = !G.uids[j] || G.seats[j].auto || G.seats[j].ting;
     const due = bot ? G.tAct + (G.phase === 'claim' ? TIME.BOT_CLAIM : TIME.BOT_PLAY) : G.tWait + (G.phase === 'claim' ? TIME.CLAIM : TIME.TURN);
     best = Math.min(best, due);
   }
@@ -153,7 +154,7 @@ export function viewFor(T, uid, now) {
   const V = MJ.view(G, j);
   const hum = G.uids.map(Boolean);
   let deadline = null;
-  if (V.waiting.includes(j) && !G.seats[j].auto) deadline = G.tWait + (G.phase === 'claim' ? TIME.CLAIM : TIME.TURN);
+  if (V.waiting.includes(j) && !G.seats[j].auto && !G.seats[j].ting) deadline = G.tWait + (G.phase === 'claim' ? TIME.CLAIM : TIME.TURN);
   return { ...base, ...V, dice: G.dice, firstDealer: G.firstDealer, humans: hum, deadline, startAt: G.tAct > now ? G.tAct : null,
     broke: (G.broke || []).includes(uid), ready: G.ready, endAt: G.phase === 'end' ? G.endAt + TIME.NEXT_WAIT : null, leaving: G.leaving.includes(uid),
     ticker: G.uids.findIndex(Boolean) === j, pendingN: (G.pending || []).length };

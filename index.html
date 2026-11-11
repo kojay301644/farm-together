@@ -652,6 +652,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mja-k{background:radial-gradient(circle at 35% 30%,#B48CFF,#7A4FD8);box-shadow:0 4px 0 #4F2FA0}
 .mja-p{background:radial-gradient(circle at 35% 30%,#7CC6FF,#2F86E0);box-shadow:0 4px 0 #1C5FA8}
 .mja-c{background:radial-gradient(circle at 35% 30%,#7EE0A6,#2E9E60);box-shadow:0 4px 0 #1E6E42}
+.mja-t{background:radial-gradient(circle at 35% 30%,#FFC46B,#F08A1C);box-shadow:0 4px 0 #A85A08}
+.mjhand .mt.ht:after{content:"聽";position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-size:11px;font-weight:900;color:#fff;background:#F08A1C;border-radius:6px;padding:0 5px;line-height:16px}
+.mjhand .mt.dim{opacity:.4}
+.mjhint.ting{background:#FFF1DC;color:#8A4B00}.mjhint small{font-size:10px;color:#B07A3A;margin-left:1px}
+.mjtg{position:absolute;left:-8px;bottom:-6px;background:#F08A1C;color:#fff;font-size:11px;font-weight:900;border-radius:8px;padding:0 5px;border:2px solid #fff;line-height:1.4}
 .mja-x{background:#EFE9DF;color:var(--ink);text-shadow:none;box-shadow:0 4px 0 #CFC3AF;font-size:18px;width:54px;height:54px}
 @keyframes mjin{from{transform:scale(.3);opacity:0}}
 .mjchi{position:absolute;right:22px;bottom:calc(100% + 90px);display:flex;gap:8px;z-index:9}
@@ -746,21 +751,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794411127" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794412249" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794411127" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794411127" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794412249" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794412249" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794411127" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794412249" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794411127" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794411127" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794412249" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794412249" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -777,11 +782,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794411127" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794412249" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794411127";
+const BUILD="1794412249";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3080,6 +3085,13 @@ const MJ = (() => {
     if (!isHonor(i) && i % 10 <= 7 && c[i + 1] && c[i + 2]) { c[i]--; c[i + 1]--; c[i + 2]--; acc.push({ k: 'chi', t: i }); walk(c, acc, emit); acc.pop(); c[i]++; c[i + 1]++; c[i + 2]++; }
   }
   function waits(hand) { return KINDS.filter(t => canWin(hand.concat([t]))); }   // hand: 3n+1 張
+  // 輪到出牌時：打哪張會聽牌、聽什麼 → { 牌: [聽的牌…] }
+  function tingTiles(s) {
+    if (s.hand.length % 3 !== 2) return null;
+    const out = {};
+    for (const t of new Set(s.hand)) { const h = s.hand.slice(); removeN(h, t); const w = waits(h); if (w.length) out[t] = w; }
+    return Object.keys(out).length ? out : null;
+  }
 
   /* ---------- 向聽數（電腦玩家用） ---------- */
   const memo = new Map();
@@ -3137,7 +3149,7 @@ const MJ = (() => {
     const w = []; KINDS.forEach(t => { for (let k = 0; k < 4; k++) w.push(t); }); for (let f = 51; f <= 58; f++) w.push(f);
     G.wall = shuffle(w, rnd); G.handNo++; G.dice = [1,2,3].map(() => 1 + Math.floor(rnd() * 6)); G.result = null; G.last = null; G.pend = null; G.drawn = null; G.kakan = null;
     G.afterKan = false; G.anyClaim = false; G.log = [];
-    G.seats.forEach(s => { s.hand = []; s.melds = []; s.flowers = []; s.river = []; s.firstGo = true; });
+    G.seats.forEach(s => { s.hand = []; s.melds = []; s.flowers = []; s.river = []; s.firstGo = true; s.ting = false; });
     for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) { const s = G.seats[(G.dealer + k) % 4]; for (let j = 0; j < 4; j++) s.hand.push(G.wall.shift()); }
     // 開局補花（從莊家開始）
     for (let k = 0; k < 4; k++) { const si = (G.dealer + k) % 4; replaceFlowers(G, si); }
@@ -3168,7 +3180,8 @@ const MJ = (() => {
     if (G.phase === 'play' && G.turn === si) {
       o.discard = true;
       if (G.drawn != null && canWin(s.hand)) o.zimo = true;
-      if (G.drawn != null && G.wall.length > RESERVE) {
+      if (!s.ting) o.ting = tingTiles(s);
+      if (G.drawn != null && G.wall.length > RESERVE && !s.ting) {
         const c = cnt(s.hand);
         const an = KINDS.filter(t => c[t] === 4); if (an.length) o.ankan = an;
         const ka = s.melds.filter(m => m.k === 'pon' && c[m.t]).map(m => m.t); if (ka.length) o.kakan = ka;
@@ -3181,7 +3194,7 @@ const MJ = (() => {
   function claimOpts(G, si, t, from, kakanOnly) {
     const s = G.seats[si], o = {}, c = cnt(s.hand);
     if (canWin(s.hand.concat([t]))) o.hu = true;
-    if (kakanOnly) return o;
+    if (kakanOnly || s.ting) return o;
     if (c[t] >= 2) o.pon = true;
     if (c[t] >= 3 && G.wall.length > RESERVE) o.kan = true;
     if (si === (from + 1) % 4 && !isHonor(t)) {
@@ -3212,12 +3225,14 @@ const MJ = (() => {
         removeN(s.hand, a.t); G.drawn = null;
         // 先看有沒有人搶槓
         const pend = {}; let any = false;
-        for (let k = 1; k < 4; k++) { const j = (si + k) % 4, co = claimOpts(G, j, a.t, si, true); if (co.hu) { pend[j] = { opts: co, pick: null }; any = true; } }
-        if (any) { G.phase = 'claim'; G.pend = pend; G.last = { t: a.t, from: si }; G.kakan = { s: si, t: a.t }; G.seq++; return; }
+        for (let k = 1; k < 4; k++) { const j = (si + k) % 4, co = claimOpts(G, j, a.t, si, true); if (co.hu) { pend[j] = { opts: co, pick: G.seats[j].ting ? { a: 'hu' } : null }; any = true; } }
+        if (any) { G.phase = 'claim'; G.pend = pend; G.last = { t: a.t, from: si }; G.kakan = { s: si, t: a.t }; G.seq++; if (Object.values(pend).some(p => p.pick)) return resolveClaims(G); return; }
         return doKakan(G, si, a.t);
       }
       if (a.a === 'discard') {
         if (!s.hand.includes(a.t)) throw new Error('沒有這張牌');
+        if (s.ting && G.drawn != null && a.t !== G.drawn) throw new Error('報聽後只能打摸到的牌');
+        if (a.ting && !s.ting) { const h = s.hand.slice(); removeN(h, a.t); if (!waits(h).length) throw new Error('打這張不會聽牌'); s.ting = true; G.log.push({ k: 'ting', s: si }); }
         removeN(s.hand, a.t); sortT(s.hand); s.river.push(a.t); s.firstGo = false;
         G.drawn = null; G.afterKan = false; G.last = { t: a.t, from: si }; G.log.push({ k: 'discard', s: si, t: a.t });
         return openClaims(G, si, a.t);
@@ -3242,9 +3257,10 @@ const MJ = (() => {
   }
   function openClaims(G, from, t) {
     const pend = {}; let any = false;
-    for (let k = 1; k < 4; k++) { const j = (from + k) % 4, co = claimOpts(G, j, t, from); if (Object.keys(co).length) { pend[j] = { opts: co, pick: null }; any = true; } }
+    for (let k = 1; k < 4; k++) { const j = (from + k) % 4, co = claimOpts(G, j, t, from); if (Object.keys(co).length) { pend[j] = { opts: co, pick: G.seats[j].ting && co.hu ? { a: 'hu' } : null }; any = true; } }
     if (!any) { G.pend = null; drawTile(G, (from + 1) % 4, false); G.seq++; return; }
     G.phase = 'claim'; G.pend = pend; G.seq++;
+    if (Object.values(pend).some(p => p.pick)) return resolveClaims(G);
   }
   function resolveClaims(G) {
     const P = G.pend, from = G.last.from, t = G.last.t, order = [1, 2, 3].map(k => (from + k) % 4).filter(j => P[j]);
@@ -3289,6 +3305,7 @@ const MJ = (() => {
       if (!flags.self && d.sets.some(x => x.k === 'pon' && x.t === winTile) && !d.sets.some(x => x.k === 'chi' && winTile >= x.t && winTile <= x.t + 2) && d.pair !== winTile) an--;
       const menqing = open.length === 0;
       if (flags.tian) add('天胡', 16); else if (flags.di) add('地胡', 16);
+      if (s.ting) add('報聽', 1);
       if (menqing && flags.self) add('門清自摸', 3); else { if (menqing) add('門清', 1); if (flags.self) add('自摸', 1); }
       if (open.length === 5 && !flags.self) add('全求人', 2);
       if (!flags.self && !hasHonor && !s.flowers.length && chis === 5 && wt.length >= 2 && menqing) add('平胡', 2);
@@ -3370,9 +3387,11 @@ const MJ = (() => {
     if (G.phase === 'play' && G.turn === si) {
       const o = options(G, si);
       if (o.zimo) return { a: 'zimo' };
+      if (s.ting) return { a: 'discard', t: G.drawn != null ? G.drawn : s.hand[s.hand.length - 1] };
       if (o.ankan) return { a: 'ankan', t: o.ankan[0] };
       if (o.kakan) return { a: 'kakan', t: o.kakan[0] };
-      return { a: 'discard', t: bestDiscard(s).t };
+      const bd = bestDiscard(s);
+      return { a: 'discard', t: bd.t, ting: bd.sh === 0 };
     }
     if (G.phase === 'claim' && G.pend && G.pend[si] && G.pend[si].pick == null) {
       const o = G.pend[si].opts, t = G.last.t, N = s.melds.length;
@@ -3389,9 +3408,11 @@ const MJ = (() => {
   }
   // 讓某個座位自動動作（電腦或超時代打）；回傳有沒有動
   function autoAct(G, si, smart) {
+    if (G.seats[si].ting) smart = true;   // 報聽的人：一律照規則自動處理
     if (smart) { const d = botDecide(G, si); if (d) { act(G, si, d); return true; } return false; }
-    if (G.phase === 'play' && G.turn === si) { const o = options(G, si); if (o.zimo) act(G, si, { a: 'zimo' }); else act(G, si, { a: 'discard', t: G.drawn != null ? G.drawn : G.seats[si].hand[G.seats[si].hand.length - 1] }); return true; }
-    if (G.phase === 'claim' && G.pend && G.pend[si] && G.pend[si].pick == null) { act(G, si, G.pend[si].opts.hu ? { a: 'hu' } : { a: 'pass' }); return true; }
+    // 超時代打：沒報聽的人不幫他胡（胡不胡要自己選），直接打掉摸到的牌／當作不要
+    if (G.phase === 'play' && G.turn === si) { act(G, si, { a: 'discard', t: G.drawn != null ? G.drawn : G.seats[si].hand[G.seats[si].hand.length - 1] }); return true; }
+    if (G.phase === 'claim' && G.pend && G.pend[si] && G.pend[si].pick == null) { act(G, si, { a: 'pass' }); return true; }
     return false;
   }
   function waitingOn(G) {                    // 目前在等誰
@@ -3406,13 +3427,13 @@ const MJ = (() => {
     return {
       me, table: G.table, phase: G.phase, firstDealer: G.firstDealer, turn: G.turn, dealer: G.dealer, lian: G.lian, wind: G.wind, handNo: G.handNo, seq: G.seq,
       left: Math.max(0, G.wall.length - RESERVE), last: G.last, dice: G.dice,
-      seats: G.seats.map((s, j) => ({ name: s.name, av: s.av, bot: s.bot, gold: s.gold, auto: s.auto, n: s.hand.length, melds: s.melds, flowers: s.flowers, river: s.river,
+      seats: G.seats.map((s, j) => ({ name: s.name, av: s.av, bot: s.bot, gold: s.gold, auto: s.auto, ting: !!s.ting, n: s.hand.length, melds: s.melds, flowers: s.flowers, river: s.river,
         hand: (j === me || end) ? sortT(s.hand.slice()) : null, wind: (j - G.dealer + 4) % 4 })),
       drawn: G.turn === me ? G.drawn : null, opts: options(G, me), waiting: waitingOn(G), result: G.result, log: G.log.slice(-6),
     };
   }
 
-  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
+  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
 })();
 if (typeof module !== 'undefined') module.exports = MJ;
 /* ================= 遊戲廳・麻將 ================= */
@@ -3541,7 +3562,8 @@ function mjRules(){
 
 /* ---------- 牌桌控制：練習場（本機跟電腦）／連線（伺服器） ---------- */
 const MJ_BOTS = [{name:'小兔',av:3},{name:'阿熊',av:7},{name:'狐狸妹',av:15},{name:'企鵝哥',av:21},{name:'水獺',av:24},{name:'小鼠',av:9}];
-const MJ_TURN_SEC = 15, MJ_CLAIM_SEC = 8;
+const MJ_TURN_SEC = 15, MJ_CLAIM_SEC = 5;
+let mjTingMode = false;
 let mjDiceHand = 0, mjDiceUntil = 0, mjMe = 0;
 let MJG = null, MJO = null, mjSel = null, mjTimer = 0, mjDeadline = 0, mjDue = '', mjBotT = 0, mjMiss = 0, mjLastLog = 0, mjNextT = 0;
 const mjOn = () => !!(MJG || MJO);
@@ -3571,7 +3593,7 @@ function mjTick(first){
   mjRender(first);
   clearTimeout(mjBotT);
   if(MJG.phase==='end'){ mjDue=''; return; }
-  const w = MJ.waitingOn(MJG), bots = w.filter(j=>MJG.seats[j].bot || MJG.seats[j].auto);
+  const w = MJ.waitingOn(MJG), bots = w.filter(j=>MJG.seats[j].bot || MJG.seats[j].auto || MJG.seats[j].ting);
   const wait0 = Math.max(0, mjDiceUntil - Date.now());
   const due = w.includes(0) ? MJG.phase+':'+MJG.handNo+':'+MJG.log.length : '';
   if(due && due!==mjDue){ mjDeadline = Date.now() + wait0 + (MJG.phase==='play'?MJ_TURN_SEC:MJ_CLAIM_SEC)*1000; if(MJG.phase==='play') setTimeout(()=>mjSfx('turn'), wait0); }
@@ -3638,7 +3660,7 @@ function mjDo(a){
     if(MJO.busy) return;
     const me = V.seats[V.me];
     if(a.a==='discard'){ const i = me.hand.lastIndexOf(a.t);
-      if(i>=0){ me.hand.splice(i,1); me.n = me.hand.length; me.river.push(a.t); V.last = { t:a.t, from:V.me }; V.drawn = null; V.waiting = []; V.opts = {}; V.turn = -1;
+      if(i>=0){ me.hand.splice(i,1); me.n = me.hand.length; me.river.push(a.t); if(a.ting) me.ting = true; V.last = { t:a.t, from:V.me }; V.drawn = null; V.waiting = []; V.opts = {}; V.turn = -1;
         mjSfx('tile'); MJO.skipSig = 'discard:' + V.me + ':' + a.t; mjRender(); } }
     else if(a.a==='pass'){ V.waiting = (V.waiting||[]).filter(j=>j!==V.me); V.opts = {}; mjRender(); }
     return mjOnline('act', { act: a });
@@ -3655,7 +3677,7 @@ function mjClock(){
   if(!dl){ if(el) el.textContent=''; return; }
   const left = Math.max(0, Math.ceil((dl-Date.now())/1000));
   if(el){ el.textContent = left; el.classList.toggle('hurry', left<=5); }
-  if(MJG && left<=0){ mjMiss++; try{ MJ.autoAct(MJG, 0, false); }catch(e){} if(mjMiss>=2){ MJG.seats[0].auto = true; mjToast('超時太多次，先幫你託管'); } mjSel=null; mjTick(); }
+  if(MJG && left<=0){ if(MJG.phase==='play') mjMiss++; try{ MJ.autoAct(MJG, 0, false); }catch(e){} if(mjMiss>=2){ MJG.seats[0].auto = true; mjToast('超時太多次，先幫你託管'); } mjSel=null; mjTick(); }
 }
 
 /* ---------- 畫面（橫向牌桌；手機直拿時整桌轉 90 度） ---------- */
@@ -3699,7 +3721,7 @@ function mjRender(first){
   const ME = V.me, T = MJ.TABLES[V.table], me = V.seats[ME], wl = V.waiting;
   const posOf = {b:ME,r:(ME+1)%4,t:(ME+2)%4,l:(ME+3)%4};
   const seatCard = j => { const s = V.seats[j], on = wl.includes(j) && V.phase!=='end';
-    return `<div class="mjs mjs-${mjSeatPos(j)}${on?' on':''}"><div class="mjav"><img src="${avSrc(s.av)}" alt="">${j===V.dealer?`<span class="mjdl">莊${V.lian?`<small>${V.lian}</small>`:''}</span>`:''}<span class="mjwd">${MJ.WIND[s.wind]}</span></div>
+    return `<div class="mjs mjs-${mjSeatPos(j)}${on?' on':''}"><div class="mjav"><img src="${avSrc(s.av)}" alt="">${j===V.dealer?`<span class="mjdl">莊${V.lian?`<small>${V.lian}</small>`:''}</span>`:''}<span class="mjwd">${MJ.WIND[s.wind]}</span>${s.ting?'<span class="mjtg">聽</span>':''}</div>
       <div class="mjtx"><div class="mjnm">${esc(s.name)}</div><div class="mjgd">${s.gold.toLocaleString()}</div></div></div>`; };
   // 對手：頭像、沒打的牌、吃碰的牌放在同一個區塊裡排好，不會疊到桌上的牌
   const others = j => { const s = V.seats[j], p = mjSeatPos(j);
@@ -3714,7 +3736,15 @@ function mjRender(first){
   // 我的手牌（一排）：吃碰的牌在左邊，剛摸到的牌放最右邊
   let hand = me.hand.slice(), drawn = null;
   if(V.drawn!=null && V.turn===ME && V.phase==='play'){ const i = hand.lastIndexOf(V.drawn); if(i>=0){ hand.splice(i,1); drawn = V.drawn; } }
-  const canDis = V.phase==='play' && V.turn===ME && V.opts.discard && !me.auto;
+  const canDis = V.phase==='play' && V.turn===ME && V.opts.discard && !me.auto && !me.ting;
+  // 聽牌指示：打哪張會聽、聽什麼、還剩幾張
+  const seen = {}; const see = t => seen[t] = (seen[t]||0) + 1;
+  me.hand.forEach(see); V.seats.forEach(x=>{ x.river.forEach(see); x.melds.forEach(m=>mjMeldTiles(m).forEach(t=>t!=null && see(t))); });
+  const leftOf = t => Math.max(0, 4 - (seen[t]||0));
+  const tt = canDis && !me.ting ? MJ.tingTiles({ hand: me.hand }) : null;
+  if(!tt) mjTingMode = false;
+  const myWaits = me.ting || (!canDis && me.hand.length % 3 === 1) ? MJ.waits(me.hand.length % 3 === 2 && drawn!=null ? (()=>{ const h=me.hand.slice(); h.splice(h.lastIndexOf(drawn),1); return h; })() : me.hand) : [];
+  const waitTxt = w => w.map(t=>`${MJ.name(t)}<small>剩${leftOf(t)}</small>`).join('、');
   const meldN = me.melds.reduce((a,m)=>a+(m.k==='chi'||m.k==='pon'?3:4),0);
   const units = hand.length + (drawn!=null?1.3:0) + meldN*0.62 + me.melds.length*0.2;
   const tw = Math.max(24, Math.min(58, Math.floor(mjH*0.19*44/60), Math.floor((mjW - 30) / Math.max(units, 12))));
@@ -3728,18 +3758,26 @@ function mjRender(first){
   const chiSet = new Set((oo.chi||[]).flat()), ponOn = oo.pon || oo.kan;
   const marked = {};   // 每種牌只標一張（碰標兩張）
   const mark = t => { if(ponOn && t===lt && (marked[t]||0) < 2){ marked[t]=(marked[t]||0)+1; return ' hp'; } if(chiSet.has(t) && !marked[t]){ marked[t]=1; return ' hc'; } return ''; };
-  const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis?'':' idle') + mark(t)).replace('<i ', `<i data-k="${k}" `);
+  const tMarked = {};
+  const tingCls = t => { if(!tt) return ''; if(!tt[t]) return mjTingMode ? ' dim' : ''; if(tMarked[t]) return ''; tMarked[t] = 1; return ' ht'; };
+  const one = (t,k,extra='')=>mjTile(t, 'hd' + extra + (mjSel===k?' sel':'') + (canDis?'':' idle') + mark(t) + tingCls(t)).replace('<i ', `<i data-k="${k}" `);
   const handHtml = (me.melds.length?`<div class="mjmy">${me.melds.map(m=>mjMeld(m,'mm')).join('')}</div>`:'')
     + hand.map((t,i)=>one(t,'h'+i)).join('') + (drawn!=null ? `<span class="mjgap"></span>` + one(drawn,'d',' new') : '');
 
   const o = V.opts || {}, acts = [];
   if(V.phase==='claim' && wl.includes(0)){
-    if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']); if(o.chi) acts.push(['chi', o.chi.length>1 ? `吃<small>${o.chi.length}種</small>` : '吃','c']); if(o.hu) acts.push(['pass','過','x']);   // 只能吃碰時不顯示「過」，不點就是不要
+    if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']); if(o.chi) acts.push(['chi', o.chi.length>1 ? `吃<small>${o.chi.length}種</small>` : '吃','c']);   // 沒有「過」：不點就是不要
   } else if(V.phase==='play' && V.turn===ME && !me.auto){
-    if(o.zimo) acts.push(['zimo','自摸','w']); if(o.ankan) acts.push(['ankan','暗槓','k']); if(o.kakan) acts.push(['kakan','加槓','k']); if(acts.length) acts.push(['skip','過','x']);
+    if(o.zimo) acts.push(['zimo','自摸','w']); if(o.ankan) acts.push(['ankan','暗槓','k']); if(o.kakan) acts.push(['kakan','加槓','k']);   // 不想胡就直接打牌
+    if(tt && !me.ting) acts.push(['ting', mjTingMode ? '取消<small>報聽</small>' : '聽', 't']);
   }
   const claimTile = V.phase==='claim' && V.last && wl.includes(0) ? `<div class="mjct">${esc(V.seats[V.last.from].name)} 打出 ${mjTile(V.last.t,'md')}</div>` : '';
+  const selT = mjSel==null ? null : (mjSel==='d' ? drawn : hand[+String(mjSel).slice(1)]);
   const hint = me.auto ? `<button class="mjauto" id="mjAuto">🤖 託管中・點這裡自己打</button>`
+    : me.ting ? `<div class="mjhint ting">🀄 已報聽・聽：${waitTxt(myWaits) || '—'}</div>`
+    : canDis && tt && selT!=null && tt[selT] ? `<div class="mjhint ting">打${MJ.name(selT)}，聽：${waitTxt(tt[selT])}${mjTingMode?'（再點一次報聽）':''}</div>`
+    : canDis && mjTingMode ? `<div class="mjhint ting">選一張標「聽」的牌打出就是報聽（多 1 台）</div>`
+    : !canDis && myWaits.length ? `<div class="mjhint ting">聽：${waitTxt(myWaits)}</div>`
     : canDis && !acts.length ? `<div class="mjhint">輪到你了！點一張牌選起來，再點一次打出</div>` : '';
   const myOn = wl.includes(0) && V.phase!=='end';
 
@@ -3747,7 +3785,7 @@ function mjRender(first){
   $('mjUi').innerHTML = `<div class="mjacts">${claimTile}${acts.map(([k,t,c])=>`<button class="mja mja-${c}" data-ma="${k}">${t}</button>`).join('')}</div><div class="mjchi" id="mjChi"></div>${hint}
     <div class="mjhand${canDis?' can':''}" style="--tw:${tw}px;--mw:${Math.round(tw*0.62)}px">${handHtml}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div>
-    <div class="mjbme${myOn?' on':''}"><img src="${avSrc(me.av)}" alt=""><span class="mjbw">${MJ.WIND[me.wind]}</span>${V.dealer===ME?`<span class="mjbd">莊${V.lian?V.lian:''}</span>`:''}<b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
+    <div class="mjbme${myOn?' on':''}"><img src="${avSrc(me.av)}" alt=""><span class="mjbw">${MJ.WIND[me.wind]}</span>${me.ting?'<span class="mjbd" style="background:#F08A1C">聽</span>':''}${V.dealer===ME?`<span class="mjbd">莊${V.lian?V.lian:''}</span>`:''}<b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
     <div class="mjbf">${me.flowers.map(t=>mjTile(t,'xs')).join('')}</div><div class="mjbt r">${T.name}・第 ${V.handNo} 局</div>`;
   $('mjEnd').innerHTML = V.phase==='end' ? mjResultHtml(V) : '';
 
@@ -3755,14 +3793,13 @@ function mjRender(first){
   document.querySelectorAll('#mj .mjhand .mt.hd').forEach(el=>el.onclick=()=>{
     if(!canDis) return;
     const k = el.dataset.k, t = +el.dataset.t;
-    if(mjSel===k){ mjSfx('tile'); return mjDo({a:'discard', t}); }
-    mjSel = k; mjSfx('pick');
-    document.querySelectorAll('#mj .mjhand .mt.hd').forEach(x=>x.classList.toggle('sel', x.dataset.k===k));
+    if(mjTingMode && tt && !tt[t]) return mjToast('報聽要打標「聽」的牌');
+    if(mjSel===k){ const ting = mjTingMode && !!(tt && tt[t]); mjTingMode = false; if(!MJO) mjSfx('tile'); return mjDo({a:'discard', t, ting}); }
+    mjSel = k; mjSfx('pick'); mjRender();
   });
   document.querySelectorAll('#mj [data-ma]').forEach(b=>b.onclick=()=>{
     const k = b.dataset.ma;
-    if(k==='pass') return mjDo({a:'pass'});
-    if(k==='skip'){ b.parentNode.innerHTML=''; return; }
+    if(k==='ting'){ mjTingMode = !mjTingMode; mjSel = null; return mjRender(); }
     if(k==='hu') return mjDo({a:'hu'});
     if(k==='zimo') return mjDo({a:'zimo'});
     if(k==='pon'||k==='kan') return mjDo({a:k});
@@ -3772,7 +3809,7 @@ function mjRender(first){
   if(V.phase==='end') mjBindResult(V);
   const e = (V.log||[])[(V.log||[]).length-1], sig = V.handNo + ':' + V.seq + ':' + (e?e.k:'');
   if(e && sig!==mjLastLog){ mjLastLog = sig;
-    if(['pon','chi','kan','ankan','kakan','hu','zimo'].includes(e.k)) mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！'}[e.k]);
+    if(['pon','chi','kan','ankan','kakan','hu','zimo','ting'].includes(e.k)) mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！',ting:'聽！'}[e.k]);
     else if(e.k==='discard'){ const k = 'discard:' + e.s + ':' + e.t; if(MJO && MJO.skipSig === k) MJO.skipSig = null; else mjSfx('tile'); }
     else if(e.k==='flower') mjShout(e.s, '補花', true);
   }
@@ -3820,7 +3857,7 @@ function mjPick(list){
   const box = $('mjChi'); box.innerHTML = `<div class="mjpkt">選一種吃法</div>` + list.map((x,i)=>`<button class="mjpk" data-pk="${i}">${x.h}</button>`).join('') + `<button class="mja mja-x" data-pk="-1">取消</button>`;
   box.querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.pk; box.innerHTML=''; if(i>=0) mjDo(list[i].a); });
 }
-const MJ_MASCOT = {'碰！':'bunny1','吃！':'fox1','槓！':'bear1','暗槓！':'bear1','加槓！':'bear1','胡了！':'dragon1','自摸！':'phoenix1'};
+const MJ_MASCOT = {'聽！':'owl1','碰！':'bunny1','吃！':'fox1','槓！':'bear1','暗槓！':'bear1','加槓！':'bear1','胡了！':'dragon1','自摸！':'phoenix1'};
 function mjShout(j, txt, small){
   const box = $('mjCall'); if(!box) return;
   const pos = mjSeatPos(j), d = document.createElement('div'), big = /胡|自摸/.test(txt), pet = !small && MJ_MASCOT[txt];

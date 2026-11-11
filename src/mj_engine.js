@@ -41,6 +41,13 @@ const MJ = (() => {
     if (!isHonor(i) && i % 10 <= 7 && c[i + 1] && c[i + 2]) { c[i]--; c[i + 1]--; c[i + 2]--; acc.push({ k: 'chi', t: i }); walk(c, acc, emit); acc.pop(); c[i]++; c[i + 1]++; c[i + 2]++; }
   }
   function waits(hand) { return KINDS.filter(t => canWin(hand.concat([t]))); }   // hand: 3n+1 張
+  // 輪到出牌時：打哪張會聽牌、聽什麼 → { 牌: [聽的牌…] }
+  function tingTiles(s) {
+    if (s.hand.length % 3 !== 2) return null;
+    const out = {};
+    for (const t of new Set(s.hand)) { const h = s.hand.slice(); removeN(h, t); const w = waits(h); if (w.length) out[t] = w; }
+    return Object.keys(out).length ? out : null;
+  }
 
   /* ---------- 向聽數（電腦玩家用） ---------- */
   const memo = new Map();
@@ -98,7 +105,7 @@ const MJ = (() => {
     const w = []; KINDS.forEach(t => { for (let k = 0; k < 4; k++) w.push(t); }); for (let f = 51; f <= 58; f++) w.push(f);
     G.wall = shuffle(w, rnd); G.handNo++; G.dice = [1,2,3].map(() => 1 + Math.floor(rnd() * 6)); G.result = null; G.last = null; G.pend = null; G.drawn = null; G.kakan = null;
     G.afterKan = false; G.anyClaim = false; G.log = [];
-    G.seats.forEach(s => { s.hand = []; s.melds = []; s.flowers = []; s.river = []; s.firstGo = true; });
+    G.seats.forEach(s => { s.hand = []; s.melds = []; s.flowers = []; s.river = []; s.firstGo = true; s.ting = false; });
     for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) { const s = G.seats[(G.dealer + k) % 4]; for (let j = 0; j < 4; j++) s.hand.push(G.wall.shift()); }
     // 開局補花（從莊家開始）
     for (let k = 0; k < 4; k++) { const si = (G.dealer + k) % 4; replaceFlowers(G, si); }
@@ -129,7 +136,8 @@ const MJ = (() => {
     if (G.phase === 'play' && G.turn === si) {
       o.discard = true;
       if (G.drawn != null && canWin(s.hand)) o.zimo = true;
-      if (G.drawn != null && G.wall.length > RESERVE) {
+      if (!s.ting) o.ting = tingTiles(s);
+      if (G.drawn != null && G.wall.length > RESERVE && !s.ting) {
         const c = cnt(s.hand);
         const an = KINDS.filter(t => c[t] === 4); if (an.length) o.ankan = an;
         const ka = s.melds.filter(m => m.k === 'pon' && c[m.t]).map(m => m.t); if (ka.length) o.kakan = ka;
@@ -142,7 +150,7 @@ const MJ = (() => {
   function claimOpts(G, si, t, from, kakanOnly) {
     const s = G.seats[si], o = {}, c = cnt(s.hand);
     if (canWin(s.hand.concat([t]))) o.hu = true;
-    if (kakanOnly) return o;
+    if (kakanOnly || s.ting) return o;
     if (c[t] >= 2) o.pon = true;
     if (c[t] >= 3 && G.wall.length > RESERVE) o.kan = true;
     if (si === (from + 1) % 4 && !isHonor(t)) {
@@ -173,12 +181,14 @@ const MJ = (() => {
         removeN(s.hand, a.t); G.drawn = null;
         // 先看有沒有人搶槓
         const pend = {}; let any = false;
-        for (let k = 1; k < 4; k++) { const j = (si + k) % 4, co = claimOpts(G, j, a.t, si, true); if (co.hu) { pend[j] = { opts: co, pick: null }; any = true; } }
-        if (any) { G.phase = 'claim'; G.pend = pend; G.last = { t: a.t, from: si }; G.kakan = { s: si, t: a.t }; G.seq++; return; }
+        for (let k = 1; k < 4; k++) { const j = (si + k) % 4, co = claimOpts(G, j, a.t, si, true); if (co.hu) { pend[j] = { opts: co, pick: G.seats[j].ting ? { a: 'hu' } : null }; any = true; } }
+        if (any) { G.phase = 'claim'; G.pend = pend; G.last = { t: a.t, from: si }; G.kakan = { s: si, t: a.t }; G.seq++; if (Object.values(pend).some(p => p.pick)) return resolveClaims(G); return; }
         return doKakan(G, si, a.t);
       }
       if (a.a === 'discard') {
         if (!s.hand.includes(a.t)) throw new Error('沒有這張牌');
+        if (s.ting && G.drawn != null && a.t !== G.drawn) throw new Error('報聽後只能打摸到的牌');
+        if (a.ting && !s.ting) { const h = s.hand.slice(); removeN(h, a.t); if (!waits(h).length) throw new Error('打這張不會聽牌'); s.ting = true; G.log.push({ k: 'ting', s: si }); }
         removeN(s.hand, a.t); sortT(s.hand); s.river.push(a.t); s.firstGo = false;
         G.drawn = null; G.afterKan = false; G.last = { t: a.t, from: si }; G.log.push({ k: 'discard', s: si, t: a.t });
         return openClaims(G, si, a.t);
@@ -203,9 +213,10 @@ const MJ = (() => {
   }
   function openClaims(G, from, t) {
     const pend = {}; let any = false;
-    for (let k = 1; k < 4; k++) { const j = (from + k) % 4, co = claimOpts(G, j, t, from); if (Object.keys(co).length) { pend[j] = { opts: co, pick: null }; any = true; } }
+    for (let k = 1; k < 4; k++) { const j = (from + k) % 4, co = claimOpts(G, j, t, from); if (Object.keys(co).length) { pend[j] = { opts: co, pick: G.seats[j].ting && co.hu ? { a: 'hu' } : null }; any = true; } }
     if (!any) { G.pend = null; drawTile(G, (from + 1) % 4, false); G.seq++; return; }
     G.phase = 'claim'; G.pend = pend; G.seq++;
+    if (Object.values(pend).some(p => p.pick)) return resolveClaims(G);
   }
   function resolveClaims(G) {
     const P = G.pend, from = G.last.from, t = G.last.t, order = [1, 2, 3].map(k => (from + k) % 4).filter(j => P[j]);
@@ -250,6 +261,7 @@ const MJ = (() => {
       if (!flags.self && d.sets.some(x => x.k === 'pon' && x.t === winTile) && !d.sets.some(x => x.k === 'chi' && winTile >= x.t && winTile <= x.t + 2) && d.pair !== winTile) an--;
       const menqing = open.length === 0;
       if (flags.tian) add('天胡', 16); else if (flags.di) add('地胡', 16);
+      if (s.ting) add('報聽', 1);
       if (menqing && flags.self) add('門清自摸', 3); else { if (menqing) add('門清', 1); if (flags.self) add('自摸', 1); }
       if (open.length === 5 && !flags.self) add('全求人', 2);
       if (!flags.self && !hasHonor && !s.flowers.length && chis === 5 && wt.length >= 2 && menqing) add('平胡', 2);
@@ -331,9 +343,11 @@ const MJ = (() => {
     if (G.phase === 'play' && G.turn === si) {
       const o = options(G, si);
       if (o.zimo) return { a: 'zimo' };
+      if (s.ting) return { a: 'discard', t: G.drawn != null ? G.drawn : s.hand[s.hand.length - 1] };
       if (o.ankan) return { a: 'ankan', t: o.ankan[0] };
       if (o.kakan) return { a: 'kakan', t: o.kakan[0] };
-      return { a: 'discard', t: bestDiscard(s).t };
+      const bd = bestDiscard(s);
+      return { a: 'discard', t: bd.t, ting: bd.sh === 0 };
     }
     if (G.phase === 'claim' && G.pend && G.pend[si] && G.pend[si].pick == null) {
       const o = G.pend[si].opts, t = G.last.t, N = s.melds.length;
@@ -350,9 +364,11 @@ const MJ = (() => {
   }
   // 讓某個座位自動動作（電腦或超時代打）；回傳有沒有動
   function autoAct(G, si, smart) {
+    if (G.seats[si].ting) smart = true;   // 報聽的人：一律照規則自動處理
     if (smart) { const d = botDecide(G, si); if (d) { act(G, si, d); return true; } return false; }
-    if (G.phase === 'play' && G.turn === si) { const o = options(G, si); if (o.zimo) act(G, si, { a: 'zimo' }); else act(G, si, { a: 'discard', t: G.drawn != null ? G.drawn : G.seats[si].hand[G.seats[si].hand.length - 1] }); return true; }
-    if (G.phase === 'claim' && G.pend && G.pend[si] && G.pend[si].pick == null) { act(G, si, G.pend[si].opts.hu ? { a: 'hu' } : { a: 'pass' }); return true; }
+    // 超時代打：沒報聽的人不幫他胡（胡不胡要自己選），直接打掉摸到的牌／當作不要
+    if (G.phase === 'play' && G.turn === si) { act(G, si, { a: 'discard', t: G.drawn != null ? G.drawn : G.seats[si].hand[G.seats[si].hand.length - 1] }); return true; }
+    if (G.phase === 'claim' && G.pend && G.pend[si] && G.pend[si].pick == null) { act(G, si, { a: 'pass' }); return true; }
     return false;
   }
   function waitingOn(G) {                    // 目前在等誰
@@ -367,12 +383,12 @@ const MJ = (() => {
     return {
       me, table: G.table, phase: G.phase, firstDealer: G.firstDealer, turn: G.turn, dealer: G.dealer, lian: G.lian, wind: G.wind, handNo: G.handNo, seq: G.seq,
       left: Math.max(0, G.wall.length - RESERVE), last: G.last, dice: G.dice,
-      seats: G.seats.map((s, j) => ({ name: s.name, av: s.av, bot: s.bot, gold: s.gold, auto: s.auto, n: s.hand.length, melds: s.melds, flowers: s.flowers, river: s.river,
+      seats: G.seats.map((s, j) => ({ name: s.name, av: s.av, bot: s.bot, gold: s.gold, auto: s.auto, ting: !!s.ting, n: s.hand.length, melds: s.melds, flowers: s.flowers, river: s.river,
         hand: (j === me || end) ? sortT(s.hand.slice()) : null, wind: (j - G.dealer + 4) % 4 })),
       drawn: G.turn === me ? G.drawn : null, opts: options(G, me), waiting: waitingOn(G), result: G.result, log: G.log.slice(-6),
     };
   }
 
-  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
+  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
 })();
 if (typeof module !== 'undefined') module.exports = MJ;
