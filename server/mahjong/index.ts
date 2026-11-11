@@ -105,6 +105,21 @@ async function joinTable(uid: string, a: string, b: any) {
   return { view: viewOf(ins, uid) };
 }
 
+// 排程每分鐘呼叫：麻將／大老二的桌子超過 2 分鐘都沒動（代表桌上沒有真人在線上，不會有人推進），
+// 就把桌上的真人都當作離開，讓電腦把這局打完、結算、散桌。不然會卡到有人回來才繼續打
+async function sweep() {
+  const cut = new Date(Date.now() - 120000).toISOString();
+  const { data: L } = await sb.from('mj_tables').select('id').eq('status', 'play').in('game', ['mj', 'b2']).lt('updated_at', cut).limit(20);
+  const done: number[] = [];
+  for (const r of L || []) {
+    try {
+      await mutate(r.id, (T: any, now: number) => { for (const u of C.humans(T)) C.leave(T, u, now); });
+      done.push(r.id);
+    } catch (e) { console.error('sweep', r.id, e); }
+  }
+  return { swept: done };
+}
+
 async function handle(uid: string, b: any, test = false) {
   const a = b.a;
   if (a === 'sim' && test) {   // 測試：把時間快轉到下一個事件，連跑 n 步
@@ -163,7 +178,7 @@ Deno.serve(async (req) => {
     const b = await req.json().catch(() => ({}));
     let uid: string | null = null;
     const tk = req.headers.get('x-mj-test');
-    if (tk) { const { data } = await sb.from('push_config').select('v').eq('k', 'mj_test_key').maybeSingle(); if (data && data.v && tk === data.v) uid = b.as; }
+    if (tk) { const { data } = await sb.from('push_config').select('v').eq('k', 'mj_test_key').maybeSingle(); if (data && data.v && tk === data.v) { if (b.a === 'sweep') return J(await sweep()); uid = b.as; } }
     if (!uid) { const token = (req.headers.get('Authorization') || '').replace('Bearer ', ''); const { data } = await sb.auth.getUser(token); uid = data?.user?.id || null; }
     if (!uid) return J({ error: '請先登入' }, 401);
     const { data: on } = await sb.from('settings').select('value').eq('key', 'mj_on').maybeSingle();
