@@ -317,7 +317,7 @@ function mjRender(first){
 
   const o = V.opts || {}, acts = [];
   if(V.phase==='claim' && wl.includes(0)){
-    if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']); if(o.chi) acts.push(['chi', o.chi.length>1 ? `吃<small>${o.chi.length}種</small>` : '吃','c']); acts.push(['pass','過','x']);
+    if(o.hu) acts.push(['hu','胡','w']); if(o.kan) acts.push(['kan','槓','k']); if(o.pon) acts.push(['pon','碰','p']); if(o.chi) acts.push(['chi', o.chi.length>1 ? `吃<small>${o.chi.length}種</small>` : '吃','c']); if(o.hu) acts.push(['pass','過','x']);   // 只能吃碰時不顯示「過」，不點就是不要
   } else if(V.phase==='play' && V.turn===ME && !me.auto){
     if(o.zimo) acts.push(['zimo','自摸','w']); if(o.ankan) acts.push(['ankan','暗槓','k']); if(o.kakan) acts.push(['kakan','加槓','k']); if(acts.length) acts.push(['skip','過','x']);
   }
