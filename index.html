@@ -904,21 +904,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794422075" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794422616" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794422075" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794422075" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794422616" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794422616" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794422075" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794422616" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794422075" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794422075" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794422616" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794422616" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -935,11 +935,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794422075" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794422616" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794422075";
+const BUILD="1794422616";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -4297,7 +4297,7 @@ const B2 = (() => {
   function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   function deal(G, starter) {
     const deck = shuffle(Array.from({ length: 52 }, (_, i) => i));
-    G.seats.forEach((s, j) => { s.hand = deck.slice(j * 13, j * 13 + 13).sort((a, b) => a - b); s.last = null; });
+    G.seats.forEach((s, j) => { s.hand = deck.slice(j * 13, j * 13 + 13).sort((a, b) => a - b); s.last = null; s.out = false; });
     G.phase = 'play'; G.cur = null; G.result = null; G.log = []; G.logBase = 0;
     G.pet = PETS[Math.floor(Math.random() * PETS.length)];
     if (starter == null) { starter = G.seats.findIndex(s => s.hand.includes(0)); G.must = 0; } else G.must = null;   // 第一局：拿梅花 3 的人先出，而且要出到梅花 3
@@ -4323,10 +4323,8 @@ const B2 = (() => {
     const s = G.seats[si];
     if (a.a === 'pass') {
       if (isLead(G, si)) throw new Error('這輪由你先出，不能過');
-      s.last = 'pass'; G.log.push({ k: 'pass', s: si });
-      let nx = (si + 1) % 4;
-      G.turn = nx;
-      if (nx === G.cur.by) { G.cur = null; G.seats.forEach(p => p.last = null); G.lead = nx; G.log.push({ k: 'round', s: nx }); }
+      s.last = 'pass'; s.out = true; G.log.push({ k: 'pass', s: si });   // 過了就鎖住，這一輪不能再出
+      advanceTurn(G, si);
       return;
     }
     if (a.a !== 'play') throw new Error('不支援的動作');
@@ -4340,7 +4338,14 @@ const B2 = (() => {
     G.cur = { cards: sorted, cb, by: si }; s.last = sorted; G.must = null;
     G.log.push({ k: 'play', s: si, cards: sorted, ty: comboName(cb) });
     if (!s.hand.length) return finish(G, si);
-    G.turn = (si + 1) % 4;
+    advanceTurn(G, si);
+  }
+  // 換下一個還沒過的人；輪回到最後出牌的人（其他人都過了）就開新的一輪
+  function advanceTurn(G, si) {
+    let nx = (si + 1) % 4;
+    while (nx !== G.cur.by && G.seats[nx].out) nx = (nx + 1) % 4;
+    G.turn = nx;
+    if (nx === G.cur.by) { G.cur = null; G.seats.forEach(p => { p.last = null; p.out = false; }); G.lead = nx; G.log.push({ k: 'round', s: nx }); }
   }
   function finish(G, w) {
     const T = TABLES[G.table], pay = [0, 0, 0, 0], lines = [];
@@ -4477,7 +4482,7 @@ function b2Rules(){
     <p><b>目標：</b>最先把 13 張牌出完的人贏。</p>
     <p><b>大小：</b>3 最小，2 最大（3 4 5 6 7 8 9 10 J Q K A 2）。一樣大時比花色：♠ 黑桃 &gt; ♥ 紅心 &gt; ♦ 方塊 &gt; ♣ 梅花。</p>
     <p><b>能出的牌：</b>單張、對子、五張牌型（順子、葫蘆、鐵支、同花順，沒有同花）。</p><p><b>順子比大小：</b>看最前面那張：3‑4‑5‑6‑7 &lt; 4‑5‑6‑7‑8 &lt; … &lt; 10‑J‑Q‑K‑A；A‑2‑3‑4‑5 最小，2‑3‑4‑5‑6 最大。一樣的話比最前面那張的花色。</p><p><b>五張牌型怎麼壓：</b>只能用同一種壓（順子壓順子、葫蘆壓葫蘆…）。例外：鐵支可以壓順子、葫蘆；同花順可以壓所有五張牌型。</p>
-    <p><b>怎麼出：</b>第一局拿到梅花 3 的人先出，而且要出到梅花 3；之後每局由上一局贏家先出。輪到你時要出同樣張數、比較大的牌，或按「過」。其他三家都過，就由最後出牌的人重新出任何牌型。</p>
+    <p><b>怎麼出：</b>第一局拿到梅花 3 的人先出，而且要出到梅花 3；之後每局由上一局贏家先出。輪到你時要出同樣張數、比較大的牌，或按「過」。<b>過了之後這一輪就不能再出</b>，等其他人都過，由最後出牌的人重新開始，出任何牌型都可以。</p>
     <p><b>怎麼算：</b>有人出完，其他三家照手上剩幾張付錢，每張 × 桌上的「每張」金額：</p>
     <ul><li>手上的 2，每張多算一張</li><li>剩 10 張以上：加倍</li><li>13 張都沒出：3 倍</li></ul>
     <p>贏家的獎金，娛樂廳會抽 ${Math.round(B2.RAKE*100)}% 當場地費。</p></div>`;

@@ -53,7 +53,7 @@ const B2 = (() => {
   function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   function deal(G, starter) {
     const deck = shuffle(Array.from({ length: 52 }, (_, i) => i));
-    G.seats.forEach((s, j) => { s.hand = deck.slice(j * 13, j * 13 + 13).sort((a, b) => a - b); s.last = null; });
+    G.seats.forEach((s, j) => { s.hand = deck.slice(j * 13, j * 13 + 13).sort((a, b) => a - b); s.last = null; s.out = false; });
     G.phase = 'play'; G.cur = null; G.result = null; G.log = []; G.logBase = 0;
     G.pet = PETS[Math.floor(Math.random() * PETS.length)];
     if (starter == null) { starter = G.seats.findIndex(s => s.hand.includes(0)); G.must = 0; } else G.must = null;   // 第一局：拿梅花 3 的人先出，而且要出到梅花 3
@@ -79,10 +79,8 @@ const B2 = (() => {
     const s = G.seats[si];
     if (a.a === 'pass') {
       if (isLead(G, si)) throw new Error('這輪由你先出，不能過');
-      s.last = 'pass'; G.log.push({ k: 'pass', s: si });
-      let nx = (si + 1) % 4;
-      G.turn = nx;
-      if (nx === G.cur.by) { G.cur = null; G.seats.forEach(p => p.last = null); G.lead = nx; G.log.push({ k: 'round', s: nx }); }
+      s.last = 'pass'; s.out = true; G.log.push({ k: 'pass', s: si });   // 過了就鎖住，這一輪不能再出
+      advanceTurn(G, si);
       return;
     }
     if (a.a !== 'play') throw new Error('不支援的動作');
@@ -96,7 +94,14 @@ const B2 = (() => {
     G.cur = { cards: sorted, cb, by: si }; s.last = sorted; G.must = null;
     G.log.push({ k: 'play', s: si, cards: sorted, ty: comboName(cb) });
     if (!s.hand.length) return finish(G, si);
-    G.turn = (si + 1) % 4;
+    advanceTurn(G, si);
+  }
+  // 換下一個還沒過的人；輪回到最後出牌的人（其他人都過了）就開新的一輪
+  function advanceTurn(G, si) {
+    let nx = (si + 1) % 4;
+    while (nx !== G.cur.by && G.seats[nx].out) nx = (nx + 1) % 4;
+    G.turn = nx;
+    if (nx === G.cur.by) { G.cur = null; G.seats.forEach(p => { p.last = null; p.out = false; }); G.lead = nx; G.log.push({ k: 'round', s: nx }); }
   }
   function finish(G, w) {
     const T = TABLES[G.table], pay = [0, 0, 0, 0], lines = [];
