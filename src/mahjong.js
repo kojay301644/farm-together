@@ -512,9 +512,10 @@ function mjDice(d, dealer){
   setTimeout(()=>el.remove(), 2200);
 }
 function mjTurnAlert(){
-  const box = $('mjCall'); if(!box) return;
+  const b2 = (mjCurView()||{}).game==='b2';
+  const box = $('mjCall'); if(!box) return;   // 大老二：小小一條放在桌子正中間（寵物那裡），不擋到牌和按鈕
   box.querySelectorAll('.mjturn').forEach(x=>x.remove());
-  const d = document.createElement('div'); d.className = 'mjturn' + ((mjCurView()||{}).game==='b2' ? ' b2' : ''); d.textContent = '輪到你了！';   // 大老二用小一點的，不要擋到別人出的牌
+  const d = document.createElement('div'); d.className = 'mjturn' + (b2 ? ' b2' : ''); d.textContent = '輪到你了！';
   box.appendChild(d); setTimeout(()=>d.remove(), 1900);
   mjSfx('myturn'); try{ if(typeof vib==='function') vib(60); }catch(e){}
 }

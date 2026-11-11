@@ -78,8 +78,11 @@ function b2Render(V){
   const canPlay = myTurn && cb && (V.must==null || selArr.includes(V.must)) && (lead || B2.beats(cb, curCb(V)));
   // 現在能出的牌，依牌型分組（對子、順子、同花、葫蘆、鐵支、同花順）
   b2Groups = {};
+  const playable = new Set();   // 這一手能出到的牌（其他變灰）
   if(myTurn){
-    const all = B2.combos(hand).filter(x=> x.cards.length > 1 && (V.must==null || x.cards.includes(V.must)) && (lead || B2.beats(x.cb, curCb(V))));
+    const legal = B2.combos(hand).filter(x=> (V.must==null || x.cards.includes(V.must)) && (lead || B2.beats(x.cb, curCb(V))));
+    legal.forEach(x=>x.cards.forEach(c=>playable.add(c)));
+    const all = legal.filter(x=>x.cards.length > 1);
     all.forEach(x=>{ const n = B2.comboName(x.cb); (b2Groups[n] = b2Groups[n] || []).push(x); });
     Object.values(b2Groups).forEach(L=>L.sort((a,b)=>a.cb.key-b.cb.key || a.cards[0]-b.cards[0]));
   }
@@ -97,7 +100,7 @@ function b2Render(V){
   $('mjUi').innerHTML = `${hint?`<div class="mjhint still b2hint${myTurn && typeBtns ? ' hi' : ''}">${hint}</div>`:''}
     ${myTurn && typeBtns ? `<div class="b2types">${typeBtns}</div>` : ''}
     ${myTurn ? `<div class="b2btns">${V.opts && V.opts.pass ? `<button class="b2b pass" id="b2Pass">過</button>` : ''}<button class="b2b go" id="b2Go" ${canPlay?'':'disabled'}>出牌${cb?`<small>${B2.comboName(cb)}</small>`:''}</button></div>` : ''}
-    <div class="b2hand${myTurn?' can':''}" style="--cw:${cw}px">${hand.map(c=>b2Card(c, 'hd'+(b2Sel.has(c)?' sel':''))).join('')}</div>`;
+    <div class="b2hand${myTurn?' can':''}" style="--cw:${cw}px">${hand.map(c=>b2Card(c, 'hd'+(b2Sel.has(c)?' sel':'')+(myTurn && !playable.has(c)?' dim':''))).join('')}</div>`;
   $('mjBar').innerHTML = `<div class="mjbt">每張 ${T.per.toLocaleString()} 金</div>
     <div class="mjbme${wl.includes(ME)&&V.phase==='play'?' on':''}"><img src="${avSrc(me.av)}" alt=""><b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
     <div class="mjbt r">${T.name}・第 ${V.handNo} 局</div>`;
@@ -116,6 +119,7 @@ function b2Render(V){
 
   // 點牌：選起來／放下
   document.querySelectorAll('#mj .b2hand .b2c').forEach(el=>el.onclick=()=>{
+    if(el.classList.contains('dim')) return;   // 這手出不到的牌不能選
     const c = +el.dataset.c; if(b2Sel.has(c)) b2Sel.delete(c); else b2Sel.add(c); b2Hint = {}; mjSfx('pick'); b2Render(mjCurView());
   });
   if($('b2Go')) $('b2Go').onclick = ()=>{ const cs = [...b2Sel].sort((a,b)=>a-b); if(cs.length) b2Do({a:'play', cards:cs}); };
