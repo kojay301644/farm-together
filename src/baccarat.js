@@ -1,5 +1,5 @@
 /* ---------- 百家樂（多人同桌，跟系統對賭；共用麻將的牌桌外框、連線流程） ---------- */
-let bcChip = 0, bcTimer = 0, bcStage = '', bcFlash = {};
+let bcPrevShown = {}, bcChip = 0, bcTimer = 0, bcStage = '', bcFlash = {};
 const BC_ICON = {n:'🌱',m:'🌻',h:'🏆',r:'💰'};
 const BC_ORDER = ['pp','p','t','b','bp'];
 
@@ -48,19 +48,21 @@ function bcRender(V){
   $('mj').style.setProperty('--b2pet', `url("${typeof chrSrc==='function' ? chrSrc((V.pet||'bunny')+'1') : ''}")`);
   const felt = $('mjFelt'); if(!felt) return;
   const rv = bcReveal(V), bet = V.phase==='bet';
+  // 翻牌動畫只給剛翻開的那張，翻好的不要每次重畫都再跳
+  const prev = bcPrevShown.round === V.round ? bcPrevShown : { p:0, b:0 };
+  bcPrevShown = { round: V.round, p: rv.p, b: rv.b };
   const cards = side => { const cs = (V.cards && V.cards[side]) || [], n = side==='p' ? rv.p : rv.b;
     const shown = cs.slice(0, n), pt = shown.length ? BC.pts(shown) : null;
-    const slots = [0,1,2].map(i=> i < cs.length ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'')) : b2Card(null, 'bcc' + (i===2?' third':''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
+    const slots = [0,1,2].map(i=> i < cs.length ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'') + (i >= prev[side] ? ' new' : '')) : b2Card(null, 'bcc' + (i===2?' third':''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
     const won = V.result && (V.result.win===side);
     return `<div class="bcside bc-${side}${won?' won':''}"><div class="bcsh"><b>${side==='p'?'閒':'莊'}</b>${pt!=null?`<span class="bcpt">${pt} 點</span>`:''}</div><div class="bccs">${slots}</div></div>`; };
-  // 路單：最近的結果（紅＝莊、藍＝閒、綠＝和）
-  const hist = (V.hist||[]).slice(-36);
-  const road = `<div class="bcroad">${hist.map(h=>`<i class="r-${h[0]}">${h[0]==='b'?'莊':h[0]==='p'?'閒':'和'}${/P/.test(h)?'<u class="pp"></u>':''}${/B/.test(h)?'<u class="bp"></u>':''}</i>`).join('')}</div>`;
+  const road = bcRoad(V.hist||[]);
   const players = `<div class="bcpl">${(V.players||[]).map(p=>`<div class="bcpp${p.me?' me':''}"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span><b>${p.win!=null && p.bet ? (p.win>0?`<em class="up">+${p.win.toLocaleString()}</em>`:p.win<0?`<em class="dn">${p.win.toLocaleString()}</em>`:'退回') : p.bet ? p.bet.toLocaleString() : '—'}</b></div>`).join('')}</div>`;
   const left = Math.max(0, Math.ceil(((V.tEnd||0) + (MJO?MJO.off:0) - Date.now())/1000));
   const status = bet ? `<div class="bcst bet"><b id="bcSec">${left}</b><span>請下注</span></div>`
     : V.phase==='deal' ? `<div class="bcst deal"><span>停止下注・開牌中</span></div>`
     : V.result ? `<div class="bcst res r-${V.result.win}"><b>${V.result.win==='t'?'和局':V.result.win==='b'?'莊贏':'閒贏'}</b><span>${V.result.pt} : ${V.result.bt}${V.result.pp?'・閒對':''}${V.result.bp?'・莊對':''}</span></div>` : '';
+  felt.style.setProperty('--bcw', (mjW < 760 ? 40 : 46) + 'px');
   felt.innerHTML = `${road}${players}<div class="bctable">${cards('p')}${status}${cards('b')}</div>`;
 
   // 押注區
@@ -117,4 +119,24 @@ function bcSend(act){
   bcPend++;
   mjCall('act', { act }).then(r=>{ bcPend--; if(MJO && bcPend===0) mjApply(r.view, null, false, true); })
     .catch(e=>{ bcPend--; mjToast(e.message); if(MJO) mjCall('state').then(r=>MJO && mjApply(r.view, null, false, true)).catch(()=>{}); });
+}
+
+// 牌路：珠盤路（每局一格，紅＝莊、藍＝閒、綠＝和）＋大路（同一邊連贏往下排，換邊就換一行；和局畫斜線）
+function bcRoad(hist){
+  const n = { b:0, p:0, t:0 }; hist.forEach(h=>n[h[0]]++);
+  const bead = hist.slice(-48);
+  const beadHtml = bead.map(h=>`<i class="r-${h[0]}">${h[0]==='b'?'莊':h[0]==='p'?'閒':'和'}${/P/.test(h)?'<u class="pp"></u>':''}${/B/.test(h)?'<u class="bp"></u>':''}</i>`).join('');
+  // 大路
+  const cols = []; let last = null;
+  hist.forEach(h=>{
+    const w = h[0];
+    if(w==='t'){ if(cols.length){ const c = cols[cols.length-1]; c[c.length-1].t++; } else { cols.push([{ w:'t0', t:1 }]); } return; }
+    if(last === w && cols.length && cols[cols.length-1].length < 6) cols[cols.length-1].push({ w, t:0 });
+    else cols.push([{ w, t:0 }]);
+    last = w;
+  });
+  const big = cols.slice(-14);
+  const bigHtml = big.map(c=>`<div class="bcbc">${c.map(x=>`<i class="b-${x.w}">${x.t?`<s></s>${x.t>1?`<em>${x.t}</em>`:''}`:''}</i>`).join('')}</div>`).join('');
+  return `<div class="bcroadw"><div class="bcrh"><b>牌路</b><span class="r-b">莊 ${n.b}</span><span class="r-p">閒 ${n.p}</span><span class="r-t">和 ${n.t}</span></div>
+    <div class="bcroad">${beadHtml || '<small>還沒開過牌</small>'}</div><div class="bcbig">${bigHtml}</div></div>`;
 }

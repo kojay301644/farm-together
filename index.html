@@ -617,8 +617,17 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2rl{display:flex;align-items:center;gap:8px}.b2rl>span{font-size:12px;font-weight:900;min-width:52px;color:#5A4A36}
 .b2rh{display:flex}.b2rh .b2c+.b2c{margin-left:-8px}
 /* ---------- 百家樂 ---------- */
-.bcroad{position:absolute;left:14px;top:10px;display:grid;grid-template-rows:repeat(6,15px);grid-auto-flow:column;grid-auto-columns:15px;gap:2px;padding:5px;border-radius:10px;background:rgba(8,20,48,.75);border:1px solid rgba(0,229,255,.35);z-index:2;min-width:60px;min-height:100px}
-.bcroad i{position:relative;width:15px;height:15px;border-radius:50%;font-size:9px;font-weight:900;font-style:normal;color:#fff;display:grid;place-items:center;line-height:1}
+.bcroadw{position:absolute;left:12px;top:8px;padding:5px 6px 6px;border-radius:10px;background:rgba(8,20,48,.82);border:1px solid rgba(0,229,255,.4);z-index:2;width:130px}
+.bcrh{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:900;margin-bottom:4px;white-space:nowrap}.bcrh b{color:#DDF7FF;font-size:11px;margin-right:auto}
+.bcrh .r-b{color:#FF8E9B}.bcrh .r-p{color:#8EC2FF}.bcrh .r-t{color:#7CFFB0}
+.bcroad{display:grid;grid-template-rows:repeat(6,13px);grid-auto-flow:column;grid-auto-columns:13px;gap:2px;min-height:88px;overflow:hidden}
+.bcroad small{grid-row:1/7;font-size:10px;color:#7FA7C9;white-space:nowrap;align-self:center}
+.bcbig{display:flex;gap:1px;margin-top:5px;height:54px;padding-top:3px;border-top:1px solid rgba(0,229,255,.25)}
+.bcbc{display:flex;flex-direction:column;gap:1px}
+.bcbc i{position:relative;width:8px;height:8px;border-radius:50%;border:2px solid}.bcbc .b-b{border-color:#E2364B}.bcbc .b-p{border-color:#2F7BFF}.bcbc .b-t0{border-color:#2EAE60}
+.bcbc s{position:absolute;left:-2px;top:2px;width:12px;height:2px;background:#2EAE60;transform:rotate(-45deg)}
+.bcbc em{position:absolute;right:-6px;top:-6px;font-size:7px;color:#7CFFB0;font-style:normal;font-weight:900}
+.bcroad i{position:relative;width:13px;height:13px;border-radius:50%;font-size:8px;font-weight:900;font-style:normal;color:#fff;display:grid;place-items:center;line-height:1}
 .bcroad .r-b{background:#E2364B}.bcroad .r-p{background:#2F7BFF}.bcroad .r-t{background:#2EAE60}
 .bcroad u{position:absolute;width:5px;height:5px;border-radius:50%;border:1px solid #fff}.bcroad u.pp{right:-1px;bottom:-1px;background:#2F7BFF}.bcroad u.bp{left:-1px;top:-1px;background:#E2364B}
 .bcpl{position:absolute;right:62px;top:8px;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:52%;z-index:2}
@@ -626,19 +635,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .bcpp.me{border-color:#FFD43B}
 .bcpp img{width:24px;height:24px;border-radius:50%}.bcpp span{max-width:56px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .bcpp b{color:#FFE59A}.bcpp em{font-style:normal}.bcpp em.up{color:#7CFFB0}.bcpp em.dn{color:#FF8A8A}
-.bctable{position:absolute;left:50%;top:27%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;z-index:1}
-.bcside{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 10px 8px;border-radius:16px;border:2px solid;min-width:150px}
+.bctable{position:absolute;left:calc(50% + 40px);top:27%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;z-index:1}
+.bcside{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 10px 8px;border-radius:16px;border:2px solid;min-width:120px}
 .bc-p{border-color:#2F7BFF;background:rgba(47,123,255,.12)}.bc-b{border-color:#E2364B;background:rgba(226,54,75,.12)}
 .bcside.won{box-shadow:0 0 0 2px #fff,0 0 22px 6px #FFD43B;animation:mjpulse 1s ease-in-out infinite}
 .bcsh{display:flex;align-items:center;gap:8px;font-weight:900}.bcsh b{font-size:20px;color:#fff}
 .bc-p .bcsh b{color:#8EC2FF}.bc-b .bcsh b{color:#FF8E9B}
 .bcpt{font-size:16px;color:#FFE59A;background:rgba(0,0,0,.35);border-radius:8px;padding:0 8px}
 .bccs{display:flex;gap:4px;min-height:calc(var(--bcw,46px) * 1.4)}
-.b2c.bcc{--w:var(--bcw,46px);animation:bcflip .35s ease-out}
+.b2c.bcc{--w:var(--bcw,46px)}
+.b2c.bcc.new{animation:bcflip .35s ease-out}
 .b2c.bcc.third{transform:rotate(90deg);margin:0 8px}
 .b2c.ghost{background:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18);animation:none}
 @keyframes bcflip{0%{transform:rotateY(90deg)}100%{transform:none}}
-.b2c.bcc.third{animation:none}
+.b2c.bcc.third.new{animation:bcflip3 .35s ease-out}
+@keyframes bcflip3{0%{transform:rotate(90deg) rotateY(90deg)}100%{transform:rotate(90deg)}}
 .bcst{display:flex;flex-direction:column;align-items:center;min-width:110px;text-align:center;font-weight:900}
 .bcst b{font-size:34px;line-height:1;color:#FFE59A}.bcst b.hurry{color:#FF8A8A;animation:mjpulse2 .5s ease-in-out infinite}
 .bcst span{font-size:13px;color:#BDF6FF;white-space:nowrap}
@@ -958,21 +969,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794424688" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794424892" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794424688" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794424688" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794424892" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794424892" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794424688" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794424892" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794424688" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794424688" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794424892" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794424892" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -989,11 +1000,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794424688" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794424892" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794424688";
+const BUILD="1794424892";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -4738,7 +4749,7 @@ const BC = (() => {
 })();
 if (typeof module !== 'undefined') module.exports = BC;
 /* ---------- 百家樂（多人同桌，跟系統對賭；共用麻將的牌桌外框、連線流程） ---------- */
-let bcChip = 0, bcTimer = 0, bcStage = '', bcFlash = {};
+let bcPrevShown = {}, bcChip = 0, bcTimer = 0, bcStage = '', bcFlash = {};
 const BC_ICON = {n:'🌱',m:'🌻',h:'🏆',r:'💰'};
 const BC_ORDER = ['pp','p','t','b','bp'];
 
@@ -4787,19 +4798,21 @@ function bcRender(V){
   $('mj').style.setProperty('--b2pet', `url("${typeof chrSrc==='function' ? chrSrc((V.pet||'bunny')+'1') : ''}")`);
   const felt = $('mjFelt'); if(!felt) return;
   const rv = bcReveal(V), bet = V.phase==='bet';
+  // 翻牌動畫只給剛翻開的那張，翻好的不要每次重畫都再跳
+  const prev = bcPrevShown.round === V.round ? bcPrevShown : { p:0, b:0 };
+  bcPrevShown = { round: V.round, p: rv.p, b: rv.b };
   const cards = side => { const cs = (V.cards && V.cards[side]) || [], n = side==='p' ? rv.p : rv.b;
     const shown = cs.slice(0, n), pt = shown.length ? BC.pts(shown) : null;
-    const slots = [0,1,2].map(i=> i < cs.length ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'')) : b2Card(null, 'bcc' + (i===2?' third':''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
+    const slots = [0,1,2].map(i=> i < cs.length ? (i < n ? b2Card(cs[i], 'bcc' + (i===2?' third':'') + (i >= prev[side] ? ' new' : '')) : b2Card(null, 'bcc' + (i===2?' third':''))) : (i<2 && !V.cards ? `<i class="b2c bcc ghost"></i>` : '')).join('');
     const won = V.result && (V.result.win===side);
     return `<div class="bcside bc-${side}${won?' won':''}"><div class="bcsh"><b>${side==='p'?'閒':'莊'}</b>${pt!=null?`<span class="bcpt">${pt} 點</span>`:''}</div><div class="bccs">${slots}</div></div>`; };
-  // 路單：最近的結果（紅＝莊、藍＝閒、綠＝和）
-  const hist = (V.hist||[]).slice(-36);
-  const road = `<div class="bcroad">${hist.map(h=>`<i class="r-${h[0]}">${h[0]==='b'?'莊':h[0]==='p'?'閒':'和'}${/P/.test(h)?'<u class="pp"></u>':''}${/B/.test(h)?'<u class="bp"></u>':''}</i>`).join('')}</div>`;
+  const road = bcRoad(V.hist||[]);
   const players = `<div class="bcpl">${(V.players||[]).map(p=>`<div class="bcpp${p.me?' me':''}"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span><b>${p.win!=null && p.bet ? (p.win>0?`<em class="up">+${p.win.toLocaleString()}</em>`:p.win<0?`<em class="dn">${p.win.toLocaleString()}</em>`:'退回') : p.bet ? p.bet.toLocaleString() : '—'}</b></div>`).join('')}</div>`;
   const left = Math.max(0, Math.ceil(((V.tEnd||0) + (MJO?MJO.off:0) - Date.now())/1000));
   const status = bet ? `<div class="bcst bet"><b id="bcSec">${left}</b><span>請下注</span></div>`
     : V.phase==='deal' ? `<div class="bcst deal"><span>停止下注・開牌中</span></div>`
     : V.result ? `<div class="bcst res r-${V.result.win}"><b>${V.result.win==='t'?'和局':V.result.win==='b'?'莊贏':'閒贏'}</b><span>${V.result.pt} : ${V.result.bt}${V.result.pp?'・閒對':''}${V.result.bp?'・莊對':''}</span></div>` : '';
+  felt.style.setProperty('--bcw', (mjW < 760 ? 40 : 46) + 'px');
   felt.innerHTML = `${road}${players}<div class="bctable">${cards('p')}${status}${cards('b')}</div>`;
 
   // 押注區
@@ -4856,6 +4869,26 @@ function bcSend(act){
   bcPend++;
   mjCall('act', { act }).then(r=>{ bcPend--; if(MJO && bcPend===0) mjApply(r.view, null, false, true); })
     .catch(e=>{ bcPend--; mjToast(e.message); if(MJO) mjCall('state').then(r=>MJO && mjApply(r.view, null, false, true)).catch(()=>{}); });
+}
+
+// 牌路：珠盤路（每局一格，紅＝莊、藍＝閒、綠＝和）＋大路（同一邊連贏往下排，換邊就換一行；和局畫斜線）
+function bcRoad(hist){
+  const n = { b:0, p:0, t:0 }; hist.forEach(h=>n[h[0]]++);
+  const bead = hist.slice(-48);
+  const beadHtml = bead.map(h=>`<i class="r-${h[0]}">${h[0]==='b'?'莊':h[0]==='p'?'閒':'和'}${/P/.test(h)?'<u class="pp"></u>':''}${/B/.test(h)?'<u class="bp"></u>':''}</i>`).join('');
+  // 大路
+  const cols = []; let last = null;
+  hist.forEach(h=>{
+    const w = h[0];
+    if(w==='t'){ if(cols.length){ const c = cols[cols.length-1]; c[c.length-1].t++; } else { cols.push([{ w:'t0', t:1 }]); } return; }
+    if(last === w && cols.length && cols[cols.length-1].length < 6) cols[cols.length-1].push({ w, t:0 });
+    else cols.push([{ w, t:0 }]);
+    last = w;
+  });
+  const big = cols.slice(-14);
+  const bigHtml = big.map(c=>`<div class="bcbc">${c.map(x=>`<i class="b-${x.w}">${x.t?`<s></s>${x.t>1?`<em>${x.t}</em>`:''}`:''}</i>`).join('')}</div>`).join('');
+  return `<div class="bcroadw"><div class="bcrh"><b>牌路</b><span class="r-b">莊 ${n.b}</span><span class="r-p">閒 ${n.p}</span><span class="r-t">和 ${n.t}</span></div>
+    <div class="bcroad">${beadHtml || '<small>還沒開過牌</small>'}</div><div class="bcbig">${bigHtml}</div></div>`;
 }
 
 /* ================= 連線設定 ================= */
