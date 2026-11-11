@@ -38,6 +38,7 @@ textarea{width:100%;min-height:90px}
 .btn.o{background:var(--orange)}.btn.r{background:var(--red)}.btn.g{background:#E9E4DA;color:var(--ink)}
 .btn:disabled{opacity:.5}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.nbad{background:#E5484D;color:#fff;border-radius:9px;padding:0 6px;font-size:11px}.nbad:empty{display:none}
 .tag{display:inline-block;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:700;background:#EEF6E8;color:var(--green-d)}
 .tag.r{background:#FDECEC;color:#C93D44}.tag.o{background:#FFF1DC;color:#D97A12}
 .muted{color:var(--ink2);font-size:12px}
@@ -59,7 +60,7 @@ button.ok{background:#3BB273!important;color:#fff!important}button.bad{backgroun
 <body>
 <header><h1>🌱 一起種田吧｜營運後台</h1><span class="who" id="who"></span><a href="./" target="_blank">開啟遊戲</a></header>
 <nav id="nav" style="display:none">
-  <button data-t="ov" class="on">總覽</button><button data-t="pl">玩家管理</button><button data-t="nt">公告</button>
+  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="pl">玩家管理</button><button data-t="nt">公告</button>
   <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="gf">發獎／兌換碼</button><button data-t="ev">活動／維護</button><button data-t="bt">電腦玩家</button><button data-t="lg">操作紀錄</button>
 </nav>
 <main id="main"><div class="center"><div class="muted">讀取中…</div></div></main>
@@ -88,7 +89,37 @@ async function boot(){
   $('nav').style.display='flex';
   document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
   try{ const c = await rpc('farm_config'); CFG=c; c.crops.forEach(x=>CROPN[x.id]=x.name); }catch(e){}
-  go('ov');
+  go('ov'); rpBadge(); setInterval(rpBadge, 60000);
+}
+/* ================= 玩家回報 ================= */
+const RPK = {bug:'🐞 遊戲錯誤',idea:'💡 建議',pay:'💎 儲值問題',abuse:'🚨 檢舉玩家',other:'💬 其他',crash:'💥 自動錯誤'};
+const RPS = {new:'🕐 未處理',doing:'🔧 處理中',done:'✅ 已解決'};
+let rpFilter = 'new', rpAuto = false;
+async function rpBadge(){ try{ const r = await rpc('adm_reports', {p_status:'new', p_auto:false}); const n=r.counts.new; $('rpBad').textContent = n ? n : ''; }catch(e){} }
+async function pageRp(){
+  M(`<div class="card"><div class="muted">讀取中…</div></div>`);
+  let R; try{ R = await rpc('adm_reports', {p_status: rpAuto ? null : (rpFilter||null), p_auto: rpAuto}); }catch(e){ return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+  const c = R.counts; $('rpBad').textContent = c.new ? c.new : '';
+  const tabs = `<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    ${[['new',`🕐 未處理（${c.new}）`],['doing',`🔧 處理中（${c.doing}）`],['done','✅ 已解決'],['','全部']].map(([k,t])=>`<button class="btn ${!rpAuto&&rpFilter===k?'':'g'}" data-rf="${k}">${t}</button>`).join('')}
+    <button class="btn ${rpAuto?'':'g'}" data-ra="1">💥 自動錯誤紀錄（24 小時 ${c.crash24} 筆）</button></div>`;
+  const rows = R.list.map(r=>{ const m=r.meta||{};
+    return `<div class="card rp"><div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><b>${RPK[r.kind]||esc(r.kind)}</b><span class="tag">${RPS[r.status]||r.status}</span>
+      <a href="#" data-pid="${r.uid}">${esc(r.nick||'（已刪除）')}</a><span class="muted">${dt(r.at)}</span></div>
+      <div style="white-space:pre-wrap;margin:8px 0;font-size:15px">${esc(r.body)}</div>
+      ${r.img?`<a href="${esc(r.img)}" target="_blank"><img src="${esc(r.img)}" style="max-width:220px;max-height:220px;border-radius:8px;border:1px solid #ddd"></a>`:''}
+      <details style="margin:6px 0"><summary class="muted">裝置與錯誤資料</summary><div class="muted" style="font-size:12px;line-height:1.6">
+        裝置：${esc(m.dev||'')}（${esc(m.app||'')}，${esc(m.size||'')}）・Lv${esc(m.lv||'')}・版本 ${esc(m.build||'')}<br>畫面：${esc(m.screen||'')}<br>${esc(m.ua||'')}
+        ${(m.errs||[]).length?`<br><b>最近錯誤：</b><br>${m.errs.map(e=>`${esc(e.t)}　${esc(e.m)}`).join('<br>')}`:''}</div></details>
+      ${rpAuto ? '' : `<textarea id="rr_${r.id}" placeholder="回覆玩家（會推播通知）" style="width:100%;min-height:60px">${esc(r.reply||'')}</textarea>
+      <div class="row" style="gap:6px;margin-top:6px">${['doing','done'].map(s=>`<button class="btn ${s==='done'?'':'g'}" data-rs="${r.id}|${s}">${s==='done'?'✅ 回覆並標為已解決':'🔧 回覆並標為處理中'}</button>`).join('')}
+      ${r.status!=='new'?`<button class="btn g" data-rs="${r.id}|new">改回未處理</button>`:''}${r.rat?`<span class="muted">已回覆 ${dt(r.rat)}</span>`:''}</div>`}</div>`; }).join('');
+  M(`<div class="card"><h2>🐞 玩家回報</h2>${tabs}<div class="muted">「自動錯誤紀錄」是遊戲發生程式錯誤時自動送上來的，同一個人同樣的錯誤 1 小時只記 1 次。</div></div>${rows || '<div class="card muted">沒有資料</div>'}`);
+  document.querySelectorAll('[data-rf]').forEach(b=>b.onclick=()=>{ rpFilter=b.dataset.rf; rpAuto=false; pageRp(); });
+  document.querySelectorAll('[data-ra]').forEach(b=>b.onclick=()=>{ rpAuto=true; pageRp(); });
+  document.querySelectorAll('[data-pid]').forEach(a=>a.onclick=e=>{ e.preventDefault(); if(a.dataset.pid && a.dataset.pid!=='null'){ showPlayer(a.dataset.pid); } });
+  document.querySelectorAll('[data-rs]').forEach(b=>b.onclick=async()=>{ const [id,st]=b.dataset.rs.split('|'); const ta=$('rr_'+id);
+    try{ await rpc('adm_report_set', {p_id:+id, p_status:st, p_reply: ta ? ta.value : null}); toast('已更新'); pageRp(); }catch(e){ toast(e.message); } });
 }
 function showLogin(){
   $('main').innerHTML = `<div class="center"><div class="login"><h2>管理員登入</h2>
@@ -99,7 +130,7 @@ function showLogin(){
   $('li').onclick = async()=>{ const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('pw').value}); if(error) return toast('登入失敗：'+error.message); location.reload(); };
   $('gl').onclick = ()=>sb.auth.signInWithOAuth({provider:'google', options:{redirectTo: location.origin+location.pathname}});
 }
-function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
+function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({rp:pageRp,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
 const M = h => $('main').innerHTML = h;
 
 /* 總覽 */

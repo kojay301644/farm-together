@@ -25,6 +25,7 @@ async function rpc(fn, args){
   const {data, error} = await sb.rpc(fn, args||{});
   if(error){ if(/KICKED/.test(error.message)){ showKicked(); throw new Error('帳號已在其他裝置登入'); }
     if(/維護中：/.test(error.message)){ showMaint(error.message.replace(/^.*維護中：/,'')); throw new Error('伺服器維護中'); }
+    try{ logErr(`${fn}: ${error.message}`); }catch(e){}
     throw new Error(zhErr(error.message)); }
   return data;
 }
@@ -365,6 +366,7 @@ async function openSettings(){
     <div class="rhint">手機容易發燙或耗電快，可以開「🔋 省電模式」：畫面更新變慢、關掉裝飾動畫和大部分特效</div>
     <div class="homebtns"><button class="btn o" id="sA2hs">📱 加到桌面</button><button class="btn sub" id="sInv">💌 邀請朋友</button></div>
     ${pushBoxHTML()}
+    <div class="sec">🐞 回報問題</div><div class="homebtns"><button class="btn sub" id="sRep">🐞 回報問題／建議</button><button class="btn sub" id="sRepMine">📋 我的回報</button></div>
     <div class="sec">兌換碼</div><div class="redeem"><input id="rCode" placeholder="輸入兌換碼" maxlength="20" autocomplete="off"><button class="btn" id="rGo">兌換</button></div>`;
   if(me.admin) body += `<div class="sec">🛠️ 管理員</div><div class="admbox">
     <div class="admrow"><span>等級</span><input id="aLv" type="number" min="1" max="30" value="${me.lv}"><span>金幣</span><input id="aGold" type="number" min="0" value="${me.gold}"><span>鑽石</span><input id="aGems" type="number" min="0" value="${me.gems||0}"></div>
@@ -373,6 +375,7 @@ async function openSettings(){
     <div class="rhint">只會改到你自己的帳號，每次修改都記錄在後台的操作紀錄</div></div>`;
   body += `<div style="text-align:center;margin-top:12px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`;
   modal('設定', body); renderPushBox();
+  if($('sRep')) $('sRep').onclick=()=>openReport(); if($('sRepMine')) $('sRepMine').onclick=openMyReports;
   $('tBgm').onclick = ()=>{ BGM_ON=!BGM_ON; SETPREF('bgm',BGM_ON); bgmSync(); openSettings(); };
   $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openSettings(); };
   $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openSettings(); };

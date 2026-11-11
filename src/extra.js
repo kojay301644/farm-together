@@ -178,7 +178,7 @@ function openHelp(){
     <p>遊戲有新版本時，畫面上方會出現「✨ 有新版本！點這裡更新」，點一下就會換成最新版。</p>
     <h4>🏆 排行榜</h4>
     <p>在好友廣場的「排行」，有四種排行榜：🏆 等級（同等級比經驗）、💰 財富（金幣）、🏙️ 繁榮（寵物、寵物造型、建築外觀、城鎮色調、裝飾、裝備階數、開墾的田地越多越高）、🥕 偷菜（偷到的東西總價值，田地、收集倉、牧場都算，一樣多再比次數）。每種都可以看好友排行和全服前 50 名。</p></div>`,
-    [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); FEAT_TUTS.forEach(f=>localStorage.removeItem(featKey(f.id))); }catch(e){} feat=null; tut={step:0}; tutRender(); }],['知道了','',closeModal]]);
+    [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); FEAT_TUTS.forEach(f=>localStorage.removeItem(featKey(f.id))); }catch(e){} feat=null; tut={step:0}; tutRender(); }],['🐞 回報問題','sub',()=>openReport()],['知道了','',closeModal]]);
 }
 function openA2HS(){
   modal('加到手機桌面', `<div class="help">

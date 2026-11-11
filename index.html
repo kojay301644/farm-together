@@ -286,6 +286,13 @@ body.lowfx .bird{display:none}
 @keyframes updPulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
 .guestbox{margin:8px 0;padding:10px 12px;border-radius:14px;background:#FFF3D6;border:2px solid #F0B24A;font-size:13px;font-weight:700;line-height:1.6}
 .btn.try{font-size:18px;padding:13px 0;margin-bottom:4px}
+.repk{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.repk .chip{padding:7px 11px;border-radius:16px;border:2px solid #D9C39A;background:#FFF8E8;font:inherit;font-weight:800;font-size:13px;cursor:pointer}.repk .chip.on{background:#FFD84D;border-color:#3A3226}
+#repTx{width:100%;min-height:110px;box-sizing:border-box;border:2px solid #D9C39A;border-radius:14px;padding:10px;font:inherit;font-size:15px;resize:vertical}
+.repc{text-align:right;font-size:12px;color:var(--ink2);margin:2px 0 6px}.repimg{display:block;text-align:center;cursor:pointer}
+.reppv{display:flex;align-items:center;gap:8px;margin-top:8px}.reppv img{max-width:140px;max-height:140px;border-radius:10px;border:2px solid #D9C39A}
+.reprow{border-bottom:1px dashed #E5D6B8;padding:10px 2px}.reprow .rh{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.reprow .rh small{color:var(--ink2);margin-left:auto}
+.reprow .rb{white-space:pre-wrap;margin:6px 0;font-size:14px}.reprow .rimg{max-width:120px;border-radius:8px}.reprow .rr{background:#EAF7EF;border-radius:10px;padding:8px 10px;font-size:14px;white-space:pre-wrap}.reprow .rr b{display:block;color:#2E9660}
+.tag.st-new{background:#FFF1DC}.tag.st-doing{background:#E3EEFF}.tag.st-done{background:#E8F8EE;color:#2E9660}
 .pkinds{display:flex;flex-direction:column;gap:6px;margin:6px 0}.pk{display:flex;align-items:center;justify-content:space-between;font-weight:800;padding:4px 2px;border-bottom:1px dashed #E5D6B8}
 .autobtn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;margin-bottom:6px;border:2.5px solid #3A3226;border-radius:16px;background:linear-gradient(#FFF6DB,#FFE7B0);font:inherit;cursor:pointer;text-align:left}
 .autobtn b{font-size:16px;white-space:nowrap}.autobtn span{flex:1;font-size:17px;letter-spacing:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#7A6A55;font-weight:700}.autobtn i{font-style:normal;font-weight:900;font-size:20px}
@@ -536,21 +543,21 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794370513" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794385082" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794370513" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794370513" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794385082" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794385082" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794370513" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794385082" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794370513" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794370513" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794385082" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794385082" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -566,11 +573,11 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794370513" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794385082" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794370513";
+const BUILD="1794385082";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1557,7 +1564,7 @@ function openHelp(){
     <p>遊戲有新版本時，畫面上方會出現「✨ 有新版本！點這裡更新」，點一下就會換成最新版。</p>
     <h4>🏆 排行榜</h4>
     <p>在好友廣場的「排行」，有四種排行榜：🏆 等級（同等級比經驗）、💰 財富（金幣）、🏙️ 繁榮（寵物、寵物造型、建築外觀、城鎮色調、裝飾、裝備階數、開墾的田地越多越高）、🥕 偷菜（偷到的東西總價值，田地、收集倉、牧場都算，一樣多再比次數）。每種都可以看好友排行和全服前 50 名。</p></div>`,
-    [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); FEAT_TUTS.forEach(f=>localStorage.removeItem(featKey(f.id))); }catch(e){} feat=null; tut={step:0}; tutRender(); }],['知道了','',closeModal]]);
+    [['重新看新手教學','sub',()=>{ closeModal(); try{ localStorage.removeItem(tutKey()); FEAT_TUTS.forEach(f=>localStorage.removeItem(featKey(f.id))); }catch(e){} feat=null; tut={step:0}; tutRender(); }],['🐞 回報問題','sub',()=>openReport()],['知道了','',closeModal]]);
 }
 function openA2HS(){
   modal('加到手機桌面', `<div class="help">
@@ -2756,6 +2763,77 @@ function pushAskMaybe(){
     [['之後再說','sub',closeModal],['🔔 開啟','',async()=>{ closeModal(); await pushEnable(); }]]);
 }
 
+/* ================= 回報問題＋自動記錄錯誤 ================= */
+const ERRS = [];   // 最近 20 筆錯誤（回報時自動附上）
+function logErr(msg){ try{ ERRS.push({t:new Date().toLocaleTimeString('zh-TW',{hour12:false}), m:String(msg).slice(0,300)}); if(ERRS.length>20) ERRS.shift(); }catch(e){} }
+function reportMeta(){
+  let scr = mode==='visit' ? '拜訪好友' : '自己的農場';
+  try{ if(document.querySelector('#ov.show')) scr += '／視窗：' + (document.querySelector('#md h3 span')||{}).textContent; }catch(e){}
+  return { ua:navigator.userAgent.slice(0,200), dev:(typeof devName==='function'?devName():''), build:(typeof BUILD!=='undefined'?BUILD:''),
+    screen:scr, size:`${innerWidth}x${innerHeight}`, app:(typeof isStandalone==='function'&&isStandalone())?'主畫面':'瀏覽器',
+    lv:(S&&S.me&&S.me.lv)||0, errs:ERRS.slice(-20) };
+}
+/* 遊戲發生錯誤：自動記到後台（同一個錯誤這次開遊戲只送一次） */
+const crashSent = new Set();
+function autoCrash(msg){
+  logErr(msg);
+  const k = String(msg).slice(0,200); if(crashSent.has(k) || crashSent.size>=10) return; crashSent.add(k);
+  setTimeout(()=>{ try{ if(S && S.me) sb.rpc('farm_crash', {p_msg:String(msg).slice(0,500), p_meta:reportMeta()}); }catch(e){} }, 1500);
+}
+window.addEventListener('error', e=>{ if(!e || !e.message) return; if(/ResizeObserver|Script error/i.test(e.message)) return;
+  autoCrash(`${e.message}${e.filename?` @ ${String(e.filename).split('/').pop()}:${e.lineno}:${e.colno}`:''}`); });
+window.addEventListener('unhandledrejection', e=>{ const m = e && e.reason ? (e.reason.message||String(e.reason)) : ''; if(!m) return;
+  if(/Failed to fetch|NetworkError|Load failed|帳號已在其他裝置|伺服器維護中/i.test(m)) return logErr(m); autoCrash('Promise: '+m); });
+
+const REP_KIND = [['bug','🐞 遊戲錯誤'],['idea','💡 建議'],['pay','💎 儲值問題'],['abuse','🚨 檢舉玩家'],['other','💬 其他']];
+const REP_ST = {new:'🕐 已收到', doing:'🔧 處理中', done:'✅ 已解決'};
+let repImg = null;
+async function shrinkImg(file){
+  const url = URL.createObjectURL(file);
+  try{ const im = await new Promise((ok,no)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=no; i.src=url; });
+    const k = Math.min(1, 1280/Math.max(im.width, im.height)), cv=document.createElement('canvas');
+    cv.width=Math.round(im.width*k); cv.height=Math.round(im.height*k); cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
+    return await new Promise(ok=>cv.toBlob(ok,'image/jpeg',0.82));
+  } finally{ URL.revokeObjectURL(url); }
+}
+function openReport(kind){
+  repImg = null; let k = kind || 'bug';
+  modal('🐞 回報問題', `<div class="rhint">遇到錯誤、有建議或要檢舉都可以告訴我們，系統會自動附上你的手機型號和最近的錯誤訊息，方便我們查。</div>
+    <div class="repk">${REP_KIND.map(([id,t])=>`<button class="chip${id===k?' on':''}" data-rk="${id}">${t}</button>`).join('')}</div>
+    <textarea id="repTx" maxlength="500" placeholder="發生了什麼事？在哪個畫面、做了什麼動作？（最多 500 字）"></textarea>
+    <div class="repc"><span id="repN">0 / 500</span></div>
+    <label class="btn sub repimg"><input type="file" id="repF" accept="image/*" hidden>📷 附上截圖（可不附）</label>
+    <div id="repPv"></div>
+    <div class="homebtns"><button class="btn sub" id="repMine">📋 我的回報</button></div>`,
+    [['取消','sub',closeModal],['送出','',async()=>{
+      const tx=$('repTx').value.trim(); if(tx.length<2) return toast('請寫一下發生了什麼事');
+      const b=document.querySelector('#mft button:last-child'); b.disabled=true; b.textContent='送出中…';
+      try{
+        let img=null;
+        if(repImg){ const {data:{user}} = await sb.auth.getUser(); const path=`${user.id}/${Date.now()}.jpg`;
+          const {error} = await sb.storage.from('reports').upload(path, repImg, {contentType:'image/jpeg'});
+          if(error) throw new Error('截圖上傳失敗：'+error.message);
+          img = sb.storage.from('reports').getPublicUrl(path).data.publicUrl; }
+        await rpc('farm_report', {p_kind:k, p_body:tx, p_img:img, p_meta:reportMeta()});
+        sfx('coin'); modal('謝謝你的回報！', `<div style="text-align:center;font-weight:800;line-height:1.8">我們收到了，會盡快處理<br><small style="color:var(--ink2)">有回覆時會通知你，也可以到「📋 我的回報」查看</small></div>`, [['好','',closeModal]]);
+      }catch(e){ toast(e.message); b.disabled=false; b.textContent='送出'; }
+    }]]);
+  document.querySelectorAll('#md [data-rk]').forEach(c=>c.onclick=()=>{ k=c.dataset.rk; document.querySelectorAll('#md [data-rk]').forEach(x=>x.classList.toggle('on', x===c)); });
+  $('repTx').oninput=()=>{ $('repN').textContent=`${$('repTx').value.length} / 500`; };
+  $('repF').onchange=async e=>{ const f=e.target.files[0]; if(!f) return;
+    try{ repImg = await shrinkImg(f); $('repPv').innerHTML=`<div class="reppv"><img src="${URL.createObjectURL(repImg)}"><button class="mini sub" id="repX">移除</button></div>`;
+      $('repX').onclick=()=>{ repImg=null; $('repPv').innerHTML=''; $('repF').value=''; }; }catch(err){ toast('這張圖片讀不到，換一張試試'); } };
+  $('repMine').onclick=openMyReports;
+}
+async function openMyReports(){
+  let L=[]; try{ L = await rpc('farm_reports_mine'); }catch(e){ return toast(e.message); }
+  const K = Object.fromEntries(REP_KIND);
+  modal('📋 我的回報', L.length ? L.map(r=>`<div class="reprow"><div class="rh"><b>${K[r.kind]||r.kind}</b><span class="tag st-${r.status}">${REP_ST[r.status]||r.status}</span><small>${new Date(r.at).toLocaleString('zh-TW',{hour12:false})}</small></div>
+      <div class="rb">${esc(r.body)}</div>${r.img?`<a href="${esc(r.img)}" target="_blank"><img class="rimg" src="${esc(r.img)}"></a>`:''}
+      ${r.reply?`<div class="rr"><b>💬 回覆</b>${esc(r.reply)}</div>`:''}</div>`).join('') : `<div class="empty">還沒有回報過</div>`,
+    [['← 回報問題','sub',()=>openReport()],['關閉','',closeModal]]);
+}
+
 /* ================= 連線設定 ================= */
 const SB_URL = 'https://qnxnuyfvkrvhnaewvrik.supabase.co';
 const SB_KEY = 'sb_publishable_nX97hqqEgiGRwKQMOz56ow_uvMEAdht';
@@ -2782,6 +2860,7 @@ async function rpc(fn, args){
   const {data, error} = await sb.rpc(fn, args||{});
   if(error){ if(/KICKED/.test(error.message)){ showKicked(); throw new Error('帳號已在其他裝置登入'); }
     if(/維護中：/.test(error.message)){ showMaint(error.message.replace(/^.*維護中：/,'')); throw new Error('伺服器維護中'); }
+    try{ logErr(`${fn}: ${error.message}`); }catch(e){}
     throw new Error(zhErr(error.message)); }
   return data;
 }
@@ -3122,6 +3201,7 @@ async function openSettings(){
     <div class="rhint">手機容易發燙或耗電快，可以開「🔋 省電模式」：畫面更新變慢、關掉裝飾動畫和大部分特效</div>
     <div class="homebtns"><button class="btn o" id="sA2hs">📱 加到桌面</button><button class="btn sub" id="sInv">💌 邀請朋友</button></div>
     ${pushBoxHTML()}
+    <div class="sec">🐞 回報問題</div><div class="homebtns"><button class="btn sub" id="sRep">🐞 回報問題／建議</button><button class="btn sub" id="sRepMine">📋 我的回報</button></div>
     <div class="sec">兌換碼</div><div class="redeem"><input id="rCode" placeholder="輸入兌換碼" maxlength="20" autocomplete="off"><button class="btn" id="rGo">兌換</button></div>`;
   if(me.admin) body += `<div class="sec">🛠️ 管理員</div><div class="admbox">
     <div class="admrow"><span>等級</span><input id="aLv" type="number" min="1" max="30" value="${me.lv}"><span>金幣</span><input id="aGold" type="number" min="0" value="${me.gold}"><span>鑽石</span><input id="aGems" type="number" min="0" value="${me.gems||0}"></div>
@@ -3130,6 +3210,7 @@ async function openSettings(){
     <div class="rhint">只會改到你自己的帳號，每次修改都記錄在後台的操作紀錄</div></div>`;
   body += `<div style="text-align:center;margin-top:12px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`;
   modal('設定', body); renderPushBox();
+  if($('sRep')) $('sRep').onclick=()=>openReport(); if($('sRepMine')) $('sRepMine').onclick=openMyReports;
   $('tBgm').onclick = ()=>{ BGM_ON=!BGM_ON; SETPREF('bgm',BGM_ON); bgmSync(); openSettings(); };
   $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openSettings(); };
   $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openSettings(); };
