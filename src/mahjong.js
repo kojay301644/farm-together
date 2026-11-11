@@ -106,14 +106,14 @@ function mjSay(txt){
 /* ---------- 遊戲廳大廳 ---------- */
 const HALL_GAMES = [
   {id:'mj', icon:'🀄', name:'麻將', desc:'台灣 16 張，跟朋友或電腦一起打', open:true},
-  {id:'big2', icon:'🃏', name:'大老二', desc:'敬請期待'},
+  {id:'big2', icon:'🃏', name:'大老二', desc:'台灣玩法，四個人搶先出完', open:true},
   {id:'niu', icon:'🐮', name:'妞妞', desc:'敬請期待'},
   {id:'holdem', icon:'♠️', name:'德州撲克', desc:'敬請期待'},
 ];
 function openHall(){
   modal('🎰 寵物娛樂廳', `<div class="rhint">用農場金幣跟大家同樂！每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費</div>
     <div class="hallg">${HALL_GAMES.map(g=>`<button class="hgc${g.open?'':' off'}" data-hg="${g.id}"><span class="hgi">${g.icon}</span><b>${g.name}</b><small>${g.desc}</small></button>`).join('')}</div>`);
-  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ if(b.dataset.hg==='mj') openMjLobby(); else toast('這個遊戲還在做，敬請期待！'); });
+  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ if(b.dataset.hg==='mj') openMjLobby(); else if(b.dataset.hg==='big2') openB2Lobby(); else toast('這個遊戲還在做，敬請期待！'); });
 }
 function openMjLobby(){
   const gold = S.me.gold;
@@ -301,12 +301,12 @@ function mjPanel(title, body, btns){
 function mjPanelClose(){ const p=$('mjPanel'); if(p) p.classList.remove('on'); }
 function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
-    <button class="mjmi" id="mmRules">📖<span>台數表</span></button>
+    <button class="mjmi" id="mmRules">📖<span>${(mjCurView()||{}).game==='b2'?'規則':'台數表'}</span></button>
     <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
-  $('mmRules').onclick = mjRules;
+  $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else mjRules(); };
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
   $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', mjMe); mjMenu(); };
   $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
@@ -317,6 +317,7 @@ function mjRender(first){
   if(first || !$('mjFelt')) mjShell();
   const V = mjCurView(); if(!V) return;
   if(V.status==='wait' || V.pending || V.me==null || V.me<0) return mjRenderWait(V);
+  if(V.game==='b2') return b2Render(V);
   mjMe = V.me;
   // 每局開始：莊家先擲骰子
   if(V.dice && V.handNo !== mjDiceHand && V.phase!=='end' && (MJG || V.startAt)){ mjDiceHand = V.handNo; mjDiceUntil = Date.now() + 2200; setTimeout(()=>mjDice(V.dice, V.dealer), 30); }
@@ -463,13 +464,13 @@ function mjRender(first){
   if(MJO && MJO.claimWait && V.phase!=='claim') MJO.claimWait = null;   // 這次吃碰沒有結果（例如時間到）就收掉
 }
 function mjRenderWait(V){
-  const T = MJ.TABLES[V.lvl] || MJ.TABLES.n;
+  const b2 = V.game==='b2', T = (b2 ? B2 : MJ).TABLES[V.lvl] || (b2 ? B2 : MJ).TABLES.n, gname = b2 ? '大老二' : '麻將';
   let inner;
   const shoutN = (S && S.me && S.me.items && S.me.items.shout) || 0;
   if(V.status==='wait'){
     const P = (V.wait && V.wait.players) || [];
     inner = `<div class="mjwt">${V.priv ? '🏠 朋友房間' : '🔍 正在找牌友…'}</div>
-      ${V.priv ? `<div class="mjcode">房號 <b>${esc(V.code||'')}</b><small>把房號告訴朋友，在「麻將」輸入就能加入</small></div>` : ''}
+      ${V.priv ? `<div class="mjcode">房號 <b>${esc(V.code||'')}</b><small>把房號告訴朋友，在「${gname}」輸入就能加入</small></div>` : ''}
       <div class="mjwp">${[0,1,2,3].map(i=>{ const p=P[i]; return p ? `<div class="mjwq"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span></div>` : `<div class="mjwq e"><i>？</i><span>${V.priv?'等朋友加入':'等待中'}</span></div>`; }).join('')}</div>
       <div class="mjws" id="mjWs"></div>
       ${V.priv && P.length < 4 ? `<button class="btn o mjshb" id="mjShout" ${shoutN>0?'':'disabled'}>📢 用大聲公找人${shoutN>0?`（剩 ${shoutN} 個）`:'（沒有大聲公，可到綜合商店買）'}</button>` : ''}
@@ -479,11 +480,11 @@ function mjRenderWait(V){
   }
   $('mjFelt').innerHTML = `<div class="mjwait">${inner}</div>`;
   $('mjUi').innerHTML = ''; $('mjEnd').innerHTML = '';
-  $('mjBar').innerHTML = `<div class="mjbt">底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}</div><div class="mjbt r">${T.name}</div>`;
+  $('mjBar').innerHTML = `<div class="mjbt">${b2 ? `每張 ${T.per.toLocaleString()} 金` : `底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}`}</div><div class="mjbt r">${T.name}</div>`;
   if($('mjStart')) $('mjStart').onclick = ()=>mjOnline('start');
   if($('mjShout')) $('mjShout').onclick = ()=>{
     const miss = 4 - ((V.wait && V.wait.players) || []).length;
-    const def = `麻將缺${miss}!!! 房號:${V.code}`;
+    const def = `${gname}缺${miss}!!! 房號:${V.code}`;
     mjPanel('📢 大聲公找人', `<div class="help"><p>會放上全服跑馬燈，大家都看得到。可以改字（最多 30 字）</p></div>
       <input id="mjShTx" maxlength="30" value="${esc(def)}" style="width:100%;font-family:inherit;font-size:17px;font-weight:900;padding:10px 12px;border-radius:12px;border:2px solid #E6D9C3;margin-top:6px">`,
       [['取消','sub',mjPanelClose],['📢 送出','o',async()=>{ const t = ($('mjShTx').value||'').trim(); if(!t) return mjToast('請輸入內容');
@@ -533,7 +534,7 @@ function mjShout(j, txt, small){
   if(!small){ mjSfx(big ? 'win' : 'call'); const w = {'碰！':'碰','吃！':'吃','槓！':'槓','暗槓！':'槓','加槓！':'槓','胡了！':'胡啦','自摸！':'自摸','聽！':'聽'}[txt] || txt; if(!mjPlayVoice(w, j)) mjSay(w); }
 }
 // 胡牌／自摸：全螢幕慶祝（金光、大字、寵物、彩帶），結算視窗晚一點才出來
-function mjCelebrate(j, txt){
+function mjCelebrate(j, txt, label){
   const box = $('mj'); if(!box) return;
   box.querySelectorAll('.mjwin').forEach(x=>x.remove());
   const self = /自摸/.test(txt), mine = j === mjMe, V = mjCurView() || { seats: [] }, who = mine ? '你' : ((V.seats[j]||{}).name || '');
@@ -541,7 +542,7 @@ function mjCelebrate(j, txt){
   const conf = Array.from({length: 46}, (_, i)=>`<i style="left:${(Math.random()*100).toFixed(1)}%;background:${cols[i%cols.length]};animation-delay:${(Math.random()*0.6).toFixed(2)}s;animation-duration:${(1.6+Math.random()*1.2).toFixed(2)}s;transform:rotate(${Math.floor(Math.random()*360)}deg)"></i>`).join('');
   const d = document.createElement('div'); d.className = 'mjwin' + (mine ? ' mine' : '');
   d.innerHTML = `<div class="mjwrays"></div><div class="mjwconf">${conf}</div>
-    <div class="mjwbox"><img src="${typeof chrSrc==='function' ? chrSrc(pet) : ''}" alt=""><div class="mjwint">${self ? '自摸' : '胡了'}</div><div class="mjwwho">${esc(who)}${mine ? ' 贏了！' : ''}</div></div>`;
+    <div class="mjwbox"><img src="${typeof chrSrc==='function' ? chrSrc(pet) : ''}" alt=""><div class="mjwint">${label || (self ? '自摸' : '胡了')}</div><div class="mjwwho">${esc(who)}${mine ? ' 贏了！' : ''}</div></div>`;
   box.appendChild(d); setTimeout(()=>d.remove(), 2600);
   mjSfx('win'); setTimeout(()=>mjSfx('win'), 450); try{ if(mine && typeof vib==='function') vib([60,40,120]); }catch(e){}
 }

@@ -1,6 +1,8 @@
 // 麻將連線版 Edge Function：讀牌桌 → 動作／推進 → 存回（版本號防同時寫入）→ 更新每位玩家的畫面
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import MJ from './mj_engine.mjs';
+import B2 from './b2_engine.mjs';
+const ENG = (g: string) => (g === 'b2' ? B2 : MJ);
 import * as C from './core.mjs';
 
 const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
@@ -76,16 +78,17 @@ async function handle(uid: string, b: any, test = false) {
     if (cur) { const T = await load(cur); if (T && T.status !== 'closed' && C.humans(T).includes(uid)) return { view: viewOf(T, uid) }; }
     const p = await me(uid);
     if (a === 'join') {
-      const { data: L } = await sb.from('mj_tables').select('id,lvl').eq('code', String(b.code || '')).in('status', ['wait', 'play']).limit(1);
+      const { data: L } = await sb.from('mj_tables').select('id,lvl,game').eq('code', String(b.code || '')).in('status', ['wait', 'play']).limit(1);
       if (!L || !L.length) throw new Fail('找不到這個房號');
-      if (p.gold < MJ.TABLES[L[0].lvl].min) throw new Fail(`這桌要 ${MJ.TABLES[L[0].lvl].min.toLocaleString()} 金幣才能坐`);
+      const TB = ENG(L[0].game).TABLES[L[0].lvl];
+      if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
       const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now));
       return { view: viewOf(T, uid) };
     }
-    const lvl = b.lvl; if (!MJ.TABLES[lvl]) throw new Fail('沒有這種桌');
-    if (p.gold < MJ.TABLES[lvl].min) throw new Fail(`這桌要 ${MJ.TABLES[lvl].min.toLocaleString()} 金幣才能坐`);
+    const game = b.game === 'b2' ? 'b2' : 'mj', lvl = b.lvl; const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
+    if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
     if (a === 'quick') {
-      const { data: L } = await sb.from('mj_tables').select('id,status,nh').eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', 4).gt('nh', 0)
+      const { data: L } = await sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', 4).gt('nh', 0)
         .gt('updated_at', new Date(Date.now() - 120e3).toISOString()).order('status', { ascending: false }).order('nh', { ascending: false }).limit(5);
       for (const t of (L || [])) {
         try { const { T } = await mutate(t.id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now)); return { view: viewOf(T, uid) }; } catch (e) { if (!(e instanceof Fail) && !(e instanceof Error)) throw e; }
@@ -94,8 +97,8 @@ async function handle(uid: string, b: any, test = false) {
     const now = NOW(), priv = a === 'create';
     let code = null;
     if (priv) for (let k = 0; k < 20; k++) { const c = String(1000 + Math.floor(Math.random() * 9000)); const { data: ex } = await sb.from('mj_tables').select('id').eq('code', c).in('status', ['wait', 'play']).limit(1); if (!ex || !ex.length) { code = c; break; } }
-    const T = C.newTable(lvl, priv, uid, { uid, name: p.name, av: p.av }, now);
-    const { data: ins, error } = await sb.from('mj_tables').insert({ lvl, priv, code, host: uid, status: T.status, state: T.state, nh: 1 }).select('*').single();
+    const T = C.newTable(lvl, priv, uid, { uid, name: p.name, av: p.av }, now, game);
+    const { data: ins, error } = await sb.from('mj_tables').insert({ game, lvl, priv, code, host: uid, status: T.status, state: T.state, nh: 1 }).select('*').single();
     if (error) throw new Fail('開桌失敗');
     await pushViews(ins, now, []);
     return { view: viewOf(ins, uid) };
