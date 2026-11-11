@@ -1,7 +1,7 @@
 // 百家樂：牌桌狀態機（純邏輯，不碰資料庫）。跟系統對賭，不需要電腦補位
 import BC from './bc_engine.mjs';
 
-export const BT = { BET: 10000, DEAL: 7000, END: 4500, SHUFFLE: 3500, SLIDE: 900 };
+export const BT = { BET: 15000, DEAL: 7000, END: 4500, SHUFFLE: 3500, SLIDE: 900 };
 // 開牌動畫要多久：4 張各 0.7 秒，補牌各 1 秒，再停 1.2 秒看結果
 const dealMs = (r) => BT.SLIDE + 4 * 700 + (r.p.length - 2 + r.b.length - 2) * 1000 + 1500;   // 先滑牌出來，再一張一張翻
 

@@ -28,7 +28,7 @@ function bcRules(){
   if(mjOn()) return mjPanel('📖 百家樂怎麼玩', body, [['知道了','',mjPanelClose]]);
   modal('📖 百家樂怎麼玩', body, [['知道了','',openBcLobby]]);
 }
-const BC_BET_SEC = 10;
+const BC_BET_SEC = 15;
 
 // 開牌動畫：照時間一張一張翻（閒、莊、閒、莊，再補牌）
 function bcReveal(V){
