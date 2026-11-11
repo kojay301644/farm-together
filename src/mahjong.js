@@ -103,14 +103,12 @@ function openMjLobby(){
       <div>底 ${t.base.toLocaleString()}・每台 ${t.tai.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
       <div class="mjtbb"><button class="mini" data-mjq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-mjc="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
     <div class="mjjoin"><input id="mjCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="mjJoin">加入朋友的房間</button></div>
-    <div class="mjtb prac"><div class="mjtbi">🎓</div><div class="tx"><b>練習場</b><div>跟電腦打，不用金幣，輸贏不算</div></div><button class="mini sub" id="mjPrac">練習</button></div>
     <button class="link" id="mjRules">📖 台數怎麼算？</button>`, [['回寵物娛樂廳','sub',openHall]]);
   const busy = b => { document.querySelectorAll('#md .mini').forEach(x=>x.disabled = b); };
   const go = async (a, extra) => { busy(true); try{ const r = await mjCall(a, extra); if(!r.view) throw new Error('進不去，等等再試'); closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); busy(false); } };
   document.querySelectorAll('#md [data-mjq]').forEach(b=>b.onclick=()=>go('quick', {lvl:b.dataset.mjq}));
   document.querySelectorAll('#md [data-mjc]').forEach(b=>b.onclick=()=>go('create', {lvl:b.dataset.mjc}));
   $('mjJoin').onclick = ()=>{ const c = ($('mjCode').value||'').trim(); if(!/^\d{4}$/.test(c)) return toast('房號是 4 位數字'); go('join', {code:c}); };
-  $('mjPrac').onclick = ()=>{ closeModal(); mjEnter('n'); };
   $('mjRules').onclick = mjRules;
   mjCall('state').then(r=>{ if(r.view && r.view.status && $('mjBack')) { $('mjBack').innerHTML = `<button class="btn o" id="mjBackB" style="width:100%;margin:6px 0">🀄 你還有一桌在打，回到牌桌</button>`; $('mjBackB').onclick = ()=>{ closeModal(); mjOnlineEnter(r.view); }; } }).catch(()=>{});
 }
