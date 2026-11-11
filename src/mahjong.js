@@ -175,8 +175,12 @@ async function mjOnlineEnter(view){
   MJO.poll = setInterval(()=>{ if(MJO && !MJO.busy && Date.now() - (MJO.at||0) > 5000) mjCall('state').then(r=>MJO && mjApply(r.view, null)).catch(()=>{}); }, 3000);
   if(!mjTimer) mjTimer = setInterval(mjClock, 250);
 }
-function mjApply(view, seq, first){
+function mjApply(view, seq, first, own){
   if(!MJO) return;
+  if(view && seq==null && view.ver!=null) seq = view.ver;
+  // 自己的動作還在送：先把別人的更新存起來，等回覆再一起套用（避免畫面跳回去）
+  if(MJO.busy && !own){ if(view && seq!=null && (!MJO.queued || seq > MJO.queued.seq)) MJO.queued = { view, seq }; return; }
+  if(own && MJO.queued){ const q = MJO.queued; MJO.queued = null; if(q.seq > (seq ?? -1)){ view = q.view; seq = q.seq; } }
   if(!view){ mjClose(); toast('已經離開牌桌'); sync && sync(); return; }
   if(view.status==='kicked' && view.broke) return mjBroke();
   if(view.status==='kicked' || view.status==='closed'){ mjClose(); toast(view.msg || '牌桌已經關了'); sync && sync(); return; }
@@ -193,7 +197,8 @@ function mjApply(view, seq, first){
 async function mjOnline(a, extra){
   if(!MJO || MJO.busy) return;
   MJO.busy = true;
-  try{ const r = await mjCall(a, extra); MJO && mjApply(r.view, null); }catch(e){ mjToast(e.message); }
+  try{ const r = await mjCall(a, extra); if(MJO){ MJO.busy = false; mjApply(r.view, null, false, true); } }
+  catch(e){ mjToast(e.message); if(MJO){ MJO.busy = false; MJO.seq = -1; const q = MJO.queued; MJO.queued = null; if(q) mjApply(q.view, q.seq); mjCall('state').then(r=>MJO && mjApply(r.view, null)).catch(()=>{}); } }
   finally{ if(MJO) MJO.busy = false; }
 }
 function mjCurView(){ return MJG ? mjLocalView() : MJO && MJO.V; }
@@ -211,7 +216,16 @@ function mjConfirmLeave(){
 function mjDo(a){
   const V = mjCurView(); if(!V || V.phase==='end') return;
   mjSel = null;
-  if(MJO) return mjOnline('act', { act: a });
+  if(MJO){
+    // 自己的動作先顯示在畫面上，伺服器確認是在背景做
+    if(MJO.busy) return;
+    const me = V.seats[V.me];
+    if(a.a==='discard'){ const i = me.hand.lastIndexOf(a.t);
+      if(i>=0){ me.hand.splice(i,1); me.n = me.hand.length; me.river.push(a.t); V.last = { t:a.t, from:V.me }; V.drawn = null; V.waiting = []; V.opts = {}; V.turn = -1;
+        mjSfx('tile'); MJO.skipSig = 'discard:' + V.me + ':' + a.t; mjRender(); } }
+    else if(a.a==='pass'){ V.waiting = (V.waiting||[]).filter(j=>j!==V.me); V.opts = {}; mjRender(); }
+    return mjOnline('act', { act: a });
+  }
   try{ MJ.act(MJG, 0, a); mjMiss = 0; mjTick(); }catch(e){ mjToast(e.message); }
 }
 function mjClock(){
@@ -342,7 +356,7 @@ function mjRender(first){
   const e = (V.log||[])[(V.log||[]).length-1], sig = V.handNo + ':' + V.seq + ':' + (e?e.k:'');
   if(e && sig!==mjLastLog){ mjLastLog = sig;
     if(['pon','chi','kan','ankan','kakan','hu','zimo'].includes(e.k)) mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！'}[e.k]);
-    else if(e.k==='discard') mjSfx('tile');
+    else if(e.k==='discard'){ const k = 'discard:' + e.s + ':' + e.t; if(MJO && MJO.skipSig === k) MJO.skipSig = null; else mjSfx('tile'); }
     else if(e.k==='flower') mjShout(e.s, '補花', true);
   }
 }

@@ -746,21 +746,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794410696" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794410793" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794410696" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794410696" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794410793" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794410793" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794410696" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794410793" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794410696" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794410696" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794410793" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794410793" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -777,11 +777,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794410696" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794410793" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794410696";
+const BUILD="1794410793";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3592,8 +3592,12 @@ async function mjOnlineEnter(view){
   MJO.poll = setInterval(()=>{ if(MJO && !MJO.busy && Date.now() - (MJO.at||0) > 5000) mjCall('state').then(r=>MJO && mjApply(r.view, null)).catch(()=>{}); }, 3000);
   if(!mjTimer) mjTimer = setInterval(mjClock, 250);
 }
-function mjApply(view, seq, first){
+function mjApply(view, seq, first, own){
   if(!MJO) return;
+  if(view && seq==null && view.ver!=null) seq = view.ver;
+  // 自己的動作還在送：先把別人的更新存起來，等回覆再一起套用（避免畫面跳回去）
+  if(MJO.busy && !own){ if(view && seq!=null && (!MJO.queued || seq > MJO.queued.seq)) MJO.queued = { view, seq }; return; }
+  if(own && MJO.queued){ const q = MJO.queued; MJO.queued = null; if(q.seq > (seq ?? -1)){ view = q.view; seq = q.seq; } }
   if(!view){ mjClose(); toast('已經離開牌桌'); sync && sync(); return; }
   if(view.status==='kicked' && view.broke) return mjBroke();
   if(view.status==='kicked' || view.status==='closed'){ mjClose(); toast(view.msg || '牌桌已經關了'); sync && sync(); return; }
@@ -3610,7 +3614,8 @@ function mjApply(view, seq, first){
 async function mjOnline(a, extra){
   if(!MJO || MJO.busy) return;
   MJO.busy = true;
-  try{ const r = await mjCall(a, extra); MJO && mjApply(r.view, null); }catch(e){ mjToast(e.message); }
+  try{ const r = await mjCall(a, extra); if(MJO){ MJO.busy = false; mjApply(r.view, null, false, true); } }
+  catch(e){ mjToast(e.message); if(MJO){ MJO.busy = false; MJO.seq = -1; const q = MJO.queued; MJO.queued = null; if(q) mjApply(q.view, q.seq); mjCall('state').then(r=>MJO && mjApply(r.view, null)).catch(()=>{}); } }
   finally{ if(MJO) MJO.busy = false; }
 }
 function mjCurView(){ return MJG ? mjLocalView() : MJO && MJO.V; }
@@ -3628,7 +3633,16 @@ function mjConfirmLeave(){
 function mjDo(a){
   const V = mjCurView(); if(!V || V.phase==='end') return;
   mjSel = null;
-  if(MJO) return mjOnline('act', { act: a });
+  if(MJO){
+    // 自己的動作先顯示在畫面上，伺服器確認是在背景做
+    if(MJO.busy) return;
+    const me = V.seats[V.me];
+    if(a.a==='discard'){ const i = me.hand.lastIndexOf(a.t);
+      if(i>=0){ me.hand.splice(i,1); me.n = me.hand.length; me.river.push(a.t); V.last = { t:a.t, from:V.me }; V.drawn = null; V.waiting = []; V.opts = {}; V.turn = -1;
+        mjSfx('tile'); MJO.skipSig = 'discard:' + V.me + ':' + a.t; mjRender(); } }
+    else if(a.a==='pass'){ V.waiting = (V.waiting||[]).filter(j=>j!==V.me); V.opts = {}; mjRender(); }
+    return mjOnline('act', { act: a });
+  }
   try{ MJ.act(MJG, 0, a); mjMiss = 0; mjTick(); }catch(e){ mjToast(e.message); }
 }
 function mjClock(){
@@ -3759,7 +3773,7 @@ function mjRender(first){
   const e = (V.log||[])[(V.log||[]).length-1], sig = V.handNo + ':' + V.seq + ':' + (e?e.k:'');
   if(e && sig!==mjLastLog){ mjLastLog = sig;
     if(['pon','chi','kan','ankan','kakan','hu','zimo'].includes(e.k)) mjShout(e.s, {pon:'碰！',chi:'吃！',kan:'槓！',ankan:'暗槓！',kakan:'加槓！',hu:'胡了！',zimo:'自摸！'}[e.k]);
-    else if(e.k==='discard') mjSfx('tile');
+    else if(e.k==='discard'){ const k = 'discard:' + e.s + ':' + e.t; if(MJO && MJO.skipSig === k) MJO.skipSig = null; else mjSfx('tile'); }
     else if(e.k==='flower') mjShout(e.s, '補花', true);
   }
 }

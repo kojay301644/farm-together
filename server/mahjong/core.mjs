@@ -145,7 +145,7 @@ export function leave(T, uid, now) {
 }
 
 export function viewFor(T, uid, now) {
-  const base = { tid: T.id, lvl: T.lvl, priv: T.priv, code: T.priv ? T.code : null, host: T.host === uid, status: T.status, now, due: dueAt(T) };
+  const base = { tid: T.id, ver: T.ver || 0, lvl: T.lvl, priv: T.priv, code: T.priv ? T.code : null, host: T.host === uid, status: T.status, now, due: dueAt(T) };
   if (T.status === 'wait') return { ...base, wait: { players: T.state.wait.players.map(p => ({ name: p.name, av: p.av })), startAt: T.state.wait.startAt } };
   if (T.status !== 'play') return base;
   const G = T.state, j = G.uids.indexOf(uid);
