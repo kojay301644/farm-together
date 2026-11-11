@@ -618,6 +618,44 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjbt1{font-size:30px;font-weight:900;color:#D3403A;margin-top:4px}
 .mjbt2{font-size:14px;font-weight:700;color:var(--ink2);margin:6px 0 14px}
 .mjbk .btn{width:100%}
+
+/* ===== 科技感主題（#mj.tech） ===== */
+#mj.tech{background:radial-gradient(ellipse at 50% 30%,#0E1A3A 0%,#060B1E 70%,#03060F 100%)}
+#mj.tech .mjfelt{background:
+  radial-gradient(ellipse at 50% 46%,rgba(0,229,255,.16) 0%,transparent 60%),
+  linear-gradient(rgba(0,229,255,.07) 1px,transparent 1px) 0 0/28px 28px,
+  linear-gradient(90deg,rgba(0,229,255,.07) 1px,transparent 1px) 0 0/28px 28px,
+  linear-gradient(160deg,#0B1F3F,#071330 55%,#050C22);
+  border-radius:26px;box-shadow:inset 0 0 0 2px rgba(0,229,255,.55),inset 0 0 26px rgba(0,229,255,.25),0 0 0 3px #0B1430,0 0 0 5px rgba(160,90,255,.7),0 0 24px 6px rgba(140,80,255,.45)}
+#mj.tech .mjfelt:after{content:"";position:absolute;inset:10px;border-radius:20px;pointer-events:none;
+  background:linear-gradient(90deg,#00E5FF,transparent 18%,transparent 82%,#B26BFF) top/100% 2px no-repeat,linear-gradient(90deg,#B26BFF,transparent 18%,transparent 82%,#00E5FF) bottom/100% 2px no-repeat;opacity:.8}
+#mj.tech .mjc{background:none;filter:none}
+#mj.tech .mjc:before{content:"";position:absolute;inset:0;clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%);
+  background:linear-gradient(135deg,#00E5FF,#7A5CFF 50%,#FF4FD8)}
+#mj.tech .mjc:after{content:"";position:absolute;inset:3px;clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%);
+  background:radial-gradient(circle at 50% 45%,#13305E,#08132E 75%)}
+#mj.tech .mjc{box-shadow:none}
+#mj.tech .mjcc{z-index:2}
+#mj.tech .mjcc .mjrd{color:#7FE9FF}
+#mj.tech .mjcc b{color:#5CF2FF;text-shadow:0 0 10px #00E5FF}
+#mj.tech .mjcw{z-index:3;background:#0A1838;border-color:#00E5FF;color:#9FEFFF;box-shadow:0 0 8px rgba(0,229,255,.6)}
+#mj.tech .mjcw.on{background:#00E5FF;color:#04122A;border-color:#fff;box-shadow:0 0 14px #00E5FF}
+#mj.tech .mjcw.dl{color:#FF9BE6}
+#mj.tech .mjav{background:#0A1838;border-color:#5CF2FF;box-shadow:0 0 0 2px #7A5CFF,0 0 12px rgba(122,92,255,.7)}
+#mj.tech .mjs.on .mjav{border-color:#fff;box-shadow:0 0 0 2px #00E5FF,0 0 22px 6px #00E5FF}
+#mj.tech .mjnm{color:#DDF7FF}
+#mj.tech .mjgd{background:rgba(0,229,255,.12);color:#7FF6FF;border:1px solid rgba(0,229,255,.35)}
+#mj.tech .mjbar2{background:linear-gradient(#0A1430,#050A1C);border-top:1px solid rgba(0,229,255,.4);box-shadow:0 -4px 14px rgba(0,229,255,.15)}
+#mj.tech .mjbt{background:rgba(0,229,255,.1);color:#9FEFFF;border:1px solid rgba(0,229,255,.25)}
+#mj.tech .mjbg{background:rgba(0,229,255,.12);color:#7FF6FF}
+#mj.tech .mjmenu{background:#0A1838;color:#5CF2FF;box-shadow:0 0 0 2px #00E5FF,0 0 14px rgba(0,229,255,.6)}
+#mj.tech .mjbar{background:linear-gradient(90deg,#DDF7FF 0 38%,#7A5CFF 38%);box-shadow:0 0 4px rgba(122,92,255,.7)}
+#mj.tech .mjhid-r .mjbar{background:linear-gradient(270deg,#DDF7FF 0 38%,#7A5CFF 38%)}
+#mj.tech .mt:not([data-t]) svg{filter:hue-rotate(185deg) saturate(1.3) drop-shadow(0 0 3px rgba(0,229,255,.6))}
+#mj.tech .mt.last svg{filter:drop-shadow(0 0 4px #00E5FF) drop-shadow(0 0 2px #00E5FF)}
+#mj.tech .mt.last:after{border-top-color:#00E5FF}
+#mj.tech .mjhint{background:rgba(8,20,48,.92);color:#BDF6FF;border:1px solid rgba(0,229,255,.5);box-shadow:0 0 12px rgba(0,229,255,.35)}
+#mj.tech .mjhint.ting{background:rgba(40,12,60,.92);color:#FFC6F2;border-color:rgba(255,79,216,.6)}
 /* 胡牌慶祝 */
 .mjwin{position:absolute;inset:0;z-index:30;pointer-events:none;overflow:hidden;background:radial-gradient(circle at 50% 46%,rgba(255,220,120,.55),rgba(60,20,0,.55) 70%);animation:mjwbg 2.6s ease-out forwards}
 @keyframes mjwbg{0%{opacity:0}8%{opacity:1}80%{opacity:1}100%{opacity:0}}
@@ -779,21 +817,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794415390" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794415545" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794415390" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794415390" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794415545" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794415545" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794415390" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794415545" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794415390" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794415390" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794415545" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794415545" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -810,11 +848,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794415390" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794415545" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794415390";
+const BUILD="1794415545";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3638,7 +3676,7 @@ function mjBgmSync(){
 document.addEventListener('visibilitychange', mjBgmSync);
 addEventListener('pointerdown', ()=>{ if(mjOn() && MJ_BGM && MJ_BGM.paused && mjBgmOn) mjBgmSync(); }, {passive:true});
 function mjOpenReset(){ mjAnimKey = {}; }
-function mjOpen(){ mjOpenReset(); $('mj').classList.add('on'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = null; mjDiceHand = 0; mjBgmSync(); }
+function mjOpen(){ mjOpenReset(); $('mj').classList.add('on', 'tech'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = null; mjDiceHand = 0; mjBgmSync(); }
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
