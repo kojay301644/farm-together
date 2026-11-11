@@ -514,7 +514,7 @@ function mjDice(d, dealer){
 function mjTurnAlert(){
   const box = $('mjCall'); if(!box) return;
   box.querySelectorAll('.mjturn').forEach(x=>x.remove());
-  const d = document.createElement('div'); d.className = 'mjturn'; d.textContent = '輪到你了！';
+  const d = document.createElement('div'); d.className = 'mjturn' + ((mjCurView()||{}).game==='b2' ? ' b2' : ''); d.textContent = '輪到你了！';   // 大老二用小一點的，不要擋到別人出的牌
   box.appendChild(d); setTimeout(()=>d.remove(), 1900);
   mjSfx('myturn'); try{ if(typeof vib==='function') vib(60); }catch(e){}
 }
