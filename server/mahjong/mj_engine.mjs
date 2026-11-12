@@ -103,6 +103,7 @@ const MJ = (() => {
     return G;
   }
   function startHand(G, rnd = Math.random) {
+    G.tc = null; tc(G);
     const w = []; KINDS.forEach(t => { for (let k = 0; k < 4; k++) w.push(t); }); for (let f = 51; f <= 58; f++) w.push(f);
     G.wall = shuffle(w, rnd); G.handNo++; G.dice = [1,2,3].map(() => 1 + Math.floor(rnd() * 6)); G.result = null; G.last = null; G.pend = null; G.drawn = null; G.kakan = null;
     G.afterKan = false; G.anyClaim = false; G.log = [];
@@ -310,7 +311,7 @@ const MJ = (() => {
     const sc = score(G, si, t, flags);
     if (!flags.self) s.hand.push(t);
     if (!flags.self && from != null && !flags.rob) G.seats[from].river.pop();
-    const T = TABLES[G.table], pay = [0, 0, 0, 0];
+    const T = tc(G), pay = [0, 0, 0, 0];
     const payers = flags.self ? [0, 1, 2, 3].filter(j => j !== si) : [from];
     const lines = [];
     for (const j of payers) {
@@ -319,7 +320,7 @@ const MJ = (() => {
       const want = T.base + tai * T.tai, got = Math.max(0, Math.min(want, G.seats[j].gold));
       pay[j] -= got; pay[si] += got; lines.push({ s: j, tai, amt: got, short: got < want });
     }
-    const rake = Math.floor(pay[si] * RAKE); pay[si] -= rake;
+    const rake = Math.floor(pay[si] * T.rake); pay[si] -= rake;
     pay.forEach((v, j) => G.seats[j].gold += v);
     const dealerTai = (G.lian ? `連${G.lian}拉${G.lian}` : '');
     G.result = { win: si, from: flags.self ? null : from, self: !!flags.self, t, tai: sc.list, total: sc.total, dealer: G.dealer, lian: G.lian, dealerTai, lines, pay, rake,
@@ -444,6 +445,15 @@ const MJ = (() => {
     };
   }
 
-  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, canTing, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
+  // 這一局用的桌子數值（開局時記下來，後台中途改了也不影響這一局）
+  function tc(G) { if (!G.tc) G.tc = Object.assign({}, TABLES[G.table], { rake: API.RAKE }); return G.tc; }
+  // 後台調整（娛樂廳頁）：o = { rake, tables: { n: { base, tai, min }, ... } }；只改數字，桌名不變
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.rake >= 0 && +o.rake < 0.5) API.RAKE = +o.rake;
+    for (const k in (o.tables || {})) if (TABLES[k]) for (const f of ['base','tai','min']) { const v = Math.floor(+o.tables[k][f]); if (v > 0) TABLES[k][f] = v; }
+  }
+  const API = { setCfg, RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, canTing, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
+  return API;
 })();
 export default MJ;

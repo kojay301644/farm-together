@@ -1123,21 +1123,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794473870" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794474566" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794473870" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794473870" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794474566" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794474566" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794473870" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794474566" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794473870" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794473870" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794474566" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794474566" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1154,11 +1154,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794473870" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794474566" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794473870";
+const BUILD="1794474566";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3552,6 +3552,7 @@ const MJ = (() => {
     return G;
   }
   function startHand(G, rnd = Math.random) {
+    G.tc = null; tc(G);
     const w = []; KINDS.forEach(t => { for (let k = 0; k < 4; k++) w.push(t); }); for (let f = 51; f <= 58; f++) w.push(f);
     G.wall = shuffle(w, rnd); G.handNo++; G.dice = [1,2,3].map(() => 1 + Math.floor(rnd() * 6)); G.result = null; G.last = null; G.pend = null; G.drawn = null; G.kakan = null;
     G.afterKan = false; G.anyClaim = false; G.log = [];
@@ -3759,7 +3760,7 @@ const MJ = (() => {
     const sc = score(G, si, t, flags);
     if (!flags.self) s.hand.push(t);
     if (!flags.self && from != null && !flags.rob) G.seats[from].river.pop();
-    const T = TABLES[G.table], pay = [0, 0, 0, 0];
+    const T = tc(G), pay = [0, 0, 0, 0];
     const payers = flags.self ? [0, 1, 2, 3].filter(j => j !== si) : [from];
     const lines = [];
     for (const j of payers) {
@@ -3768,7 +3769,7 @@ const MJ = (() => {
       const want = T.base + tai * T.tai, got = Math.max(0, Math.min(want, G.seats[j].gold));
       pay[j] -= got; pay[si] += got; lines.push({ s: j, tai, amt: got, short: got < want });
     }
-    const rake = Math.floor(pay[si] * RAKE); pay[si] -= rake;
+    const rake = Math.floor(pay[si] * T.rake); pay[si] -= rake;
     pay.forEach((v, j) => G.seats[j].gold += v);
     const dealerTai = (G.lian ? `連${G.lian}拉${G.lian}` : '');
     G.result = { win: si, from: flags.self ? null : from, self: !!flags.self, t, tai: sc.list, total: sc.total, dealer: G.dealer, lian: G.lian, dealerTai, lines, pay, rake,
@@ -3893,7 +3894,16 @@ const MJ = (() => {
     };
   }
 
-  return { RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, canTing, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
+  // 這一局用的桌子數值（開局時記下來，後台中途改了也不影響這一局）
+  function tc(G) { if (!G.tc) G.tc = Object.assign({}, TABLES[G.table], { rake: API.RAKE }); return G.tc; }
+  // 後台調整（娛樂廳頁）：o = { rake, tables: { n: { base, tai, min }, ... } }；只改數字，桌名不變
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.rake >= 0 && +o.rake < 0.5) API.RAKE = +o.rake;
+    for (const k in (o.tables || {})) if (TABLES[k]) for (const f of ['base','tai','min']) { const v = Math.floor(+o.tables[k][f]); if (v > 0) TABLES[k][f] = v; }
+  }
+  const API = { setCfg, RESERVE, KINDS, TABLES, RAKE, WIND, name, isFlower, isHonor, suitOf, canWin, waits, tingTiles, canTing, shanten, decomps, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, score };
+  return API;
 })();
 if (typeof module !== 'undefined') module.exports = MJ;
 /* ================= 遊戲廳・麻將 ================= */
@@ -4021,7 +4031,14 @@ const HALL_FUN = [
   {id:'match3', icon:'🐾', name:'寵物消消樂', desc:'三隻一樣的寵物連成一線就消掉，限時 60 秒', open:true},
   {id:'mole', icon:'🔨', name:'打田鼠', desc:'田鼠冒出來偷菜，快打下去', open:false},
 ];
+// 後台調的各遊戲數值（桌子、抽成、大富翁規則、百家樂籌碼）：進娛樂廳時讀一次（1 分鐘內不重讀）
+let casinoCfgAt = 0;
+async function casinoCfg(force){
+  if(!force && Date.now() - casinoCfgAt < 60000) return; casinoCfgAt = Date.now();
+  try{ const c = await rpc('farm_casino_cfg'); if(c){ MJ.setCfg(c.mj); B2.setCfg(c.b2); TH.setCfg(c.th); MF.setCfg(c.mf); BC.setCfg(c.bc); } }catch(e){ casinoCfgAt = Date.now() - 50000; }   // 失敗：10 秒後再試（不要卡住大廳）
+}
 function openHall(tab){
+  if(Date.now() - casinoCfgAt >= 60000) return casinoCfg().then(()=>openHall(tab));
   tab = tab === 'fun' ? 'fun' : 'casino';
   const L = tab === 'fun' ? HALL_FUN : HALL_GAMES;
   modal('🎰 寵物娛樂廳', `<div class="snav hallnav"><button data-ht="casino" class="${tab==='casino'?'on':''}">🃏 棋牌對戰</button><button data-ht="fun" class="${tab==='fun'?'on':''}">🎮 休閒手感</button></div>
@@ -4611,11 +4628,13 @@ const B2 = (() => {
   function newGame(players, opt = {}) {
     const G = { table: opt.table || 'n', seats: players.map(p => ({ id: p.id, name: p.name, av: p.av, bot: !!p.bot, gold: p.gold || 0, auto: false, hand: [], last: null })),
       handNo: 1, firstDealer: 0, dealer: 0, wind: 0, lian: 0 };
+    G.tc = Object.assign({}, TABLES[G.table], { rake: API.RAKE });
     deal(G, null); G.dealer = G.firstDealer = G.turn;
     return G;
   }
   function nextHand(G) {
     const w = G.result ? G.result.winner : null;
+    G.tc = Object.assign({}, TABLES[G.table], { rake: API.RAKE });   // 這一局用的數值（後台中途改了也不影響這一局）
     G.handNo++; deal(G, w); G.dealer = G.turn;
   }
   const isLead = (G, si) => !G.cur || G.cur.by === si;
@@ -4652,7 +4671,7 @@ const B2 = (() => {
     if (nx === G.cur.by) { G.cur = null; G.seats.forEach(p => { p.last = null; p.out = false; }); G.lead = nx; G.log.push({ k: 'round', s: nx }); }
   }
   function finish(G, w) {
-    const T = TABLES[G.table], pay = [0, 0, 0, 0], lines = [];
+    const T = G.tc || Object.assign({}, TABLES[G.table], { rake: API.RAKE }), pay = [0, 0, 0, 0], lines = [];
     G.seats.forEach((s, j) => {
       if (j === w) return;
       const n = s.hand.length, twos = s.hand.filter(c => rk(c) === 12).length;
@@ -4661,7 +4680,7 @@ const B2 = (() => {
       const want = units * T.per, got = Math.max(0, Math.min(want, s.gold));
       pay[j] -= got; pay[w] += got; lines.push({ s: j, n, twos, mult, units, amt: got, short: got < want });
     });
-    const rake = Math.floor(pay[w] * RAKE); pay[w] -= rake;
+    const rake = Math.floor(pay[w] * T.rake); pay[w] -= rake;
     G.seats.forEach((s, j) => s.gold += pay[j]);
     G.result = { winner: w, pay, rake, lines, hands: G.seats.map(s => s.hand.slice()) };
     G.phase = 'end'; G.turn = -1; G.log.push({ k: 'win', s: w });
@@ -4774,7 +4793,14 @@ const B2 = (() => {
       opts: options(G, si), result: G.result, left: 0,
     };
   }
-  return { RANKS, SUITS, TABLES, RAKE, PETS, rk, st, name, classify, beats, comboName, combos, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view };
+  // 後台調整（娛樂廳頁）：o = { rake, tables: { n: {...}, ... } }；只改數字，桌名不變
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.rake >= 0 && +o.rake < 0.5) API.RAKE = +o.rake;
+    for (const k in (o.tables || {})) if (TABLES[k]) for (const f of ['per','min']) { const v = Math.floor(+o.tables[k][f]); if (v > 0) TABLES[k][f] = v; }
+  }
+  const API = { setCfg, RANKS, SUITS, TABLES, RAKE, PETS, rk, st, name, classify, beats, comboName, combos, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view };
+  return API;
 })();
 if (typeof module !== 'undefined') module.exports = B2;
 /* ---------- 大老二（連線；跟麻將共用牌桌外框、連線流程、結算） ---------- */
@@ -5008,7 +5034,8 @@ const MF = (() => {
   ];
 
   function freshState(G) {
-    G.cash = G.seats.map(() => START_CASH);
+    G.mc = { rake: API.RAKE, start: API.START_CASH, go: API.PASS_GO, rounds: API.ROUNDS, split: API.SPLIT.slice(), fee: TABLES[G.table].fee };   // 這一局用的規則（後台中途改了也不影響這一局）
+    G.cash = G.seats.map(() => G.mc.start);
     G.pos = G.seats.map(() => 0);
     G.own = B.map(() => -1); G.hs = B.map(() => 0); G.mort = B.map(() => false);
     G.rest = G.seats.map(() => false); G.bk = G.seats.map(() => false); G.brokeAt = G.seats.map(() => 0);
@@ -5055,7 +5082,7 @@ const MF = (() => {
   }
 
   function moveTo(G, j, to, passGo) {
-    if (passGo && to < G.pos[j]) { G.cash[j] += PASS_GO; G.log.push({ k: 'go', s: j }); }
+    if (passGo && to < G.pos[j]) { G.cash[j] += mc(G).go; G.log.push({ k: 'go', s: j }); }
     G.pos[j] = (to + N) % N;
     land(G, j);
   }
@@ -5080,7 +5107,7 @@ const MF = (() => {
     else if (c.f === 'pay') pay(G, j, c.v, -1);
     else if (c.f === 'collect') others.forEach(x => pay(G, x, c.v, j));
     else if (c.f === 'payall') others.forEach(x => { if (!G.bk[j]) pay(G, j, c.v, x); });
-    else if (c.f === 'go') { G.cash[j] += PASS_GO; G.pos[j] = 0; }
+    else if (c.f === 'go') { G.cash[j] += mc(G).go; G.pos[j] = 0; }
     else if (c.f === 'rest') G.rest[j] = true;
     else if (c.f === 'repair') { const n = B.reduce((a, x, k) => a + (G.own[k] === j ? G.hs[k] : 0), 0); pay(G, j, n * c.v, -1); }
     else if (c.f === 'move') { const keep = G.card; G.pos[j] = (G.pos[j] + c.v + N) % N; if (B[G.pos[j]].k !== 'chance' && B[G.pos[j]].k !== 'fate') land(G, j); G.card = keep; }
@@ -5091,7 +5118,7 @@ const MF = (() => {
     let nx = G.turn;
     for (let k = 0; k < 4; k++) {
       nx = (nx + 1) % 4;
-      if (nx === G.first) { G.round++; if (G.round > ROUNDS) return finish(G); }
+      if (nx === G.first) { G.round++; if (G.round > mc(G).rounds) return finish(G); }
       if (!G.bk[nx]) break;
     }
     G.turn = nx; G.stage = 'roll'; G.dice = null; G.card = null;
@@ -5134,10 +5161,10 @@ const MF = (() => {
   }
 
   function finish(G) {
-    const T = TABLES[G.table], order = G.seats.map((s, j) => j).sort((a, b) => (G.bk[a] - G.bk[b]) || (G.bk[a] ? G.brokeAt[b] - G.brokeAt[a] : worth(G, b) - worth(G, a)));
+    const T = { fee: mc(G).fee }, order = G.seats.map((s, j) => j).sort((a, b) => (G.bk[a] - G.bk[b]) || (G.bk[a] ? G.brokeAt[b] - G.brokeAt[a] : worth(G, b) - worth(G, a)));
     const fee = G.seats.map(s => Math.min(T.fee, Math.max(0, s.gold)));
-    const pool = fee.reduce((a, x) => a + x, 0), rake = Math.floor(pool * RAKE), net = pool - rake;
-    const prize = [0, 0, 0, 0]; order.forEach((j, r) => { prize[j] = Math.floor(net * SPLIT[r]); });
+    const pool = fee.reduce((a, x) => a + x, 0), rake = Math.floor(pool * mc(G).rake), net = pool - rake;
+    const prize = [0, 0, 0, 0]; order.forEach((j, r) => { prize[j] = Math.floor(net * (mc(G).split[r] || 0)); });
     const pay = G.seats.map((s, j) => prize[j] - fee[j]);
     G.seats.forEach((s, j) => s.gold += pay[j]);
     G.result = { order, worth: G.seats.map((s, j) => Math.round(worth(G, j))), pay, rake, pool, fee: T.fee };
@@ -5171,14 +5198,26 @@ const MF = (() => {
   function view(G, si) {
     return {
       game: 'mf', table: G.table, phase: G.phase, turn: G.turn, me: si, handNo: G.handNo, dealer: G.dealer, firstDealer: G.firstDealer, wind: 0, lian: 0,
-      waiting: waitingOn(G), stage: G.stage, round: G.round, rounds: ROUNDS, dice: G.dice, card: G.card,
+      waiting: waitingOn(G), stage: G.stage, round: G.round, rounds: mc(G).rounds, split: mc(G).split, dice: G.dice, card: G.card,
       cash: G.cash.slice(), pos: G.pos.slice(), own: G.own.slice(), hs: G.hs.slice(), mort: G.mort.slice(), rest: G.rest.slice(), bk: G.bk.slice(),
       worth: G.seats.map((s, j) => Math.round(worth(G, j))), rent: B.map((b, i) => rentOf(G, i)),
       seats: G.seats.map(s => ({ name: s.name, av: s.av, gold: s.gold, bot: s.bot, auto: s.auto })),
       log: G.log.slice(-12), logN: G.log.length, opts: options(G, si), result: G.result, left: 0,
     };
   }
-  return { TABLES, RAKE, START_CASH, PASS_GO, ROUNDS, SPLIT, COLORS, B, N, MAXH, HMUL, houseCost, group, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, rentOf, worth };
+  function mc(G) { return G.mc || { rake: API.RAKE, start: API.START_CASH, go: API.PASS_GO, rounds: API.ROUNDS, split: API.SPLIT, fee: TABLES[G.table].fee }; }
+  // 後台調整（娛樂廳頁）：o = { rake, start, go, rounds, split: [第1名, 第2名]（0～1）, tables: { n: { fee }, ... } }；入座門檻＝報名費
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.rake >= 0 && +o.rake < 0.5) API.RAKE = +o.rake;
+    if (+o.start > 0) API.START_CASH = Math.floor(+o.start);
+    if (+o.go >= 0 && o.go !== '' && o.go != null) API.PASS_GO = Math.floor(+o.go);
+    if (+o.rounds > 0) API.ROUNDS = Math.min(100, Math.floor(+o.rounds));
+    if (Array.isArray(o.split) && o.split.length >= 2) { const a = +o.split[0], b = +o.split[1]; if (a >= 0 && b >= 0 && a + b > 0 && a + b <= 1.0001) API.SPLIT = [a, b, 0, 0]; }
+    for (const k in (o.tables || {})) if (TABLES[k]) { const v = Math.floor(+o.tables[k].fee); if (v > 0) TABLES[k].fee = TABLES[k].min = v; }
+  }
+  const API = { setCfg, TABLES, RAKE, START_CASH, PASS_GO, ROUNDS, SPLIT, COLORS, B, N, MAXH, HMUL, houseCost, group, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, rentOf, worth };
+  return API;
 })();
 if (typeof module !== 'undefined') module.exports = MF;
 /* ---------- 大富翁（農場版）：連線，跟麻將共用牌桌外框、連線流程、結算 ---------- */
@@ -5190,9 +5229,9 @@ const MF_STEP = 260;   // 每走一格多久（毫秒）
 
 function openMfLobby(){
   const gold = S.me.gold;
-  modal('🎲 大富翁', `<div class="rhint">農場版大富翁，2～4 人連線，人不夠由農場電腦補位。每人付報名費進獎池，每人走 ${MF.ROUNDS} 輪後比總資產：第 1 名拿 70%、第 2 名拿 30%（娛樂廳抽 ${Math.round(MF.RAKE*100)}%）。中途離開，這局由系統代打、照樣結算</div>
+  modal('🎲 大富翁', `<div class="rhint">農場版大富翁，2～4 人連線，人不夠由農場電腦補位。每人付報名費進獎池，每人走 ${MF.ROUNDS} 輪後比總資產：第 1 名拿 ${Math.round(MF.SPLIT[0]*100)}%、第 2 名拿 ${Math.round(MF.SPLIT[1]*100)}%（娛樂廳抽 ${Math.round(MF.RAKE*100)}%）。中途離開，這局由系統代打、照樣結算</div>
     <div id="mfBack"></div>
-    ${Object.entries(MF.TABLES).map(([k,t])=>{ const poor = gold<t.min, win = Math.floor(t.fee*4*(1-MF.RAKE)*0.7); return `<div class="mjtb"><div class="mjtbi">${MF_ICON[k]}</div><div class="tx"><b>${t.name}</b>
+    ${Object.entries(MF.TABLES).map(([k,t])=>{ const poor = gold<t.min, win = Math.floor(t.fee*4*(1-MF.RAKE)*MF.SPLIT[0]); return `<div class="mjtb"><div class="mjtbi">${MF_ICON[k]}</div><div class="tx"><b>${t.name}</b>
       <div>報名費 ${t.fee.toLocaleString()} 金</div><div>4 人桌第 1 名拿 ${win.toLocaleString()} 金</div></div>
       <div class="mjtbb"><button class="mini" data-mfq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-mfc="${k}" ${poor?'disabled':''}>開房間</button></div></div>`; }).join('')}
     <div class="mjjoin"><input id="mfCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="mfJoin">加入朋友的房間</button></div>
@@ -5212,7 +5251,7 @@ function mfRules(){
     <p><b>特殊格：</b>❓機會、🎴命運抽卡（有好有壞）；🏪菜市場繳稅；🌾穀倉領錢；🛏️休息站休息一回合；🌀颱風每間溫室要付修理費；🅿️免費停車沒事。</p>
     <p><b>錢不夠：</b>系統會自動賣掉溫室、把地抵押給銀行換錢；還是不夠就破產出局。抵押的地之後可以付 55% 贖回。</p>
     <p><b>結束：</b>每人走 ${MF.ROUNDS} 輪，或只剩一人沒破產。比總資產（現金＋地＋溫室）排名。</p>
-    <p><b>獎池：</b>每人付的報名費（農場金幣）進獎池，娛樂廳抽 ${Math.round(MF.RAKE*100)}%，剩下第 1 名拿 70%、第 2 名拿 30%。</p>
+    <p><b>獎池：</b>每人付的報名費（農場金幣）進獎池，娛樂廳抽 ${Math.round(MF.RAKE*100)}%，剩下第 1 名拿 ${Math.round(MF.SPLIT[0]*100)}%、第 2 名拿 ${Math.round(MF.SPLIT[1]*100)}%。</p>
     <p><b>時間：</b>每個動作 15 秒，沒動作系統自動幫你（擲骰子、不買、結束回合）。</p></div>`;
   if(mjOn()) return mjPanel('📖 大富翁怎麼玩', body, [['知道了','',mjPanelClose]]);
   modal('📖 大富翁怎麼玩', body, [['知道了','',openMfLobby]]);
@@ -5360,7 +5399,7 @@ function mfResultHtml(V){
   const rows = r.order.map((j, k)=>{ const s = V.seats[j], v = r.pay[j];
     return `<div class="mjpr${j===V.me?' me':''}"><img src="${avSrc(s.av)}" alt=""><span>${['🥇','🥈','3️⃣','4️⃣'][k]} ${esc(s.name)}<small class="b2why">總資產 ${r.worth[j].toLocaleString()}${V.bk[j]?'（破產）':''}</small></span><b class="${v>0?'up':v<0?'dn':''}">${v>0?'+':''}${v.toLocaleString()}</b></div>`; }).join('');
   return `<div class="mjres"><div class="mjrc${r.order[0]===V.me?' mine':''}"><div class="mjrl1"><div class="mjrt">🏆 ${esc(w.name)} 贏了！</div>
-    <div class="mjrs">獎池 ${r.pool.toLocaleString()} 金（報名費 ${T.fee.toLocaleString()} × ${V.seats.length}），第 1 名 70%、第 2 名 30%</div></div>
+    <div class="mjrs">獎池 ${r.pool.toLocaleString()} 金（報名費 ${(r.fee||T.fee).toLocaleString()} × ${V.seats.length}），第 1 名 ${Math.round((V.split||MF.SPLIT)[0]*100)}%、第 2 名 ${Math.round((V.split||MF.SPLIT)[1]*100)}%</div></div>
     <div class="mjrl2"><div class="mjpay">${rows}</div>${r.rake?`<div class="mjrk">娛樂廳場地費 ${Math.round(MF.RAKE*100)}%：${r.rake.toLocaleString()} 金</div>`:''}${btns}</div></div></div>`;
 }
 /* 百家樂規則引擎：前端、伺服器共用
@@ -5411,7 +5450,13 @@ const BC = (() => {
     }
     return d;
   }
-  return { TABLES, LIMIT, BOT_LIMIT, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
+  // 後台調整（娛樂廳頁）：o = { min, chips: [100, 500, ...] }（最多 7 種籌碼）
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.min > 0) TABLES.n.min = Math.floor(+o.min);
+    if (Array.isArray(o.chips)) { const c = [...new Set(o.chips.map(x => Math.floor(+x)).filter(x => x > 0))].sort((a, b) => a - b).slice(0, 7); if (c.length) TABLES.n.chips = c; }
+  }
+  return { setCfg, TABLES, LIMIT, BOT_LIMIT, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
 })();
 if (typeof module !== 'undefined') module.exports = BC;
 /* ---------- 百家樂（多人同桌，跟系統對賭；共用麻將的牌桌外框、連線流程） ---------- */
@@ -5620,7 +5665,8 @@ const HOLD = (() => {
 
   function canStart(G) { return G.seats.filter(p => p && !p.sitOut && p.stack > 0).length >= 2; }
   function startHand(G) {
-    const T = TABLES[G.table];
+    G.tc = Object.assign({}, TABLES[G.table], { rake: API.RAKE, cap: API.RAKE_CAP_BB });   // 這一手用的數值（後台中途改了也不影響這一手）
+    const T = G.tc;
     G.seats.forEach(p => { if (!p) return; Object.assign(p, { inHand: !p.sitOut && p.stack > 0, folded: false, allin: false, bet: 0, put: 0, hole: [], acted: false, last: null, start: p.stack, shown: false }); });
     const inn = i => G.seats[i] && G.seats[i].inHand;
     G.handNo++; G.board = []; G.result = null; G.deck = shuffle(); G.log = [{ k: 'hand' }];
@@ -5642,7 +5688,7 @@ const HOLD = (() => {
   }
   function nextStreet(G) {
     G.seats.forEach(p => { if (p) { p.bet = 0; p.acted = false; if (p.inHand && !p.folded && !p.allin) p.last = null; } });
-    G.curBet = 0; G.minRaise = TABLES[G.table].bb;
+    G.curBet = 0; G.minRaise = thT(G).bb;
     const deal = n => { for (let k = 0; k < n; k++) G.board.push(G.deck.pop()); };
     if (G.street === 'pre') { deal(3); G.street = 'flop'; }
     else if (G.street === 'flop') { deal(1); G.street = 'turn'; }
@@ -5681,7 +5727,8 @@ const HOLD = (() => {
     G.turn = nextFrom(G, si, i => canAct(G, i));
   }
   // 抽成：看過翻牌才抽，底池 5%，最多 3 個大盲
-  function rakeOf(G, total) { return G.board.length >= 3 ? Math.min(Math.floor(total * RAKE), TABLES[G.table].bb * RAKE_CAP_BB) : 0; }
+  function thT(G) { return G.tc || Object.assign({}, TABLES[G.table], { rake: API.RAKE, cap: API.RAKE_CAP_BB }); }
+  function rakeOf(G, total) { const T = thT(G); return G.board.length >= 3 ? Math.min(Math.floor(total * T.rake), T.bb * T.cap) : 0; }
   function showdown(G) {
     while (G.board.length < 5) G.board.push(G.deck.pop());
     const alive = G.seats.map((p, i) => i).filter(i => live(G, i));
@@ -5742,7 +5789,7 @@ const HOLD = (() => {
   }
   function botDecide(G, si) {
     const o = options(G, si); if (!o) return null;
-    const p = G.seats[si], T = TABLES[G.table], r = Math.random(), bb = T.bb;
+    const p = G.seats[si], T = thT(G), r = Math.random(), bb = T.bb;
     const opp = G.seats.filter((q, i) => i !== si && q && q.inHand && !q.folded).length;
     const nIn = G.seats.filter(q => q && q.inHand).length;
     const posLate = ((si - G.button + SEATS) % SEATS) === 0 || ((si - G.button + SEATS) % SEATS) >= nIn - 1;   // 莊家位或最後幾個：可以玩鬆一點
@@ -5778,7 +5825,16 @@ const HOLD = (() => {
     const o = options(G, si); act(G, si, { a: o && o.canCheck ? 'check' : 'fold' }); return true;   // 超時：能過牌就過，不然棄牌
   }
   function waitingOn(G) { return G.turn >= 0 && ['pre', 'flop', 'turn', 'river'].includes(G.street) ? [G.turn] : []; }
-  return { TABLES, SEATS, HAND, v, su, eval5, best, cmp, newTable, canStart, startHand, act, options, botDecide, autoAct, waitingOn };
+  // 後台調整（娛樂廳頁）：o = { rake, cap, tables: { n: { sb, bb, min }, ... } }；帶入籌碼範圍跟著大盲算（20～100 個大盲）
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.rake >= 0 && +o.rake < 0.5) API.RAKE = +o.rake;
+    if (+o.cap > 0) API.RAKE_CAP_BB = +o.cap;
+    for (const k in (o.tables || {})) if (TABLES[k]) for (const f of ['sb','bb','min']) { const v = Math.floor(+o.tables[k][f]); if (v > 0) TABLES[k][f] = v; }
+    Object.values(TABLES).forEach(t => { t.buyMin = t.bb * 20; t.buyMax = t.bb * 100; });
+  }
+  const API = { setCfg, RAKE, RAKE_CAP_BB, TABLES, SEATS, HAND, v, su, eval5, best, cmp, newTable, canStart, startHand, act, options, botDecide, autoAct, waitingOn };
+  return API;
 })();
 if (typeof module !== 'undefined') module.exports = HOLD;
 /* ---------- 德州撲克（6 人桌，無限注；共用麻將的牌桌外框、連線流程） ---------- */

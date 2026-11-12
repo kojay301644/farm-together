@@ -7,9 +7,9 @@ const MF_STEP = 260;   // 每走一格多久（毫秒）
 
 function openMfLobby(){
   const gold = S.me.gold;
-  modal('🎲 大富翁', `<div class="rhint">農場版大富翁，2～4 人連線，人不夠由農場電腦補位。每人付報名費進獎池，每人走 ${MF.ROUNDS} 輪後比總資產：第 1 名拿 70%、第 2 名拿 30%（娛樂廳抽 ${Math.round(MF.RAKE*100)}%）。中途離開，這局由系統代打、照樣結算</div>
+  modal('🎲 大富翁', `<div class="rhint">農場版大富翁，2～4 人連線，人不夠由農場電腦補位。每人付報名費進獎池，每人走 ${MF.ROUNDS} 輪後比總資產：第 1 名拿 ${Math.round(MF.SPLIT[0]*100)}%、第 2 名拿 ${Math.round(MF.SPLIT[1]*100)}%（娛樂廳抽 ${Math.round(MF.RAKE*100)}%）。中途離開，這局由系統代打、照樣結算</div>
     <div id="mfBack"></div>
-    ${Object.entries(MF.TABLES).map(([k,t])=>{ const poor = gold<t.min, win = Math.floor(t.fee*4*(1-MF.RAKE)*0.7); return `<div class="mjtb"><div class="mjtbi">${MF_ICON[k]}</div><div class="tx"><b>${t.name}</b>
+    ${Object.entries(MF.TABLES).map(([k,t])=>{ const poor = gold<t.min, win = Math.floor(t.fee*4*(1-MF.RAKE)*MF.SPLIT[0]); return `<div class="mjtb"><div class="mjtbi">${MF_ICON[k]}</div><div class="tx"><b>${t.name}</b>
       <div>報名費 ${t.fee.toLocaleString()} 金</div><div>4 人桌第 1 名拿 ${win.toLocaleString()} 金</div></div>
       <div class="mjtbb"><button class="mini" data-mfq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-mfc="${k}" ${poor?'disabled':''}>開房間</button></div></div>`; }).join('')}
     <div class="mjjoin"><input id="mfCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="mfJoin">加入朋友的房間</button></div>
@@ -29,7 +29,7 @@ function mfRules(){
     <p><b>特殊格：</b>❓機會、🎴命運抽卡（有好有壞）；🏪菜市場繳稅；🌾穀倉領錢；🛏️休息站休息一回合；🌀颱風每間溫室要付修理費；🅿️免費停車沒事。</p>
     <p><b>錢不夠：</b>系統會自動賣掉溫室、把地抵押給銀行換錢；還是不夠就破產出局。抵押的地之後可以付 55% 贖回。</p>
     <p><b>結束：</b>每人走 ${MF.ROUNDS} 輪，或只剩一人沒破產。比總資產（現金＋地＋溫室）排名。</p>
-    <p><b>獎池：</b>每人付的報名費（農場金幣）進獎池，娛樂廳抽 ${Math.round(MF.RAKE*100)}%，剩下第 1 名拿 70%、第 2 名拿 30%。</p>
+    <p><b>獎池：</b>每人付的報名費（農場金幣）進獎池，娛樂廳抽 ${Math.round(MF.RAKE*100)}%，剩下第 1 名拿 ${Math.round(MF.SPLIT[0]*100)}%、第 2 名拿 ${Math.round(MF.SPLIT[1]*100)}%。</p>
     <p><b>時間：</b>每個動作 15 秒，沒動作系統自動幫你（擲骰子、不買、結束回合）。</p></div>`;
   if(mjOn()) return mjPanel('📖 大富翁怎麼玩', body, [['知道了','',mjPanelClose]]);
   modal('📖 大富翁怎麼玩', body, [['知道了','',openMfLobby]]);
@@ -177,6 +177,6 @@ function mfResultHtml(V){
   const rows = r.order.map((j, k)=>{ const s = V.seats[j], v = r.pay[j];
     return `<div class="mjpr${j===V.me?' me':''}"><img src="${avSrc(s.av)}" alt=""><span>${['🥇','🥈','3️⃣','4️⃣'][k]} ${esc(s.name)}<small class="b2why">總資產 ${r.worth[j].toLocaleString()}${V.bk[j]?'（破產）':''}</small></span><b class="${v>0?'up':v<0?'dn':''}">${v>0?'+':''}${v.toLocaleString()}</b></div>`; }).join('');
   return `<div class="mjres"><div class="mjrc${r.order[0]===V.me?' mine':''}"><div class="mjrl1"><div class="mjrt">🏆 ${esc(w.name)} 贏了！</div>
-    <div class="mjrs">獎池 ${r.pool.toLocaleString()} 金（報名費 ${T.fee.toLocaleString()} × ${V.seats.length}），第 1 名 70%、第 2 名 30%</div></div>
+    <div class="mjrs">獎池 ${r.pool.toLocaleString()} 金（報名費 ${(r.fee||T.fee).toLocaleString()} × ${V.seats.length}），第 1 名 ${Math.round((V.split||MF.SPLIT)[0]*100)}%、第 2 名 ${Math.round((V.split||MF.SPLIT)[1]*100)}%</div></div>
     <div class="mjrl2"><div class="mjpay">${rows}</div>${r.rake?`<div class="mjrk">娛樂廳場地費 ${Math.round(MF.RAKE*100)}%：${r.rake.toLocaleString()} 金</div>`:''}${btns}</div></div></div>`;
 }

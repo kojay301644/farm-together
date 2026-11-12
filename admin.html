@@ -127,15 +127,58 @@ let csDays = 1, csGame = '', csQ = '';
 const csAmt = v => `<b style="color:${v>0?'#1E9E55':v<0?'#D3403A':'#666'}">${v>0?'+':''}${(v||0).toLocaleString()}</b>`;
 // 停在娛樂廳頁面時每 30 秒自動更新（看單一玩家、正在打搜尋字、切到別的分頁時不更新）
 let csTimer = 0, csList = false;
-// 百家樂每個押注區的單注上限（0＝不限）
+// 娛樂廳各遊戲的調整：桌子數值、抽成、大富翁規則、百家樂（籌碼、單注上限）、休閒小遊戲獎勵
 let csLimDirty = false;
+const CS_TB = { n:'新手桌', m:'中級桌', h:'高手桌', r:'土豪桌' };
 function csLimCard(CF){
   if(!CF || !CF.settings) return '';
-  const v = k => +(((CF.settings||[]).find(x=>x.key==='bc_lim_'+k)||{}).value||0);
-  const A = [['p','閒'],['b','莊'],['t','和'],['pp','閒對'],['bp','莊對']];
-  return `<div class="card"><h2>🎴 百家樂單注上限</h2><div class="muted" style="margin-bottom:8px">每個押注區、每位玩家每局最多押多少金幣。0＝不限（只受身上金幣限制）。電腦玩家固定照舊（閒、莊 2 萬，其他 1 萬），不受這裡影響。</div>
-    <div class="row" style="gap:10px;flex-wrap:wrap;align-items:flex-end">${A.map(([k,n])=>`<label style="display:flex;flex-direction:column;gap:4px;font-weight:700">${n}<input class="num" type="number" min="0" step="1000" data-bl="${k}" value="${v(k)}" style="width:110px"></label>`).join('')}
-    <button class="btn" id="blSave">💾 儲存</button></div></div>`;
+  const st = k => ((CF.settings||[]).find(x=>x.key===k)||{}).value;
+  const cc = st('casino_cfg') || {};
+  const get = path => path.split('.').reduce((o,k)=>o==null?undefined:o[k], cc);
+  const inp = (path, w, pct) => { const v = get(path); return `<input class="num" type="number" min="0" step="any" data-cc="${path}"${pct?' data-pct="1"':''} value="${v==null?'':pct?Math.round(v*1000)/10:v}" style="width:${w||78}px">`; };
+  const pct = (path) => `${inp(path, 64, true)} %`;
+  const tbl = (g, cols) => `<table class="tb" style="margin-top:6px"><tr><th>桌</th>${cols.map(c=>`<th>${c[1]}</th>`).join('')}</tr>${Object.keys((cc[g]||{}).tables||{}).map(k=>`<tr><td style="white-space:nowrap">${CS_TB[k]||k}</td>${cols.map(c=>`<td>${inp(`${g}.tables.${k}.${c[0]}`)}</td>`).join('')}</tr>`).join('')}</table>`;
+  const sec = (t, body) => `<div style="flex:1;min-width:300px;border:1px solid var(--line);border-radius:12px;padding:10px 12px"><h3 style="margin:0 0 6px;font-size:15px">${t}</h3>${body}</div>`;
+  const lim = k => +(st('bc_lim_'+k)||0);
+  const LA = [['p','閒'],['b','莊'],['t','和'],['pp','閒對'],['bp','莊對']];
+  const mini = [['run','🏃 寵物跑酷','run_coin_gold','撿 1 枚金幣換幾金'],['stair','🪜 寵物下樓梯','stair_floor_gold','每下 1 層換幾金'],['match','🐾 寵物消消樂','match_gold_per100','每 100 分換幾金']];
+  const ms = k => `<input class="num" type="number" min="0" step="any" data-ms="${k}" value="${st(k)??''}" style="width:90px">`;
+  const mw = (g) => { const rw = st(g+'_week_rw') || []; return [0,1,2].map(i=>`<div class="row" style="gap:4px;margin:3px 0">${['🥇','🥈','🥉'][i]} 金 <input class="num" type="number" min="0" data-mw="${g}|${i}|gold" value="${(rw[i]||{}).gold||0}" style="width:90px"> 💎 <input class="num" type="number" min="0" data-mw="${g}|${i}|gems" value="${(rw[i]||{}).gems||0}" style="width:64px"></div>`).join(''); };
+  return `<div class="card"><h2>🎮 各遊戲調整 <span class="muted" style="font-size:12px;font-weight:400">改完按最下面「儲存」。牌桌類是新開的那一局才生效，正在打的那一局照舊</span></h2>
+    <div class="row" style="gap:10px;flex-wrap:wrap;align-items:flex-start">
+    ${sec('🀄 麻將', `抽成 ${pct('mj.rake')}　<span class="muted">贏家獎金抽多少當場地費</span>${tbl('mj', [['base','底'],['tai','每台'],['min','入座門檻']])}`)}
+    ${sec('🃏 大老二', `抽成 ${pct('b2.rake')}${tbl('b2', [['per','每張'],['min','入座門檻']])}`)}
+    ${sec('♠️ 德州撲克', `抽成 ${pct('th.rake')}　每手最多抽 ${inp('th.cap',60)} 個大盲<div class="muted">帶入籌碼固定 20～100 個大盲</div>${tbl('th', [['sb','小盲'],['bb','大盲'],['min','入座門檻']])}`)}
+    ${sec('🎲 大富翁', `抽成 ${pct('mf.rake')}　玩 ${inp('mf.rounds',60)} 輪<br>起始現金 ${inp('mf.start')}　經過起點領 ${inp('mf.go')}<br>獎池：第 1 名 ${pct('mf.split.0')}　第 2 名 ${pct('mf.split.1')}<div class="muted">兩個加起來不能超過 100%；入座門檻＝報名費</div>${tbl('mf', [['fee','報名費']])}`)}
+    ${sec('🎴 百家樂', `入場門檻 ${inp('bc.min')}<br>籌碼面額（逗號隔開，最多 7 種）<br><input data-chips="1" value="${((cc.bc||{}).chips||[]).join(', ')}" style="width:100%;margin:4px 0 8px">
+      <b>單注上限</b> <span class="muted">每個押注區、每位玩家每局最多押多少；0＝不限。電腦玩家固定照舊</span>
+      <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:4px">${LA.map(([k,n])=>`<label style="display:flex;flex-direction:column;gap:2px;font-weight:700">${n}<input class="num" type="number" min="0" step="1000" data-bl="${k}" value="${lim(k)}" style="width:96px"></label>`).join('')}</div>`)}
+    </div>
+    <h3 style="margin:14px 0 6px;font-size:15px">休閒手感小遊戲</h3>
+    <div class="row" style="gap:10px;flex-wrap:wrap;align-items:flex-start">
+    ${mini.map(([g,t,rk,rn])=>sec(t, `${rn} ${ms(rk)}<br>每天最多換 ${ms(g+'_daily_gold')} 金<div style="margin-top:6px"><b>每週前 3 名獎勵</b>${mw(g)}</div>`)).join('')}
+    </div>
+    <div style="margin-top:12px"><button class="btn" id="blSave">💾 儲存全部調整</button></div></div>`;
+}
+async function csCfgSave(CF){
+  const st = k => ((CF.settings||[]).find(x=>x.key===k)||{}).value;
+  const cc = JSON.parse(JSON.stringify(st('casino_cfg') || {}));
+  for(const i of document.querySelectorAll('[data-cc]')){
+    if(i.value === '') continue;
+    let v = +i.value; if(!(v >= 0)) throw new Error('數字不對：' + i.dataset.cc);
+    if(i.dataset.pct) v = Math.round(v * 10) / 1000;
+    const ks = i.dataset.cc.split('.'); let o = cc; ks.slice(0,-1).forEach((k, n)=>{ if(o[k]==null) o[k] = /^\d+$/.test(ks[n+1]) ? [] : {}; o = o[k]; }); o[ks[ks.length-1]] = v;
+  }
+  for(const g of ['mj','b2','th','mf']) if(cc[g] && cc[g].rake >= 0.5) throw new Error('抽成要小於 50%');
+  if(cc.mf && cc.mf.split && (+cc.mf.split[0]) + (+cc.mf.split[1]) > 1.0001) throw new Error('大富翁第 1、2 名加起來不能超過 100%');
+  const ch = document.querySelector('[data-chips]'); if(ch){ const c = ch.value.split(/[,，\s]+/).map(x=>Math.floor(+x)).filter(x=>x>0); if(!c.length) throw new Error('至少要有一種籌碼'); if(c.length > 7) throw new Error('籌碼最多 7 種'); cc.bc = Object.assign(cc.bc||{}, { chips: [...new Set(c)].sort((a,b)=>a-b) }); }
+  await rpc('adm_setting_put', { p_key: 'casino_cfg', p_value: cc });
+  for(const i of document.querySelectorAll('[data-bl]')) await rpc('adm_setting_set',{p_key:'bc_lim_'+i.dataset.bl,p_value:Math.max(0, Math.floor(+i.value||0))});
+  for(const i of document.querySelectorAll('[data-ms]')) if(i.value !== '' && +i.value !== +st(i.dataset.ms)) await rpc('adm_setting_set',{p_key:i.dataset.ms,p_value:Math.max(0, +i.value)});
+  for(const g of ['run','stair','match']){
+    const old = st(g+'_week_rw') || [], rw = [0,1,2].map(n=>({ gold: Math.max(0, Math.floor(+document.querySelector(`[data-mw="${g}|${n}|gold"]`).value||0)), gems: Math.max(0, Math.floor(+document.querySelector(`[data-mw="${g}|${n}|gems"]`).value||0)) }));
+    if(JSON.stringify(rw) !== JSON.stringify(old.map(x=>({gold:+x.gold||0,gems:+x.gems||0})))) await rpc('adm_setting_put',{p_key:g+'_week_rw',p_value:rw});
+  }
 }
 async function pageCs(quiet){
   clearInterval(csTimer); csList = true;
@@ -160,8 +203,8 @@ async function pageCs(quiet){
   document.querySelectorAll('[data-cd]').forEach(b=>b.onclick=()=>{ csDays=+b.dataset.cd; pageCs(); });
   document.querySelectorAll('[data-cg]').forEach(b=>b.onclick=()=>{ csGame=b.dataset.cg; pageCs(); });
   $('csGo').onclick = ()=>{ csQ = $('csQ').value.trim(); pageCs(); };
-  document.querySelectorAll('[data-bl]').forEach(i=>i.oninput=()=>{ csLimDirty = true; });
-  if($('blSave')) $('blSave').onclick = async()=>{ try{ for(const i of document.querySelectorAll('[data-bl]')) await rpc('adm_setting_set',{p_key:'bc_lim_'+i.dataset.bl,p_value:Math.max(0, Math.floor(+i.value||0))}); csLimDirty = false; toast('已儲存，下一次下注就生效'); pageCs(true); }catch(e){ toast(e.message); } };
+  document.querySelectorAll('[data-cc],[data-bl],[data-ms],[data-mw],[data-chips]').forEach(i=>i.oninput=()=>{ csLimDirty = true; });
+  if($('blSave')) $('blSave').onclick = async()=>{ const b = $('blSave'); b.disabled = true; try{ await csCfgSave(CF); csLimDirty = false; toast('已儲存，新開的那一局就生效'); pageCs(true); }catch(e){ toast(e.message); } b.disabled = false; };
   $('csQ').onkeydown = e=>{ if(e.key==='Enter') $('csGo').click(); };
   document.querySelectorAll('[data-cp]').forEach(a=>a.onclick=e=>{ e.preventDefault(); csPlayer(a.dataset.cp); });
   if(quiet===true) scrollTo(0, y);   // 自動更新不要跳回最上面
@@ -316,7 +359,7 @@ async function mktAdmin(R){
 }
 async function pageCf(){
   const C = await rpc('adm_config'), SIGN=((C.settings||[]).find(x=>x.key==='sign_rw')||{}).value||[], GB=((C.settings||[]).find(x=>x.key==='gold_bags')||{}).value||[];
-  M(`<div class="savebar"><span id="dirtyN">沒有未儲存的修改</span><button class="btn" id="saveAll">💾 全部儲存</button></div><div class="card"><h2>玩法設定</h2><table>${C.settings.filter(s=>typeof s.value==='number' && !/^(ev_|maint_|bot_last_run|evo_|bc_lim_)/.test(s.key)).map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
+  M(`<div class="savebar"><span id="dirtyN">沒有未儲存的修改</span><button class="btn" id="saveAll">💾 全部儲存</button></div><div class="card"><h2>玩法設定</h2><table>${C.settings.filter(s=>typeof s.value==='number' && !/^(ev_|maint_|bot_last_run|evo_|bc_lim_|run_|stair_|match_)/.test(s.key)).map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>✍️ 七天簽到獎勵</h2><div class="muted" style="margin-bottom:8px">連續簽到第 1～7 天各送什麼，不送就留空或填 0；道具、種子各可選一種。中斷一天會從第 1 天重新開始。改完按「儲存簽到獎勵」，玩家重新整理後就會看到。</div>
     <table><tr><th>天數</th><th>金幣</th><th>鑽石</th><th>道具</th><th>數量</th><th>種子</th><th>數量</th></tr>${[0,1,2,3,4,5,6].map(i=>{ const r=(SIGN[i]||{}), it=Object.entries(r.items||{})[0]||['',''], sd=Object.entries(r.seeds||{})[0]||['',''];
       return `<tr data-signrow><td><b>第 ${i+1} 天</b></td><td><input class="num" id="sg_${i}_gold" type="number" value="${r.gold??''}"></td><td><input class="num" id="sg_${i}_gems" type="number" value="${r.gems??''}"></td>

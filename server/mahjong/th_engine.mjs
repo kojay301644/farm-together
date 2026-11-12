@@ -50,7 +50,8 @@ const HOLD = (() => {
 
   function canStart(G) { return G.seats.filter(p => p && !p.sitOut && p.stack > 0).length >= 2; }
   function startHand(G) {
-    const T = TABLES[G.table];
+    G.tc = Object.assign({}, TABLES[G.table], { rake: API.RAKE, cap: API.RAKE_CAP_BB });   // 這一手用的數值（後台中途改了也不影響這一手）
+    const T = G.tc;
     G.seats.forEach(p => { if (!p) return; Object.assign(p, { inHand: !p.sitOut && p.stack > 0, folded: false, allin: false, bet: 0, put: 0, hole: [], acted: false, last: null, start: p.stack, shown: false }); });
     const inn = i => G.seats[i] && G.seats[i].inHand;
     G.handNo++; G.board = []; G.result = null; G.deck = shuffle(); G.log = [{ k: 'hand' }];
@@ -72,7 +73,7 @@ const HOLD = (() => {
   }
   function nextStreet(G) {
     G.seats.forEach(p => { if (p) { p.bet = 0; p.acted = false; if (p.inHand && !p.folded && !p.allin) p.last = null; } });
-    G.curBet = 0; G.minRaise = TABLES[G.table].bb;
+    G.curBet = 0; G.minRaise = thT(G).bb;
     const deal = n => { for (let k = 0; k < n; k++) G.board.push(G.deck.pop()); };
     if (G.street === 'pre') { deal(3); G.street = 'flop'; }
     else if (G.street === 'flop') { deal(1); G.street = 'turn'; }
@@ -111,7 +112,8 @@ const HOLD = (() => {
     G.turn = nextFrom(G, si, i => canAct(G, i));
   }
   // 抽成：看過翻牌才抽，底池 5%，最多 3 個大盲
-  function rakeOf(G, total) { return G.board.length >= 3 ? Math.min(Math.floor(total * RAKE), TABLES[G.table].bb * RAKE_CAP_BB) : 0; }
+  function thT(G) { return G.tc || Object.assign({}, TABLES[G.table], { rake: API.RAKE, cap: API.RAKE_CAP_BB }); }
+  function rakeOf(G, total) { const T = thT(G); return G.board.length >= 3 ? Math.min(Math.floor(total * T.rake), T.bb * T.cap) : 0; }
   function showdown(G) {
     while (G.board.length < 5) G.board.push(G.deck.pop());
     const alive = G.seats.map((p, i) => i).filter(i => live(G, i));
@@ -172,7 +174,7 @@ const HOLD = (() => {
   }
   function botDecide(G, si) {
     const o = options(G, si); if (!o) return null;
-    const p = G.seats[si], T = TABLES[G.table], r = Math.random(), bb = T.bb;
+    const p = G.seats[si], T = thT(G), r = Math.random(), bb = T.bb;
     const opp = G.seats.filter((q, i) => i !== si && q && q.inHand && !q.folded).length;
     const nIn = G.seats.filter(q => q && q.inHand).length;
     const posLate = ((si - G.button + SEATS) % SEATS) === 0 || ((si - G.button + SEATS) % SEATS) >= nIn - 1;   // 莊家位或最後幾個：可以玩鬆一點
@@ -208,6 +210,15 @@ const HOLD = (() => {
     const o = options(G, si); act(G, si, { a: o && o.canCheck ? 'check' : 'fold' }); return true;   // 超時：能過牌就過，不然棄牌
   }
   function waitingOn(G) { return G.turn >= 0 && ['pre', 'flop', 'turn', 'river'].includes(G.street) ? [G.turn] : []; }
-  return { TABLES, SEATS, HAND, v, su, eval5, best, cmp, newTable, canStart, startHand, act, options, botDecide, autoAct, waitingOn };
+  // 後台調整（娛樂廳頁）：o = { rake, cap, tables: { n: { sb, bb, min }, ... } }；帶入籌碼範圍跟著大盲算（20～100 個大盲）
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.rake >= 0 && +o.rake < 0.5) API.RAKE = +o.rake;
+    if (+o.cap > 0) API.RAKE_CAP_BB = +o.cap;
+    for (const k in (o.tables || {})) if (TABLES[k]) for (const f of ['sb','bb','min']) { const v = Math.floor(+o.tables[k][f]); if (v > 0) TABLES[k][f] = v; }
+    Object.values(TABLES).forEach(t => { t.buyMin = t.bb * 20; t.buyMax = t.bb * 100; });
+  }
+  const API = { setCfg, RAKE, RAKE_CAP_BB, TABLES, SEATS, HAND, v, su, eval5, best, cmp, newTable, canStart, startHand, act, options, botDecide, autoAct, waitingOn };
+  return API;
 })();
-export default HOLD;
+export default TH;

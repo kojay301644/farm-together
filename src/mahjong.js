@@ -123,7 +123,14 @@ const HALL_FUN = [
   {id:'match3', icon:'🐾', name:'寵物消消樂', desc:'三隻一樣的寵物連成一線就消掉，限時 60 秒', open:true},
   {id:'mole', icon:'🔨', name:'打田鼠', desc:'田鼠冒出來偷菜，快打下去', open:false},
 ];
+// 後台調的各遊戲數值（桌子、抽成、大富翁規則、百家樂籌碼）：進娛樂廳時讀一次（1 分鐘內不重讀）
+let casinoCfgAt = 0;
+async function casinoCfg(force){
+  if(!force && Date.now() - casinoCfgAt < 60000) return; casinoCfgAt = Date.now();
+  try{ const c = await rpc('farm_casino_cfg'); if(c){ MJ.setCfg(c.mj); B2.setCfg(c.b2); TH.setCfg(c.th); MF.setCfg(c.mf); BC.setCfg(c.bc); } }catch(e){ casinoCfgAt = Date.now() - 50000; }   // 失敗：10 秒後再試（不要卡住大廳）
+}
 function openHall(tab){
+  if(Date.now() - casinoCfgAt >= 60000) return casinoCfg().then(()=>openHall(tab));
   tab = tab === 'fun' ? 'fun' : 'casino';
   const L = tab === 'fun' ? HALL_FUN : HALL_GAMES;
   modal('🎰 寵物娛樂廳', `<div class="snav hallnav"><button data-ht="casino" class="${tab==='casino'?'on':''}">🃏 棋牌對戰</button><button data-ht="fun" class="${tab==='fun'?'on':''}">🎮 休閒手感</button></div>

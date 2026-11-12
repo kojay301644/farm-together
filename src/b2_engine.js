@@ -63,11 +63,13 @@ const B2 = (() => {
   function newGame(players, opt = {}) {
     const G = { table: opt.table || 'n', seats: players.map(p => ({ id: p.id, name: p.name, av: p.av, bot: !!p.bot, gold: p.gold || 0, auto: false, hand: [], last: null })),
       handNo: 1, firstDealer: 0, dealer: 0, wind: 0, lian: 0 };
+    G.tc = Object.assign({}, TABLES[G.table], { rake: API.RAKE });
     deal(G, null); G.dealer = G.firstDealer = G.turn;
     return G;
   }
   function nextHand(G) {
     const w = G.result ? G.result.winner : null;
+    G.tc = Object.assign({}, TABLES[G.table], { rake: API.RAKE });   // 這一局用的數值（後台中途改了也不影響這一局）
     G.handNo++; deal(G, w); G.dealer = G.turn;
   }
   const isLead = (G, si) => !G.cur || G.cur.by === si;
@@ -104,7 +106,7 @@ const B2 = (() => {
     if (nx === G.cur.by) { G.cur = null; G.seats.forEach(p => { p.last = null; p.out = false; }); G.lead = nx; G.log.push({ k: 'round', s: nx }); }
   }
   function finish(G, w) {
-    const T = TABLES[G.table], pay = [0, 0, 0, 0], lines = [];
+    const T = G.tc || Object.assign({}, TABLES[G.table], { rake: API.RAKE }), pay = [0, 0, 0, 0], lines = [];
     G.seats.forEach((s, j) => {
       if (j === w) return;
       const n = s.hand.length, twos = s.hand.filter(c => rk(c) === 12).length;
@@ -113,7 +115,7 @@ const B2 = (() => {
       const want = units * T.per, got = Math.max(0, Math.min(want, s.gold));
       pay[j] -= got; pay[w] += got; lines.push({ s: j, n, twos, mult, units, amt: got, short: got < want });
     });
-    const rake = Math.floor(pay[w] * RAKE); pay[w] -= rake;
+    const rake = Math.floor(pay[w] * T.rake); pay[w] -= rake;
     G.seats.forEach((s, j) => s.gold += pay[j]);
     G.result = { winner: w, pay, rake, lines, hands: G.seats.map(s => s.hand.slice()) };
     G.phase = 'end'; G.turn = -1; G.log.push({ k: 'win', s: w });
@@ -226,6 +228,13 @@ const B2 = (() => {
       opts: options(G, si), result: G.result, left: 0,
     };
   }
-  return { RANKS, SUITS, TABLES, RAKE, PETS, rk, st, name, classify, beats, comboName, combos, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view };
+  // 後台調整（娛樂廳頁）：o = { rake, tables: { n: {...}, ... } }；只改數字，桌名不變
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.rake >= 0 && +o.rake < 0.5) API.RAKE = +o.rake;
+    for (const k in (o.tables || {})) if (TABLES[k]) for (const f of ['per','min']) { const v = Math.floor(+o.tables[k][f]); if (v > 0) TABLES[k][f] = v; }
+  }
+  const API = { setCfg, RANKS, SUITS, TABLES, RAKE, PETS, rk, st, name, classify, beats, comboName, combos, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view };
+  return API;
 })();
 if (typeof module !== 'undefined') module.exports = B2;

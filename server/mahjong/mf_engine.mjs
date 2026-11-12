@@ -59,7 +59,8 @@ const MF = (() => {
   ];
 
   function freshState(G) {
-    G.cash = G.seats.map(() => START_CASH);
+    G.mc = { rake: API.RAKE, start: API.START_CASH, go: API.PASS_GO, rounds: API.ROUNDS, split: API.SPLIT.slice(), fee: TABLES[G.table].fee };   // 這一局用的規則（後台中途改了也不影響這一局）
+    G.cash = G.seats.map(() => G.mc.start);
     G.pos = G.seats.map(() => 0);
     G.own = B.map(() => -1); G.hs = B.map(() => 0); G.mort = B.map(() => false);
     G.rest = G.seats.map(() => false); G.bk = G.seats.map(() => false); G.brokeAt = G.seats.map(() => 0);
@@ -106,7 +107,7 @@ const MF = (() => {
   }
 
   function moveTo(G, j, to, passGo) {
-    if (passGo && to < G.pos[j]) { G.cash[j] += PASS_GO; G.log.push({ k: 'go', s: j }); }
+    if (passGo && to < G.pos[j]) { G.cash[j] += mc(G).go; G.log.push({ k: 'go', s: j }); }
     G.pos[j] = (to + N) % N;
     land(G, j);
   }
@@ -131,7 +132,7 @@ const MF = (() => {
     else if (c.f === 'pay') pay(G, j, c.v, -1);
     else if (c.f === 'collect') others.forEach(x => pay(G, x, c.v, j));
     else if (c.f === 'payall') others.forEach(x => { if (!G.bk[j]) pay(G, j, c.v, x); });
-    else if (c.f === 'go') { G.cash[j] += PASS_GO; G.pos[j] = 0; }
+    else if (c.f === 'go') { G.cash[j] += mc(G).go; G.pos[j] = 0; }
     else if (c.f === 'rest') G.rest[j] = true;
     else if (c.f === 'repair') { const n = B.reduce((a, x, k) => a + (G.own[k] === j ? G.hs[k] : 0), 0); pay(G, j, n * c.v, -1); }
     else if (c.f === 'move') { const keep = G.card; G.pos[j] = (G.pos[j] + c.v + N) % N; if (B[G.pos[j]].k !== 'chance' && B[G.pos[j]].k !== 'fate') land(G, j); G.card = keep; }
@@ -142,7 +143,7 @@ const MF = (() => {
     let nx = G.turn;
     for (let k = 0; k < 4; k++) {
       nx = (nx + 1) % 4;
-      if (nx === G.first) { G.round++; if (G.round > ROUNDS) return finish(G); }
+      if (nx === G.first) { G.round++; if (G.round > mc(G).rounds) return finish(G); }
       if (!G.bk[nx]) break;
     }
     G.turn = nx; G.stage = 'roll'; G.dice = null; G.card = null;
@@ -185,10 +186,10 @@ const MF = (() => {
   }
 
   function finish(G) {
-    const T = TABLES[G.table], order = G.seats.map((s, j) => j).sort((a, b) => (G.bk[a] - G.bk[b]) || (G.bk[a] ? G.brokeAt[b] - G.brokeAt[a] : worth(G, b) - worth(G, a)));
+    const T = { fee: mc(G).fee }, order = G.seats.map((s, j) => j).sort((a, b) => (G.bk[a] - G.bk[b]) || (G.bk[a] ? G.brokeAt[b] - G.brokeAt[a] : worth(G, b) - worth(G, a)));
     const fee = G.seats.map(s => Math.min(T.fee, Math.max(0, s.gold)));
-    const pool = fee.reduce((a, x) => a + x, 0), rake = Math.floor(pool * RAKE), net = pool - rake;
-    const prize = [0, 0, 0, 0]; order.forEach((j, r) => { prize[j] = Math.floor(net * SPLIT[r]); });
+    const pool = fee.reduce((a, x) => a + x, 0), rake = Math.floor(pool * mc(G).rake), net = pool - rake;
+    const prize = [0, 0, 0, 0]; order.forEach((j, r) => { prize[j] = Math.floor(net * (mc(G).split[r] || 0)); });
     const pay = G.seats.map((s, j) => prize[j] - fee[j]);
     G.seats.forEach((s, j) => s.gold += pay[j]);
     G.result = { order, worth: G.seats.map((s, j) => Math.round(worth(G, j))), pay, rake, pool, fee: T.fee };
@@ -222,13 +223,25 @@ const MF = (() => {
   function view(G, si) {
     return {
       game: 'mf', table: G.table, phase: G.phase, turn: G.turn, me: si, handNo: G.handNo, dealer: G.dealer, firstDealer: G.firstDealer, wind: 0, lian: 0,
-      waiting: waitingOn(G), stage: G.stage, round: G.round, rounds: ROUNDS, dice: G.dice, card: G.card,
+      waiting: waitingOn(G), stage: G.stage, round: G.round, rounds: mc(G).rounds, split: mc(G).split, dice: G.dice, card: G.card,
       cash: G.cash.slice(), pos: G.pos.slice(), own: G.own.slice(), hs: G.hs.slice(), mort: G.mort.slice(), rest: G.rest.slice(), bk: G.bk.slice(),
       worth: G.seats.map((s, j) => Math.round(worth(G, j))), rent: B.map((b, i) => rentOf(G, i)),
       seats: G.seats.map(s => ({ name: s.name, av: s.av, gold: s.gold, bot: s.bot, auto: s.auto })),
       log: G.log.slice(-12), logN: G.log.length, opts: options(G, si), result: G.result, left: 0,
     };
   }
-  return { TABLES, RAKE, START_CASH, PASS_GO, ROUNDS, SPLIT, COLORS, B, N, MAXH, HMUL, houseCost, group, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, rentOf, worth };
+  function mc(G) { return G.mc || { rake: API.RAKE, start: API.START_CASH, go: API.PASS_GO, rounds: API.ROUNDS, split: API.SPLIT, fee: TABLES[G.table].fee }; }
+  // 後台調整（娛樂廳頁）：o = { rake, start, go, rounds, split: [第1名, 第2名]（0～1）, tables: { n: { fee }, ... } }；入座門檻＝報名費
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.rake >= 0 && +o.rake < 0.5) API.RAKE = +o.rake;
+    if (+o.start > 0) API.START_CASH = Math.floor(+o.start);
+    if (+o.go >= 0 && o.go !== '' && o.go != null) API.PASS_GO = Math.floor(+o.go);
+    if (+o.rounds > 0) API.ROUNDS = Math.min(100, Math.floor(+o.rounds));
+    if (Array.isArray(o.split) && o.split.length >= 2) { const a = +o.split[0], b = +o.split[1]; if (a >= 0 && b >= 0 && a + b > 0 && a + b <= 1.0001) API.SPLIT = [a, b, 0, 0]; }
+    for (const k in (o.tables || {})) if (TABLES[k]) { const v = Math.floor(+o.tables[k].fee); if (v > 0) TABLES[k].fee = TABLES[k].min = v; }
+  }
+  const API = { setCfg, TABLES, RAKE, START_CASH, PASS_GO, ROUNDS, SPLIT, COLORS, B, N, MAXH, HMUL, houseCost, group, newGame, nextHand, act, options, botDecide, autoAct, waitingOn, view, rentOf, worth };
+  return API;
 })();
 export default MF;

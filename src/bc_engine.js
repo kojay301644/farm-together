@@ -46,6 +46,12 @@ const BC = (() => {
     }
     return d;
   }
-  return { TABLES, LIMIT, BOT_LIMIT, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
+  // 後台調整（娛樂廳頁）：o = { min, chips: [100, 500, ...] }（最多 7 種籌碼）
+  function setCfg(o) {
+    if (!o) return;
+    if (+o.min > 0) TABLES.n.min = Math.floor(+o.min);
+    if (Array.isArray(o.chips)) { const c = [...new Set(o.chips.map(x => Math.floor(+x)).filter(x => x > 0))].sort((a, b) => a - b).slice(0, 7); if (c.length) TABLES.n.chips = c; }
+  }
+  return { setCfg, TABLES, LIMIT, BOT_LIMIT, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
 })();
 if (typeof module !== 'undefined') module.exports = BC;

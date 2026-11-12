@@ -218,10 +218,13 @@ async function handle(uid: string, b: any, test = false) {
   throw new Fail('不支援的動作');
 }
 
-// 讀後台設定：維護開關、百家樂每個押注區的單注上限（0＝不限）
+// 讀後台設定：維護開關、各遊戲調整、百家樂每個押注區的單注上限（0＝不限）
 async function loadCfg() {
-  const { data: cfg } = await sb.from('settings').select('key,value').in('key', ['mj_on', ...BC_LIM_KEYS]);
-  const cf: Record<string, string> = {}; (cfg || []).forEach((r: any) => { cf[r.key] = String(r.value); });
+  const { data: cfg } = await sb.from('settings').select('key,value').in('key', ['mj_on', 'casino_cfg', ...BC_LIM_KEYS]);
+  const cf: Record<string, string> = {}; let cc: any = null;
+  (cfg || []).forEach((r: any) => { if (r.key === 'casino_cfg') cc = r.value; else cf[r.key] = String(r.value); });
+  // 各遊戲的桌子數值、抽成、大富翁規則、百家樂籌碼（後台娛樂廳頁設定）
+  if (cc) { try { MJ.setCfg(cc.mj); B2.setCfg(cc.b2); TH.setCfg(cc.th); MF.setCfg(cc.mf); BC.setCfg(cc.bc); } catch (e) { console.error('casino_cfg', e); } }
   for (const k of Object.keys(BC.LIMIT)) { const v = +(cf['bc_lim_' + k] ?? 0); BC.LIMIT[k] = v > 0 ? v : Infinity; }
   return cf;
 }
