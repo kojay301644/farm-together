@@ -153,11 +153,12 @@ const MF = (() => {
     if (G.phase !== 'play') throw new Error('這局已經結束');
     if (G.turn !== si) throw new Error('還沒輪到你');
     if (G.bk[si]) throw new Error('你已經破產了');
+    G.mvMs = 0;   // 棋子走路的時間：電腦要等走完才做下一步
     if (a.a === 'roll') {
       if (G.stage === 'skip') { G.log.push({ k: 'skip', s: si }); return endTurn(G); }
       if (G.stage !== 'roll') throw new Error('已經擲過骰子了');
       const d = [1 + Math.floor(Math.random() * 6), 1 + Math.floor(Math.random() * 6)];
-      G.dice = d; G.log.push({ k: 'roll', s: si, d });
+      G.dice = d; G.log.push({ k: 'roll', s: si, d }); G.mvMs = (d[0] + d[1]) * 260;
       const to = (G.pos[si] + d[0] + d[1]) % N;
       moveTo(G, si, to, true);
       if (G.bk[si]) return endTurn(G);

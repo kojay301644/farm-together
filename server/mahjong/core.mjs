@@ -138,7 +138,7 @@ function _advance(T, now, gold) {
     let acted = false;
     for (const j of w) {
       const s = G.seats[j], bot = !G.uids[j] || s.auto || s.ting;   // 報聽的人由系統自動處理
-      const due = bot ? G.tAct + (G.phase === 'claim' ? TIME.BOT_CLAIM : TIME.BOT_PLAY) : G.tWait + (G.phase === 'claim' ? TIME.CLAIM : turnMs(T));
+      const due = bot ? G.tAct + (G.mvMs || 0) + (G.phase === 'claim' ? TIME.BOT_CLAIM : TIME.BOT_PLAY) : G.tWait + (G.phase === 'claim' ? TIME.CLAIM : turnMs(T));
       if (now >= due || fast()) {
         if (bot) E(T).autoAct(G, j, !!(!G.uids[j] || s.auto || s.ting));
         else if (G.phase === 'claim') E(T).autoAct(G, j, false);   // 吃碰胡沒點：當作不要，不算超時
@@ -159,7 +159,7 @@ function _dueAt(T) {
   let best = Infinity;
   for (const j of E(T).waitingOn(G)) {
     const bot = !G.uids[j] || G.seats[j].auto || G.seats[j].ting;
-    const due = bot ? G.tAct + (G.phase === 'claim' ? TIME.BOT_CLAIM : TIME.BOT_PLAY) : G.tWait + (G.phase === 'claim' ? TIME.CLAIM : turnMs(T));
+    const due = bot ? G.tAct + (G.mvMs || 0) + (G.phase === 'claim' ? TIME.BOT_CLAIM : TIME.BOT_PLAY) : G.tWait + (G.phase === 'claim' ? TIME.CLAIM : turnMs(T));
     best = Math.min(best, due);
   }
   return best === Infinity ? null : best;

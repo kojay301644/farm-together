@@ -2,7 +2,8 @@
 const MF_ICON = {n:'🌱', m:'🌻', h:'🏆'};
 const MF_PC = ['#E84B4B', '#3B82F6', '#22A55B', '#F59E0B'];   // 四個座位的顏色
 const MF_SP = {go:'🏁', chance:'❓', fate:'🎴', tax:'🏪', rest:'🛏️', park:'🅿️', barn:'🌾', storm:'🌀'};
-let mfLastPos = null, mfLastHand = 0;
+let mfLastPos = null, mfLastHand = 0, mfMoves = {};
+const MF_STEP = 260;   // 每走一格多久（毫秒）
 
 function openMfLobby(){
   const gold = S.me.gold;
@@ -106,17 +107,31 @@ function mfRender(V){
     <div class="mjbme${wl.includes(ME)&&V.phase==='play'?' on':''}"><img src="${avSrc(me.av)}" alt=""><b>${esc(me.name)}</b><span class="mjbg">${me.gold.toLocaleString()}</span></div>
     <div class="mjbt r">${T.name}・大富翁</div>`;
 
-  // 棋子移動動畫：從上一格一路跳過去
-  if(mfLastHand !== V.handNo){ mfLastHand = V.handNo; mfLastPos = null; }
+  // 棋子移動動畫：一格一格跳過去。畫面每次更新都會重畫棋子，所以走到一半的動畫要接著播（不然會直接跳到終點）
+  if(mfLastHand !== V.handNo){ mfLastHand = V.handNo; mfLastPos = null; mfMoves = {}; }
+  const now = performance.now();
   if(mfLastPos) V.pos.forEach((p, j) => { const q = mfLastPos[j]; if(q == null || q === p || V.bk[j]) return;
-    const el = felt.querySelector(`[data-tok="${j}"]`); if(!el) return;
-    const steps = (p - q + MF.N) % MF.N; if(steps > 12) return;
-    const path = Array.from({length: steps}, (_, k) => mfXY((q + k + 1) % MF.N));
-    const [x0, y0] = mfXY(q), left0 = parseFloat(el.style.left) - mfXY(p)[0]*ts, top0 = parseFloat(el.style.top) - mfXY(p)[1]*ts;
-    const frames = [[x0, y0]].concat(path).map(([x, y]) => ({ left: (x*ts + left0) + 'px', top: (y*ts + top0) + 'px' }));
-    try{ el.animate(frames, { duration: 160 * steps, easing: 'linear' }); }catch(e){}
+    const steps = (p - q + MF.N) % MF.N;
+    const prev = mfMoves[j], t0 = prev ? Math.max(now, prev.t0 + prev.dur) : now;   // 上一段還沒走完就排在後面
+    if(steps > 12){ mfMoves[j] = { q, p, steps: 0, t0, dur: 0, warp: true }; return; }   // 卡片傳送：直接過去
+    mfMoves[j] = { q, p, steps, t0, dur: MF_STEP * steps };
   });
   mfLastPos = V.pos.slice();
+  for(const j in mfMoves){
+    const m = mfMoves[j], el = felt.querySelector(`[data-tok="${j}"]`);
+    if(now >= m.t0 + m.dur + 50){ delete mfMoves[j]; continue; }
+    if(!el || m.warp) continue;
+    const [px, py] = mfXY(m.p), offL = parseFloat(el.style.left) - px*ts, offT = parseFloat(el.style.top) - py*ts;
+    const pts = [mfXY(m.q)].concat(Array.from({length: m.steps}, (_, k) => mfXY((m.q + k + 1) % MF.N)));
+    const frames = [];
+    pts.forEach(([x, y], k) => {
+      const L = x*ts + offL, T = y*ts + offT;
+      if(k > 0){ const [x1, y1] = pts[k-1]; frames.push({ left: ((x1 + x) / 2 * ts + offL) + 'px', top: ((y1 + y) / 2 * ts + offT - ts * 0.28) + 'px', offset: (k - 0.5) / m.steps, easing: 'ease-in' }); }
+      frames.push({ left: L + 'px', top: T + 'px', offset: m.steps ? k / m.steps : 1, easing: 'ease-out' });
+    });
+    try{ el.style.transition = 'none'; const a = el.animate(frames, { duration: m.dur, delay: Math.max(0, m.t0 - now), fill: 'backwards' }); a.currentTime = Math.max(0, now - m.t0); }catch(e){}
+    if(m.t0 > now - 30 && !m.sfx){ m.sfx = 1; for(let k = 0; k < m.steps; k++) setTimeout(()=>{ try{ sfx('tap'); }catch(e){} }, m.t0 - now + MF_STEP * (k + 1) - 40); }
+  }
 
   // 結算
   const endKey = V.phase==='end' ? 'mf:' + V.handNo : '';
