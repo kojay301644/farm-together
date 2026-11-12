@@ -127,7 +127,7 @@ const HALL_FUN = [
 let casinoCfgAt = 0;
 async function casinoCfg(force){
   if(!force && Date.now() - casinoCfgAt < 60000) return; casinoCfgAt = Date.now();
-  try{ const c = await rpc('farm_casino_cfg'); if(c){ MJ.setCfg(c.mj); B2.setCfg(c.b2); TH.setCfg(c.th); MF.setCfg(c.mf); BC.setCfg(c.bc); } }catch(e){ casinoCfgAt = Date.now() - 50000; }   // 失敗：10 秒後再試（不要卡住大廳）
+  try{ const c = await rpc('farm_casino_cfg'); if(c){ MJ.setCfg(c.mj); B2.setCfg(c.b2); HOLD.setCfg(c.th); MF.setCfg(c.mf); BC.setCfg(c.bc); } }catch(e){ casinoCfgAt = Date.now() - 50000; }   // 失敗：10 秒後再試（不要卡住大廳）
 }
 function openHall(tab){
   if(Date.now() - casinoCfgAt >= 60000) return casinoCfg().then(()=>openHall(tab));

@@ -221,4 +221,4 @@ const HOLD = (() => {
   const API = { setCfg, RAKE, RAKE_CAP_BB, TABLES, SEATS, HAND, v, su, eval5, best, cmp, newTable, canStart, startHand, act, options, botDecide, autoAct, waitingOn };
   return API;
 })();
-export default TH;
+export default HOLD;
