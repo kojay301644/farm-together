@@ -33,8 +33,9 @@ async function stairStart(){
   gameTouchLock(el); try{ scrollTo(0, 0); }catch(e){}
   el.innerHTML = `<canvas id="stC"></canvas><div class="rnhud"><span id="stF">地下 0 層</span><span class="sthp" id="stHp"></span><button id="stX">✕</button></div>
     <div id="stMsg" class="rnmsg">按 ◀ ▶ 開始！</div>
-    <button class="stbtn l" id="stL">◀</button><button class="stbtn r" id="stR">▶</button><div id="stEnd"></div>`;
+    <button class="stbtn l" id="stL"><i>◀</i></button><button class="stbtn r" id="stR"><i>▶</i></button><div id="stEnd"></div>`;
   el.classList.add('on'); document.body.classList.add('mjon');
+  el.style.backgroundImage = `url(${A('backdrop')}), linear-gradient(#3f9be8, #8fcdfb 55%, #d6efff)`;   // 外面的農場遠景用 CSS 畫，不用每格重畫
   const pet = new Image(); pet.src = chrSrc((S && S.me && S.me.chara) || 'bunny1');
   if(!ST.img){ ST.img = {}; ['backdrop','isl0','isl1','isl2'].forEach(n => { const i = new Image(); i.src = A(n); ST.img[n] = i; }); }
   // 遠景浮島＋雲（跟農場一樣的天空），慢慢往上飄
@@ -45,7 +46,7 @@ async function stairStart(){
   // 一開始的平台：前幾層都是田埂，寵物站在中間那塊
   for(let y = 150, i = 0; y < ST.H + ST.GAP; y += ST.GAP, i++) SR.plats.push(stairPlat(y, i < 6 ? 'n' : null, i===2 ? ST.W/2 - ST.PW/2 : null));
   SR.on = SR.plats[2]; SR.y = SR.on.y;
-  const cv = $('stC'), fit = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; cv.style.width = innerWidth+'px'; cv.style.height = innerHeight+'px'; stairLayout(); };
+  const fit = () => stairLayout();
   fit(); SR.fit = fit; addEventListener('resize', fit);
   // 按住按鈕：手機用 touch 事件（iPhone 長按 pointer 會被取消），電腦用滑鼠
   const hold = (id, k) => { const b = $(id);
@@ -64,7 +65,7 @@ async function stairStart(){
 }
 // 直式：場地加高，上面留給血條、下面留給按鈕；橫式：場地在中間，按鈕在兩邊
 function stairLayout(){
-  const w = innerWidth, h = innerHeight, dpr = devicePixelRatio, el = $('stair');
+  const w = innerWidth, h = innerHeight, dpr = Math.min(2, devicePixelRatio || 1), el = $('stair');
   const port = h > w * 1.15;
   if(el) el.classList.toggle('port', port);
   let sc, ox, oy;
@@ -76,7 +77,17 @@ function stairLayout(){
     ST.H = 520; sc = Math.min(h / ST.H, w / ST.W);
     ox = (w - ST.W * sc) / 2; oy = (h - ST.H * sc) / 2;
   }
-  ST.L = { sc: sc * dpr, ox: ox * dpr, oy: oy * dpr, port };
+  // 畫布只蓋場地那一塊（像素少很多，手機比較順）
+  const cv = $('stC'), cwc = ST.W * sc, chc = ST.H * sc;
+  if(cv){ cv.width = Math.round(cwc * dpr); cv.height = Math.round(chc * dpr); Object.assign(cv.style, { left: ox + 'px', top: oy + 'px', width: cwc + 'px', height: chc + 'px' }); }
+  ST.L = { sc: sc * dpr, ox: 0, oy: 0, port };
+  // 按鈕的感應區做大：橫式＝場地兩邊整塊，直式＝下面左右各一半
+  const L = $('stL'), R = $('stR');
+  if(L && R){
+    const set = (b, x, y, ww, hh) => Object.assign(b.style, { left: x + 'px', top: y + 'px', width: ww + 'px', height: hh + 'px' });
+    if(port){ const y0 = oy + chc + 4; set(L, 0, y0, w / 2, h - y0); set(R, w / 2, y0, w / 2, h - y0); }
+    else { const sw = Math.max(90, ox - 12), y0 = Math.min(90, h * 0.22); set(L, 0, y0, sw, h - y0); set(R, w - sw, y0, sw, h - y0); }
+  }
 }
 function stairGo(){ const r = SR; if(!r || r.over || r.started) return; r.started = true; r.last = performance.now(); $('stMsg').style.display = 'none'; }
 
@@ -158,15 +169,9 @@ function stairLoop(now){
 
 /* ---------- 畫 ---------- */
 function stairDraw(r, cv, now){
-  const ctx = cv.getContext('2d'), cw = cv.width, ch = cv.height;
+  const ctx = cv.getContext('2d');
   if(!ST.L) stairLayout();
   const { sc, ox, oy } = ST.L;
-  ctx.setTransform(1,0,0,1,0,0);
-  // 外面：農場的遠景（瀑布、浮島、草地）
-  const bd = ST.img && ST.img.backdrop;
-  const sky0 = ctx.createLinearGradient(0, 0, 0, ch); sky0.addColorStop(0, '#3f9be8'); sky0.addColorStop(.55, '#8fcdfb'); sky0.addColorStop(1, '#d6efff');
-  ctx.fillStyle = sky0; ctx.fillRect(0, 0, cw, ch);
-  if(bd && bd.complete && bd.naturalWidth){ const k = Math.max(cw / bd.naturalWidth, ch / bd.naturalHeight); ctx.drawImage(bd, (cw - bd.naturalWidth * k) / 2, ch - bd.naturalHeight * k, bd.naturalWidth * k, bd.naturalHeight * k); }
   ctx.setTransform(sc, 0, 0, sc, ox, oy);
   ctx.save(); ctx.beginPath(); ctx.rect(0, 0, ST.W, ST.H); ctx.clip();
   // 裡面：農場的天空，雲和浮島慢慢往上飄
@@ -204,9 +209,7 @@ function stairDraw(r, cv, now){
   if(r.flash > 0){ ctx.fillStyle = `rgba(255,60,60,${r.flash})`; ctx.fillRect(0, 0, ST.W, ST.H); }
   ctx.restore();
   // 兩邊的木框
-  ctx.fillStyle = '#8A5A2B'; ctx.fillRect(-8, 0, 8, ST.H); ctx.fillRect(ST.W, 0, 8, ST.H);
-  ctx.fillStyle = '#6CC04A'; ctx.fillRect(-8, 0, 8, 6); ctx.fillRect(ST.W, 0, 8, 6);
-  ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 1; ctx.strokeRect(-8, 0, ST.W + 16, ST.H);
+  ctx.fillStyle = '#8A5A2B'; ctx.fillRect(0, 0, 6, ST.H); ctx.fillRect(ST.W - 6, 0, 6, ST.H);
   // HUD（有變才改）
   const f = Math.floor(r.scroll / ST.GAP);
   if(f !== r.fShown){ r.fShown = f; const e = $('stF'); if(e) e.textContent = `地下 ${f.toLocaleString()} 層`; }

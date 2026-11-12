@@ -511,15 +511,15 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 .rnbtn{display:flex;gap:8px;margin-top:12px}.rnbtn .btn{flex:1}
 .rnhd{display:flex;gap:8px;margin-bottom:10px}.rnhd>div{flex:1;background:#FFF1D6;border-radius:14px;padding:8px 10px;text-align:center}.rnhd small{display:block;color:var(--ink2);font-weight:700;font-size:12px}.rnhd b{display:block;font-size:18px;color:#7A4B25}
 .rnl{max-height:40vh;overflow:auto}.rnr{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid #EFE4D2;font-weight:800}.rnr b{width:26px;text-align:center;color:#B07A00}.rnr img{width:30px;height:30px;border-radius:50%}.rnr span{flex:1}.rnr em{font-style:normal;color:#E07A1F}.rnr.me{background:#FFF4D9;border-radius:10px}
-#stair{position:fixed;inset:0;z-index:70;display:none;background:#8fcdfb;touch-action:none;user-select:none;-webkit-user-select:none}#stair.on{display:block}
-#stair canvas{position:absolute;inset:0;display:block}
+#stair{position:fixed;inset:0;z-index:70;display:none;background:#8fcdfb;background-size:cover,cover;background-position:center bottom,center;overscroll-behavior:none;touch-action:none;user-select:none;-webkit-user-select:none}#stair.on{display:block}
+#stair canvas{position:absolute;display:block;box-shadow:0 0 0 2px rgba(0,0,0,.2)}
 .sthp{gap:2px!important;padding:8px 10px!important}.sthp i{display:block;width:8px;height:14px;border-radius:3px;background:#E6D8C4}.sthp i.on{background:#4CC36B}.sthp i.on.lo{background:#E8534A}
-.stbtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.85);color:#7A4B25;font-size:34px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.25);touch-action:none;-webkit-tap-highlight-color:transparent;z-index:2}
-.stbtn.l{left:calc(env(safe-area-inset-left,0px) + 18px)}.stbtn.r{right:calc(env(safe-area-inset-right,0px) + 18px)}.stbtn.on{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.25);background:#FFE7A8}
-#stair.port .stbtn{width:96px;height:96px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}#stair.port .stbtn.l{left:calc(50% - 120px)}#stair.port .stbtn.r{right:calc(50% - 120px)}
-/* iPhone 橫式：Safari 會把貼著螢幕上緣、下緣的點擊拿去叫出網址列，所以按鈕、✕、結算按鈕都要離邊緣遠一點 */
+.stbtn{position:absolute;border:0;background:none;padding:0;margin:0;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;z-index:2;display:flex;align-items:center;justify-content:center}
+.stbtn i{font-style:normal;display:grid;place-items:center;width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.85);color:#7A4B25;font-size:34px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.25);pointer-events:none}
+.stbtn.on i{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.25);background:#FFE7A8}
+#stair.port .stbtn i{width:96px;height:96px}
+/* iPhone 橫式：Safari 會把貼著螢幕上緣、下緣的點擊拿去叫出網址列，所以 ✕、結算按鈕都要離邊緣遠一點 */
 @media (orientation:landscape) and (max-height:540px){
-  #stair .stbtn{bottom:auto;top:50%;margin-top:-30px}
   #run .rnhud,#stair .rnhud{top:calc(env(safe-area-inset-top,0px) + 36px)}
   .rnres{padding:10px 16px 12px;width:min(360px,80vw)}.rnres h3{font-size:18px}.rnbig{font-size:32px}.rnline{margin:3px 0}.rnline small{width:auto}.rnbtn{margin-top:8px}
 }
