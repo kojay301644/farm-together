@@ -73,12 +73,17 @@ function _adv(T, now) {
   // 剛才的動作已經結束這局／有人離桌：把紀錄和要換回的金幣交給 index.ts
   if (G.pendingLog) { out.log = G.pendingLog; G.pendingLog = null; }
   if (G.refund) { for (const [u, x] of Object.entries(G.refund)) out.bank[u] = (out.bank[u] || 0) + x; G.refund = null; }
-  for (let k = 0; k < 60; k++) {
+  for (let k = 0; k < 400; k++) {
     if (T.status !== 'play') break;
+    // 真人都按了離開：沒人會再來推進，直接讓電腦把這局打完、換回籌碼、關桌（不然籌碼會卡在桌上）
+    const fast = !G.seats.some(p => p && p.uid && !p.leaving) && !(G.queue || []).length;
     if (!inHand(G)) {
-      if (now < G.nextAt) break;
+      if (now < G.nextAt && !fast) break;
       cleanup(G, now, out);
-      if (!humansIn(G) && !G.queue.length) { T.status = 'closed'; break; }
+      if (!humansIn(G) && !G.queue.length) {
+        G.seats.forEach((p, i) => { if (p && p.bid && p.stack > 0) bq(G, p.bid, p.stack); G.seats[i] = null; });   // 農場電腦的籌碼換回他們的金幣
+        T.status = 'closed'; break;
+      }
       if (!TH.canStart(G)) { G.nextAt = now + TT.IDLE; break; }
       G.seats.forEach(p => { if (p) p.startStack = p.stack; });
       TH.startHand(G); G.tAct = G.tWait = now; G.wKey = '';
@@ -90,7 +95,7 @@ function _adv(T, now) {
     const j = G.turn, p = G.seats[j]; if (j < 0 || !p) break;
     const bot = !p.uid || p.auto || p.leaving;
     const due = bot ? G.tAct + TT.BOT : G.tWait + TT.TURN;
-    if (now < due) break;
+    if (now < due && !fast) break;
     if (bot) TH.autoAct(G, j, !p.uid);
     else { TH.autoAct(G, j, false); p.miss = (p.miss || 0) + 1; if (p.miss >= 2) p.auto = true; }
     G.tAct = now;

@@ -129,7 +129,7 @@ async function joinTable(uid: string, a: string, b: any) {
 // 就把桌上的真人都當作離開，讓電腦把這局打完、結算、散桌。不然會卡到有人回來才繼續打
 async function sweep() {
   const cut = new Date(Date.now() - 120000).toISOString();
-  const { data: L } = await sb.from('mj_tables').select('id').eq('status', 'play').in('game', ['mj', 'b2']).lt('updated_at', cut).limit(20);
+  const { data: L } = await sb.from('mj_tables').select('id').eq('status', 'play').in('game', ['mj', 'b2', 'th']).lt('updated_at', cut).limit(20);
   const done: number[] = [];
   for (const r of L || []) {
     try {
