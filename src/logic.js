@@ -846,6 +846,7 @@ function rewardList(rw){ rw=rw||{}; const out=[];
   Object.entries(rw.gear||{}).forEach(([k,n])=>out.push([GEAR[k]?.icon||'', `${GEAR[k]?gearTitle(GEAR[k]):k} ×${n}`]));
   Object.entries(rw.decor||{}).forEach(([k,n])=>out.push(['dc_'+k, `${(typeof DEC!=='undefined'&&DEC[k]?.name)||k} ×${n}`]));
   (rw.beasts||[]).forEach(k=>out.push(['', `🐾 寵物 ${bName(k)}`]));
+  Object.entries(rw.items||{}).forEach(([k,n])=>{ const x=(typeof ITEMS!=='undefined'&&ITEMS.find(i=>i.id===k))||{}; out.push([x.icon&&!x.icon.startsWith('emoji:')?x.icon:'', `${x.icon&&x.icon.startsWith('emoji:')?x.icon.slice(6)+' ':''}${x.name||k} ×${n}`]); });
   (rw.tones||[]).forEach(k=>out.push(['', `🌈 色調 ${TONE[k]?.name||k}`]));
   (rw.skins||[]).forEach(k=>out.push(['', `🏠 外觀 ${(SKINS.find(x=>x.id===k)||{}).name||k}`]));
   return out; }

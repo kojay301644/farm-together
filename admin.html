@@ -288,6 +288,12 @@ function wireSaves(){
 async function pageCf(){
   const C = await rpc('adm_config'), SIGN=((C.settings||[]).find(x=>x.key==='sign_rw')||{}).value||[];
   M(`<div class="savebar"><span id="dirtyN">沒有未儲存的修改</span><button class="btn" id="saveAll">💾 全部儲存</button></div><div class="card"><h2>玩法設定</h2><table>${C.settings.filter(s=>typeof s.value==='number' && !/^(ev_|maint_|bot_last_run|evo_)/.test(s.key)).map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
+    <div class="card"><h2>✍️ 七天簽到獎勵</h2><div class="muted" style="margin-bottom:8px">連續簽到第 1～7 天各送什麼，不送就留空或填 0；道具、種子各可選一種。中斷一天會從第 1 天重新開始。改完按「儲存簽到獎勵」，玩家重新整理後就會看到。</div>
+    <table><tr><th>天數</th><th>金幣</th><th>鑽石</th><th>道具</th><th>數量</th><th>種子</th><th>數量</th></tr>${[0,1,2,3,4,5,6].map(i=>{ const r=(SIGN[i]||{}), it=Object.entries(r.items||{})[0]||['',''], sd=Object.entries(r.seeds||{})[0]||['',''];
+      return `<tr data-signrow><td><b>第 ${i+1} 天</b></td><td><input class="num" id="sg_${i}_gold" type="number" value="${r.gold??''}"></td><td><input class="num" id="sg_${i}_gems" type="number" value="${r.gems??''}"></td>
+      <td><select id="sg_${i}_it"><option value="">（不送）</option>${(C.items||[]).map(x=>`<option value="${x.id}" ${x.id===it[0]?'selected':''}>${esc(x.name)}</option>`).join('')}</select></td><td><input class="num" id="sg_${i}_itn" type="number" min="0" value="${it[1]}"></td>
+      <td><select id="sg_${i}_sd"><option value="">（不送）</option>${(C.crops||[]).map(x=>`<option value="${x.id}" ${x.id===sd[0]?'selected':''}>${esc(x.name)}</option>`).join('')}</select></td><td><input class="num" id="sg_${i}_sdn" type="number" min="0" value="${sd[1]}"></td></tr>`; }).join('')}
+    <tr><td></td><td colspan="6"><button class="btn" data-sign="1">儲存簽到獎勵</button></td></tr></table></div>
     <div class="card"><h2>作物數值</h2><div class="muted" style="margin-bottom:8px">成熟時間單位是「秒」。改完按該列的儲存，玩家重新整理後就會套用。</div>
     <table><tr><th>作物</th><th>解鎖等級</th><th>種子價</th><th>成熟秒數</th><th>收成數</th><th>單價</th><th>經驗</th><th></th></tr>
     ${C.crops.map(c=>`<tr><td><b>${esc(c.name)}</b></td>${['lv','seed','grow_sec','yield','price','exp'].map(f=>`<td><input class="num" id="c_${c.id}_${f}" type="number" value="${c[f]}"></td>`).join('')}<td><button class="btn" data-cid="${c.id}">儲存</button></td></tr>`).join('')}</table></div>
@@ -316,9 +322,6 @@ async function pageCf(){
     <table><tr><th>外觀</th><th>建築</th><th>名稱</th><th>金幣價</th><th>鑽石價</th><th></th></tr>
     ${(C.skins||[]).map(k=>`<tr><td><img src="assets/th_${k.style}_${({home:'academy',barn:'farm',shop:'shop',fountain:'fountain',pen:'play',decor:'forge'})[k.bld]}.webp" style="width:40px;height:40px;object-fit:contain"></td><td>${({home:'我的家',barn:'穀倉',shop:'種子商店',fountain:'噴水池',pen:'寵物園',decor:'裝飾店'})[k.bld]}</td>
       <td><input id="k_${k.id}_name" value="${esc(k.name)}" style="width:6em"></td><td><input class="num" id="k_${k.id}_gold" type="number" value="${k.gold??''}"></td><td><input class="num" id="k_${k.id}_gems" type="number" value="${k.gems??''}"></td><td><button class="btn" data-kid="${k.id}">儲存</button></td></tr>`).join('')}</table></div>
-    <div class="card"><h2>每日簽到獎勵</h2><div class="muted" style="margin-bottom:8px">連續簽到第 1～7 天各送什麼，不送就留空或填 0。</div>
-    <table><tr><th>天數</th><th>金幣</th><th>鑽石</th></tr>${[0,1,2,3,4,5,6].map(i=>{ const r=(SIGN[i]||{}); return `<tr data-signrow><td><b>第 ${i+1} 天</b></td><td><input class="num" id="sg_${i}_gold" type="number" value="${r.gold??''}"></td><td><input class="num" id="sg_${i}_gems" type="number" value="${r.gems??''}"></td></tr>`; }).join('')}
-    <tr><td></td><td colspan="2"><button class="btn" data-sign="1">儲存簽到獎勵</button></td></tr></table></div>
     <div class="card"><h2>道具</h2><div class="muted" style="margin-bottom:8px">金幣價、鑽石價留空＝不能用那種方式買。時間（分鐘）只對有時間的道具有效。每日限買／限用留空＝不限。</div>
     <table><tr><th>道具</th><th>名稱</th><th>說明</th><th>金幣</th><th>鑽石</th><th>分鐘</th><th>每日限買</th><th>每日限用</th><th>上架</th><th></th></tr>
     ${(C.items||[]).map(x=>`<tr><td>${x.icon.startsWith('emoji:')?x.icon.slice(6):`<img src="assets/${x.icon}.webp" style="width:32px;height:32px;object-fit:contain">`}</td><td><input id="it_${x.id}_name" value="${esc(x.name)}" style="width:8em"></td><td><input id="it_${x.id}_descr" value="${esc(x.descr)}" style="width:14em"></td>
@@ -366,7 +369,9 @@ async function pageCf(){
     await rpc('adm_pack_save',{p_id:id,p_name:el('name').value,p_descr:el('descr').value,p_price:+el('price').value,p_reward:rw}); });
   document.querySelectorAll('[data-acid]').forEach(b=>b._save=async()=>{ const id=b.dataset.acid, v=f=>$(`ac_${id}_${f}`).value;
     await rpc('adm_ach_save',{p_id:id,p_name:v('name'),p_target:+v('target'),p_gems:+v('gems')}); });
-  document.querySelectorAll('[data-sign]').forEach(b=>b._save=async()=>{ const rw=[0,1,2,3,4,5,6].map(i=>{ const o={}, g=+$(`sg_${i}_gold`).value||0, m=+$(`sg_${i}_gems`).value||0; if(g>0) o.gold=g; if(m>0) o.gems=m; return o; });
+  document.querySelectorAll('[data-sign]').forEach(b=>b._save=async()=>{ const rw=[0,1,2,3,4,5,6].map(i=>{ const o=Object.assign({}, SIGN[i]||{}), g=+$(`sg_${i}_gold`).value||0, m=+$(`sg_${i}_gems`).value||0, it=$(`sg_${i}_it`).value, itn=+$(`sg_${i}_itn`).value||0, sd=$(`sg_${i}_sd`).value, sdn=+$(`sg_${i}_sdn`).value||0;
+      delete o.gold; delete o.gems; delete o.items; delete o.seeds;   // 其他種類（例如稱號）照原本的留著
+      if(g>0) o.gold=g; if(m>0) o.gems=m; if(it && itn>0) o.items={[it]:itn}; if(sd && sdn>0) o.seeds={[sd]:sdn}; return o; });
     await rpc('adm_setting_put',{p_key:'sign_rw',p_value:rw}); });
   wireSaves();
 }
