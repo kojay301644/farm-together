@@ -35,13 +35,14 @@ async function myTableId(uid: string) { const { data } = await sb.from('mj_views
 let POOLC: { at: number, list: any[], busy: Record<string, number> } = { at: 0, list: [], busy: {} };
 async function botPool(tid: number) {
   if (Date.now() - POOLC.at > 15000) {
-    const { data: B } = await sb.from('bots').select('id').eq('active', true);
+    const { data: B } = await sb.from('bots').select('id,style').eq('active', true);
+    const sty: Record<string, string> = {}; (B || []).forEach((b: any) => sty[b.id] = b.style);
     const ids = (B || []).map((b: any) => b.id);
     const { data: P } = ids.length ? await sb.from('players').select('id,nickname,avatar,gold').in('id', ids) : { data: [] as any[] };
-    const { data: L } = await sb.from('mj_tables').select('id,game,state').in('status', ['wait', 'play']).in('game', ['mj', 'b2', 'th']);
+    const { data: L } = await sb.from('mj_tables').select('id,game,state').in('status', ['wait', 'play']).in('game', ['mj', 'b2', 'th', 'bc']);
     const busy: Record<string, number> = {};
     for (const t of L || []) for (const id of C.botIds({ ...t, status: 'play' })) busy[id] = t.id;
-    POOLC = { at: Date.now(), busy, list: (P || []).map((p: any) => ({ id: p.id, name: p.nickname || '農夫', av: p.avatar || 11, gold: p.gold || 0 })) };
+    POOLC = { at: Date.now(), busy, list: (P || []).map((p: any) => ({ id: p.id, name: p.nickname || '農夫', av: p.avatar || 11, gold: p.gold || 0, style: sty[p.id] })) };
   }
   return POOLC.list.filter(b => !POOLC.busy[b.id] || POOLC.busy[b.id] === tid).map(b => ({ ...b }));
 }
@@ -51,7 +52,7 @@ async function mutate(id: number, fn: (T: any, now: number) => Promise<any> | an
   for (let k = 0; k < 6; k++) {
     const T = await load(id); if (!T) throw new Fail('牌桌不存在');
     const now = NOW(), before = T.ver;
-    if (T.game !== 'bc') { try { C.setBots(await botPool(id)); } catch { C.setBots([]); } }
+    try { C.setBots(await botPool(id)); } catch { C.setBots([]); }
     const r = await fn(T, now);
     let out = C.advance(T, now, null);
     if (out.needGold) { const g = await golds(C.humans(T).concat((T.state.pending || []).map((p: any) => p.uid), C.botIds(T))); out = { ...C.advance(T, now, g), settle: out.settle || null, botBank: out.botBank }; }

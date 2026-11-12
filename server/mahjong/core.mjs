@@ -12,11 +12,12 @@ const BOTS = [{ name: '小兔', av: 3 }, { name: '阿熊', av: 7 }, { name: '狐
 // 農場裡會種菜的電腦玩家（index.ts 每次推進前放進來；已排除正坐在別桌的）：[{id,name,av,gold}]
 // 只有金幣夠坐這桌的農場電腦能上桌，輸贏算進他們農場的金幣；沒人夠就等（不用其他電腦）
 let POOL = [];
-export function setBots(list) { POOL = list || []; THC.setBots(POOL); }
+export function setBots(list) { POOL = list || []; THC.setBots(POOL); BCC.setBots(POOL); }
 const pickBot = (used, min = 0, usedIds = []) => {
   const F = POOL.filter(b => b.gold >= min && !usedIds.includes(b.id) && !used.includes(b.name));
   if (!F.length) return null;
-  const b = F[Math.floor(Math.random() * F.length)]; return { id: b.id, name: b.name, av: b.av, gold: b.gold };
+  const G = F.filter(b => b.style === 'gambler'), L = G.length && Math.random() < 0.8 ? G : F;   // 愛賭博的優先上桌
+  const b = L[Math.floor(Math.random() * L.length)]; return { id: b.id, name: b.name, av: b.av, gold: b.gold };
 };
 const botsFree = (min, usedIds = [], used = []) => POOL.filter(b => b.gold >= min && !usedIds.includes(b.id) && !used.includes(b.name)).length;
 // 湊不到 4 個人（農場電腦不夠）：牌桌回到等人的狀態，留著的真人繼續等
@@ -204,7 +205,7 @@ export function humans(T) { const x = X(T); return x ? x.humans(T) : _humans(T);
 export function botIds(T) {
   if (T.status !== 'play' || !T.state) return [];
   if (T.game === 'th') return (T.state.seats || []).filter(p => p && p.bid).map(p => p.bid);
-  if (T.game === 'bc') return [];
+  if (T.game === 'bc') return (T.state.bots || []).map(b => b.bid);
   return (T.state.seats || []).map((s, j) => (!T.state.uids[j] && s.id ? s.id : null)).filter(Boolean);
 }
 export function seatOf(T, uid) { return X(T) ? -1 : _seatOf(T, uid); }

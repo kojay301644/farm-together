@@ -391,7 +391,7 @@ async function pageLg(){
 }
 
 /* ================= 電腦玩家、一鍵全部重玩 ================= */
-const STYLE = {busy:'勤勞型',casual:'休閒型',thief:'愛偷菜',helper:'熱心型',normal:'一般'};
+const STYLE = {busy:'勤勞型',casual:'休閒型',thief:'愛偷菜',helper:'熱心型',normal:'一般',gambler:'愛賭博'};
 async function pageBt(data){
   let L; try{ L = data || await rpc('adm_bots'); }catch(e){ return M(`<div class="card"><h2>電腦玩家</h2><p class="muted">還沒有電腦玩家資料（伺服器更新 SQL 執行後才會出現）：${esc(e.message)}</p></div>`); }
   M(`<div class="card"><h2>電腦玩家（${L.length} 隻）</h2>

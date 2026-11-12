@@ -18,7 +18,8 @@ function addBot(G) {
   const T = TH.TABLES[G.table];
   const F = POOL.filter(b => b.gold >= T.buyMin * 2 && !ids.includes(b.id) && !used.includes(b.name));
   if (F.length) {
-    const b = F[Math.floor(Math.random() * F.length)], stack = Math.min(T.buyMax, Math.floor(b.gold / 2));
+    const GF = F.filter(x => x.style === 'gambler'), L = GF.length && Math.random() < 0.8 ? GF : F;   // 愛賭博的優先上桌
+    const b = L[Math.floor(Math.random() * L.length)], stack = Math.min(T.buyMax, Math.floor(b.gold / 2));
     bq(G, b.id, -stack); b.gold -= stack;
     G.seats[i] = { uid: null, bid: b.id, bot: true, name: b.name, av: b.av, stack, sitOut: true, auto: false, miss: 0 };   // 下一局才加入
     return;
