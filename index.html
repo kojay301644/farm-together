@@ -554,6 +554,31 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
   .mttime{width:150px}.mtx{top:calc(env(safe-area-inset-top,0px) + 40px)}
   #match .rnmsg{bottom:auto;top:50%;left:auto;right:16px;transform:translateY(-50%);white-space:normal;width:140px;text-align:center}
 }
+/* 被看門狗咬 */
+#dogBite{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden}
+#dogBite.out{transition:opacity .4s;opacity:0}
+.dbdark{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(40,0,0,.55),rgba(0,0,0,.92) 70%);animation:dbdark .3s ease-out both}
+@keyframes dbdark{from{opacity:0}to{opacity:1}}
+.dbeyes{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);display:flex;gap:min(22vw,140px);animation:dbeyes .62s ease-in both}
+.dbeyes i{width:min(13vw,74px);height:min(6vw,34px);background:radial-gradient(ellipse,#FFF3B0 0 18%,#FF2A1F 40%,rgba(255,0,0,0) 72%);border-radius:50%;box-shadow:0 0 30px 12px rgba(255,30,20,.55);transform:rotate(14deg)}
+.dbeyes i:last-child{transform:rotate(-14deg)}
+@keyframes dbeyes{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}35%{opacity:1}85%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+.dbjaw{position:absolute;left:-4vw;width:108vw;height:56vh}
+.dbjaw svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 18px rgba(0,0,0,.6))}
+.dbjaw.up{top:0;transform:translateY(-105%);animation:dbup 1.9s cubic-bezier(.55,0,.1,1) .5s both}
+.dbjaw.dn{bottom:0;transform:translateY(105%);animation:dbdn 1.9s cubic-bezier(.55,0,.1,1) .5s both}
+@keyframes dbup{0%{transform:translateY(-105%)}7%{transform:translateY(-6%)}10%{transform:translateY(-12%)}14%{transform:translateY(-5%)}40%{transform:translateY(-8%)}100%{transform:translateY(-110%)}}
+@keyframes dbdn{0%{transform:translateY(105%)}7%{transform:translateY(6%)}10%{transform:translateY(12%)}14%{transform:translateY(5%)}40%{transform:translateY(8%)}100%{transform:translateY(110%)}}
+.dbflash{position:absolute;inset:0;background:#E0141E;opacity:0;animation:dbflash .5s ease-out .6s both;mix-blend-mode:screen}
+@keyframes dbflash{0%{opacity:.85}100%{opacity:0}}
+.dbmark{position:absolute;left:50%;top:50%;width:min(70vw,380px);transform:translate(-50%,-50%) scale(.6);opacity:0;animation:dbmark 1.6s ease-out .78s both}
+@keyframes dbmark{0%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}75%{opacity:.9}100%{opacity:0}}
+.dbtxt{position:absolute;left:0;right:0;top:20%;text-align:center;font-size:min(22vw,150px);font-weight:900;color:#FFF3E0;-webkit-text-stroke:4px #7A0E16;text-shadow:0 6px 0 #4A0D12,0 0 30px rgba(255,40,30,.8);opacity:0;animation:dbtxt 1.4s ease-out .7s both}
+@keyframes dbtxt{0%{opacity:0;transform:scale(2.4) rotate(-8deg)}14%{opacity:1;transform:scale(1) rotate(-4deg)}20%{transform:scale(1.08) rotate(3deg)}26%{transform:scale(1) rotate(-2deg)}80%{opacity:1}100%{opacity:0;transform:scale(1.1)}}
+.dbmsg{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);background:rgba(20,0,0,.85);color:#FFD6D6;font-weight:900;font-size:20px;padding:10px 22px;border-radius:999px;border:2px solid #E0141E;white-space:nowrap;opacity:0;animation:dbmsg 1.5s ease-out .85s both}
+@keyframes dbmsg{0%{opacity:0;transform:translate(-50%,20px)}15%{opacity:1;transform:translate(-50%,0)}85%{opacity:1}100%{opacity:0}}
+body.dbshake{animation:dbshake .5s linear}
+@keyframes dbshake{0%,100%{transform:none}10%{transform:translate(-14px,8px) rotate(-1.5deg)}20%{transform:translate(12px,-10px) rotate(1.5deg)}30%{transform:translate(-10px,6px)}40%{transform:translate(9px,-5px) rotate(1deg)}55%{transform:translate(-6px,4px)}70%{transform:translate(4px,-3px)}85%{transform:translate(-2px,1px)}}
 #stEnd{position:absolute;inset:0;pointer-events:none}#stEnd .rnres{pointer-events:auto;z-index:3}
 .rnlast{background:#F3EEFF;border-radius:12px;padding:6px 10px;font-weight:800;font-size:13px;color:#5B4ED6;margin-top:8px}.rnend{margin-left:auto;font-size:12px;color:var(--ink2);font-weight:700;align-self:center}
 .mfwrap{position:absolute;left:10px;top:50%;transform:translateY(-50%)}
@@ -1124,21 +1149,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794484681" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794493177" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794484681" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794484681" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794493177" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794493177" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794484681" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794493177" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794484681" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794484681" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794493177" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794493177" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1155,11 +1180,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794484681" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794493177" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794484681";
+const BUILD="1794493177";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2000,6 +2025,36 @@ function openAvatarPicker(){
   setTimeout(finish, 8000);
 })();
 
+/* ================= 被看門狗咬：全螢幕驚嚇動畫 =================
+   黑暗中先亮起一對紅眼睛（低吼）→ 上下兩排尖牙猛然咬合（紅光、畫面震動、手機震動）→ 留下齒痕和「汪！！」→ 淡出 */
+function dogBite(msg){
+  try{
+    const old = document.getElementById('dogBite'); if(old) old.remove();
+    const teeth = (up) => { let s = '';
+      for(let i = 0; i < 12; i++){ const x = i * 34 + 4, big = i === 2 || i === 9, h = big ? 92 : 46 + (i % 2) * 12, w = big ? 30 : 26;
+        s += up ? `<path d="M${x} 118 L${x + w / 2} ${118 + h} L${x + w} 118 Z" fill="#F3ECDD" stroke="#C9BBA0" stroke-width="2"/>` : `<path d="M${x} 82 L${x + w / 2} ${82 - h} L${x + w} 82 Z" fill="#F3ECDD" stroke="#C9BBA0" stroke-width="2"/>`; }
+      return s; };
+    const jaw = (up) => `<svg viewBox="0 0 410 200" preserveAspectRatio="none">${up
+      ? `<path d="M0 0 H410 V112 Q360 132 305 116 Q255 132 205 118 Q155 132 105 116 Q50 132 0 112 Z" fill="#4A0D12"/><path d="M0 100 Q100 122 205 108 Q310 122 410 100 V112 Q310 134 205 120 Q100 134 0 112 Z" fill="#8E1B24"/>${teeth(true)}`
+      : `<path d="M0 200 H410 V88 Q360 68 305 84 Q255 68 205 82 Q155 68 105 84 Q50 68 0 88 Z" fill="#4A0D12"/><path d="M0 100 Q100 78 205 92 Q310 78 410 100 V88 Q310 66 205 80 Q100 66 0 88 Z" fill="#8E1B24"/>${teeth(false)}`}</svg>`;
+    const mark = `<svg viewBox="0 0 240 160" class="dbmark">${[0,1,2,3,4,5].map(i => `<ellipse cx="${40 + i * 32}" cy="${44 - Math.sin(i / 5 * Math.PI) * 18}" rx="11" ry="15" fill="#7A0E16" opacity=".85"/>`).join('')}${[0,1,2,3,4,5].map(i => `<ellipse cx="${40 + i * 32}" cy="${118 + Math.sin(i / 5 * Math.PI) * 18}" rx="11" ry="15" fill="#7A0E16" opacity=".85"/>`).join('')}</svg>`;
+    const d = document.createElement('div'); d.id = 'dogBite';
+    d.innerHTML = `<div class="dbdark"></div><div class="dbeyes"><i></i><i></i></div><div class="dbflash"></div>
+      <div class="dbjaw up">${jaw(true)}</div><div class="dbjaw dn">${jaw(false)}</div>${mark}
+      <div class="dbtxt">汪！！</div><div class="dbmsg">${esc(msg || '被看門狗咬了！')}</div>`;
+    document.body.appendChild(d);
+    // 聲音：低吼 → 咬合 → 兩聲狗叫
+    if(SFX_ON){ noise(0.55, 220, 0.28); tone(90, 70, 0.55, 'sawtooth', 0.05);
+      noise(0.08, 3200, 0.35, 0.55); tone(160, 60, 0.18, 'square', 0.12, 0.55);
+      tone(720, 340, 0.13, 'sawtooth', 0.16, 0.72); noise(0.12, 1400, 0.18, 0.72);
+      tone(680, 320, 0.15, 'sawtooth', 0.16, 0.92); noise(0.13, 1300, 0.18, 0.92); }
+    setTimeout(() => { if(VIB_ON && navigator.vibrate) try{ navigator.vibrate([90, 50, 160, 60, 60]); }catch(e){}
+      document.body.classList.add('dbshake'); setTimeout(() => document.body.classList.remove('dbshake'), 520); }, 560);
+    setTimeout(() => d.classList.add('out'), 2100);
+    setTimeout(() => d.remove(), 2500);
+  }catch(e){}
+}
+
 /* ================= 新手教學 ================= */
 const GAME_URL = 'https://kojay301644.github.io/farm-together/';
 const bEl = id => document.querySelector(`[data-b="${id}"]`);
@@ -2625,7 +2680,7 @@ async function ranchFriend(action, slot){
   try{
     const r = await rpc('farm_ranch_friend', {p_owner:V.owner.id, p_action:action, p_slot:slot});
     applyState(r.state); applyVisit(r.visit); refresh();
-    if(r.ab==='dog'){ sfx('err'); toast('被看門狗趕走了！🐶'); }
+    if(r.ab==='dog'){ dogBite('被看門狗咬了！什麼都沒偷到'); }
     else if(r.ab==='scare'){ sfx('err'); toast('被稻草人擋下了！🎃'); }
     else if(action==='steal'){ sfx('steal'); toast(`偷到 ${r.qty} 個！`); }
     else if(action==='help_feed'){ sfx('seed'); toast('幫忙餵飽了！'); }
@@ -6944,7 +6999,7 @@ async function actVisit(i){
   const owner = V.owner.id;
   const r = await queueRpc('farm_friend_act', {p_owner:owner, p_action:action, p_idx:i}, r=>{ applyState(r.state); if(mode==='visit' && V && V.owner.id===owner){ applyVisit(r.visit); } refresh(); });
   if(!r) return;
-  if(r.ab==='dog'){ sfx('err'); vib(60); floatAt(el, '被看門狗趕走了！🐶', '#FFD6E5'); }
+  if(r.ab==='dog'){ dogBite('被看門狗咬了！什麼都沒偷到'); floatAt(el, '被看門狗咬了！🐶', '#FFD6E5'); }
   else if(r.ab==='scare'){ sfx('err'); floatAt(el, '被稻草人擋下了！🎃', '#FFD6E5'); }
   else if(action==='steal'){ fxSteal(i, c); floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066'); }
   xpFloat(el, r.xp);
@@ -7599,7 +7654,7 @@ function openBin(){
     const why = !n ? '收集倉是空的' : b.mine ? '這一批你已經偷過了' : !(b.left>0) ? '已經被偷光了，留點給主人吧' : V.protected ? '對方還在新手保護中' : '';
     modal(`🧺 ${esc(V.owner.nickname)} 的收集倉`, `<div class="rhint" style="margin-bottom:6px">寵物自動收成的東西會先放在這裡，主人還沒收走前可以偷一點（每次最多 ${+(CFG_SET.bin_steal_max??2)} 個）</div>${binListHTML(b.items)}`,
       why ? [[why,'sub',closeModal]] : [['🧺 偷一點','r',async()=>{ try{ const r=await rpc('farm_bin_steal',{p_owner:V.owner.id}); applyState(r.state); applyVisit(r.visit); refresh(); closeModal();
-        if(r.ab==='dog'){ sfx('err'); toast('被看門狗咬了！什麼都沒偷到 🐶'); } else { sfx('steal'); toast(`偷到 ${r.qty} 個！`); } if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } }]]);
+        if(r.ab==='dog'){ dogBite('被看門狗咬了！什麼都沒偷到'); } else { sfx('steal'); toast(`偷到 ${r.qty} 個！`); } if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } }]]);
     return;
   }
   const b=S.me.bin||{}, n=binCount(b), cap=+(S.me.bin_cap||200);

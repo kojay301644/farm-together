@@ -144,7 +144,7 @@ async function ranchFriend(action, slot){
   try{
     const r = await rpc('farm_ranch_friend', {p_owner:V.owner.id, p_action:action, p_slot:slot});
     applyState(r.state); applyVisit(r.visit); refresh();
-    if(r.ab==='dog'){ sfx('err'); toast('被看門狗趕走了！🐶'); }
+    if(r.ab==='dog'){ dogBite('被看門狗咬了！什麼都沒偷到'); }
     else if(r.ab==='scare'){ sfx('err'); toast('被稻草人擋下了！🎃'); }
     else if(action==='steal'){ sfx('steal'); toast(`偷到 ${r.qty} 個！`); }
     else if(action==='help_feed'){ sfx('seed'); toast('幫忙餵飽了！'); }

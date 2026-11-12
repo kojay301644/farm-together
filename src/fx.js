@@ -153,3 +153,33 @@ function openAvatarPicker(){
   list.forEach(k=>{ const im=new Image(); im.onload=im.onerror=done; im.src=A(k); });
   setTimeout(finish, 8000);
 })();
+
+/* ================= 被看門狗咬：全螢幕驚嚇動畫 =================
+   黑暗中先亮起一對紅眼睛（低吼）→ 上下兩排尖牙猛然咬合（紅光、畫面震動、手機震動）→ 留下齒痕和「汪！！」→ 淡出 */
+function dogBite(msg){
+  try{
+    const old = document.getElementById('dogBite'); if(old) old.remove();
+    const teeth = (up) => { let s = '';
+      for(let i = 0; i < 12; i++){ const x = i * 34 + 4, big = i === 2 || i === 9, h = big ? 92 : 46 + (i % 2) * 12, w = big ? 30 : 26;
+        s += up ? `<path d="M${x} 118 L${x + w / 2} ${118 + h} L${x + w} 118 Z" fill="#F3ECDD" stroke="#C9BBA0" stroke-width="2"/>` : `<path d="M${x} 82 L${x + w / 2} ${82 - h} L${x + w} 82 Z" fill="#F3ECDD" stroke="#C9BBA0" stroke-width="2"/>`; }
+      return s; };
+    const jaw = (up) => `<svg viewBox="0 0 410 200" preserveAspectRatio="none">${up
+      ? `<path d="M0 0 H410 V112 Q360 132 305 116 Q255 132 205 118 Q155 132 105 116 Q50 132 0 112 Z" fill="#4A0D12"/><path d="M0 100 Q100 122 205 108 Q310 122 410 100 V112 Q310 134 205 120 Q100 134 0 112 Z" fill="#8E1B24"/>${teeth(true)}`
+      : `<path d="M0 200 H410 V88 Q360 68 305 84 Q255 68 205 82 Q155 68 105 84 Q50 68 0 88 Z" fill="#4A0D12"/><path d="M0 100 Q100 78 205 92 Q310 78 410 100 V88 Q310 66 205 80 Q100 66 0 88 Z" fill="#8E1B24"/>${teeth(false)}`}</svg>`;
+    const mark = `<svg viewBox="0 0 240 160" class="dbmark">${[0,1,2,3,4,5].map(i => `<ellipse cx="${40 + i * 32}" cy="${44 - Math.sin(i / 5 * Math.PI) * 18}" rx="11" ry="15" fill="#7A0E16" opacity=".85"/>`).join('')}${[0,1,2,3,4,5].map(i => `<ellipse cx="${40 + i * 32}" cy="${118 + Math.sin(i / 5 * Math.PI) * 18}" rx="11" ry="15" fill="#7A0E16" opacity=".85"/>`).join('')}</svg>`;
+    const d = document.createElement('div'); d.id = 'dogBite';
+    d.innerHTML = `<div class="dbdark"></div><div class="dbeyes"><i></i><i></i></div><div class="dbflash"></div>
+      <div class="dbjaw up">${jaw(true)}</div><div class="dbjaw dn">${jaw(false)}</div>${mark}
+      <div class="dbtxt">汪！！</div><div class="dbmsg">${esc(msg || '被看門狗咬了！')}</div>`;
+    document.body.appendChild(d);
+    // 聲音：低吼 → 咬合 → 兩聲狗叫
+    if(SFX_ON){ noise(0.55, 220, 0.28); tone(90, 70, 0.55, 'sawtooth', 0.05);
+      noise(0.08, 3200, 0.35, 0.55); tone(160, 60, 0.18, 'square', 0.12, 0.55);
+      tone(720, 340, 0.13, 'sawtooth', 0.16, 0.72); noise(0.12, 1400, 0.18, 0.72);
+      tone(680, 320, 0.15, 'sawtooth', 0.16, 0.92); noise(0.13, 1300, 0.18, 0.92); }
+    setTimeout(() => { if(VIB_ON && navigator.vibrate) try{ navigator.vibrate([90, 50, 160, 60, 60]); }catch(e){}
+      document.body.classList.add('dbshake'); setTimeout(() => document.body.classList.remove('dbshake'), 520); }, 560);
+    setTimeout(() => d.classList.add('out'), 2100);
+    setTimeout(() => d.remove(), 2500);
+  }catch(e){}
+}

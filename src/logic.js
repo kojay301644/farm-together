@@ -268,7 +268,7 @@ async function actVisit(i){
   const owner = V.owner.id;
   const r = await queueRpc('farm_friend_act', {p_owner:owner, p_action:action, p_idx:i}, r=>{ applyState(r.state); if(mode==='visit' && V && V.owner.id===owner){ applyVisit(r.visit); } refresh(); });
   if(!r) return;
-  if(r.ab==='dog'){ sfx('err'); vib(60); floatAt(el, '被看門狗趕走了！🐶', '#FFD6E5'); }
+  if(r.ab==='dog'){ dogBite('被看門狗咬了！什麼都沒偷到'); floatAt(el, '被看門狗咬了！🐶', '#FFD6E5'); }
   else if(r.ab==='scare'){ sfx('err'); floatAt(el, '被稻草人擋下了！🎃', '#FFD6E5'); }
   else if(action==='steal'){ fxSteal(i, c); floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066'); }
   xpFloat(el, r.xp);
@@ -923,7 +923,7 @@ function openBin(){
     const why = !n ? '收集倉是空的' : b.mine ? '這一批你已經偷過了' : !(b.left>0) ? '已經被偷光了，留點給主人吧' : V.protected ? '對方還在新手保護中' : '';
     modal(`🧺 ${esc(V.owner.nickname)} 的收集倉`, `<div class="rhint" style="margin-bottom:6px">寵物自動收成的東西會先放在這裡，主人還沒收走前可以偷一點（每次最多 ${+(CFG_SET.bin_steal_max??2)} 個）</div>${binListHTML(b.items)}`,
       why ? [[why,'sub',closeModal]] : [['🧺 偷一點','r',async()=>{ try{ const r=await rpc('farm_bin_steal',{p_owner:V.owner.id}); applyState(r.state); applyVisit(r.visit); refresh(); closeModal();
-        if(r.ab==='dog'){ sfx('err'); toast('被看門狗咬了！什麼都沒偷到 🐶'); } else { sfx('steal'); toast(`偷到 ${r.qty} 個！`); } if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } }]]);
+        if(r.ab==='dog'){ dogBite('被看門狗咬了！什麼都沒偷到'); } else { sfx('steal'); toast(`偷到 ${r.qty} 個！`); } if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } }]]);
     return;
   }
   const b=S.me.bin||{}, n=binCount(b), cap=+(S.me.bin_cap||200);
