@@ -4,8 +4,9 @@ import * as BP from './botplay.mjs';
 import MJ from './mj_engine.mjs';
 import B2 from './b2_engine.mjs';
 import BC from './bc_engine.mjs';
+import MF from './mf_engine.mjs';
 import TH from './th_engine.mjs';
-const ENG = (g: string) => (g === 'b2' ? B2 : g === 'bc' ? BC : g === 'th' ? TH : MJ);
+const ENG = (g: string) => (g === 'b2' ? B2 : g === 'bc' ? BC : g === 'th' ? TH : g === 'mf' ? MF : MJ);
 // 德州撲克：帶入籌碼先扣金幣、離桌換回金幣
 async function thBuyin(uid: string, amt: number) { const { error } = await sb.rpc('th_buyin', { p_uid: uid, p_amt: amt }); if (error) throw new Fail(error.message.includes('gold') ? '金幣不夠' : '金幣不夠'); }
 async function thBank(d: Record<string, number>) { const k = Object.keys(d).filter(u => d[u] > 0); if (!k.length) return; const o: Record<string, number> = {}; k.forEach(u => o[u] = Math.floor(d[u])); await sb.rpc('th_bank', { p_delta: o }); }
@@ -40,7 +41,7 @@ async function botPool(tid: number) {
     const sty: Record<string, string> = {}; (B || []).forEach((b: any) => sty[b.id] = b.style);
     const ids = (B || []).map((b: any) => b.id);
     const { data: P } = ids.length ? await sb.from('players').select('id,nickname,avatar,gold').in('id', ids) : { data: [] as any[] };
-    const { data: L } = await sb.from('mj_tables').select('id,game,state').in('status', ['wait', 'play']).in('game', ['mj', 'b2', 'th', 'bc']);
+    const { data: L } = await sb.from('mj_tables').select('id,game,state').in('status', ['wait', 'play']).in('game', ['mj', 'b2', 'th', 'bc', 'mf']);
     const busy: Record<string, number> = {};
     for (const t of L || []) for (const id of C.botIds({ ...t, status: 'play' })) busy[id] = t.id;
     POOLC = { at: Date.now(), busy, list: (P || []).map((p: any) => ({ id: p.id, name: p.nickname || '農夫', av: p.avatar || 11, gold: p.gold || 0, style: sty[p.id] })) };
@@ -98,7 +99,7 @@ async function joinTable(uid: string, a: string, b: any) {
     const { T } = await mutate(L[0].id, (T: any, now: number) => C.addPlayer(T, { uid, name: p.name, av: p.av }, now));
     return { view: viewOf(T, uid) };
   }
-  const game = ['b2', 'bc', 'th'].includes(b.game) ? b.game : 'mj', lvl = b.lvl;
+  const game = ['b2', 'bc', 'th', 'mf'].includes(b.game) ? b.game : 'mj', lvl = b.lvl;
   if (game === 'bc' && a === 'create') throw new Fail('百家樂不能開房，請直接進入牌桌'); const TB = ENG(game).TABLES[lvl]; if (!TB) throw new Fail('沒有這種桌');
   if (p.gold < TB.min) throw new Fail(`這桌要 ${TB.min.toLocaleString()} 金幣才能坐`);
   if (a === 'quick') {
@@ -130,7 +131,7 @@ async function joinTable(uid: string, a: string, b: any) {
 // 就把桌上的真人都當作離開，讓電腦把這局打完、結算、散桌。不然會卡到有人回來才繼續打
 async function sweep() {
   const cut = new Date(Date.now() - 120000).toISOString();
-  const { data: L } = await sb.from('mj_tables').select('id').eq('status', 'play').in('game', ['mj', 'b2', 'th']).lt('updated_at', cut).limit(20);
+  const { data: L } = await sb.from('mj_tables').select('id').eq('status', 'play').in('game', ['mj', 'b2', 'th', 'mf']).lt('updated_at', cut).limit(20);
   const done: number[] = [];
   for (const r of L || []) {
     try {

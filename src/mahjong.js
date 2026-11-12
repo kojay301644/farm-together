@@ -109,6 +109,7 @@ const HALL_GAMES = [
   {id:'big2', icon:'🃏', name:'大老二', desc:'台灣玩法，四個人搶先出完', open:true},
   {id:'bc', icon:'🎴', name:'百家樂', desc:'押莊或閒，最多 6 人同桌', open:true},
   {id:'holdem', icon:'♠️', name:'德州撲克', desc:'6 人桌無限注，帶籌碼上桌', open:true},
+  {id:'mono', icon:'🎲', name:'大富翁', desc:'買菜園收過路費，贏獎池', open:true},
   {id:'bj', icon:'🂡', name:'21 點', desc:'跟莊家比大小，不超過 21', open:false},
   {id:'xq', icon:'♟️', name:'象棋', desc:'兩人對弈，將軍！', open:false},
   {id:'aq', icon:'🀄', name:'暗棋', desc:'翻棋吃子，運氣加策略', open:false},
@@ -118,8 +119,7 @@ const HALL_GAMES = [
 // 休閒手感：靠手感的小遊戲（不用下注）
 const HALL_FUN = [
   {id:'run', icon:'🏃', name:'寵物跑酷', desc:'帶寵物衝刺撿金幣，每週排行榜', open:true},
-  {id:'claw', icon:'🧸', name:'夾娃娃機', desc:'夾寵物、裝飾、稀有種子', open:false},
-  {id:'mono', icon:'🎲', name:'大富翁', desc:'擲骰子買菜園，收過路費', open:false},
+  {id:'match3', icon:'🍓', name:'農場消消樂', desc:'三個一樣的蔬果連成一線就消掉', open:false},
   {id:'mole', icon:'🔨', name:'打田鼠', desc:'田鼠冒出來偷菜，快打下去', open:false},
 ];
 function openHall(tab){
@@ -129,7 +129,7 @@ function openHall(tab){
     <div class="rhint">${tab==='fun' ? '靠手感的小遊戲，不用下注，玩得好就能賺農場金幣、衝排行榜' : `用農場金幣跟大家同樂！麻將、大老二每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費`}</div>
     <div class="hallg">${L.map(g=>`<button class="hgc${g.open?'':' off'}" data-hg="${g.id}"><span class="hgi">${g.icon}</span><b>${g.name}</b><small>${g.open ? g.desc : '尚未開放'}</small></button>`).join('')}</div>`);
   document.querySelectorAll('#md [data-ht]').forEach(b=>b.onclick=()=>openHall(b.dataset.ht));
-  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ const g=b.dataset.hg; if(g==='mj') openMjLobby(); else if(g==='big2') openB2Lobby(); else if(g==='bc') openBcLobby(); else if(g==='holdem') openThLobby(); else if(g==='run') openRunLobby(); else toast('尚未開放，敬請期待！'); });
+  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ const g=b.dataset.hg; if(g==='mj') openMjLobby(); else if(g==='big2') openB2Lobby(); else if(g==='bc') openBcLobby(); else if(g==='holdem') openThLobby(); else if(g==='run') openRunLobby(); else if(g==='mono') openMfLobby(); else toast('尚未開放，敬請期待！'); });
 }
 function openMjLobby(){
   const gold = S.me.gold;
@@ -173,7 +173,7 @@ async function mjCall(a, extra){
 }
 /* 麻將背景音樂（Higgsfield 生成，20 秒無縫循環）：進牌桌換成這首，離開換回農場音樂 */
 let MJ_BGM = null, mjBgmOn = (()=>{ try{ return localStorage.getItem('ytzt_mjbgm')!=='0'; }catch(e){ return true; } })();
-const mjBgmKey = V => ({ b2:'b2_bgm', bc:'bc_bgm', th:'bc_bgm' })[(V||{}).game] || 'mj_bgm';
+const mjBgmKey = V => ({ b2:'b2_bgm', bc:'bc_bgm', th:'bc_bgm', mf:'b2_bgm' })[(V||{}).game] || 'mj_bgm';
 function mjBgmSync(){
   const want = mjOn() && mjBgmOn && !document.hidden && (typeof BGM_ON==='undefined' || BGM_ON);
   if(want){
@@ -337,14 +337,14 @@ async function mjSetVis(after){
 }
 function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
-    <button class="mjmi" id="mmRules">📖<span>${['b2','bc','th'].includes((mjCurView()||{}).game)?'規則':'台數表'}</span></button>
+    <button class="mjmi" id="mmRules">📖<span>${['b2','bc','th','mf'].includes((mjCurView()||{}).game)?'規則':'台數表'}</span></button>
     <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
     ${(()=>{ const V = mjCurView()||{}; return V.room && V.host ? `<button class="mjmi" id="mmVis">${V.priv?'🔒':'🌐'}<span>${V.priv?'私人房間（點了改公開）':'公開房間（點了改私人）'}</span></button>` : ''; })()}
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
   if($('mmVis')) $('mmVis').onclick = ()=>mjSetVis(()=>mjMenu());
-  $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else if(V && V.game==='bc') bcRules(); else if(V && V.game==='th') thRules(); else mjRules(); };
+  $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else if(V && V.game==='bc') bcRules(); else if(V && V.game==='th') thRules(); else if(V && V.game==='mf') mfRules(); else mjRules(); };
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
   $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', mjMe); mjMenu(); };
   $('mmBgm').onclick = ()=>{ mjBgmOn = !mjBgmOn; try{ localStorage.setItem('ytzt_mjbgm', mjBgmOn?'1':'0'); }catch(e){} mjBgmSync(); mjMenu(); };
@@ -359,6 +359,7 @@ function mjRender(first){
   if(V.game==='th' && V.status==='play' && V.seats) return thRender(V);
   if(V.status==='wait' || V.pending || V.me==null || V.me<0) return mjRenderWait(V);
   if(V.game==='b2') return b2Render(V);
+  if(V.game==='mf') return mfRender(V);
   mjMe = V.me;
   // 每局開始：莊家先擲骰子
   if(V.dice && V.handNo !== mjDiceHand && V.phase!=='end' && (MJG || V.startAt)){ mjDiceHand = V.handNo; mjDiceUntil = Date.now() + 2200; setTimeout(()=>mjDice(V.dice, V.dealer), 30); }
@@ -505,7 +506,7 @@ function mjRender(first){
   if(MJO && MJO.claimWait && V.phase!=='claim') MJO.claimWait = null;   // 這次吃碰沒有結果（例如時間到）就收掉
 }
 function mjRenderWait(V){
-  const b2 = V.game==='b2', T = (b2 ? B2 : MJ).TABLES[V.lvl] || (b2 ? B2 : MJ).TABLES.n, gname = b2 ? '大老二' : '麻將';
+  const b2 = V.game==='b2', mf = V.game==='mf', ENGW = b2 ? B2 : mf ? MF : MJ, T = ENGW.TABLES[V.lvl] || ENGW.TABLES.n, gname = b2 ? '大老二' : mf ? '大富翁' : '麻將';
   let inner;
   const shoutN = (S && S.me && S.me.items && S.me.items.shout) || 0;
   if(V.status==='wait'){
@@ -521,11 +522,11 @@ function mjRenderWait(V){
   }
   $('mjFelt').innerHTML = `<div class="mjwait">${inner}</div>`;
   $('mjUi').innerHTML = ''; $('mjEnd').innerHTML = '';
-  $('mjBar').innerHTML = `<div class="mjbt">${b2 ? `每張 ${T.per.toLocaleString()} 金` : `底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}`}</div><div class="mjbt r">${T.name}</div>`;
+  $('mjBar').innerHTML = `<div class="mjbt">${b2 ? `每張 ${T.per.toLocaleString()} 金` : mf ? `報名費 ${T.fee.toLocaleString()} 金` : `底台：${T.base.toLocaleString()} / ${T.tai.toLocaleString()}`}</div><div class="mjbt r">${T.name}</div>`;
   if($('mjStart')) $('mjStart').onclick = ()=>mjOnline('start');
   if($('mjShout')) $('mjShout').onclick = ()=>{
     const miss = 4 - ((V.wait && V.wait.players) || []).length;
-    const def = `${gname} ${T.name} ${b2 ? `每張${T.per}` : `${T.base}/${T.tai}`} 缺${miss}!!! 房號:${V.code}`;   // 寫上哪種桌、打多大，大家才知道
+    const def = `${gname} ${T.name} ${b2 ? `每張${T.per}` : mf ? `報名${T.fee}` : `${T.base}/${T.tai}`} 缺${miss}!!! 房號:${V.code}`;   // 寫上哪種桌、打多大，大家才知道
     mjPanel('📢 大聲公找人', `<div class="help"><p>會放上全服跑馬燈，大家都看得到。可以改字（最多 30 字）</p></div>
       <input id="mjShTx" maxlength="30" value="${esc(def)}" style="width:100%;font-family:inherit;font-size:17px;font-weight:900;padding:10px 12px;border-radius:12px;border:2px solid #E6D9C3;margin-top:6px">`,
       [['取消','sub',mjPanelClose],['📢 送出','o',async()=>{ const t = ($('mjShTx').value||'').trim(); if(!t) return mjToast('請輸入內容');
@@ -557,7 +558,7 @@ function mjTurnAlert(){
   const b2 = (mjCurView()||{}).game==='b2';
   const box = $('mjCall'); if(!box) return;   // 大老二：小小一條放在桌子正中間（寵物那裡），不擋到牌和按鈕
   box.querySelectorAll('.mjturn').forEach(x=>x.remove());
-  const d = document.createElement('div'); d.className = 'mjturn' + (b2 || (mjCurView()||{}).game==='th' ? ' b2' : ''); d.textContent = '輪到你了！';
+  const d = document.createElement('div'); d.className = 'mjturn' + (b2 || ['th','mf'].includes((mjCurView()||{}).game) ? ' b2' : ''); d.textContent = '輪到你了！';
   box.appendChild(d); setTimeout(()=>d.remove(), 1900);
   mjSfx('myturn'); try{ if(typeof vib==='function') vib(60); }catch(e){}
 }

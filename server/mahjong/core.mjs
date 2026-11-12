@@ -1,10 +1,11 @@
 // 麻將連線版：牌桌狀態機（純邏輯，不碰資料庫；index.ts 負責讀寫）
 import MJ from './mj_engine.mjs';
 import B2 from './b2_engine.mjs';
+import MF from './mf_engine.mjs';
 import * as BCC from './bc_core.mjs';
 import * as THC from './th_core.mjs';
 // 同一套牌桌流程給不同遊戲用：麻將（mj）、大老二（b2）
-const E = (T) => (T.game === 'b2' ? B2 : MJ);
+const E = (T) => (T.game === 'b2' ? B2 : T.game === 'mf' ? MF : MJ);
 const turnMs = (T) => (T.game === 'b2' ? 20000 : TIME.TURN);
 
 export const TIME = { TURN: 15000, CLAIM: 5000, BOT_PLAY: 900, BOT_CLAIM: 450, WAIT_START: 8000, NEXT_WAIT: 12000, DICE: 2300 };

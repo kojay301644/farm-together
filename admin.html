@@ -122,7 +122,7 @@ async function pageRp(){
     try{ await rpc('adm_report_set', {p_id:+id, p_status:st, p_reply: ta ? ta.value : null}); toast('已更新'); pageRp(); }catch(e){ toast(e.message); } });
 }
 // ---------- 娛樂廳輸贏紀錄 ----------
-const CSG = { mj:'🀄 麻將', b2:'🃏 大老二', bc:'🎴 百家樂', th:'♠️ 德州撲克' }, CS_BIG = 100000;
+const CSG = { mj:'🀄 麻將', b2:'🃏 大老二', bc:'🎴 百家樂', th:'♠️ 德州撲克', mf:'🎲 大富翁' }, CS_BIG = 100000;
 let csDays = 1, csGame = '', csQ = '';
 const csAmt = v => `<b style="color:${v>0?'#1E9E55':v<0?'#D3403A':'#666'}">${v>0?'+':''}${(v||0).toLocaleString()}</b>`;
 // 停在娛樂廳頁面時每 30 秒自動更新（看單一玩家、正在打搜尋字、切到別的分頁時不更新）
@@ -135,7 +135,7 @@ async function pageCs(quiet){
   if(tab!=='cs' || !csList) return;   // 讀的時候已經換頁
   const btn = (on, attr, t) => `<button class="btn ${on?'':'g'}" ${attr}>${t}</button>`;
   const filt = `<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">${[[1,'今天'],[7,'7 天'],[30,'30 天'],[0,'全部']].map(([d,t])=>btn(csDays===d,`data-cd="${d}"`,t)).join('')}
-    <span style="width:12px"></span>${[['','全部遊戲'],['mj',CSG.mj],['b2',CSG.b2],['bc',CSG.bc],['th',CSG.th]].map(([g,t])=>btn(csGame===g,`data-cg="${g}"`,t)).join('')}</div>`;
+    <span style="width:12px"></span>${[['','全部遊戲'],['mj',CSG.mj],['b2',CSG.b2],['bc',CSG.bc],['th',CSG.th],['mf',CSG.mf]].map(([g,t])=>btn(csGame===g,`data-cg="${g}"`,t)).join('')}</div>`;
   const sum = R.summary.length ? `<table class="tb"><tr><th>遊戲</th><th>局數</th><th>玩家總輸贏</th><th>娛樂廳收入</th></tr>${R.summary.map(x=>`<tr><td>${CSG[x.game]||esc(x.game)}</td><td>${x.hands.toLocaleString()}</td><td>${csAmt(x.net)}</td><td>${csAmt(x.house)}</td></tr>`).join('')}
     <tr><td><b>合計</b></td><td>${R.summary.reduce((a,x)=>a+x.hands,0).toLocaleString()}</td><td>${csAmt(R.summary.reduce((a,x)=>a+x.net,0))}</td><td>${csAmt(R.summary.reduce((a,x)=>a+x.house,0))}</td></tr></table>
     <div class="muted" style="margin-top:6px">娛樂廳收入：麻將、大老二是 5% 場地費；百家樂是莊家（系統）的賺賠；德州撲克是底池抽成。德州撲克的輸贏是籌碼輸贏，金幣在帶入、離桌時才換。這兩欄從 ${'2026/11/12'} 之後才開始記，之前的局只有玩家輸贏。</div>` : '<div class="muted">這段時間沒有紀錄</div>';
