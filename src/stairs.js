@@ -217,7 +217,9 @@ function stairDrawPlat(ctx, p, now){
   if(p.k === 'n'){   // 田埂：泥土＋草皮
     ctx.fillStyle = '#9A6B3F'; rrect(ctx, 0, 0, W, H, 6); ctx.fill();
     ctx.fillStyle = '#6CC04A'; rrect(ctx, 0, -2, W, 7, 4); ctx.fill();
-    ctx.fillStyle = '#4FA232'; for(let x = 8; x < W; x += 14){ ctx.beginPath(); ctx.moveTo(x, -1); ctx.lineTo(x + 3, -7); ctx.lineTo(x + 6, -1); ctx.fill(); }
+    ctx.fillStyle = '#6CC04A'; for(let x = 6; x < W - 4; x += 12){ ctx.beginPath(); ctx.arc(x + 3, 0, 5, Math.PI, 0); ctx.fill(); }   // 圓圓的草皮邊（不要尖尖的，才不會看成刺）
+    ctx.fillStyle = 'rgba(255,255,255,.35)'; rrect(ctx, 4, -1, W - 8, 2, 1); ctx.fill();
+    ctx.fillStyle = '#F7D54A'; ctx.beginPath(); ctx.arc(W * 0.25, -2, 2, 0, Math.PI*2); ctx.arc(W * 0.7, -2, 2, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = 'rgba(0,0,0,.12)'; for(let x = 10; x < W; x += 22) { ctx.beginPath(); ctx.arc(x, 9, 2, 0, Math.PI*2); ctx.fill(); }
   } else if(p.k === 's'){   // 尖刺板
     ctx.fillStyle = '#7D858F'; rrect(ctx, 0, 0, W, H, 4); ctx.fill();
