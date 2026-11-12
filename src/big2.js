@@ -4,7 +4,7 @@ const B2_ICON = {n:'🌱',m:'🌻',h:'🏆',r:'💰'};
 
 function openB2Lobby(){
   const gold = S.me.gold;
-  modal('🃏 大老二', `<div class="rhint">台灣大老二，輸贏用農場金幣。人不夠時由電腦補位；中途離開，這局由電腦代打、輸贏照算</div>
+  modal('🃏 大老二', `<div class="rhint">台灣大老二，輸贏用農場金幣。中途離開，這局由系統代打、輸贏照算</div>
     <div id="b2Back"></div>
     ${Object.entries(B2.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${B2_ICON[k]}</div><div class="tx"><b>${t.name}</b>
       <div>每張 ${t.per.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>

@@ -105,7 +105,7 @@ function mjSay(txt){
 
 /* ---------- 遊戲廳大廳 ---------- */
 const HALL_GAMES = [
-  {id:'mj', icon:'🀄', name:'麻將', desc:'台灣 16 張，跟朋友或電腦一起打', open:true},
+  {id:'mj', icon:'🀄', name:'麻將', desc:'台灣 16 張，跟大家一起打', open:true},
   {id:'big2', icon:'🃏', name:'大老二', desc:'台灣玩法，四個人搶先出完', open:true},
   {id:'bc', icon:'🎴', name:'百家樂', desc:'押莊或閒，最多 6 人同桌', open:true},
   {id:'holdem', icon:'♠️', name:'德州撲克', desc:'6 人桌無限注，帶籌碼上桌', open:true},
@@ -117,7 +117,7 @@ function openHall(){
 }
 function openMjLobby(){
   const gold = S.me.gold;
-  modal('🀄 麻將', `<div class="rhint">台灣 16 張麻將，輸贏用農場金幣。人不夠時由電腦補位；中途離開，這局由電腦代打、輸贏照算</div>
+  modal('🀄 麻將', `<div class="rhint">台灣 16 張麻將，輸贏用農場金幣。中途離開，這局由系統代打、輸贏照算</div>
     <div id="mjBack"></div>
     ${Object.entries(MJ.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${{n:'🌱',m:'🌻',h:'🏆',r:'💰'}[k]}</div><div class="tx"><b>${t.name}</b>
       <div>底 ${t.base.toLocaleString()}・每台 ${t.tai.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
@@ -250,7 +250,7 @@ function mjLeave(force){
   mjClose();
 }
 function mjConfirmLeave(){
-  mjPanel('要離開牌桌嗎？', `<div class="help"><p>這一局還沒打完，現在離開會由電腦幫你打完這一局，${MJG?'練習場不算輸贏。':'輸贏照算。'}</p></div>`,
+  mjPanel('要離開牌桌嗎？', `<div class="help"><p>這一局還沒打完，現在離開會由系統幫你打完這一局，${MJG?'練習場不算輸贏。':'輸贏照算。'}</p></div>`,
     [['繼續打','sub',mjPanelClose],['離開','r',()=>{ mjPanelClose(); mjLeave(true); }]]);
 }
 function mjDo(a){
@@ -277,7 +277,7 @@ function mjDo(a){
 function mjClock(){
   if(!mjOn()){ clearInterval(mjTimer); mjTimer=0; return; }
   const V = mjCurView(), el = $('mjSec');
-  if(V && V.status==='wait' && $('mjWs') && MJO){ const sec = Math.max(0, Math.ceil((V.wait.startAt + MJO.off - Date.now())/1000)); $('mjWs').textContent = V.priv ? '人到齊或房主按開始就開打' : sec > 0 ? `${sec} 秒後開始，人不夠由電腦補位` : '準備開始…'; return; }
+  if(V && V.status==='wait' && $('mjWs') && MJO){ const sec = Math.max(0, Math.ceil((V.wait.startAt + MJO.off - Date.now())/1000)); $('mjWs').textContent = V.priv ? '人到齊或房主按開始就開打' : sec > 0 ? `${sec} 秒後開始` : '準備開始…'; return; }
   if(!V || !V.waiting) { if(el) el.textContent=''; return; }
   if(!V.waiting.includes(V.me) || V.phase==='end'){ if(el) el.textContent=''; return; }
   const dl = MJG ? mjDeadline : (V.deadline ? V.deadline + MJO.off : 0);
@@ -484,7 +484,7 @@ function mjRenderWait(V){
       <div class="mjwp">${[0,1,2,3].map(i=>{ const p=P[i]; return p ? `<div class="mjwq"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span></div>` : `<div class="mjwq e"><i>？</i><span>${V.priv?'等朋友加入':'等待中'}</span></div>`; }).join('')}</div>
       <div class="mjws" id="mjWs"></div>
       ${V.priv && P.length < 4 ? `<button class="btn o mjshb" id="mjShout" ${shoutN>0?'':'disabled'}>📢 用大聲公找人${shoutN>0?`（剩 ${shoutN} 個）`:'（沒有大聲公，可到綜合商店買）'}</button>` : ''}
-      <div class="mjwb">${V.priv && V.host ? `<button class="btn" id="mjStart">立即開始（空位由電腦補）</button>` : ''}<button class="btn sub" id="mjWl">離開</button></div>`;
+      <div class="mjwb">${V.priv && V.host ? `<button class="btn" id="mjStart">立即開始</button>` : ''}<button class="btn sub" id="mjWl">離開</button></div>`;
   } else {
     inner = `<div class="mjwt">⏳ 牌桌正在打</div><div class="mjws">這一局結束後你就會入座，請稍等…</div><div class="mjwb"><button class="btn sub" id="mjWl">離開</button></div>`;
   }

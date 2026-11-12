@@ -4,7 +4,7 @@ const TH_ICON = {n:'🌱',m:'🌻',h:'🏆',r:'💰'};
 
 function openThLobby(){
   const gold = S.me.gold;
-  modal('♠️ 德州撲克', `<div class="rhint">6 人桌無限注德州撲克。坐下時把金幣換成籌碼帶上桌，離桌時剩下的籌碼自動換回金幣。人不夠時電腦補到 4 人，有真人加入電腦會讓位</div>
+  modal('♠️ 德州撲克', `<div class="rhint">6 人桌無限注德州撲克。坐下時把金幣換成籌碼帶上桌，離桌時剩下的籌碼自動換回金幣</div>
     <div id="thBack"></div>
     ${Object.entries(HOLD.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${TH_ICON[k]}</div><div class="tx"><b>${t.name}</b>
       <div>盲注 ${t.sb.toLocaleString()} / ${t.bb.toLocaleString()}</div><div>帶入 ${t.buyMin.toLocaleString()}～${t.buyMax.toLocaleString()}・要 ${t.min.toLocaleString()} 金幣才能坐</div></div>
@@ -66,7 +66,7 @@ function thRender(V){
   const board = [0,1,2,3,4].map(k=> V.board && V.board[k]!=null ? b2Card(V.board[k], 'thb' + (thAnim['b'+k] !== V.handNo+':'+V.board[k] ? ' new' : '')) : `<i class="b2c thb ghost"></i>`).join('');
   (V.board||[]).forEach((c,k)=>thAnim['b'+k] = V.handNo+':'+c);
   const potTxt = V.pot ? `<div class="thpot">底池 <b>${V.pot.toLocaleString()}</b></div>` : '';
-  const info = V.queued ? '<div class="thinfo">座位滿了，等電腦讓位…</div>' : !live && !res ? '<div class="thinfo">等下一局開始…</div>' : '';
+  const info = V.queued ? '<div class="thinfo">座位滿了，等有人離座…</div>' : !live && !res ? '<div class="thinfo">等下一局開始…</div>' : '';
   $('mj').style.setProperty('--b2pet', `url("${typeof chrSrc==='function' ? chrSrc('fox1') : ''}")`);
   felt.innerHTML = `<div class="thtab"></div><div class="thmid"><div class="thboard">${board}</div>${potTxt}${res && res.rake ? `<div class="thrake">場地費 ${res.rake.toLocaleString()}</div>` : ''}${info}</div>
     ${V.seats.map(seat).join('')}`;
