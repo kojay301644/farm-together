@@ -983,3 +983,9 @@ setInterval(checkSteals, 30000); setTimeout(checkSteals, 6000);
 function regenTxt(me, k){ if(!me || !(+me[k+'_regen']>0)) return ''; if(me[k+'_next']==null) return `，每 ${+me[k+'_regen']} 分鐘回 1 點`;
   const s=Math.max(0, me[k+'_next'] - Math.floor((Date.now()-(me._stAt||Date.now()))/1000)); return `，${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 後回 1 點`; }
 const stealRegenTxt = me => regenTxt(me, 'steal');
+
+/* 整個遊戲都不要被縮放：iPhone 會無視 maximum-scale，連點會「點兩下放大」、兩指會縮放。
+   連點的第二下擋掉預設動作、自己補按一次；兩指縮放直接擋掉 */
+try{ mjNoZoom(document.body); }catch(e){}
+document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });

@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>一起種田吧</title>
 <meta name="description" content="開心農場風格的小鎮種田遊戲：種菜、收成、加好友、偷菜！">
 <meta name="theme-color" content="#3BB273">
@@ -1123,21 +1123,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794474625" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794474776" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794474625" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794474625" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794474776" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794474776" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794474625" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794474776" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794474625" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794474625" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794474776" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794474776" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1154,11 +1154,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794474625" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794474776" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794474625";
+const BUILD="1794474776";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -4103,16 +4103,20 @@ function mjBgmSync(){
 document.addEventListener('visibilitychange', mjBgmSync);
 addEventListener('pointerdown', ()=>{ if(mjOn() && MJ_BGM && MJ_BGM.paused && mjBgmOn) mjBgmSync(); }, {passive:true});
 function mjOpenReset(){ mjAnimKey = {}; }
-// 牌桌上連點（例如百家樂一直加注）：iPhone 會當成點兩下放大。第二下擋掉預設動作，自己補按一次
+// 連點（例如百家樂一直加注、一直點田）：iPhone 會當成點兩下放大。第二下擋掉預設動作，自己補按一次（整個遊戲都用）
 function mjNoZoom(el){
   if(el.dataset.nz) return; el.dataset.nz = '1'; let last = 0;
   el.addEventListener('touchend', e => { const now = Date.now();
-    if(now - last < 380 && e.touches.length === 0 && e.cancelable){ e.preventDefault(); const t = e.target.closest && e.target.closest('button,a,[data-bca],[data-chip]'); if(t && !t.disabled) t.click(); }
+    if(now - last < 380 && e.touches.length === 0 && e.cancelable && !(e.target.closest && e.target.closest('input,textarea,select'))){
+      e.preventDefault();
+      const t = (e.target.closest && e.target.closest('button,a,[data-bca],[data-chip]')) || e.target, p = e.changedTouches && e.changedTouches[0];
+      if(t && !t.disabled) t.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window, clientX: p ? p.clientX : 0, clientY: p ? p.clientY : 0 }));
+    }
     last = now; }, { passive: false });
   el.addEventListener('dblclick', e => e.preventDefault());
   el.addEventListener('gesturestart', e => e.preventDefault());
 }
-function mjOpen(){ mjNoZoom($('mj')); mjOpenReset(); $('mj').classList.add('on', 'tech'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = null; mjDiceHand = 0; mjBgmSync(); }
+function mjOpen(){ mjOpenReset(); $('mj').classList.add('on', 'tech'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = null; mjDiceHand = 0; mjBgmSync(); }
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }
@@ -4234,9 +4238,11 @@ let mjW = 844, mjH = 390;
 function mjFit(){
   const el = $('mj'); if(!el) return;
   const W = innerWidth, H = innerHeight, rot = H > W;
-  mjW = rot ? H : W; mjH = rot ? W : H;
+  // iPhone 橫拿：Safari 會把貼著螢幕上緣、下緣的點擊拿去叫出網址列，牌桌上下各留一點空
+  const pad = !rot && H < 540 && /iPhone|iPad|iPod/.test(navigator.userAgent) ? [18, 14] : [0, 0];
+  mjW = rot ? H : W; mjH = (rot ? W : H) - pad[0] - pad[1];
   el.classList.toggle('rot', rot);
-  el.style.width = mjW + 'px'; el.style.height = mjH + 'px';
+  el.style.width = mjW + 'px'; el.style.height = mjH + 'px'; el.style.top = pad[0] + 'px';
   el.style.transform = rot ? `translateX(${W}px) rotate(90deg)` : '';
 }
 function mjToast(msg){ const t = $('mjToast'); if(!t) return toast(msg); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'), 1800); }
@@ -7651,6 +7657,12 @@ setInterval(checkSteals, 30000); setTimeout(checkSteals, 6000);
 function regenTxt(me, k){ if(!me || !(+me[k+'_regen']>0)) return ''; if(me[k+'_next']==null) return `，每 ${+me[k+'_regen']} 分鐘回 1 點`;
   const s=Math.max(0, me[k+'_next'] - Math.floor((Date.now()-(me._stAt||Date.now()))/1000)); return `，${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 後回 1 點`; }
 const stealRegenTxt = me => regenTxt(me, 'steal');
+
+/* 整個遊戲都不要被縮放：iPhone 會無視 maximum-scale，連點會「點兩下放大」、兩指會縮放。
+   連點的第二下擋掉預設動作、自己補按一次；兩指縮放直接擋掉 */
+try{ mjNoZoom(document.body); }catch(e){}
+document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 
 </script>
 </body>
