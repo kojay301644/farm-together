@@ -109,11 +109,27 @@ const HALL_GAMES = [
   {id:'big2', icon:'🃏', name:'大老二', desc:'台灣玩法，四個人搶先出完', open:true},
   {id:'bc', icon:'🎴', name:'百家樂', desc:'押莊或閒，最多 6 人同桌', open:true},
   {id:'holdem', icon:'♠️', name:'德州撲克', desc:'6 人桌無限注，帶籌碼上桌', open:true},
+  {id:'bj', icon:'🂡', name:'21 點', desc:'跟莊家比大小，不超過 21', open:false},
+  {id:'xq', icon:'♟️', name:'象棋', desc:'兩人對弈，將軍！', open:false},
+  {id:'aq', icon:'🀄', name:'暗棋', desc:'翻棋吃子，運氣加策略', open:false},
+  {id:'cc', icon:'🔵', name:'跳棋', desc:'跳來跳去，先到對面贏', open:false},
+  {id:'gm', icon:'⚫', name:'五子棋', desc:'連成五顆就贏', open:false},
 ];
-function openHall(){
-  modal('🎰 寵物娛樂廳', `<div class="rhint">用農場金幣跟大家同樂！麻將、大老二每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費</div>
-    <div class="hallg">${HALL_GAMES.map(g=>`<button class="hgc${g.open?'':' off'}" data-hg="${g.id}"><span class="hgi">${g.icon}</span><b>${g.name}</b><small>${g.desc}</small></button>`).join('')}</div>`);
-  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ if(b.dataset.hg==='mj') openMjLobby(); else if(b.dataset.hg==='big2') openB2Lobby(); else if(b.dataset.hg==='bc') openBcLobby(); else if(b.dataset.hg==='holdem') openThLobby(); else toast('這個遊戲還在做，敬請期待！'); });
+// 休閒手感：靠手感的小遊戲（不用下注）
+const HALL_FUN = [
+  {id:'run', icon:'🏃', name:'寵物跑酷', desc:'帶寵物衝刺撿金幣，每週排行榜', open:true},
+  {id:'claw', icon:'🧸', name:'夾娃娃機', desc:'夾寵物、裝飾、稀有種子', open:false},
+  {id:'mono', icon:'🎲', name:'大富翁', desc:'擲骰子買菜園，收過路費', open:false},
+  {id:'mole', icon:'🔨', name:'打田鼠', desc:'田鼠冒出來偷菜，快打下去', open:false},
+];
+function openHall(tab){
+  tab = tab === 'fun' ? 'fun' : 'casino';
+  const L = tab === 'fun' ? HALL_FUN : HALL_GAMES;
+  modal('🎰 寵物娛樂廳', `<div class="snav hallnav"><button data-ht="casino" class="${tab==='casino'?'on':''}">🃏 棋牌對戰</button><button data-ht="fun" class="${tab==='fun'?'on':''}">🎮 休閒手感</button></div>
+    <div class="rhint">${tab==='fun' ? '靠手感的小遊戲，不用下注，玩得好就能賺農場金幣、衝排行榜' : `用農場金幣跟大家同樂！麻將、大老二每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費`}</div>
+    <div class="hallg">${L.map(g=>`<button class="hgc${g.open?'':' off'}" data-hg="${g.id}"><span class="hgi">${g.icon}</span><b>${g.name}</b><small>${g.open ? g.desc : '尚未開放'}</small></button>`).join('')}</div>`);
+  document.querySelectorAll('#md [data-ht]').forEach(b=>b.onclick=()=>openHall(b.dataset.ht));
+  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ const g=b.dataset.hg; if(g==='mj') openMjLobby(); else if(g==='big2') openB2Lobby(); else if(g==='bc') openBcLobby(); else if(g==='holdem') openThLobby(); else if(g==='run') openRunLobby(); else toast('尚未開放，敬請期待！'); });
 }
 function openMjLobby(){
   const gold = S.me.gold;
