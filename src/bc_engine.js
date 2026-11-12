@@ -3,7 +3,8 @@
 const BC = (() => {
   // 只有一種桌：單注最低 100；莊、閒每局最多押 2 萬，和、對子最多 1 萬
   const TABLES = { n: { name: '百家樂', min: 100, bet: 100, chips: [100, 500, 1000, 5000, 10000] } };
-  const LIMIT = { p: 20000, b: 20000, t: 10000, pp: 10000, bp: 10000 };
+  const LIMIT = { p: Infinity, b: Infinity, t: Infinity, pp: Infinity, bp: Infinity };   // 單注不設上限（只受身上金幣限制）
+  const BOT_LIMIT = { p: 20000, b: 20000, t: 10000, pp: 10000, bp: 10000 };   // 電腦還是照舊，不會亂押大注
   const AREAS = { p: { name: '閒', pay: 1 }, b: { name: '莊', pay: 0.95 }, t: { name: '和', pay: 8 }, pp: { name: '閒對', pay: 11 }, bp: { name: '莊對', pay: 11 } };
   const MAXP = 6;   // 一桌最多幾人
   const PETS = ['armad','bear','bunny','deer','dragon','ferret','fox','lizard','marten','mole','moth','mouse','otter','owl','pango','penguin','phoenix','seal'];
@@ -45,6 +46,6 @@ const BC = (() => {
     }
     return d;
   }
-  return { TABLES, LIMIT, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
+  return { TABLES, LIMIT, BOT_LIMIT, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
 })();
 if (typeof module !== 'undefined') module.exports = BC;

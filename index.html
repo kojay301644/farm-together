@@ -1120,21 +1120,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794472532" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794473207" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794472532" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794472532" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794473207" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794473207" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794472532" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794473207" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794472532" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794472532" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794473207" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794473207" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1151,11 +1151,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794472532" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794473207" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794472532";
+const BUILD="1794473207";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -5356,7 +5356,8 @@ function mfResultHtml(V){
 const BC = (() => {
   // 只有一種桌：單注最低 100；莊、閒每局最多押 2 萬，和、對子最多 1 萬
   const TABLES = { n: { name: '百家樂', min: 100, bet: 100, chips: [100, 500, 1000, 5000, 10000] } };
-  const LIMIT = { p: 20000, b: 20000, t: 10000, pp: 10000, bp: 10000 };
+  const LIMIT = { p: Infinity, b: Infinity, t: Infinity, pp: Infinity, bp: Infinity };   // 單注不設上限（只受身上金幣限制）
+  const BOT_LIMIT = { p: 20000, b: 20000, t: 10000, pp: 10000, bp: 10000 };   // 電腦還是照舊，不會亂押大注
   const AREAS = { p: { name: '閒', pay: 1 }, b: { name: '莊', pay: 0.95 }, t: { name: '和', pay: 8 }, pp: { name: '閒對', pay: 11 }, bp: { name: '莊對', pay: 11 } };
   const MAXP = 6;   // 一桌最多幾人
   const PETS = ['armad','bear','bunny','deer','dragon','ferret','fox','lizard','marten','mole','moth','mouse','otter','owl','pango','penguin','phoenix','seal'];
@@ -5398,7 +5399,7 @@ const BC = (() => {
     }
     return d;
   }
-  return { TABLES, LIMIT, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
+  return { TABLES, LIMIT, BOT_LIMIT, AREAS, MAXP, PETS, rk, val, pts, newShoe, deal, payout };
 })();
 if (typeof module !== 'undefined') module.exports = BC;
 /* ---------- 百家樂（多人同桌，跟系統對賭；共用麻將的牌桌外框、連線流程） ---------- */
@@ -5484,7 +5485,7 @@ function bcRender(V){
   const areas = BC_ORDER.map(k=>{ const A = BC.AREAS[k], m = my[k]||0, all = tot[k]||0;
     const fk = V.round + ':' + k + ':' + m, flash = m && bcFlash[k] !== fk; bcFlash[k] = fk;
     return `<button class="bca bca-${k}${winArea(k)?' win':''}${res && !winArea(k) && m ? ' lose':''}" data-bca="${k}" ${bet && !shuffling?'':'disabled'}>
-      <b>${A.name}</b><small>1 賠 ${A.pay}・上限 ${BC.LIMIT[k]/10000} 萬</small>${all?`<span class="bcall">全桌 ${all.toLocaleString()}</span>`:''}${m?`<span class="bcmy${flash?' pop':''}">${m.toLocaleString()}</span>`:''}</button>`; }).join('');
+      <b>${A.name}</b><small>1 賠 ${A.pay}</small>${all?`<span class="bcall">全桌 ${all.toLocaleString()}</span>`:''}${m?`<span class="bcmy${flash?' pop':''}">${m.toLocaleString()}</span>`:''}</button>`; }).join('');
   const myTot = Object.values(my).reduce((s,x)=>s+x,0);
   const winTxt = V.phase==='end' && V.myWin!=null && myTot ? (V.myWin>0?`<span class="bcwin up">贏 +${V.myWin.toLocaleString()}</span>`:V.myWin<0?`<span class="bcwin dn">輸 ${V.myWin.toLocaleString()}</span>`:`<span class="bcwin">押注退回</span>`) : '';
   $('mjUi').innerHTML = `<div class="bcareas">${areas}</div>

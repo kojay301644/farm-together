@@ -44,7 +44,7 @@ function applyPlans(G, now) {
   for (const b of G.bots || []) {
     while (b.plan.length && b.plan[0].at <= now) {
       const x = b.plan.shift(), tot = Object.values(b.bets).reduce((a, v) => a + v, 0);
-      if ((b.bets[x.k] || 0) + x.amt > BC.LIMIT[x.k] || tot + x.amt > b.gold) continue;
+      if ((b.bets[x.k] || 0) + x.amt > BC.BOT_LIMIT[x.k] || tot + x.amt > b.gold) continue;
       b.bets[x.k] = (b.bets[x.k] || 0) + x.amt;
     }
   }

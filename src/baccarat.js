@@ -81,7 +81,7 @@ function bcRender(V){
   const areas = BC_ORDER.map(k=>{ const A = BC.AREAS[k], m = my[k]||0, all = tot[k]||0;
     const fk = V.round + ':' + k + ':' + m, flash = m && bcFlash[k] !== fk; bcFlash[k] = fk;
     return `<button class="bca bca-${k}${winArea(k)?' win':''}${res && !winArea(k) && m ? ' lose':''}" data-bca="${k}" ${bet && !shuffling?'':'disabled'}>
-      <b>${A.name}</b><small>1 賠 ${A.pay}・上限 ${BC.LIMIT[k]/10000} 萬</small>${all?`<span class="bcall">全桌 ${all.toLocaleString()}</span>`:''}${m?`<span class="bcmy${flash?' pop':''}">${m.toLocaleString()}</span>`:''}</button>`; }).join('');
+      <b>${A.name}</b><small>1 賠 ${A.pay}</small>${all?`<span class="bcall">全桌 ${all.toLocaleString()}</span>`:''}${m?`<span class="bcmy${flash?' pop':''}">${m.toLocaleString()}</span>`:''}</button>`; }).join('');
   const myTot = Object.values(my).reduce((s,x)=>s+x,0);
   const winTxt = V.phase==='end' && V.myWin!=null && myTot ? (V.myWin>0?`<span class="bcwin up">贏 +${V.myWin.toLocaleString()}</span>`:V.myWin<0?`<span class="bcwin dn">輸 ${V.myWin.toLocaleString()}</span>`:`<span class="bcwin">押注退回</span>`) : '';
   $('mjUi').innerHTML = `<div class="bcareas">${areas}</div>
