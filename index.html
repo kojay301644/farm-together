@@ -499,7 +499,7 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 .barncap{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#F6F1E7;border-radius:12px;padding:8px 10px;margin:6px 0 4px;font-weight:800;font-size:13px}.barncap.full{background:#FDEBEA}
 .barncap .bcb{flex:1 1 100%;height:8px;border-radius:99px;background:#E6DCC8;overflow:hidden}.barncap .bcb i{display:block;height:100%;background:#F2A417}.barncap.full .bcb i{background:#D9534F}.barncap span{flex:1}
 .tkmkt{color:#B05A00;font-weight:900}
-#run{position:fixed;inset:0;z-index:70;display:none;background:#6EC3F0;touch-action:none;user-select:none;-webkit-user-select:none}#run.on{display:block}
+#run{position:fixed;inset:0;z-index:70;display:none;overscroll-behavior:none;background:#6EC3F0;touch-action:none;user-select:none;-webkit-user-select:none}#run.on{display:block}
 #run canvas{position:absolute;inset:0;display:block}
 .rnhud{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;align-items:center;gap:10px;padding:0 12px;pointer-events:none}
 .rnhud span{background:rgba(255,255,255,.88);border-radius:999px;padding:6px 14px;font-weight:900;font-size:17px;color:#5A3A1A;box-shadow:0 2px 0 rgba(0,0,0,.15);display:flex;align-items:center;gap:5px}.rnhud span img{width:20px;height:20px}
@@ -1086,21 +1086,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794467498" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794467655" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794467498" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794467498" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794467655" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794467655" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794467498" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794467655" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794467498" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794467498" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794467655" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794467655" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1117,11 +1117,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794467498" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794467655" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794467498";
+const BUILD="1794467655";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -5857,6 +5857,16 @@ function thRebuyAsk(){
 const RUN = { V0: 260, ACC: 6, VMAX: 650, PX_M: 40, G: 2100, J1: 760, J2: 680, LH: 400, GY: 322 };
 let RN = null;   // 進行中的一場
 
+// iPhone 會無視 maximum-scale：連點畫面會被當成「點兩下放大」，整個畫面跑掉。小遊戲的畫面上把觸控的預設動作擋掉（按鈕除外）
+function gameTouchLock(el){
+  if(el.dataset.lock) return; el.dataset.lock = '1';
+  const f = e => { if(e.target.closest && e.target.closest('button,.rnres')) return; if(e.cancelable) e.preventDefault(); };
+  el.addEventListener('touchstart', f, { passive: false });
+  el.addEventListener('touchend', f, { passive: false });
+  el.addEventListener('touchmove', e => { if(e.cancelable) e.preventDefault(); }, { passive: false });
+  el.addEventListener('dblclick', e => e.preventDefault());
+  el.addEventListener('gesturestart', e => e.preventDefault());
+}
 function runImg(src){ const i = new Image(); i.src = src; return i; }
 const RUN_IMG = {};
 function runAssets(){
@@ -5889,6 +5899,7 @@ async function runStart(){
   let s; try{ s = await rpc('farm_run_start'); }catch(e){ return toast(e.message); }
   closeModal(); runAssets();
   let el = $('run'); if(!el){ el = document.createElement('div'); el.id = 'run'; document.body.appendChild(el); }
+  gameTouchLock(el); try{ scrollTo(0, 0); }catch(e){}
   el.innerHTML = `<canvas id="rnC"></canvas><div class="rnhud"><span id="rnD">0 公尺</span><span id="rnCo"><img src="${A('i_coin')}" alt="">0</span><button id="rnX">✕</button></div><div id="rnMsg" class="rnmsg">點畫面開始！</div><div id="rnEnd"></div>`;
   el.classList.add('on'); document.body.classList.add('mjon');
   RN = { id: s.id, t: 0, px: 0, coins: 0, y: RUN.GY, vy: 0, jumps: 0, obs: [], cn: [], pw: [], next: 500, nextC: 300, nextP: 9000 + Math.random()*6000,
@@ -6053,6 +6064,7 @@ async function stairStart(){
   let s; try{ s = await rpc('farm_stair_start'); }catch(e){ return toast(e.message); }
   closeModal();
   let el = $('stair'); if(!el){ el = document.createElement('div'); el.id = 'stair'; document.body.appendChild(el); }
+  gameTouchLock(el); try{ scrollTo(0, 0); }catch(e){}
   el.innerHTML = `<canvas id="stC"></canvas><div class="rnhud"><span id="stF">地下 0 層</span><span class="sthp" id="stHp"></span><button id="stX">✕</button></div>
     <div id="stMsg" class="rnmsg">按 ◀ ▶ 開始！</div>
     <button class="stbtn l" id="stL">◀</button><button class="stbtn r" id="stR">▶</button><div id="stEnd"></div>`;

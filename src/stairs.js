@@ -30,6 +30,7 @@ async function stairStart(){
   let s; try{ s = await rpc('farm_stair_start'); }catch(e){ return toast(e.message); }
   closeModal();
   let el = $('stair'); if(!el){ el = document.createElement('div'); el.id = 'stair'; document.body.appendChild(el); }
+  gameTouchLock(el); try{ scrollTo(0, 0); }catch(e){}
   el.innerHTML = `<canvas id="stC"></canvas><div class="rnhud"><span id="stF">地下 0 層</span><span class="sthp" id="stHp"></span><button id="stX">✕</button></div>
     <div id="stMsg" class="rnmsg">按 ◀ ▶ 開始！</div>
     <button class="stbtn l" id="stL">◀</button><button class="stbtn r" id="stR">▶</button><div id="stEnd"></div>`;

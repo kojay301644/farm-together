@@ -4,6 +4,16 @@
 const RUN = { V0: 260, ACC: 6, VMAX: 650, PX_M: 40, G: 2100, J1: 760, J2: 680, LH: 400, GY: 322 };
 let RN = null;   // 進行中的一場
 
+// iPhone 會無視 maximum-scale：連點畫面會被當成「點兩下放大」，整個畫面跑掉。小遊戲的畫面上把觸控的預設動作擋掉（按鈕除外）
+function gameTouchLock(el){
+  if(el.dataset.lock) return; el.dataset.lock = '1';
+  const f = e => { if(e.target.closest && e.target.closest('button,.rnres')) return; if(e.cancelable) e.preventDefault(); };
+  el.addEventListener('touchstart', f, { passive: false });
+  el.addEventListener('touchend', f, { passive: false });
+  el.addEventListener('touchmove', e => { if(e.cancelable) e.preventDefault(); }, { passive: false });
+  el.addEventListener('dblclick', e => e.preventDefault());
+  el.addEventListener('gesturestart', e => e.preventDefault());
+}
 function runImg(src){ const i = new Image(); i.src = src; return i; }
 const RUN_IMG = {};
 function runAssets(){
@@ -36,6 +46,7 @@ async function runStart(){
   let s; try{ s = await rpc('farm_run_start'); }catch(e){ return toast(e.message); }
   closeModal(); runAssets();
   let el = $('run'); if(!el){ el = document.createElement('div'); el.id = 'run'; document.body.appendChild(el); }
+  gameTouchLock(el); try{ scrollTo(0, 0); }catch(e){}
   el.innerHTML = `<canvas id="rnC"></canvas><div class="rnhud"><span id="rnD">0 公尺</span><span id="rnCo"><img src="${A('i_coin')}" alt="">0</span><button id="rnX">✕</button></div><div id="rnMsg" class="rnmsg">點畫面開始！</div><div id="rnEnd"></div>`;
   el.classList.add('on'); document.body.classList.add('mjon');
   RN = { id: s.id, t: 0, px: 0, coins: 0, y: RUN.GY, vy: 0, jumps: 0, obs: [], cn: [], pw: [], next: 500, nextC: 300, nextP: 9000 + Math.random()*6000,
