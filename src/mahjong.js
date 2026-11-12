@@ -188,7 +188,16 @@ function mjBgmSync(){
 document.addEventListener('visibilitychange', mjBgmSync);
 addEventListener('pointerdown', ()=>{ if(mjOn() && MJ_BGM && MJ_BGM.paused && mjBgmOn) mjBgmSync(); }, {passive:true});
 function mjOpenReset(){ mjAnimKey = {}; }
-function mjOpen(){ mjOpenReset(); $('mj').classList.add('on', 'tech'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = null; mjDiceHand = 0; mjBgmSync(); }
+// 牌桌上連點（例如百家樂一直加注）：iPhone 會當成點兩下放大。第二下擋掉預設動作，自己補按一次
+function mjNoZoom(el){
+  if(el.dataset.nz) return; el.dataset.nz = '1'; let last = 0;
+  el.addEventListener('touchend', e => { const now = Date.now();
+    if(now - last < 380 && e.touches.length === 0 && e.cancelable){ e.preventDefault(); const t = e.target.closest && e.target.closest('button,a,[data-bca],[data-chip]'); if(t && !t.disabled) t.click(); }
+    last = now; }, { passive: false });
+  el.addEventListener('dblclick', e => e.preventDefault());
+  el.addEventListener('gesturestart', e => e.preventDefault());
+}
+function mjOpen(){ mjNoZoom($('mj')); mjOpenReset(); $('mj').classList.add('on', 'tech'); document.body.classList.add('mjon'); mjFit(); mjPreloadVoice(); mjSel = null; mjLastLog = null; mjDiceHand = 0; mjBgmSync(); }
 function mjClose(){
   clearTimeout(mjBotT); clearTimeout(mjNextT); clearInterval(mjTimer); mjTimer=0;
   if(MJO){ clearTimeout(MJO.tick); clearInterval(MJO.poll); try{ MJO.ch && sb.removeChannel(MJO.ch); }catch(e){} }

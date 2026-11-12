@@ -27,6 +27,9 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden}
+/* iPhone 會無視 maximum-scale：連點按鈕會被當成「點兩下放大」。manipulation 只關掉點兩下放大，捲動照常 */
+*{touch-action:manipulation}
+#mj,#mj *{-webkit-touch-callout:none}
 body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#8fcdfb;user-select:none;-webkit-user-select:none}
 button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 
