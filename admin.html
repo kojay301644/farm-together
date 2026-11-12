@@ -125,9 +125,14 @@ async function pageRp(){
 const CSG = { mj:'🀄 麻將', b2:'🃏 大老二', bc:'🎴 百家樂', th:'♠️ 德州撲克' }, CS_BIG = 100000;
 let csDays = 1, csGame = '', csQ = '';
 const csAmt = v => `<b style="color:${v>0?'#1E9E55':v<0?'#D3403A':'#666'}">${v>0?'+':''}${(v||0).toLocaleString()}</b>`;
-async function pageCs(){
-  M(`<div class="card"><div class="muted">讀取中…</div></div>`);
-  let R; try{ R = await rpc('adm_casino', { p_days: csDays, p_game: csGame || null, p_q: csQ || null }); }catch(e){ return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+// 停在娛樂廳頁面時每 30 秒自動更新（看單一玩家、正在打搜尋字、切到別的分頁時不更新）
+let csTimer = 0, csList = false;
+async function pageCs(quiet){
+  clearInterval(csTimer); csList = true;
+  csTimer = setInterval(()=>{ if(tab!=='cs' || !csList){ clearInterval(csTimer); return; } if(document.hidden || document.activeElement && document.activeElement.id==='csQ') return; pageCs(true); }, 30000);
+  if(quiet!==true) M(`<div class="card"><div class="muted">讀取中…</div></div>`);
+  let R; try{ R = await rpc('adm_casino', { p_days: csDays, p_game: csGame || null, p_q: csQ || null }); }catch(e){ if(quiet===true) return; return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+  if(tab!=='cs' || !csList) return;   // 讀的時候已經換頁
   const btn = (on, attr, t) => `<button class="btn ${on?'':'g'}" ${attr}>${t}</button>`;
   const filt = `<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">${[[1,'今天'],[7,'7 天'],[30,'30 天'],[0,'全部']].map(([d,t])=>btn(csDays===d,`data-cd="${d}"`,t)).join('')}
     <span style="width:12px"></span>${[['','全部遊戲'],['mj',CSG.mj],['b2',CSG.b2],['bc',CSG.bc],['th',CSG.th]].map(([g,t])=>btn(csGame===g,`data-cg="${g}"`,t)).join('')}</div>`;
@@ -136,7 +141,8 @@ async function pageCs(){
     <div class="muted" style="margin-top:6px">娛樂廳收入：麻將、大老二是 5% 場地費；百家樂是莊家（系統）的賺賠；德州撲克是底池抽成。德州撲克的輸贏是籌碼輸贏，金幣在帶入、離桌時才換。這兩欄從 ${'2026/11/12'} 之後才開始記，之前的局只有玩家輸贏。</div>` : '<div class="muted">這段時間沒有紀錄</div>';
   const rank = (L, k) => L.length ? `<table class="tb"><tr><th>#</th><th>玩家</th><th>總輸贏</th><th>局數</th><th>${k==='best'?'單局最多贏':'單局最多輸'}</th></tr>${L.map((x,i)=>`<tr><td>${i+1}</td><td><a href="#" data-cp="${x.uid}">${esc(x.nick||'')}</a></td><td>${csAmt(x.net)}</td><td>${x.n}</td><td>${csAmt(x[k])}</td></tr>`).join('')}</table>` : '<div class="muted">沒有</div>';
   const recent = R.recent.length ? `<table class="tb"><tr><th>時間</th><th>遊戲</th><th>桌／局</th><th>玩家</th><th>輸贏</th></tr>${R.recent.map(x=>`<tr${Math.abs(x.amt)>=CS_BIG?' style="background:#FFE9E9"':''}><td>${dt(x.at)}</td><td>${CSG[x.game]||esc(x.game)}</td><td>#${x.tid}／${x.hand}</td><td><a href="#" data-cp="${x.uid}">${esc(x.nick||'')}</a></td><td>${csAmt(x.amt)}${Math.abs(x.amt)>=CS_BIG?' ⚠️':''}</td></tr>`).join('')}</table>` : '<div class="muted">沒有紀錄</div>';
-  M(`<div class="card"><h2>🎰 娛樂廳輸贏</h2>${filt}${sum}</div>
+  const y = scrollY;
+  M(`<div class="card"><h2>🎰 娛樂廳輸贏 <span class="muted" style="font-size:12px;font-weight:400">每 30 秒自動更新・上次 ${new Date().toLocaleTimeString('zh-TW',{hour12:false})}</span></h2>${filt}${sum}</div>
     <div class="row" style="gap:12px;align-items:flex-start;flex-wrap:wrap"><div class="card" style="flex:1;min-width:300px"><h2>🏆 贏最多</h2>${rank(R.winners,'best')}</div><div class="card" style="flex:1;min-width:300px"><h2>💸 輸最多</h2>${rank(R.losers,'worst')}</div></div>
     <div class="card"><h2>📜 最近紀錄</h2><div class="row" style="gap:6px;margin-bottom:8px"><input id="csQ" placeholder="搜尋玩家名字" value="${esc(csQ)}"><button class="btn" id="csGo">搜尋</button></div>
       <div class="muted" style="margin-bottom:6px">單局輸贏超過 ${CS_BIG.toLocaleString()} 會標紅 ⚠️</div>${recent}</div>`);
@@ -145,8 +151,10 @@ async function pageCs(){
   $('csGo').onclick = ()=>{ csQ = $('csQ').value.trim(); pageCs(); };
   $('csQ').onkeydown = e=>{ if(e.key==='Enter') $('csGo').click(); };
   document.querySelectorAll('[data-cp]').forEach(a=>a.onclick=e=>{ e.preventDefault(); csPlayer(a.dataset.cp); });
+  if(quiet===true) scrollTo(0, y);   // 自動更新不要跳回最上面
 }
 async function csPlayer(id){
+  csList = false;
   M(`<div class="card"><div class="muted">讀取中…</div></div>`);
   let P; try{ P = await rpc('adm_casino_player', { p_id: id }); }catch(e){ return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
   M(`<div class="card"><button class="btn g" id="csBack">← 返回</button> <button class="btn g" id="csPl">看玩家資料</button><h2 style="margin-top:10px">🎰 ${esc(P.nick||'')} 的娛樂廳紀錄</h2>
