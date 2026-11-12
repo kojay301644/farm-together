@@ -1,8 +1,8 @@
 -- 新增 30 個農場電腦（15 個愛賭博），愛賭博的：種菜比較懶、收成就賣
 do $$
 declare
-  nm text[] := array['賭神阿發','梭哈小王子','好運來來','翻倍姐','押莊不押閒','今晚必贏','一把翻身','發財樹下','幸運七七','全押哥',
-                     '莊家剋星','牌桌老江湖','手氣正旺','金蟾蜍','賭聖星仔',
+  nm text[] := array['阿發哥','小王子','來來','芒果姐','愛睡懶覺','今晚吃什麼','翻身的鹹魚','大樹下乘涼','七七','阿強哥',
+                     '巷口阿伯','晴天娃娃','旺旺仙貝','綠色青蛙','星仔',
                      '早起的鳥','菜園小幫手','番茄炒蛋','地瓜葉','小農阿伯','綠手指','西瓜甜不甜','高麗菜妹','玉米鬚','稻草人',
                      '偷吃步','月光下的賊','蘿蔔蹲','熱心阿姨','路邊攤老闆'];
   sty text[] := array['gambler','gambler','gambler','gambler','gambler','gambler','gambler','gambler','gambler','gambler',
@@ -12,7 +12,7 @@ declare
   lvs int[] := array[6,9,12,14,17,20,8,11,15,22,10,18,13,16,24, 2,3,4,5,6,7,8,9,10,12,13,15,18,21,25];
   i int; u uuid; s0 int;
 begin
-  if exists(select 1 from players where lower(nickname) = lower(nm[1])) then return; end if;   -- 跑過了
+  if exists(select 1 from players where lower(nickname) = lower(nm[1])) then return; end if;   -- 跑過了（名字已改成跟賭博無關）
   select coalesce(max(sort),0) into s0 from bots;
   for i in 1..30 loop
     if exists(select 1 from players where lower(nickname) = lower(nm[i])) then continue; end if;
