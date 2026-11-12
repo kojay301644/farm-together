@@ -559,23 +559,21 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 #dogBite.out{transition:opacity .4s;opacity:0}
 .dbdark{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(40,0,0,.55),rgba(0,0,0,.92) 70%);animation:dbdark .3s ease-out both}
 @keyframes dbdark{from{opacity:0}to{opacity:1}}
-.dbeyes{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);display:flex;gap:min(22vw,140px);animation:dbeyes .62s ease-in both}
-.dbeyes i{width:min(13vw,74px);height:min(6vw,34px);background:radial-gradient(ellipse,#FFF3B0 0 18%,#FF2A1F 40%,rgba(255,0,0,0) 72%);border-radius:50%;box-shadow:0 0 30px 12px rgba(255,30,20,.55);transform:rotate(14deg)}
-.dbeyes i:last-child{transform:rotate(-14deg)}
-@keyframes dbeyes{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}35%{opacity:1}85%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
-.dbjaw{position:absolute;left:-4vw;width:108vw;height:56vh}
-.dbjaw svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 18px rgba(0,0,0,.6))}
-.dbjaw.up{top:0;transform:translateY(-105%);animation:dbup 1.9s cubic-bezier(.55,0,.1,1) .5s both}
-.dbjaw.dn{bottom:0;transform:translateY(105%);animation:dbdn 1.9s cubic-bezier(.55,0,.1,1) .5s both}
-@keyframes dbup{0%{transform:translateY(-105%)}7%{transform:translateY(-6%)}10%{transform:translateY(-12%)}14%{transform:translateY(-5%)}40%{transform:translateY(-8%)}100%{transform:translateY(-110%)}}
-@keyframes dbdn{0%{transform:translateY(105%)}7%{transform:translateY(6%)}10%{transform:translateY(12%)}14%{transform:translateY(5%)}40%{transform:translateY(8%)}100%{transform:translateY(110%)}}
-.dbflash{position:absolute;inset:0;background:#E0141E;opacity:0;animation:dbflash .5s ease-out .6s both;mix-blend-mode:screen}
+.dbwrap{position:absolute;left:50%;top:46%;width:min(80vw,420px);height:min(80vw,420px);transform:translate(-50%,-50%) scale(.45);animation:dblunge 2.1s cubic-bezier(.5,0,.2,1) both}
+.dbdog{width:100%;height:100%;display:block;filter:drop-shadow(0 0 24px rgba(0,0,0,.6))}
+@keyframes dblunge{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}10%{opacity:1;transform:translate(-50%,-50%) scale(.45)}14%{transform:translate(calc(-50% - 6px),-50%) scale(.46)}18%{transform:translate(calc(-50% + 6px),-50%) scale(.45)}22%{transform:translate(calc(-50% - 5px),-50%) scale(.47)}26%{transform:translate(-50%,-50%) scale(.46)}34%{transform:translate(-50%,-44%) scale(2.6)}40%{transform:translate(-50%,-46%) scale(2.3) rotate(-4deg)}46%{transform:translate(-50%,-46%) scale(2.35) rotate(4deg)}52%{transform:translate(-50%,-46%) scale(2.3) rotate(-3deg)}80%{opacity:1;transform:translate(-50%,-48%) scale(2.2) rotate(0)}100%{opacity:0;transform:translate(-50%,-50%) scale(2.6)}}
+.dbdog .mo{animation:dbmo 2.1s steps(1) both}.dbdog .mc{animation:dbmc 2.1s steps(1) both}
+@keyframes dbmo{0%{opacity:1}34%{opacity:0}100%{opacity:0}}
+@keyframes dbmc{0%{opacity:0}34%{opacity:1}100%{opacity:1}}
+.dbang{animation:dbang .25s ease-in-out infinite alternate}@keyframes dbang{to{opacity:.3}}
+.dbjaw{display:none}
+.dbflash{position:absolute;inset:0;background:#E0141E;opacity:0;animation:dbflash .5s ease-out .72s forwards;mix-blend-mode:screen}
 @keyframes dbflash{0%{opacity:.85}100%{opacity:0}}
-.dbmark{position:absolute;left:50%;top:50%;width:min(70vw,380px);transform:translate(-50%,-50%) scale(.6);opacity:0;animation:dbmark 1.6s ease-out .78s both}
+.dbmark{position:absolute;left:50%;top:50%;width:min(70vw,380px);transform:translate(-50%,-50%) scale(.6);opacity:0;animation:dbmark 1.5s ease-out .8s both}
 @keyframes dbmark{0%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}75%{opacity:.9}100%{opacity:0}}
-.dbtxt{position:absolute;left:0;right:0;top:20%;text-align:center;font-size:min(22vw,150px);font-weight:900;color:#FFF3E0;-webkit-text-stroke:4px #7A0E16;text-shadow:0 6px 0 #4A0D12,0 0 30px rgba(255,40,30,.8);opacity:0;animation:dbtxt 1.4s ease-out .7s both}
+.dbtxt{position:absolute;left:0;right:0;top:6%;text-align:center;font-size:min(22vw,150px);font-weight:900;color:#FFF3E0;-webkit-text-stroke:4px #7A0E16;text-shadow:0 6px 0 #4A0D12,0 0 30px rgba(255,40,30,.8);opacity:0;animation:dbtxt 1.4s ease-out .85s both}
 @keyframes dbtxt{0%{opacity:0;transform:scale(2.4) rotate(-8deg)}14%{opacity:1;transform:scale(1) rotate(-4deg)}20%{transform:scale(1.08) rotate(3deg)}26%{transform:scale(1) rotate(-2deg)}80%{opacity:1}100%{opacity:0;transform:scale(1.1)}}
-.dbmsg{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);background:rgba(20,0,0,.85);color:#FFD6D6;font-weight:900;font-size:20px;padding:10px 22px;border-radius:999px;border:2px solid #E0141E;white-space:nowrap;opacity:0;animation:dbmsg 1.5s ease-out .85s both}
+.dbmsg{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);background:rgba(20,0,0,.85);color:#FFD6D6;font-weight:900;font-size:20px;padding:10px 22px;border-radius:999px;border:2px solid #E0141E;white-space:nowrap;opacity:0;animation:dbmsg 1.5s ease-out .95s both}
 @keyframes dbmsg{0%{opacity:0;transform:translate(-50%,20px)}15%{opacity:1;transform:translate(-50%,0)}85%{opacity:1}100%{opacity:0}}
 body.dbshake{animation:dbshake .5s linear}
 @keyframes dbshake{0%,100%{transform:none}10%{transform:translate(-14px,8px) rotate(-1.5deg)}20%{transform:translate(12px,-10px) rotate(1.5deg)}30%{transform:translate(-10px,6px)}40%{transform:translate(9px,-5px) rotate(1deg)}55%{transform:translate(-6px,4px)}70%{transform:translate(4px,-3px)}85%{transform:translate(-2px,1px)}}

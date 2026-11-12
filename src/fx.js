@@ -155,31 +155,50 @@ function openAvatarPicker(){
 })();
 
 /* ================= 被看門狗咬：全螢幕驚嚇動畫 =================
-   黑暗中先亮起一對紅眼睛（低吼）→ 上下兩排尖牙猛然咬合（紅光、畫面震動、手機震動）→ 留下齒痕和「汪！！」→ 淡出 */
+   一隻生氣的小狗在畫面中間低吼 → 張大嘴朝螢幕撲過來 → 咬下去（畫面震動、手機震動）→「汪！！」→ 淡出（不蓋背景） */
+const DOG_SVG = `<svg viewBox="0 0 400 400" class="dbdog">
+  <ellipse cx="200" cy="372" rx="120" ry="16" fill="rgba(0,0,0,.35)"/>
+  <path d="M96 118 Q48 112 40 190 Q36 250 84 262 Q112 222 122 150 Z" fill="#7A4A26"/>
+  <path d="M304 118 Q352 112 360 190 Q364 250 316 262 Q288 222 278 150 Z" fill="#7A4A26"/>
+  <ellipse cx="200" cy="190" rx="122" ry="112" fill="#D99A5B"/>
+  <ellipse cx="148" cy="132" rx="40" ry="34" fill="#F2D2A6"/>
+  <path d="M112 128 L176 150" stroke="#3A2414" stroke-width="12" stroke-linecap="round"/>
+  <path d="M288 128 L224 150" stroke="#3A2414" stroke-width="12" stroke-linecap="round"/>
+  <ellipse cx="150" cy="168" rx="22" ry="20" fill="#FFF8EE"/><ellipse cx="250" cy="168" rx="22" ry="20" fill="#FFF8EE"/>
+  <circle cx="156" cy="172" r="11" fill="#C81E1E"/><circle cx="244" cy="172" r="11" fill="#C81E1E"/>
+  <circle cx="156" cy="172" r="5" fill="#1A0A0A"/><circle cx="244" cy="172" r="5" fill="#1A0A0A"/>
+  <ellipse cx="200" cy="232" rx="78" ry="58" fill="#F2D2A6"/>
+  <g class="mo">
+    <path d="M140 236 Q200 214 260 236 Q262 318 200 334 Q138 318 140 236 Z" fill="#5A0D14"/>
+    <path d="M168 300 Q200 336 232 300 Q226 326 200 330 Q174 326 168 300 Z" fill="#E86A7A"/>
+    <path d="M146 238 L158 270 L170 240 Z M184 232 L192 252 L200 232 Z M200 232 L208 252 L216 232 Z M230 240 L242 270 L254 238 Z" fill="#FFF8EE"/>
+    <path d="M152 316 L162 292 L172 322 Z M228 322 L238 292 L248 316 Z" fill="#FFF8EE"/>
+  </g>
+  <g class="mc">
+    <path d="M146 262 Q172 278 200 262 Q228 278 254 262" fill="none" stroke="#3A2414" stroke-width="8" stroke-linecap="round"/>
+    <path d="M162 266 L170 290 L178 270 Z M222 270 L230 290 L238 266 Z" fill="#FFF8EE" stroke="#3A2414" stroke-width="2"/>
+  </g>
+  <ellipse cx="200" cy="214" rx="26" ry="18" fill="#2A1A12"/><ellipse cx="192" cy="208" rx="8" ry="5" fill="#6B5446"/>
+  <path d="M88 330 Q86 300 120 300 Q150 302 148 336 Q120 352 88 330 Z" fill="#D99A5B"/>
+  <path d="M312 330 Q314 300 280 300 Q250 302 252 336 Q280 352 312 330 Z" fill="#D99A5B"/>
+  <path d="M104 334 v-12 M120 338 v-14 M136 334 v-12 M296 334 v-12 M280 338 v-14 M264 334 v-12" stroke="#7A4A26" stroke-width="4" stroke-linecap="round"/>
+  <path d="M52 92 l18 22 M28 140 l26 6 M348 92 l-18 22 M372 140 l-26 6" stroke="#FF5A4A" stroke-width="8" stroke-linecap="round" class="dbang"/>
+</svg>`;
 function dogBite(msg){
   try{
     const old = document.getElementById('dogBite'); if(old) old.remove();
-    const teeth = (up) => { let s = '';
-      for(let i = 0; i < 12; i++){ const x = i * 34 + 4, big = i === 2 || i === 9, h = big ? 92 : 46 + (i % 2) * 12, w = big ? 30 : 26;
-        s += up ? `<path d="M${x} 118 L${x + w / 2} ${118 + h} L${x + w} 118 Z" fill="#F3ECDD" stroke="#C9BBA0" stroke-width="2"/>` : `<path d="M${x} 82 L${x + w / 2} ${82 - h} L${x + w} 82 Z" fill="#F3ECDD" stroke="#C9BBA0" stroke-width="2"/>`; }
-      return s; };
-    const jaw = (up) => `<svg viewBox="0 0 410 200" preserveAspectRatio="none">${up
-      ? `<path d="M0 0 H410 V112 Q360 132 305 116 Q255 132 205 118 Q155 132 105 116 Q50 132 0 112 Z" fill="#4A0D12"/><path d="M0 100 Q100 122 205 108 Q310 122 410 100 V112 Q310 134 205 120 Q100 134 0 112 Z" fill="#8E1B24"/>${teeth(true)}`
-      : `<path d="M0 200 H410 V88 Q360 68 305 84 Q255 68 205 82 Q155 68 105 84 Q50 68 0 88 Z" fill="#4A0D12"/><path d="M0 100 Q100 78 205 92 Q310 78 410 100 V88 Q310 66 205 80 Q100 66 0 88 Z" fill="#8E1B24"/>${teeth(false)}`}</svg>`;
     const mark = `<svg viewBox="0 0 240 160" class="dbmark">${[0,1,2,3,4,5].map(i => `<ellipse cx="${40 + i * 32}" cy="${44 - Math.sin(i / 5 * Math.PI) * 18}" rx="11" ry="15" fill="#7A0E16" opacity=".85"/>`).join('')}${[0,1,2,3,4,5].map(i => `<ellipse cx="${40 + i * 32}" cy="${118 + Math.sin(i / 5 * Math.PI) * 18}" rx="11" ry="15" fill="#7A0E16" opacity=".85"/>`).join('')}</svg>`;
     const d = document.createElement('div'); d.id = 'dogBite';
-    d.innerHTML = `<div class="dbdark"></div><div class="dbeyes"><i></i><i></i></div><div class="dbflash"></div>
-      <div class="dbjaw up">${jaw(true)}</div><div class="dbjaw dn">${jaw(false)}</div>${mark}
-      <div class="dbtxt">汪！！</div><div class="dbmsg">${esc(msg || '被看門狗咬了！')}</div>`;
+    d.innerHTML = `<div class="dbwrap">${DOG_SVG}</div><div class="dbtxt">汪！！</div><div class="dbmsg">${esc(msg || '被看門狗咬了！')}</div>`;
     document.body.appendChild(d);
-    // 聲音：低吼 → 咬合 → 兩聲狗叫
-    if(SFX_ON){ noise(0.55, 220, 0.28); tone(90, 70, 0.55, 'sawtooth', 0.05);
-      noise(0.08, 3200, 0.35, 0.55); tone(160, 60, 0.18, 'square', 0.12, 0.55);
-      tone(720, 340, 0.13, 'sawtooth', 0.16, 0.72); noise(0.12, 1400, 0.18, 0.72);
-      tone(680, 320, 0.15, 'sawtooth', 0.16, 0.92); noise(0.13, 1300, 0.18, 0.92); }
+    // 聲音：低吼 → 撲上來咬 → 兩聲狗叫
+    if(SFX_ON){ noise(0.6, 220, 0.28); tone(90, 70, 0.6, 'sawtooth', 0.05);
+      noise(0.08, 3200, 0.35, 0.72); tone(160, 60, 0.18, 'square', 0.12, 0.72);
+      tone(720, 340, 0.13, 'sawtooth', 0.16, 0.88); noise(0.12, 1400, 0.18, 0.88);
+      tone(680, 320, 0.15, 'sawtooth', 0.16, 1.08); noise(0.13, 1300, 0.18, 1.08); }
     setTimeout(() => { if(VIB_ON && navigator.vibrate) try{ navigator.vibrate([90, 50, 160, 60, 60]); }catch(e){}
-      document.body.classList.add('dbshake'); setTimeout(() => document.body.classList.remove('dbshake'), 520); }, 560);
-    setTimeout(() => d.classList.add('out'), 2100);
-    setTimeout(() => d.remove(), 2500);
+      document.body.classList.add('dbshake'); setTimeout(() => document.body.classList.remove('dbshake'), 520); }, 720);
+    setTimeout(() => d.classList.add('out'), 2300);
+    setTimeout(() => d.remove(), 2700);
   }catch(e){}
 }
