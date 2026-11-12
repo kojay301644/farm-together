@@ -196,7 +196,7 @@ async function copyText(t, okMsg){
 
 /* ================= 邀請朋友 ================= */
 async function invite(){
-  const text = `我在玩「一起種田吧」🌱 開心農場風格的小鎮種田遊戲！我的暱稱是「${S.me.nickname}」，加我好友來偷菜吧～`;
+  const text = `我在玩「一起種田吧」🌱 一起種菜、偷菜、打牌的小鎮種田遊戲！我的暱稱是「${S.me.nickname}」，加我好友來偷菜吧～`;
   if(navigator.share){
     try{ await navigator.share({title:'一起種田吧', text, url:GAME_URL}); return; }
     catch(e){ if(e && e.name==='AbortError') return; }

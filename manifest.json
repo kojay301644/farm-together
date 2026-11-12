@@ -1,7 +1,7 @@
 {
   "name": "一起種田吧",
   "short_name": "一起種田吧",
-  "description": "開心農場風格的小鎮種田遊戲：種菜、收成、加好友、偷菜！",
+  "description": "小鎮種田遊戲：種菜、收成、加好友、偷菜！",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
