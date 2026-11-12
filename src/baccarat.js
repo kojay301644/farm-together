@@ -73,7 +73,7 @@ function bcRender(V){
   const shufLeft = (V.shufUntil||0) + (MJO?MJO.off:0) - Date.now();
   const shuffle = bet && shufLeft > 0 ? `<div class="bcshuf"><div class="bcsl">${b2Card(null,'sh')}${b2Card(null,'sh')}${b2Card(null,'sh')}</div><div class="bcsr">${b2Card(null,'sh')}${b2Card(null,'sh')}${b2Card(null,'sh')}</div><b>洗牌中⋯</b><small>換一副新的 8 副牌，牌路從頭開始</small></div>` : '';
   felt.style.setProperty('--bcw', (mjW < 760 ? 40 : 46) + 'px');
-  felt.innerHTML = `${road}${players}<div class="bcshoe">${b2Card(null,'shoe')}<small>${V.shoeLeft!=null?`剩 ${V.shoeLeft} 張`:''}</small></div>${shuffle}<div class="bctable">${cards('p')}${status}${cards('b')}</div>`;
+  felt.innerHTML = `${road}${players}${shuffle}<div class="bctable">${cards('p')}<div class="bcmidc"><div class="bcshoe">${b2Card(null,'shoe')}<small>${V.shoeLeft!=null?`剩 ${V.shoeLeft} 張`:''}</small></div>${status}</div>${cards('b')}</div>`;
 
   // 押注區
   const my = V.myBets || {}, tot = V.totals || {};
@@ -87,7 +87,8 @@ function bcRender(V){
   $('mjUi').innerHTML = `<div class="bcareas">${areas}</div>
     <div class="bcchips">${T.chips.map(c=>`<button class="bcchip${c===bcChip?' on':''}" data-chip="${c}" ${bet?'':'disabled'}>${c>=10000?(c/10000)+'萬':c>=1000?(c/1000)+'K':c}</button>`).join('')}
       <button class="bcclr" id="bcClr" ${bet && myTot?'':'disabled'}>清除</button><span class="bcmine">這局押 <b>${myTot.toLocaleString()}</b></span>${winTxt}</div>`;
-  $('mjBar').innerHTML = `<div class="mjbt">莊閒 100～2萬・和對 最高1萬</div>
+  const wan = n => n >= 10000 ? (n/10000) + '萬' : n.toLocaleString(), L = V.lim || {}, lt = ks => { const v = ks.map(k => +L[k] || 0); return v.every(x => !x) ? '不限' : v.some(x => !x) ? '部分不限' : '最高' + wan(Math.max(...v)); };
+  $('mjBar').innerHTML = `<div class="mjbt">最低 ${wan(T.chips[0])}・莊閒${lt(['p','b'])}・和對${lt(['t','pp','bp'])}</div>
     <div class="mjbme"><img src="${avSrc(S.me.avatar||11)}" alt=""><b>${esc(S.me.nickname||'')}</b><span class="mjbg">${(V.myGold||0).toLocaleString()}</span></div>
     <div class="mjbt r">百家樂・第 ${V.round} 局</div>`;
   $('mjEnd').innerHTML = '';

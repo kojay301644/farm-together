@@ -737,7 +737,8 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .b2c.bcc.ghost{box-shadow:none;border:2px dashed rgba(255,255,255,.38);border-radius:8px;box-sizing:border-box}
 .b2c.bcc.in3{animation:bcin3 .5s ease-out both}
 @keyframes bcin3{0%{transform:translate(var(--sx,0),-150px) scale(.5) rotate(70deg);opacity:0}60%{opacity:1}100%{transform:rotate(90deg);opacity:1}}
-.bcshoe{position:absolute;left:50%;top:6px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;z-index:2}
+.bcmidc{display:flex;flex-direction:column;align-items:center;gap:10px}
+.bcshoe{display:flex;align-items:center;gap:6px;z-index:2}
 .bcshoe .b2c.shoe{--w:26px;transform:rotate(-8deg);box-shadow:3px 3px 0 #0A1B44,6px 6px 0 rgba(57,243,255,.5),0 2px 4px rgba(0,0,0,.4),inset 0 0 0 2px #39F3FF}
 .bcshoe small{font-size:10px;color:#9FEFFF;font-weight:900;white-space:nowrap}
 .b2c.bcc.in{animation:bcin .5s ease-out both}
@@ -1123,21 +1124,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794474776" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794475643" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794474776" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794474776" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794475643" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794475643" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794474776" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794475643" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794474776" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794474776" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794475643" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794475643" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1154,11 +1155,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794474776" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794475643" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794474776";
+const BUILD="1794475643";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -5540,7 +5541,7 @@ function bcRender(V){
   const shufLeft = (V.shufUntil||0) + (MJO?MJO.off:0) - Date.now();
   const shuffle = bet && shufLeft > 0 ? `<div class="bcshuf"><div class="bcsl">${b2Card(null,'sh')}${b2Card(null,'sh')}${b2Card(null,'sh')}</div><div class="bcsr">${b2Card(null,'sh')}${b2Card(null,'sh')}${b2Card(null,'sh')}</div><b>洗牌中⋯</b><small>換一副新的 8 副牌，牌路從頭開始</small></div>` : '';
   felt.style.setProperty('--bcw', (mjW < 760 ? 40 : 46) + 'px');
-  felt.innerHTML = `${road}${players}<div class="bcshoe">${b2Card(null,'shoe')}<small>${V.shoeLeft!=null?`剩 ${V.shoeLeft} 張`:''}</small></div>${shuffle}<div class="bctable">${cards('p')}${status}${cards('b')}</div>`;
+  felt.innerHTML = `${road}${players}${shuffle}<div class="bctable">${cards('p')}<div class="bcmidc"><div class="bcshoe">${b2Card(null,'shoe')}<small>${V.shoeLeft!=null?`剩 ${V.shoeLeft} 張`:''}</small></div>${status}</div>${cards('b')}</div>`;
 
   // 押注區
   const my = V.myBets || {}, tot = V.totals || {};
@@ -5554,7 +5555,8 @@ function bcRender(V){
   $('mjUi').innerHTML = `<div class="bcareas">${areas}</div>
     <div class="bcchips">${T.chips.map(c=>`<button class="bcchip${c===bcChip?' on':''}" data-chip="${c}" ${bet?'':'disabled'}>${c>=10000?(c/10000)+'萬':c>=1000?(c/1000)+'K':c}</button>`).join('')}
       <button class="bcclr" id="bcClr" ${bet && myTot?'':'disabled'}>清除</button><span class="bcmine">這局押 <b>${myTot.toLocaleString()}</b></span>${winTxt}</div>`;
-  $('mjBar').innerHTML = `<div class="mjbt">莊閒 100～2萬・和對 最高1萬</div>
+  const wan = n => n >= 10000 ? (n/10000) + '萬' : n.toLocaleString(), L = V.lim || {}, lt = ks => { const v = ks.map(k => +L[k] || 0); return v.every(x => !x) ? '不限' : v.some(x => !x) ? '部分不限' : '最高' + wan(Math.max(...v)); };
+  $('mjBar').innerHTML = `<div class="mjbt">最低 ${wan(T.chips[0])}・莊閒${lt(['p','b'])}・和對${lt(['t','pp','bp'])}</div>
     <div class="mjbme"><img src="${avSrc(S.me.avatar||11)}" alt=""><b>${esc(S.me.nickname||'')}</b><span class="mjbg">${(V.myGold||0).toLocaleString()}</span></div>
     <div class="mjbt r">百家樂・第 ${V.round} 局</div>`;
   $('mjEnd').innerHTML = '';
