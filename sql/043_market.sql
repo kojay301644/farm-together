@@ -1,4 +1,5 @@
 -- 菜價行情：作物、牧場產品的收購價每小時變動（基本價的 50%～200%），有趨勢、賣壓、自動突發事件；倉庫有上限，滿了多的照現價賣掉
+-- （這份就是實際上線的版本：走勢存在 market.hist（最近 48 小時，每小時一筆）；全部都可以重複執行）
 alter table public.players add column if not exists barn_lv int not null default 0;
 
 create table if not exists public.market(
@@ -6,11 +7,10 @@ create table if not exists public.market(
   mult numeric not null default 1, trend numeric not null default 0, press numeric not null default 0,
   ev_mult numeric not null default 1, ev_until timestamptz, vol numeric not null default 0.06,
   primary key(kind, id));
-create table if not exists public.market_hist(kind text not null, id text not null, at timestamptz not null default now(), mult numeric not null);
-create index if not exists market_hist_i on public.market_hist(kind, id, at);
+alter table public.market add column if not exists hist jsonb not null default '[]'::jsonb;   -- 走勢：每小時一筆倍率，留最近 48 筆
+-- 註：早期版本另外建過 market_hist 表，現在沒在用（留著不影響）
 create table if not exists public.market_events(id bigserial primary key, typ text, title text, items jsonb, mult numeric, starts timestamptz not null default now(), ends timestamptz);
 alter table public.market enable row level security;
-alter table public.market_hist enable row level security;
 alter table public.market_events enable row level security;
 
 insert into settings(key, value, note) values
@@ -104,7 +104,7 @@ end $$;
 
 -- 每小時：價格變動、記走勢、清賣壓、可能發生事件
 create or replace function public._mkt_tick() returns void language plpgsql security definer set search_path to 'public' as $$
-declare m market; t numeric; x numeric; lo numeric := _cfg('mkt_lo',0.5); hi numeric := _cfg('mkt_hi',2);
+declare m market; t numeric; x numeric; lo numeric := _cfg('mkt_lo',0.5); hi numeric := _cfg('mkt_hi',2); h jsonb;
 begin
   if not pg_try_advisory_xact_lock(771204) then return; end if;
   perform _mkt_sync();
@@ -118,9 +118,10 @@ begin
       ev_mult = case when ev_until is null or ev_until <= now() then 1 else ev_mult end,
       ev_until = case when ev_until <= now() then null else ev_until end
      where kind = m.kind and id = m.id;
+    h := m.hist || to_jsonb(round(_mkt_mult(m.kind, m.id), 3));             -- 記走勢，只留最近 48 筆
+    if jsonb_array_length(h) > 48 then h := (select jsonb_agg(v order by i) from jsonb_array_elements(h) with ordinality a(v, i) where i > jsonb_array_length(h) - 48); end if;
+    update market set hist = h where kind = m.kind and id = m.id;
   end loop;
-  insert into market_hist(kind, id, mult) select kind, id, _mkt_mult(kind, id) from market;
-  delete from market_hist where at < now() - interval '48 hours';
   if _cfg('mkt_events',1) = 1 and not exists(select 1 from market_events where ends > now()) and random() < _cfg('mkt_event_rate',0.12) then
     perform _mkt_event(null);
   end if;
@@ -130,9 +131,9 @@ end $$;
 create or replace function public.farm_market() returns jsonb language sql stable security definer set search_path to 'public' as $$
   select jsonb_build_object(
     'items', (select coalesce(jsonb_agg(jsonb_build_object('k', m.kind, 'id', m.id, 'base', _mkt_base(m.kind, m.id), 'mult', round(_mkt_mult(m.kind, m.id), 3),
-               'prev', (select round(h.mult, 3) from market_hist h where h.kind = m.kind and h.id = m.id and h.at < now() - interval '50 minutes' order by h.at desc limit 1),
-               'hist', (select coalesce(jsonb_agg(round(h.mult, 3) order by h.at), '[]') from market_hist h where h.kind = m.kind and h.id = m.id and h.at > now() - interval '24 hours'),
-               'ev', m.ev_until > now())), '[]') from market m where _mkt_base(m.kind, m.id) is not null),
+               'prev', case when jsonb_array_length(m.hist) >= 2 then m.hist -> (jsonb_array_length(m.hist) - 2) end,
+               'hist', (select coalesce(jsonb_agg(v order by i), '[]') from jsonb_array_elements(m.hist) with ordinality a(v, i) where i > jsonb_array_length(m.hist) - 24),
+               'ev', coalesce(m.ev_until > now(), false))), '[]') from market m where _mkt_base(m.kind, m.id) is not null),
     'events', (select coalesce(jsonb_agg(jsonb_build_object('title', e.title, 'ends', _ms(e.ends)) order by e.starts desc), '[]') from market_events e where e.ends > now()),
     'barn', jsonb_build_object('lv', coalesce((select barn_lv from players where id = auth.uid()), 0),
                                'cap', _barn_cap((select barn_lv from players where id = auth.uid())),
@@ -154,7 +155,6 @@ begin
   update players set gold = gold - cost, barn_lv = barn_lv + 1 where id = uid;
   return jsonb_build_object('cap', _barn_cap(p.barn_lv + 1), 'cost', cost, 'state', _state(uid));
 end $$;
-revoke all on function public.farm_barn_upgrade() from public, anon;
 grant execute on function public.farm_barn_upgrade() to authenticated;
 
 -- 倉庫上限：作物＋牧場產品變多、超過上限時，這次多出來的照現價自動賣掉（原本就超過的舊庫存不動）
@@ -185,8 +185,7 @@ begin
   end if;
   return new;
 end $$;
-drop trigger if exists barn_guard on public.players;
-create trigger barn_guard before update of crops, goods on public.players for each row execute function public._barn_guard();
+create or replace trigger barn_guard before update of crops, goods on public.players for each row execute function public._barn_guard();
 
 -- 收購改照現價，並記賣壓
 do $$
@@ -248,8 +247,7 @@ begin
   return jsonb_build_object(
     'items', (select coalesce(jsonb_agg(jsonb_build_object('k', m.kind, 'id', m.id,
                'name', coalesce((select name from crops where id = m.id and m.kind = 'c'), (select max(good_name) from animals where good = m.id and m.kind = 'g'), m.id),
-               'base', _mkt_base(m.kind, m.id), 'mult', round(_mkt_mult(m.kind, m.id), 3), 'vol', m.vol, 'ev', m.ev_until > now(),
-               'hist', (select coalesce(jsonb_agg(round(h.mult, 3) order by h.at), '[]') from market_hist h where h.kind = m.kind and h.id = m.id and h.at > now() - interval '48 hours'))
+               'base', _mkt_base(m.kind, m.id), 'mult', round(_mkt_mult(m.kind, m.id), 3), 'vol', m.vol, 'ev', coalesce(m.ev_until > now(), false), 'hist', m.hist)
                order by m.kind, _mkt_base(m.kind, m.id)), '[]') from market m where _mkt_base(m.kind, m.id) is not null),
     'events', (select coalesce(jsonb_agg(jsonb_build_object('title', e.title, 'starts', _ms(e.starts), 'ends', _ms(e.ends)) order by e.starts desc), '[]')
                from (select * from market_events order by starts desc limit 10) e));
@@ -271,6 +269,7 @@ begin
   return adm_market();
 end $$;
 
--- 開始：建好每種東西的行情，先記一筆走勢
+-- 開始：建好每種東西的行情，先記一筆走勢；每小時 7 分更新價格
 select public._mkt_sync();
-insert into market_hist(kind, id, mult) select kind, id, 1 from market;
+update market set hist = '[1]'::jsonb where hist = '[]'::jsonb;
+select cron.schedule('farm-mkt-tick', '7 * * * *', 'select public._mkt_tick()');
