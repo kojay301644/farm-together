@@ -6,6 +6,7 @@ import B2 from './b2_engine.mjs';
 import BC from './bc_engine.mjs';
 import MF from './mf_engine.mjs';
 import TH from './th_engine.mjs';
+const BC_LIM_KEYS = ['p', 'b', 't', 'pp', 'bp'].map(k => 'bc_lim_' + k);
 const ENG = (g: string) => (g === 'b2' ? B2 : g === 'bc' ? BC : g === 'th' ? TH : g === 'mf' ? MF : MJ);
 // 德州撲克：帶入籌碼先扣金幣、離桌換回金幣
 async function thBuyin(uid: string, amt: number) { const { error } = await sb.rpc('th_buyin', { p_uid: uid, p_amt: amt }); if (error) throw new Fail(error.message.includes('gold') ? '金幣不夠' : '金幣不夠'); }
@@ -217,17 +218,24 @@ async function handle(uid: string, b: any, test = false) {
   throw new Fail('不支援的動作');
 }
 
+// 讀後台設定：維護開關、百家樂每個押注區的單注上限（0＝不限）
+async function loadCfg() {
+  const { data: cfg } = await sb.from('settings').select('key,value').in('key', ['mj_on', ...BC_LIM_KEYS]);
+  const cf: Record<string, string> = {}; (cfg || []).forEach((r: any) => { cf[r.key] = String(r.value); });
+  for (const k of Object.keys(BC.LIMIT)) { const v = +(cf['bc_lim_' + k] ?? 0); BC.LIMIT[k] = v > 0 ? v : Infinity; }
+  return cf;
+}
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   try {
     const b = await req.json().catch(() => ({}));
     let uid: string | null = null;
     const tk = req.headers.get('x-mj-test');
-    if (tk) { const { data } = await sb.from('push_config').select('v').eq('k', 'mj_test_key').maybeSingle(); if (data && data.v && tk === data.v) { if (b.a === 'sweep') return J(await sweep()); if (b.a === 'botplay') return J(await botPlay()); uid = b.as; } }
+    if (tk) { const { data } = await sb.from('push_config').select('v').eq('k', 'mj_test_key').maybeSingle(); if (data && data.v && tk === data.v) { if (b.a === 'sweep') { await loadCfg(); return J(await sweep()); } if (b.a === 'botplay') { await loadCfg(); return J(await botPlay()); } uid = b.as; } }
     if (!uid) { const token = (req.headers.get('Authorization') || '').replace('Bearer ', ''); const { data } = await sb.auth.getUser(token); uid = data?.user?.id || null; }
     if (!uid) return J({ error: '請先登入' }, 401);
-    const { data: on } = await sb.from('settings').select('value').eq('key', 'mj_on').maybeSingle();
-    if (on && String(on.value) === '0') return J({ error: '麻將維護中，等等再來' }, 200);
+    const cf = await loadCfg();
+    if (cf.mj_on === '0') return J({ error: '麻將維護中，等等再來' }, 200);
     return J(await handle(uid, b, !!tk && b.as === uid));
   } catch (e) {
     if (e instanceof Fail) return J({ error: e.message });

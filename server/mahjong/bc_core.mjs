@@ -172,7 +172,7 @@ export function viewFor(T, uid, now) {
   if (!me) return base;
   const tot = {}; G.players.concat(G.bots || []).forEach(p => Object.entries(p.bets || {}).forEach(([k, a]) => tot[k] = (tot[k] || 0) + a));
   const showCards = G.phase === 'deal' || G.phase === 'end';
-  return { ...base, phase: G.phase, round: G.round, tEnd: G.tEnd, dealAt: G.dealAt, shufUntil: G.shufUntil || 0, shoeLeft: G.shoe.length, pet: G.pet, hist: G.hist,
+  return { ...base, lim: Object.fromEntries(Object.entries(BC.LIMIT).map(([k, v]) => [k, isFinite(v) ? v : 0])), phase: G.phase, round: G.round, tEnd: G.tEnd, dealAt: G.dealAt, shufUntil: G.shufUntil || 0, shoeLeft: G.shoe.length, pet: G.pet, hist: G.hist,
     me: G.players.indexOf(me), myGold: me.gold, myBets: me.bets, myWin: G.phase === 'end' ? me.win : null, totals: tot,
     players: G.players.concat(G.bots || []).map(p => ({ name: p.name, av: p.av, gold: p.gold, bet: Object.values(p.bets || {}).reduce((s, x) => s + x, 0), win: G.phase === 'end' ? p.win : null, me: !!p.uid && p.uid === uid })),
     cards: showCards ? G.cards : null, result: G.phase === 'end' ? { win: G.result.win, pt: G.result.pt, bt: G.result.bt, pp: G.result.pp, bp: G.result.bp } : null,
