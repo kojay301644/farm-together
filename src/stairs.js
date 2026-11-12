@@ -46,9 +46,13 @@ async function stairStart(){
   SR.on = SR.plats[2]; SR.y = SR.on.y;
   const cv = $('stC'), fit = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; cv.style.width = innerWidth+'px'; cv.style.height = innerHeight+'px'; stairLayout(); };
   fit(); SR.fit = fit; addEventListener('resize', fit);
+  // 按住按鈕：手機用 touch 事件（iPhone 長按 pointer 會被取消），電腦用滑鼠
   const hold = (id, k) => { const b = $(id);
-    b.addEventListener('pointerdown', e => { e.preventDefault(); try{ b.setPointerCapture(e.pointerId); }catch(_){} stairGo(); if(SR) SR[k] = 1; b.classList.add('on'); });
-    ['pointerup','pointercancel','lostpointercapture'].forEach(n => b.addEventListener(n, () => { if(SR) SR[k] = 0; b.classList.remove('on'); })); };
+    const on = e => { if(e.cancelable) e.preventDefault(); stairGo(); if(SR) SR[k] = 1; b.classList.add('on'); };
+    const off = e => { if(e && e.touches && [...e.touches].some(t => b.contains(document.elementFromPoint(t.clientX, t.clientY)))) return; if(SR) SR[k] = 0; b.classList.remove('on'); };
+    if('ontouchstart' in window){ b.addEventListener('touchstart', on, { passive: false }); b.addEventListener('touchend', off); b.addEventListener('touchcancel', off); }
+    else { b.addEventListener('mousedown', on); b.addEventListener('mouseup', off); b.addEventListener('mouseleave', off); }
+    b.addEventListener('contextmenu', e => e.preventDefault()); };
   hold('stL', 'l'); hold('stR', 'r');
   const K = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r' };
   SR.kd = e => { const k = K[e.code]; if(!k || !SR) return; e.preventDefault(); stairGo(); SR[k] = 1; };

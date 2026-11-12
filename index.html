@@ -514,7 +514,7 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 #stair{position:fixed;inset:0;z-index:70;display:none;background:#8fcdfb;touch-action:none;user-select:none;-webkit-user-select:none}#stair.on{display:block}
 #stair canvas{position:absolute;inset:0;display:block}
 .sthp{gap:2px!important;padding:8px 10px!important}.sthp i{display:block;width:8px;height:14px;border-radius:3px;background:#E6D8C4}.sthp i.on{background:#4CC36B}.sthp i.on.lo{background:#E8534A}
-.stbtn{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.85);color:#7A4B25;font-size:34px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.25);touch-action:none;-webkit-tap-highlight-color:transparent;z-index:2}
+.stbtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.85);color:#7A4B25;font-size:34px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.25);touch-action:none;-webkit-tap-highlight-color:transparent;z-index:2}
 .stbtn.l{left:calc(env(safe-area-inset-left,0px) + 18px)}.stbtn.r{right:calc(env(safe-area-inset-right,0px) + 18px)}.stbtn.on{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.25);background:#FFE7A8}
 #stair.port .stbtn{width:96px;height:96px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}#stair.port .stbtn.l{left:calc(50% - 120px)}#stair.port .stbtn.r{right:calc(50% - 120px)}
 #stEnd{position:absolute;inset:0;pointer-events:none}#stEnd .rnres{pointer-events:auto;z-index:3}
@@ -1086,21 +1086,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794467364" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794467498" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794467364" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794467364" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794467498" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794467498" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794467364" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794467498" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794467364" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794467364" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794467498" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794467498" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1117,11 +1117,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794467364" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794467498" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794467364";
+const BUILD="1794467498";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -6069,9 +6069,13 @@ async function stairStart(){
   SR.on = SR.plats[2]; SR.y = SR.on.y;
   const cv = $('stC'), fit = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; cv.style.width = innerWidth+'px'; cv.style.height = innerHeight+'px'; stairLayout(); };
   fit(); SR.fit = fit; addEventListener('resize', fit);
+  // 按住按鈕：手機用 touch 事件（iPhone 長按 pointer 會被取消），電腦用滑鼠
   const hold = (id, k) => { const b = $(id);
-    b.addEventListener('pointerdown', e => { e.preventDefault(); try{ b.setPointerCapture(e.pointerId); }catch(_){} stairGo(); if(SR) SR[k] = 1; b.classList.add('on'); });
-    ['pointerup','pointercancel','lostpointercapture'].forEach(n => b.addEventListener(n, () => { if(SR) SR[k] = 0; b.classList.remove('on'); })); };
+    const on = e => { if(e.cancelable) e.preventDefault(); stairGo(); if(SR) SR[k] = 1; b.classList.add('on'); };
+    const off = e => { if(e && e.touches && [...e.touches].some(t => b.contains(document.elementFromPoint(t.clientX, t.clientY)))) return; if(SR) SR[k] = 0; b.classList.remove('on'); };
+    if('ontouchstart' in window){ b.addEventListener('touchstart', on, { passive: false }); b.addEventListener('touchend', off); b.addEventListener('touchcancel', off); }
+    else { b.addEventListener('mousedown', on); b.addEventListener('mouseup', off); b.addEventListener('mouseleave', off); }
+    b.addEventListener('contextmenu', e => e.preventDefault()); };
   hold('stL', 'l'); hold('stR', 'r');
   const K = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r' };
   SR.kd = e => { const k = K[e.code]; if(!k || !SR) return; e.preventDefault(); stairGo(); SR[k] = 1; };
