@@ -23,15 +23,14 @@ function addBot(G) {
     G.seats[i] = { uid: null, bid: b.id, bot: true, name: b.name, av: b.av, stack, sitOut: true, auto: false, miss: 0 };   // 下一局才加入
     return;
   }
-  const L = BOTS.filter(b => !used.includes(b.name)), b = L[Math.floor(Math.random() * L.length)] || BOTS[0];
-  G.seats[i] = { uid: null, bot: true, name: b.name, av: b.av, stack: T.buyMax, sitOut: true, auto: false, miss: 0 };
+  // 沒有金幣夠的農場電腦：這個位子先空著（不用其他電腦）
 }
 // 電腦數量：真人越多，電腦越少（總共補到 4 人）；多的電腦這局結束就離開
 function balanceBots(G) {
   const want = Math.max(0, BOT_TOTAL - humansIn(G) - (G.queue || []).length);
   let bots = G.seats.map((p, i) => (p && p.bot && !p.leaving ? i : -1)).filter(i => i >= 0);
   while (bots.length > want) { const i = bots.pop(); G.seats[i].leaving = true; }
-  while (bots.length < want && G.seats.some(p => !p)) { addBot(G); bots = G.seats.map((p, i) => (p && p.bot && !p.leaving ? i : -1)).filter(i => i >= 0); }
+  while (bots.length < want && G.seats.some(p => !p)) { const n = bots.length; addBot(G); bots = G.seats.map((p, i) => (p && p.bot && !p.leaving ? i : -1)).filter(i => i >= 0); if (bots.length === n) break; }   // 沒有農場電腦可以上就停
 }
 
 export function newTable(lvl, priv, host, me, now) {
@@ -55,6 +54,7 @@ export function addPlayer(T, me, now) {
 function cleanup(G, now, out) {
   G.seats.forEach((p, i) => {
     if (!p) return;
+    if (p.bot && !p.bid) p.leaving = true;   // 以前的小動物電腦：這局結束就下桌
     if (p.bid && !p.leaving && p.stack < TH.TABLES[G.table].bb * 10) p.leaving = true;   // 農場電腦籌碼快沒了：下桌，換別人來
     if (p.leaving) { if (p.uid) out.bank[p.uid] = (out.bank[p.uid] || 0) + p.stack + (p.rebuy || 0); if (p.bid && p.stack > 0) bq(G, p.bid, p.stack); G.seats[i] = null; return; }
     if (p.rebuy) { p.stack += p.rebuy; p.rebuy = 0; }

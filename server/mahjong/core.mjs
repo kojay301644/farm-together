@@ -10,15 +10,23 @@ const turnMs = (T) => (T.game === 'b2' ? 20000 : TIME.TURN);
 export const TIME = { TURN: 15000, CLAIM: 5000, BOT_PLAY: 900, BOT_CLAIM: 450, WAIT_START: 8000, NEXT_WAIT: 12000, DICE: 2300 };
 const BOTS = [{ name: '小兔', av: 3 }, { name: '阿熊', av: 7 }, { name: '狐狸妹', av: 15 }, { name: '企鵝哥', av: 21 }, { name: '水獺', av: 24 }, { name: '小鼠', av: 9 }, { name: '刺蝟', av: 5 }, { name: '浣熊', av: 13 }];
 // 農場裡會種菜的電腦玩家（index.ts 每次推進前放進來；已排除正坐在別桌的）：[{id,name,av,gold}]
-// 金幣夠坐這桌的優先上桌，輸贏算進他們農場的金幣；都不夠（例如土豪桌）才用小動物電腦
+// 只有金幣夠坐這桌的農場電腦能上桌，輸贏算進他們農場的金幣；沒人夠就等（不用其他電腦）
 let POOL = [];
 export function setBots(list) { POOL = list || []; THC.setBots(POOL); }
 const pickBot = (used, min = 0, usedIds = []) => {
   const F = POOL.filter(b => b.gold >= min && !usedIds.includes(b.id) && !used.includes(b.name));
-  if (F.length) { const b = F[Math.floor(Math.random() * F.length)]; return { id: b.id, name: b.name, av: b.av, gold: b.gold }; }
-  const L = BOTS.filter(b => !used.includes(b.name)); const b = L[Math.floor(Math.random() * L.length)] || BOTS[0];
-  return { id: null, name: b.name, av: b.av, gold: null };
+  if (!F.length) return null;
+  const b = F[Math.floor(Math.random() * F.length)]; return { id: b.id, name: b.name, av: b.av, gold: b.gold };
 };
+const botsFree = (min, usedIds = [], used = []) => POOL.filter(b => b.gold >= min && !usedIds.includes(b.id) && !used.includes(b.name)).length;
+// 湊不到 4 個人（農場電腦不夠）：牌桌回到等人的狀態，留著的真人繼續等
+function backToWait(T, now) {
+  const G = T.state, players = [];
+  G.uids.forEach((u, j) => { if (u && !G.leaving.includes(u)) players.push({ uid: u, name: G.seats[j].name, av: G.seats[j].av }); });
+  for (const p of G.pending || []) if (!players.some(x => x.uid === p.uid)) players.push({ uid: p.uid, name: p.name, av: p.av });
+  T.status = players.length ? 'wait' : 'closed';
+  T.state = { wait: { players: players.slice(0, 4), startAt: now, short: true } };   // 離開的人 G.kicked 已經記了，外面會通知
+}
 const botGold = (T) => E(T).TABLES[T.lvl].min * 4 + Math.floor(Math.random() * E(T).TABLES[T.lvl].min * 2);
 
 // T: { id, lvl, priv, code, host, status:'wait'|'play'|'closed', state }
@@ -47,7 +55,7 @@ function startGame(T, gold, now) {
   for (let i = 0; i < 4; i++) {
     const p = P[i];
     if (p) list.push({ id: p.uid, name: p.name, av: p.av, gold: gold[p.uid] ?? 0 });
-    else { const b = pickBot(used, min, usedIds); used.push(b.name); if (b.id) usedIds.push(b.id); list.push({ id: b.id, name: b.name, av: b.av, bot: true, gold: b.gold ?? botGold(T) }); }
+    else { const b = pickBot(used, min, usedIds); used.push(b.name); usedIds.push(b.id); list.push({ id: b.id, name: b.name, av: b.av, bot: true, gold: b.gold }); }
   }
   const G = E(T).newGame(list, { table: T.lvl, dealer: Math.floor(Math.random() * 4) });
   G.uids = list.map(p => (p.bot ? null : p.id || null)); G.miss = [0, 0, 0, 0]; G.ready = []; G.leaving = []; G.pending = [];
@@ -59,7 +67,8 @@ function startGame(T, gold, now) {
 function nextHandServer(T, gold, now) {
   const G = T.state, min = E(T).TABLES[T.lvl].min;
   const used = () => G.seats.map(s => s.name), usedIds = () => G.seats.map(s => s.id).filter(Boolean);
-  const toBot = (j) => { const b = pickBot(used(), min, usedIds()); G.uids[j] = null; Object.assign(G.seats[j], { id: b.id, name: b.name, av: b.av, bot: true, auto: false, gold: b.gold ?? botGold(T) }); G.miss[j] = 0; };
+  let short = false;   // 有位子補不到農場電腦
+  const toBot = (j) => { const b = pickBot(used(), min, usedIds()); G.uids[j] = null; if (!b) { short = true; Object.assign(G.seats[j], { id: null, bot: true, gold: 0 }); return; } Object.assign(G.seats[j], { id: b.id, name: b.name, av: b.av, bot: true, auto: false, gold: b.gold }); G.miss[j] = 0; };
   G.kicked = [];
   const BROKE = '你輸光了……回去種田吧！';
   for (let j = 0; j < 4; j++) {
@@ -75,13 +84,13 @@ function nextHandServer(T, gold, now) {
     G.uids[j] = p.uid; Object.assign(G.seats[j], { id: p.uid, name: p.name, av: p.av, bot: false, auto: false, gold: gold[p.uid] });
   }
   if (!G.uids.some(Boolean)) { T.status = 'closed'; return; }
-  // 電腦：農場電腦用他現在農場的金幣，不夠坐這桌就換人；小動物電腦有農場電腦可以換就換上來
+  // 電腦：農場電腦用他現在農場的金幣，不夠坐這桌就換人；以前的小動物電腦換成農場電腦
   G.seats.forEach((s, j) => {
     if (G.uids[j]) return;
     if (s.id) { s.gold = gold[s.id] ?? s.gold; if (s.gold < min) toBot(j); }
-    else if (POOL.some(b => b.gold >= min && !usedIds().includes(b.id))) toBot(j);
-    else if (s.gold < min) s.gold = botGold(T);
+    else toBot(j);
   });
+  if (short) { backToWait(T, now); return; }
   E(T).nextHand(G); G.ready = []; G.settled = false; G.broke = []; G.miss = [0, 0, 0, 0];
   G.tAct = G.tWait = now + TIME.DICE; G.wKey = '';
 }
@@ -95,7 +104,11 @@ function _advance(T, now, gold) {
     if (T.status === 'wait') {
       const W = T.state.wait;
       if (!W.players.length) { T.status = 'closed'; break; }
-      if (now >= W.startAt || W.players.length >= 4) { if (!gold) { out.needGold = true; break; } startGame(T, gold, now); continue; }
+      if (now >= W.startAt || W.players.length >= 4) {
+        const min = E(T).TABLES[T.lvl].min;
+        if (W.players.length < 4 && botsFree(min, [], W.players.map(p => p.name)) < 4 - W.players.length) { W.short = true; break; }   // 人不夠、農場電腦也不夠：繼續等
+        if (!gold) { out.needGold = true; break; } W.short = false; startGame(T, gold, now); continue;
+      }
       break;
     }
     if (T.status !== 'play') break;
@@ -170,7 +183,7 @@ function _leave(T, uid, now) {
 
 function _viewFor(T, uid, now) {
   const base = { tid: T.id, ver: T.ver || 0, game: T.game || 'mj', lvl: T.lvl, priv: T.priv, code: T.priv ? T.code : null, host: T.host === uid, status: T.status, now, due: _dueAt(T) };
-  if (T.status === 'wait') return { ...base, wait: { players: T.state.wait.players.map(p => ({ name: p.name, av: p.av })), startAt: T.state.wait.startAt } };
+  if (T.status === 'wait') return { ...base, wait: { players: T.state.wait.players.map(p => ({ name: p.name, av: p.av })), startAt: T.state.wait.startAt, short: !!T.state.wait.short } };
   if (T.status !== 'play') return base;
   const G = T.state, j = G.uids.indexOf(uid);
   if (j < 0) { const pend = (G.pending || []).some(p => p.uid === uid); return { ...base, pending: pend, seatsN: G.uids.filter(Boolean).length, handNo: G.handNo, phase: G.phase }; }

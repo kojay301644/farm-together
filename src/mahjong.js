@@ -277,7 +277,7 @@ function mjDo(a){
 function mjClock(){
   if(!mjOn()){ clearInterval(mjTimer); mjTimer=0; return; }
   const V = mjCurView(), el = $('mjSec');
-  if(V && V.status==='wait' && $('mjWs') && MJO){ const sec = Math.max(0, Math.ceil((V.wait.startAt + MJO.off - Date.now())/1000)); $('mjWs').textContent = V.priv ? '人到齊或房主按開始就開打' : sec > 0 ? `${sec} 秒後開始` : '準備開始…'; return; }
+  if(V && V.status==='wait' && $('mjWs') && MJO){ const sec = Math.max(0, Math.ceil((V.wait.startAt + MJO.off - Date.now())/1000)); $('mjWs').textContent = V.wait.short ? '等其他玩家加入…' : V.priv ? '人到齊或房主按開始就開打' : sec > 0 ? `${sec} 秒後開始` : '準備開始…'; return; }
   if(!V || !V.waiting) { if(el) el.textContent=''; return; }
   if(!V.waiting.includes(V.me) || V.phase==='end'){ if(el) el.textContent=''; return; }
   const dl = MJG ? mjDeadline : (V.deadline ? V.deadline + MJO.off : 0);
