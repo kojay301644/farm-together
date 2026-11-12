@@ -63,7 +63,8 @@ let V = null;          // 拜訪中的好友農場：{owner, plots, off}
 let mode = 'home';
 const ui = {tool:'hand', seed:'radish', busy:false};
 
-function applyState(st){ if(!st) return; const old=S; S = {me:st.me, plots:st.plots, ranch:st.ranch||[], off:st.now - Date.now()}; S.me._stAt = Date.now();
+function applyState(st){ if(!st) return; const old=S;
+  if(st.me && st.me.ovf && st.me.ovf.n > 0) setTimeout(()=>toast(`📦 倉庫滿了！多出來的 ${st.me.ovf.n} 個已照現價賣掉，獲得 ${(+st.me.ovf.g).toLocaleString()} 金`), 400); S = {me:st.me, plots:st.plots, ranch:st.ranch||[], off:st.now - Date.now()}; S.me._stAt = Date.now();
   try{ if(old && mode==='home' && Date.now()-(ui.lastLocal||0) > 3000) autoJobs(old, S); }catch(e){} }
 /* 比對前後狀態，看出是寵物裝備自動做的事 → 叫對應的寵物跑過去 */
 function autoJobs(a, b){
@@ -294,8 +295,36 @@ function openSeedPicker(i){
     if(i!=null && SEED_KEEP) toast(`連續播種：接著點空地就能一直種${CROP[ui.seed].name}`);
   });
 }
-const barnNav = cur => `<div class="snav"><button data-bn="bag" class="${cur==='bag'?'on':''}">📦 倉庫</button><button data-bn="seed" class="${cur==='seed'?'on':''}">🌱 種子商店</button></div>`;
-function bindBarnNav(){ document.querySelectorAll('[data-bn]').forEach(b=>b.onclick=()=> b.dataset.bn==='seed' ? openShop() : b.dataset.bn==='item' ? openItemShop() : openBag()); }
+const barnNav = cur => `<div class="snav"><button data-bn="bag" class="${cur==='bag'?'on':''}">📦 倉庫</button><button data-bn="mkt" class="${cur==='mkt'?'on':''}">📈 行情</button><button data-bn="seed" class="${cur==='seed'?'on':''}">🌱 種子商店</button></div>`;
+/* ================= 菜價行情：收購價每小時變動 ================= */
+let MKT = null, MKT_AT = 0;
+async function mktLoad(force){ if(!force && MKT && Date.now()-MKT_AT < 60000) return MKT; try{ MKT = await rpc('farm_market'); MKT_AT = Date.now(); }catch(e){} return MKT; }
+const mktItem = (k,id) => MKT && (MKT.items||[]).find(x=>x.k===k && x.id===id);
+function mktUnit(k,id){ const x = mktItem(k,id); if(x) return x.base * x.mult; return k==='c' ? (CROP[id]?.price||0) : ((ANIMALS.find(a=>a.good===id)||{}).good_price||0); }
+const mktFmt = v => v >= 100 ? Math.round(v).toLocaleString() : v >= 10 ? (Math.round(v*10)/10).toString() : (Math.round(v*100)/100).toString();
+function mktTag(k,id){ const x = mktItem(k,id); if(!x) return ''; const pct = Math.round(x.mult*100), up = x.prev!=null ? (x.mult > +x.prev + 0.004 ? 1 : x.mult < +x.prev - 0.004 ? -1 : 0) : 0;
+  return `<span class="mktp ${pct>=100?'hi':'lo'}">${up>0?'▲':up<0?'▼':'－'} ${pct}%${x.ev?' 🔥':''}</span>`; }
+function mktSpark(h){ h = (h||[]).map(Number); if(h.length < 2) h = [1].concat(h.length?h:[1]);
+  const lo = Math.min(...h, 0.5), hi = Math.max(...h, 2), W = 90, H = 30, X = i => (i/(h.length-1)*W).toFixed(1), Y = v => (H - (v-lo)/(hi-lo)*H).toFixed(1);
+  const up = h[h.length-1] >= 1;
+  return `<svg class="mkts" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><line x1="0" x2="${W}" y1="${Y(1)}" y2="${Y(1)}" stroke="#D8CBB3" stroke-dasharray="3 3"/><polyline fill="none" stroke="${up?'#2FA36B':'#D9534F'}" stroke-width="2" points="${h.map((v,i)=>X(i)+','+Y(v)).join(' ')}"/></svg>`; }
+async function openMarket(){
+  const M = await mktLoad(true); if(!M) return toast('行情讀不到，等等再試');
+  const ev = (M.events||[]).map(e=>`<div class="mktev">${esc(e.title)}<small>到 ${new Date(+e.ends - (S.off||0)).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false})}</small></div>`).join('');
+  const row = (k,id,name,icon) => { const x = mktItem(k,id); if(!x) return '';
+    return `<div class="row mktrow"><div class="ic">${icon}</div><div class="tx"><b>${esc(name)}</b> ${mktTag(k,id)}<div>現在每個 ${mktFmt(x.base*x.mult)} 金<small>（原價 ${x.base}）</small></div></div>${mktSpark(x.hist)}</div>`; };
+  const crops = CROPS.slice().sort((a,b)=>a.lv-b.lv).map(c=>row('c', c.id, c.name, iconSVG(c))).join('');
+  const goods = [...new Set(ANIMALS.map(a=>a.good))].map(g=>{ const a = ANIMALS.find(x=>x.good===g); return row('g', g, a.good_name, `<span style="font-size:26px">${GOOD_ICON[g]||'⭐'}</span>`); }).join('');
+  modal('穀倉', barnNav('mkt') + `<div class="rhint">收購價每小時變一次，在原價的 ${Math.round(M.lo*100)}%～${Math.round(M.hi*100)}% 之間；全服大家一起賣，價格會被壓低。🔥＝突發事件中</div>${ev}
+    <div class="sec">作物</div>${crops}<div class="sec">牧場產品</div>${goods}`); bindBarnNav();
+}
+function barnCapHTML(me){ const M = MKT && MKT.barn, used = Object.values(me.crops||{}).reduce((a,n)=>a+(+n||0),0) + Object.values(me.goods||{}).reduce((a,n)=>a+(+n||0),0), cap = me.barn_cap || (M&&M.cap) || 200;
+  const full = used >= cap, canUp = M && cap < M.max;
+  return `<div class="barncap${full?' full':''}"><div class="bcb"><i style="width:${Math.min(100, used/cap*100).toFixed(1)}%"></i></div><span>倉庫 ${used.toLocaleString()} / ${cap.toLocaleString()}${full?'（滿了，多的會照現價賣掉）':''}</span>
+    ${canUp ? `<button class="mini" id="barnUp">擴充 +${M ? (CFG_SET.barn_step ?? 100) : 100}（${(+M.cost).toLocaleString()} 金）</button>` : ''}</div>`; }
+function bindBarnNav(){ document.querySelectorAll('[data-bn]').forEach(b=>b.onclick=()=> b.dataset.bn==='seed' ? openShop() : b.dataset.bn==='item' ? openItemShop() : b.dataset.bn==='mkt' ? openMarket() : openBag());
+  if($('barnUp')) $('barnUp').onclick = async()=>{ const M = MKT && MKT.barn; if(!M) return; if(S.me.gold < M.cost) return toast('金幣不夠');
+    try{ const r = await rpc('farm_barn_upgrade'); applyState(r.state); refresh(); sfx('lvup'); toast(`倉庫擴充到 ${r.cap.toLocaleString()} 格`); await mktLoad(true); openBag(); }catch(e){ toast(e.message); } }; }
 function openShop(){
   if(mode==='visit') return toast('回到自己的農場才能買東西');
   const me = S.me;
@@ -320,15 +349,16 @@ function openShop(){
     if(r){ sfx('coin'); toast(`買了 ${n} 包${c.name}種子`); ui.seed = c.id; openShop(); }
   });
 }
-function openBag(){
+async function openBag(){
   if(mode==='visit') return toast('回到自己的農場才能打開倉庫');
+  await mktLoad();
   const me = S.me;
   const cr = Object.entries(me.crops).filter(([,n])=>n>0);
   const sd = Object.entries(me.seeds).filter(([,n])=>n>0);
-  const total = cr.reduce((a,[id,n])=>a+n*CROP[id].price, 0);
-  let body = barnNav('bag')+`<div class="sec">作物</div>`;
-  body += cr.length ? cr.map(([id,n])=>{ const c=CROP[id];
-    return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}</b> <span class="tag">×${n}</span><div>每個 ${c.price} 金・共 ${n*c.price} 金</div></div>
+  const total = Math.ceil(cr.reduce((a,[id,n])=>a+n*mktUnit('c',id), 0));
+  let body = barnNav('bag') + barnCapHTML(me) + `<div class="sec">作物</div>`;
+  body += cr.length ? cr.map(([id,n])=>{ const c=CROP[id], u=mktUnit('c',id);
+    return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}</b> <span class="tag">×${n}</span> ${mktTag('c',id)}<div>現在每個 ${mktFmt(u)} 金・共 ${Math.ceil(n*u).toLocaleString()} 金</div></div>
       <button class="mini o" data-sell="${id}">全部賣出</button></div>`; }).join('')
     : `<div class="empty">還沒有收成的作物</div>`;
   body += `<div class="sec">種子</div>`;
@@ -336,7 +366,7 @@ function openBag(){
     return `<div class="row"><div class="ic">${iconSVG(c)}</div><div class="tx"><b>${c.name}種子</b> <span class="tag">×${n}</span><div>成熟 ${dur(c.time)}</div></div><button class="mini" data-use="${id}">拿來種</button></div>`; }).join('')
     : `<div class="empty">沒有種子</div>`;
   body += goodsHTML(me);
-  modal('穀倉', body, cr.length?[[`一鍵全部賣出（${total} 金）`,'o',async()=>{ const r=await doAct('sell_all'); if(r){ sfx('coin'); toast(`全部賣出，獲得 ${r.amt} 金`); closeModal(); } }]]:null); bindBarnNav();
+  modal('穀倉', body, cr.length?[[`一鍵全部賣出（${total} 金）`,'o',async()=>{ const r=await doAct('sell_all'); if(r){ sfx('coin'); toast(`全部賣出，獲得 ${r.amt} 金`); mktLoad(true); closeModal(); } }]]:null); bindBarnNav();
   $('md').querySelectorAll('[data-sell]').forEach(b=>b.onclick=async()=>{
     const id=b.dataset.sell; const r = await doAct('sell', null, id);
     if(r){ sfx('coin'); toast(`賣出 ${CROP[id].name}，獲得 ${r.amt} 金`); openBag(); }
@@ -808,6 +838,7 @@ function tkText(e){ const a=`<b>${esc(e.a)}</b>`, o=`<b>${esc(e.o)}</b>`;
   if(e.k==='r_steal') return `🥚 ${a} 偷走了 ${o} 牧場的 ${e.q} 個${(ANIMALS.find(x=>x.good===e.c)||{}).good_name||'產品'}`;
   if(e.k==='dog') return `🐶 ${a} 想偷 ${o} 的菜，被看門狗咬了！`;
   if(e.k==='shout') return `<span class="tkshout">📢 ${a}：${esc(e.m||'')}</span>`;
+  if(e.k==='mkt') return `<span class="tkmkt">📈 ${esc(e.m||'')}</span>`;
   return ''; }
 async function loadTicker(){
   try{ const on=+((CFG_SET||{}).ticker_on ?? 1)!==0, L=on?await rpc('farm_ticker'):[], ev=eventInfo(); const sig=(ev||'')+L.map(e=>e.t+e.a).join();

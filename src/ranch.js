@@ -159,8 +159,8 @@ async function ranchFriend(action, slot){
 function goodsHTML(me){
   const g = Object.entries(me.goods||{}).filter(([,n])=>n>0);
   if(!g.length) return '';
-  const total = g.reduce((s,[k,n])=>{ const a=ANIMALS.find(x=>x.good===k); return s + n*(a?a.good_price:0); }, 0);
+  const total = Math.ceil(g.reduce((s,[k,n])=>s + n*mktUnit('g',k), 0));
   return `<div class="sec">牧場產品</div>` + g.map(([k,n])=>{ const a=ANIMALS.find(x=>x.good===k)||{good_name:k,good_price:0};
-    return `<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${GOOD_ICON[k]||'⭐'}</div><div class="tx"><b>${a.good_name}</b> <span class="tag">×${n}</span><div>每個 ${a.good_price} 金・共 ${n*a.good_price} 金</div></div></div>`; }).join('')
-    + `<button class="btn o" id="sellGoods" style="width:100%;margin-top:6px">賣出全部牧場產品（${total} 金）</button>`;
+    return `<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${GOOD_ICON[k]||'⭐'}</div><div class="tx"><b>${a.good_name}</b> <span class="tag">×${n}</span> ${mktTag('g',k)}<div>現在每個 ${mktFmt(mktUnit('g',k))} 金・共 ${Math.ceil(n*mktUnit('g',k)).toLocaleString()} 金</div></div></div>`; }).join('')
+    + `<button class="btn o" id="sellGoods" style="width:100%;margin-top:6px">賣出全部牧場產品（${total.toLocaleString()} 金）</button>`;
 }

@@ -285,6 +285,22 @@ function wireSaves(){
 }
 
 /* 遊戲數值 */
+// 菜價行情：每種東西的現價、波動幅度（可改）、手動觸發突發事件。價格範圍、事件機率、倉庫容量在上面「玩法設定」裡（mkt_、barn_ 開頭）
+async function mktAdmin(R){
+  const el = $('mktCard'); if(!el) return;
+  try{ R = R || await rpc('adm_market'); }catch(e){ el.innerHTML = `<h2>📈 菜價行情</h2><div class="muted">讀取失敗：${esc(e.message)}</div>`; return; }
+  const sp = h => { h=(h||[]).map(Number); if(h.length<2) return ''; const W=120,H=26,lo=Math.min(...h,0.5),hi=Math.max(...h,2); return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><polyline fill="none" stroke="#3BB273" stroke-width="2" points="${h.map((v,i)=>(i/(h.length-1)*W).toFixed(1)+','+(H-(v-lo)/(hi-lo)*H).toFixed(1)).join(' ')}"/></svg>`; };
+  const EV = [['typhoon','🌀 颱風（蔬菜大漲）'],['harvest','🧺 水果大豐收（腰斬）'],['shortage','🛒 市場缺貨（2 種大漲）'],['breakfast','🥚 早餐店搶貨（蛋、牛奶大漲）'],['newyear','🧧 過年（水果上漲）'],['midautumn','🌕 中秋（玉米、茄子、南瓜大漲）']];
+  el.innerHTML = `<h2>📈 菜價行情</h2><div class="muted" style="margin-bottom:8px">每小時自動變動一次。波動：每小時大約上下幾 %（0.06＝6%，0＝價格不動）。價格範圍、事件機率、倉庫容量在上面「玩法設定」（mkt_、barn_ 開頭）。</div>
+    <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px"><select id="mkEv">${EV.map(([k,t])=>`<option value="${k}">${t}</option>`).join('')}</select><button class="btn" id="mkGo">立刻發生</button><button class="btn g" id="mkStop">結束目前事件</button></div>
+    ${(R.events||[]).length ? `<div class="muted" style="margin-bottom:6px">最近事件：${R.events.slice(0,5).map(e=>`${esc(e.title)}（${new Date(+e.starts).toLocaleString('zh-TW',{hour12:false})}${+e.ends>Date.now()?'，進行中':''}）`).join('；')}</div>` : ''}
+    <table><tr><th>名稱</th><th>原價</th><th>現在</th><th>48 小時</th><th>波動</th><th></th></tr>
+    ${(R.items||[]).map(x=>`<tr><td>${x.k==='g'?'🥚 ':''}${esc(x.name)}</td><td>${x.base}</td><td><b style="color:${x.mult>=1?'#1F8A55':'#C9302C'}">${Math.round(x.mult*100)}%</b>${x.ev?' 🔥':''}</td><td>${sp(x.hist)}</td>
+      <td><input class="num" id="mv_${x.k}_${x.id}" type="number" step="0.01" value="${x.vol}"></td><td><button class="btn" data-mv="${x.k}|${x.id}">儲存</button></td></tr>`).join('')}</table>`;
+  el.querySelectorAll('[data-mv]').forEach(b=>b.onclick=async()=>{ const [k,id]=b.dataset.mv.split('|'); try{ mktAdmin(await rpc('adm_market_vol',{p_kind:k,p_id:id,p_vol:+$(`mv_${k}_${id}`).value||0})); toast('已儲存'); }catch(e){ toast(e.message); } });
+  $('mkGo').onclick = async()=>{ try{ mktAdmin(await rpc('adm_market_event',{p_typ:$('mkEv').value})); toast('事件已發生'); }catch(e){ toast(e.message); } };
+  $('mkStop').onclick = async()=>{ try{ mktAdmin(await rpc('adm_market_event',{p_typ:'stop'})); toast('已結束'); }catch(e){ toast(e.message); } };
+}
 async function pageCf(){
   const C = await rpc('adm_config'), SIGN=((C.settings||[]).find(x=>x.key==='sign_rw')||{}).value||[], GB=((C.settings||[]).find(x=>x.key==='gold_bags')||{}).value||[];
   M(`<div class="savebar"><span id="dirtyN">沒有未儲存的修改</span><button class="btn" id="saveAll">💾 全部儲存</button></div><div class="card"><h2>玩法設定</h2><table>${C.settings.filter(s=>typeof s.value==='number' && !/^(ev_|maint_|bot_last_run|evo_)/.test(s.key)).map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
@@ -297,6 +313,7 @@ async function pageCf(){
     <div class="card"><h2>💰 錢袋（鑽石換金幣）</h2><div class="muted" style="margin-bottom:8px">玩家點金幣旁邊的 + 就能買。名稱、要幾顆鑽石、換多少金幣都可以改；鑽石或金幣填 0＝這袋先不賣。</div>
     <table><tr><th>名稱</th><th>鑽石</th><th>金幣</th></tr>${GB.map((b,i)=>`<tr data-gbrow><td><input id="gb_${i}_name" value="${esc(b.name)}" style="width:8em"></td><td><input class="num" id="gb_${i}_gems" type="number" value="${b.gems}"></td><td><input class="num" id="gb_${i}_gold" type="number" value="${b.gold}"></td></tr>`).join('')}
     <tr><td></td><td colspan="2"><button class="btn" data-gbsave="1">儲存錢袋</button></td></tr></table></div>
+    <div class="card" id="mktCard"><h2>📈 菜價行情</h2><div class="muted">讀取中…</div></div>
     <div class="card"><h2>作物數值</h2><div class="muted" style="margin-bottom:8px">成熟時間單位是「秒」。改完按該列的儲存，玩家重新整理後就會套用。</div>
     <table><tr><th>作物</th><th>解鎖等級</th><th>種子價</th><th>成熟秒數</th><th>收成數</th><th>單價</th><th>經驗</th><th></th></tr>
     ${C.crops.map(c=>`<tr><td><b>${esc(c.name)}</b></td>${['lv','seed','grow_sec','yield','price','exp'].map(f=>`<td><input class="num" id="c_${c.id}_${f}" type="number" value="${c[f]}"></td>`).join('')}<td><button class="btn" data-cid="${c.id}">儲存</button></td></tr>`).join('')}</table></div>
@@ -372,6 +389,7 @@ async function pageCf(){
     await rpc('adm_pack_save',{p_id:id,p_name:el('name').value,p_descr:el('descr').value,p_price:+el('price').value,p_reward:rw}); });
   document.querySelectorAll('[data-acid]').forEach(b=>b._save=async()=>{ const id=b.dataset.acid, v=f=>$(`ac_${id}_${f}`).value;
     await rpc('adm_ach_save',{p_id:id,p_name:v('name'),p_target:+v('target'),p_gems:+v('gems')}); });
+  mktAdmin();
   document.querySelectorAll('[data-gbsave]').forEach(b=>b._save=async()=>{ const v=GB.map((g,i)=>({ id:g.id, name:($(`gb_${i}_name`).value||g.name).trim(), gems:Math.max(0,+$(`gb_${i}_gems`).value||0), gold:Math.max(0,+$(`gb_${i}_gold`).value||0) }));
     await rpc('adm_setting_put',{p_key:'gold_bags',p_value:v}); });
   document.querySelectorAll('[data-sign]').forEach(b=>b._save=async()=>{ const rw=[0,1,2,3,4,5,6].map(i=>{ const o=Object.assign({}, SIGN[i]||{}), g=+$(`sg_${i}_gold`).value||0, m=+$(`sg_${i}_gems`).value||0, it=$(`sg_${i}_it`).value, itn=+$(`sg_${i}_itn`).value||0, sd=$(`sg_${i}_sd`).value, sdn=+$(`sg_${i}_sdn`).value||0;
