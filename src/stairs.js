@@ -40,10 +40,11 @@ async function stairStart(){
   ST.deco = []; for(let i = 0; i < 7; i++) ST.deco.push(stairDeco(i * 160 + Math.random() * 60));
   SR = { id: s.id, t: 0, scroll: 0, plats: [], x: ST.W/2, y: 0, vy: 0, on: null, hp: ST.HP, inv: 0, skip: null, skipT: 0, l: 0, r: 0, face: 1,
          over: false, started: false, last: 0, pet, hpShown: -1, fShown: -1, flash: 0 };
+  stairLayout();
   // 一開始的平台：前幾層都是田埂，寵物站在中間那塊
   for(let y = 150, i = 0; y < ST.H + ST.GAP; y += ST.GAP, i++) SR.plats.push(stairPlat(y, i < 6 ? 'n' : null, i===2 ? ST.W/2 - ST.PW/2 : null));
   SR.on = SR.plats[2]; SR.y = SR.on.y;
-  const cv = $('stC'), fit = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; cv.style.width = innerWidth+'px'; cv.style.height = innerHeight+'px'; };
+  const cv = $('stC'), fit = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; cv.style.width = innerWidth+'px'; cv.style.height = innerHeight+'px'; stairLayout(); };
   fit(); SR.fit = fit; addEventListener('resize', fit);
   const hold = (id, k) => { const b = $(id);
     b.addEventListener('pointerdown', e => { e.preventDefault(); try{ b.setPointerCapture(e.pointerId); }catch(_){} stairGo(); if(SR) SR[k] = 1; b.classList.add('on'); });
@@ -55,6 +56,22 @@ async function stairStart(){
   addEventListener('keydown', SR.kd); addEventListener('keyup', SR.ku);
   $('stX').onclick = () => { if(!SR || SR.over) return; if(!SR.started) return stairQuit(); stairDie(); };
   requestAnimationFrame(stairLoop);
+}
+// 直式：場地加高，上面留給血條、下面留給按鈕；橫式：場地在中間，按鈕在兩邊
+function stairLayout(){
+  const w = innerWidth, h = innerHeight, dpr = devicePixelRatio, el = $('stair');
+  const port = h > w * 1.15;
+  if(el) el.classList.toggle('port', port);
+  let sc, ox, oy;
+  if(port){
+    const top = 64, bot = 124; sc = Math.min(w / (ST.W + 16), 2.2);
+    ST.H = Math.max(440, Math.round((h - top - bot) / sc));
+    ox = (w - ST.W * sc) / 2; oy = top;
+  } else {
+    ST.H = 520; sc = Math.min(h / ST.H, w / ST.W);
+    ox = (w - ST.W * sc) / 2; oy = (h - ST.H * sc) / 2;
+  }
+  ST.L = { sc: sc * dpr, ox: ox * dpr, oy: oy * dpr, port };
 }
 function stairGo(){ const r = SR; if(!r || r.over || r.started) return; r.started = true; r.last = performance.now(); $('stMsg').style.display = 'none'; }
 
@@ -137,7 +154,8 @@ function stairLoop(now){
 /* ---------- 畫 ---------- */
 function stairDraw(r, cv, now){
   const ctx = cv.getContext('2d'), cw = cv.width, ch = cv.height;
-  const sc = Math.min(ch / ST.H, cw / ST.W), ox = (cw - ST.W * sc) / 2, oy = (ch - ST.H * sc) / 2;
+  if(!ST.L) stairLayout();
+  const { sc, ox, oy } = ST.L;
   ctx.setTransform(1,0,0,1,0,0);
   // 外面：農場的遠景（瀑布、浮島、草地）
   const bd = ST.img && ST.img.backdrop;
