@@ -28,7 +28,8 @@ function addBot(G) {
 }
 // 電腦數量：真人越多，電腦越少（總共補到 4 人）；多的電腦這局結束就離開
 function balanceBots(G) {
-  const want = Math.max(0, BOT_TOTAL - humansIn(G) - (G.queue || []).length);
+  // 私人房間不放電腦（房主改成公開才會補）；公開房和快速配對補到 4 人
+  const want = G.priv ? 0 : Math.max(0, BOT_TOTAL - humansIn(G) - (G.queue || []).length);
   let bots = G.seats.map((p, i) => (p && p.bot && !p.leaving ? i : -1)).filter(i => i >= 0);
   while (bots.length > want) { const i = bots.pop(); G.seats[i].leaving = true; }
   while (bots.length < want && G.seats.some(p => !p)) { const n = bots.length; addBot(G); bots = G.seats.map((p, i) => (p && p.bot && !p.leaving ? i : -1)).filter(i => i >= 0); if (bots.length === n) break; }   // 沒有農場電腦可以上就停
@@ -37,7 +38,7 @@ function balanceBots(G) {
 export function newTable(lvl, priv, host, me, now) {
   const G = TH.newTable(lvl); G.queue = []; G.tAct = now; G.tWait = now; G.nextAt = now + TT.START; G.wKey = '';
   G.seats[0] = { uid: me.uid, name: me.name, av: me.av, stack: me.buyin, sitOut: true, auto: false, miss: 0 };
-  balanceBots(G);
+  G.priv = !!priv; balanceBots(G);   // 開房間先不放電腦，等確定是公開房再補
   return { lvl, priv, host, game: 'th', status: 'play', state: G };
 }
 export function humans(T) { return T.status === 'play' ? T.state.seats.filter(p => p && p.uid).map(p => p.uid).concat((T.state.queue || []).map(q => q.uid)) : []; }
@@ -70,6 +71,7 @@ export function advance(T, now) { const o = _adv(T, now); const G = T.state; if 
 function _adv(T, now) {
   const out = { settle: null, kicked: [], bank: {}, log: null };
   const G = T.state;
+  if (G.priv !== !!T.priv) { G.priv = !!T.priv; balanceBots(G); if (!inHand(G)) G.nextAt = Math.min(G.nextAt, now); }   // 房主切換私人／公開：電腦跟著上下桌
   // 剛才的動作已經結束這局／有人離桌：把紀錄和要換回的金幣交給 index.ts
   if (G.pendingLog) { out.log = G.pendingLog; G.pendingLog = null; }
   if (G.refund) { for (const [u, x] of Object.entries(G.refund)) out.bank[u] = (out.bank[u] || 0) + x; G.refund = null; }
