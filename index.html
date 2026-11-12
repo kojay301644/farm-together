@@ -517,6 +517,12 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 .stbtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.85);color:#7A4B25;font-size:34px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.25);touch-action:none;-webkit-tap-highlight-color:transparent;z-index:2}
 .stbtn.l{left:calc(env(safe-area-inset-left,0px) + 18px)}.stbtn.r{right:calc(env(safe-area-inset-right,0px) + 18px)}.stbtn.on{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.25);background:#FFE7A8}
 #stair.port .stbtn{width:96px;height:96px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}#stair.port .stbtn.l{left:calc(50% - 120px)}#stair.port .stbtn.r{right:calc(50% - 120px)}
+/* iPhone 橫式：Safari 會把貼著螢幕上緣、下緣的點擊拿去叫出網址列，所以按鈕、✕、結算按鈕都要離邊緣遠一點 */
+@media (orientation:landscape) and (max-height:540px){
+  #stair .stbtn{bottom:auto;top:50%;margin-top:-30px}
+  #run .rnhud,#stair .rnhud{top:calc(env(safe-area-inset-top,0px) + 36px)}
+  .rnres{padding:10px 16px 12px;width:min(360px,80vw)}.rnres h3{font-size:18px}.rnbig{font-size:32px}.rnline{margin:3px 0}.rnline small{width:auto}.rnbtn{margin-top:8px}
+}
 #stEnd{position:absolute;inset:0;pointer-events:none}#stEnd .rnres{pointer-events:auto;z-index:3}
 .rnlast{background:#F3EEFF;border-radius:12px;padding:6px 10px;font-weight:800;font-size:13px;color:#5B4ED6;margin-top:8px}.rnend{margin-left:auto;font-size:12px;color:var(--ink2);font-weight:700;align-self:center}
 .mfwrap{position:absolute;left:10px;top:50%;transform:translateY(-50%)}
@@ -1086,21 +1092,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794467655" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794467807" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794467655" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794467655" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794467807" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794467807" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794467655" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794467807" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794467655" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794467655" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794467807" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794467807" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1117,11 +1123,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794467655" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794467807" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794467655";
+const BUILD="1794467807";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
