@@ -8,11 +8,11 @@ function openThLobby(){
     <div id="thBack"></div>
     ${Object.entries(HOLD.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${TH_ICON[k]}</div><div class="tx"><b>${t.name}</b>
       <div>盲注 ${t.sb.toLocaleString()} / ${t.bb.toLocaleString()}</div><div>帶入 ${t.buyMin.toLocaleString()}～${t.buyMax.toLocaleString()}・要 ${t.min.toLocaleString()} 金幣才能坐</div></div>
-      <div class="mjtbb"><button class="mini" data-thq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-thc="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
+      <div class="mjtbb"><button class="mini" data-thq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-thc="${k}" ${poor?'disabled':''}>開房間</button></div></div>`; }).join('')}
     <div class="mjjoin"><input id="thCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="thJoin">加入朋友的房間</button></div>
     <button class="link" id="thRules">📖 怎麼玩？</button>`, [['回寵物娛樂廳','sub',openHall]]);
   document.querySelectorAll('#md [data-thq]').forEach(b=>b.onclick=()=>thBuyinAsk(b.dataset.thq, 'quick'));
-  document.querySelectorAll('#md [data-thc]').forEach(b=>b.onclick=()=>thBuyinAsk(b.dataset.thc, 'create'));
+  document.querySelectorAll('#md [data-thc]').forEach(b=>b.onclick=()=>mjAskVis(pub=>thBuyinAsk(b.dataset.thc, 'create', null, pub), openThLobby));
   $('thJoin').onclick = async()=>{ const c = ($('thCode').value||'').trim(); if(!/^\d{4}$/.test(c)) return toast('房號是 4 位數字');
     // 先問房間是哪一桌，才知道帶入範圍：用新手桌範圍以外的話伺服器會擋
     thBuyinAsk(null, 'join', c); };
@@ -20,7 +20,7 @@ function openThLobby(){
   mjCall('state').then(r=>{ if(r.view && r.view.status && $('thBack')) { $('thBack').innerHTML = `<button class="btn o" id="thBackB" style="width:100%;margin:6px 0">♠️ 你還有一桌在玩，回到牌桌</button>`; $('thBackB').onclick = ()=>{ closeModal(); mjOnlineEnter(r.view); }; } }).catch(()=>{});
 }
 // 帶入籌碼：選要帶多少上桌
-function thBuyinAsk(lvl, a, code){
+function thBuyinAsk(lvl, a, code, pub){
   const lv = lvl || 'n', T = HOLD.TABLES[lv], gold = S.me.gold;
   const ranges = lvl ? `${T.buyMin.toLocaleString()}～${T.buyMax.toLocaleString()}` : '照朋友房間的桌別';
   const max = lvl ? Math.min(T.buyMax, gold) : 0, def = lvl ? Math.min(max, T.bb*100) : 0;
@@ -33,7 +33,7 @@ function thBuyinAsk(lvl, a, code){
     [['取消','sub',openThLobby],['坐下','',async e=>{
       const btn = e && e.currentTarget; if(btn){ if(btn.disabled) return; btn.disabled = true; }   // 不要連點兩下
       const amt = lvl ? +$('thBr').value : +$('thBn').value;
-      try{ const r = await mjCall(a, Object.assign({ game:'th', buyin: amt }, lvl ? { lvl } : { code })); if(!r.view) throw new Error('進不去，等等再試');
+      try{ const r = await mjCall(a, Object.assign({ game:'th', buyin: amt, pub: !!pub }, lvl ? { lvl } : { code })); if(!r.view) throw new Error('進不去，等等再試');
         S.me.gold = Math.max(0, S.me.gold - amt); try{ refresh(); }catch(e){} closeModal(); mjOnlineEnter(r.view); }catch(err){ toast(err.message); if(btn) btn.disabled = false; } }]]);
   if($('thBr')) $('thBr').oninput = ()=>{ $('thBv').textContent = (+$('thBr').value).toLocaleString(); };
 }

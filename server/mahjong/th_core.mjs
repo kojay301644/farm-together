@@ -141,7 +141,7 @@ export function leave(T, uid, now) {
   }
 }
 export function viewFor(T, uid, now) {
-  const base = { tid: T.id, ver: T.ver || 0, game: 'th', lvl: T.lvl, priv: T.priv, code: T.priv ? T.code : null, host: T.host === uid, status: T.status, now, due: dueAt(T) };
+  const base = { tid: T.id, ver: T.ver || 0, game: 'th', lvl: T.lvl, priv: !!T.priv, room: !!T.code, code: T.code || null, host: T.host === uid, status: T.status, now, due: dueAt(T) };
   if (T.status !== 'play') return base;
   const G = T.state, me = G.seats.findIndex(p => p && p.uid === uid), queued = (G.queue || []).some(q => q.uid === uid);
   if (me < 0 && !queued) return base;

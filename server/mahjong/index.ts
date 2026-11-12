@@ -58,7 +58,7 @@ async function mutate(id: number, fn: (T: any, now: number) => Promise<any> | an
     let out = C.advance(T, now, null);
     if (out.needGold) { const g = await golds(C.humans(T).concat((T.state.pending || []).map((p: any) => p.uid), C.botIds(T))); out = { ...C.advance(T, now, g), settle: out.settle || null, botBank: out.botBank }; }
     const nh = C.humans(T).length;
-    const { data: upd } = await sb.from('mj_tables').update({ state: T.state, status: T.status, host: T.host, ver: before + 1, nh, updated_at: new Date().toISOString() }).eq('id', id).eq('ver', before).select('id');
+    const { data: upd } = await sb.from('mj_tables').update({ state: T.state, status: T.status, host: T.host, priv: !!T.priv, ver: before + 1, nh, updated_at: new Date().toISOString() }).eq('id', id).eq('ver', before).select('id');
     if (!upd || !upd.length) { await new Promise(r => setTimeout(r, 40 + Math.random() * 80)); continue; }
     T.ver = before + 1;
     // 結算一定要先做完；推畫面給其他人改成回覆後在背景做，自己的回覆比較快
@@ -105,7 +105,7 @@ async function joinTable(uid: string, a: string, b: any) {
     // 百家樂：系統桌一直開著（就算沒人），先進最早開的那桌
     const q0 = sb.from('mj_tables').select('id,status,nh').eq('game', game).eq('lvl', lvl).eq('priv', false).in('status', ['wait', 'play']).lt('nh', game === 'bc' ? BC.MAXP : game === 'th' ? TH.SEATS : 4);
     const { data: L } = game === 'bc' ? await q0.order('id', { ascending: true }).limit(5)
-      : await q0.gt('nh', 0).gt('updated_at', new Date(Date.now() - 120e3).toISOString()).order('status', { ascending: false }).order('nh', { ascending: false }).limit(5);
+      : await q0.gt('nh', 0).or(`status.eq.wait,updated_at.gt.${new Date(Date.now() - 120e3).toISOString()}`)   // 公開房間等人中也配得到.order('status', { ascending: false }).order('nh', { ascending: false }).limit(5);
     const amt0 = game === 'th' ? thAmt(lvl, b.buyin) : 0;
     if (game === 'th') await thBuyin(uid, amt0);
     for (const t of (L || [])) {
@@ -113,12 +113,13 @@ async function joinTable(uid: string, a: string, b: any) {
     }
     if (game === 'th') await thBank({ [uid]: amt0 });   // 沒找到桌：先退回，下面開新桌再扣
   }
-  const now = NOW(), priv = a === 'create';
+  // 開房間：都有房號、由房主按開始；私人房只能用房號進，公開房快速配對也會配進來（房主可以隨時切換）
+  const now = NOW(), room = a === 'create', priv = room && !b.pub;
   let code = null;
-  if (priv) for (let k = 0; k < 20; k++) { const c = String(1000 + Math.floor(Math.random() * 9000)); const { data: ex } = await sb.from('mj_tables').select('id').eq('code', c).in('status', ['wait', 'play']).limit(1); if (!ex || !ex.length) { code = c; break; } }
+  if (room) for (let k = 0; k < 20; k++) { const c = String(1000 + Math.floor(Math.random() * 9000)); const { data: ex } = await sb.from('mj_tables').select('id').eq('code', c).in('status', ['wait', 'play']).limit(1); if (!ex || !ex.length) { code = c; break; } }
   const buyin = game === 'th' ? thAmt(lvl, b.buyin) : 0;
   if (game === 'th') await thBuyin(uid, buyin);
-  const T = C.newTable(lvl, priv, uid, { uid, name: p.name, av: p.av, buyin }, now, game);
+  const T = C.newTable(lvl, room, uid, { uid, name: p.name, av: p.av, buyin }, now, game); T.priv = priv;
   const { data: ins, error } = await sb.from('mj_tables').insert({ game, lvl, priv, code, host: uid, status: T.status, state: T.state, nh: 1 }).select('*').single();
   if (error) { if (game === 'th') await thBank({ [uid]: buyin }); throw new Fail('開桌失敗'); }
   await pushViews(ins, now, []);
@@ -191,6 +192,10 @@ async function handle(uid: string, b: any, test = false) {
     const { T } = await mutate(tid, (T: any, now: number) => C.leave(T, uid, now));
     await sb.from('mj_views').upsert({ uid, table_id: null, view: null, seq: T.ver });
     return { view: null, gold: (await golds([uid]))[uid] };
+  }
+  if (a === 'vis') {   // 房主切換私人／公開
+    const { T } = await mutate(tid, (T: any) => { if (!T.code) throw new Fail('這桌不是房間'); if (T.host !== uid) throw new Fail('只有房主可以改'); T.priv = !b.pub; });
+    return { view: viewOf(T, uid) };
   }
   if (a === 'start') { const { T } = await mutate(tid, (T: any, now: number) => { if (T.status !== 'wait' || T.host !== uid) throw new Fail('只有房主可以開始'); T.state.wait.startAt = now; }); return { view: viewOf(T, uid) }; }
   if (a === 'act' && b.act && b.act.a === 'rebuy') {   // 德州撲克補籌碼

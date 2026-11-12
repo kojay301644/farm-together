@@ -173,7 +173,7 @@ function _playerAct(T, uid, a, now) {
 }
 
 function _leave(T, uid, now) {
-  if (T.status === 'wait') { T.state.wait.players = T.state.wait.players.filter(p => p.uid !== uid); if (T.host === uid && T.priv && T.state.wait.players.length) T.host = T.state.wait.players[0].uid; return; }
+  if (T.status === 'wait') { T.state.wait.players = T.state.wait.players.filter(p => p.uid !== uid); if (T.host === uid && T.code && T.state.wait.players.length) T.host = T.state.wait.players[0].uid; return; }
   if (T.status !== 'play') return;
   const G = T.state;
   G.pending = (G.pending || []).filter(p => p.uid !== uid);
@@ -183,7 +183,7 @@ function _leave(T, uid, now) {
 }
 
 function _viewFor(T, uid, now) {
-  const base = { tid: T.id, ver: T.ver || 0, game: T.game || 'mj', lvl: T.lvl, priv: T.priv, code: T.priv ? T.code : null, host: T.host === uid, status: T.status, now, due: _dueAt(T) };
+  const base = { tid: T.id, ver: T.ver || 0, game: T.game || 'mj', lvl: T.lvl, priv: !!T.priv, room: !!T.code, code: T.code || null, host: T.host === uid, status: T.status, now, due: _dueAt(T) };
   if (T.status === 'wait') return { ...base, wait: { players: T.state.wait.players.map(p => ({ name: p.name, av: p.av })), startAt: T.state.wait.startAt, short: !!T.state.wait.short } };
   if (T.status !== 'play') return base;
   const G = T.state, j = G.uids.indexOf(uid);

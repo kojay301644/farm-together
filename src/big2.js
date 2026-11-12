@@ -8,13 +8,13 @@ function openB2Lobby(){
     <div id="b2Back"></div>
     ${Object.entries(B2.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${B2_ICON[k]}</div><div class="tx"><b>${t.name}</b>
       <div>每張 ${t.per.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
-      <div class="mjtbb"><button class="mini" data-b2q="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-b2c="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
+      <div class="mjtbb"><button class="mini" data-b2q="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-b2c="${k}" ${poor?'disabled':''}>開房間</button></div></div>`; }).join('')}
     <div class="mjjoin"><input id="b2Code" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="b2Join">加入朋友的房間</button></div>
     <button class="link" id="b2Rules">📖 怎麼玩、怎麼算？</button>`, [['回寵物娛樂廳','sub',openHall]]);
   const busy = b => { document.querySelectorAll('#md .mini').forEach(x=>x.disabled = b); };
   const go = async (a, extra) => { busy(true); try{ const r = await mjCall(a, extra); if(!r.view) throw new Error('進不去，等等再試'); closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); busy(false); } };
   document.querySelectorAll('#md [data-b2q]').forEach(b=>b.onclick=()=>go('quick', {lvl:b.dataset.b2q, game:'b2'}));
-  document.querySelectorAll('#md [data-b2c]').forEach(b=>b.onclick=()=>go('create', {lvl:b.dataset.b2c, game:'b2'}));
+  document.querySelectorAll('#md [data-b2c]').forEach(b=>b.onclick=()=>mjAskVis(pub=>go('create', {lvl:b.dataset.b2c, game:'b2', pub}), openB2Lobby));
   $('b2Join').onclick = ()=>{ const c = ($('b2Code').value||'').trim(); if(!/^\d{4}$/.test(c)) return toast('房號是 4 位數字'); go('join', {code:c}); };
   $('b2Rules').onclick = b2Rules;
   mjCall('state').then(r=>{ if(r.view && r.view.status && $('b2Back')) { $('b2Back').innerHTML = `<button class="btn o" id="b2BackB" style="width:100%;margin:6px 0">🃏 你還有一桌在打，回到牌桌</button>`; $('b2BackB').onclick = ()=>{ closeModal(); mjOnlineEnter(r.view); }; } }).catch(()=>{});

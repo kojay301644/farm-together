@@ -121,13 +121,13 @@ function openMjLobby(){
     <div id="mjBack"></div>
     ${Object.entries(MJ.TABLES).map(([k,t])=>{ const poor = gold<t.min; return `<div class="mjtb"><div class="mjtbi">${{n:'🌱',m:'🌻',h:'🏆',r:'💰'}[k]}</div><div class="tx"><b>${t.name}</b>
       <div>底 ${t.base.toLocaleString()}・每台 ${t.tai.toLocaleString()} 金</div><div>需要 ${t.min.toLocaleString()} 金幣才能坐下</div></div>
-      <div class="mjtbb"><button class="mini" data-mjq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-mjc="${k}" ${poor?'disabled':''}>開房找朋友</button></div></div>`; }).join('')}
+      <div class="mjtbb"><button class="mini" data-mjq="${k}" ${poor?'disabled':''}>${poor?'金幣不夠':'快速配對'}</button><button class="mini sub" data-mjc="${k}" ${poor?'disabled':''}>開房間</button></div></div>`; }).join('')}
     <div class="mjjoin"><input id="mjCode" inputmode="numeric" maxlength="4" placeholder="輸入 4 位數房號"><button class="mini" id="mjJoin">加入朋友的房間</button></div>
     <button class="link" id="mjRules">📖 台數怎麼算？</button>`, [['回寵物娛樂廳','sub',openHall]]);
   const busy = b => { document.querySelectorAll('#md .mini').forEach(x=>x.disabled = b); };
   const go = async (a, extra) => { busy(true); try{ const r = await mjCall(a, extra); if(!r.view) throw new Error('進不去，等等再試'); closeModal(); mjOnlineEnter(r.view); }catch(e){ toast(e.message); busy(false); } };
   document.querySelectorAll('#md [data-mjq]').forEach(b=>b.onclick=()=>go('quick', {lvl:b.dataset.mjq}));
-  document.querySelectorAll('#md [data-mjc]').forEach(b=>b.onclick=()=>go('create', {lvl:b.dataset.mjc}));
+  document.querySelectorAll('#md [data-mjc]').forEach(b=>b.onclick=()=>mjAskVis(pub=>go('create', {lvl:b.dataset.mjc, pub}), openMjLobby));
   $('mjJoin').onclick = ()=>{ const c = ($('mjCode').value||'').trim(); if(!/^\d{4}$/.test(c)) return toast('房號是 4 位數字'); go('join', {code:c}); };
   $('mjRules').onclick = mjRules;
   mjCall('state').then(r=>{ if(r.view && r.view.status && $('mjBack')) { $('mjBack').innerHTML = `<button class="btn o" id="mjBackB" style="width:100%;margin:6px 0">🀄 你還有一桌在打，回到牌桌</button>`; $('mjBackB').onclick = ()=>{ closeModal(); mjOnlineEnter(r.view); }; } }).catch(()=>{});
@@ -277,7 +277,7 @@ function mjDo(a){
 function mjClock(){
   if(!mjOn()){ clearInterval(mjTimer); mjTimer=0; return; }
   const V = mjCurView(), el = $('mjSec');
-  if(V && V.status==='wait' && $('mjWs') && MJO){ const sec = Math.max(0, Math.ceil((V.wait.startAt + MJO.off - Date.now())/1000)); $('mjWs').textContent = V.wait.short ? '等其他玩家加入…' : V.priv ? '人到齊或房主按開始就開打' : sec > 0 ? `${sec} 秒後開始` : '準備開始…'; return; }
+  if(V && V.status==='wait' && $('mjWs') && MJO){ const sec = Math.max(0, Math.ceil((V.wait.startAt + MJO.off - Date.now())/1000)); $('mjWs').textContent = V.wait.short ? '等其他玩家加入…' : V.room ? '人到齊或房主按開始就開打' : sec > 0 ? `${sec} 秒後開始` : '準備開始…'; return; }
   if(!V || !V.waiting) { if(el) el.textContent=''; return; }
   if(!V.waiting.includes(V.me) || V.phase==='end'){ if(el) el.textContent=''; return; }
   const dl = MJG ? mjDeadline : (V.deadline ? V.deadline + MJO.off : 0);
@@ -306,13 +306,28 @@ function mjPanel(title, body, btns){
   $('mjPx').onclick = mjPanelClose; p.classList.add('on');
 }
 function mjPanelClose(){ const p=$('mjPanel'); if(p) p.classList.remove('on'); }
+// 開房間時選私人或公開
+function mjAskVis(cb, back){
+  modal('🏠 開房間', `<div class="rhint">之後在牌桌的「☰ 選單」裡也可以隨時切換</div>
+    <button class="btn" id="vPriv" style="width:100%;margin:6px 0">🔒 私人房間<br><small>只有知道房號的朋友能進</small></button>
+    <button class="btn o" id="vPub" style="width:100%;margin:6px 0">🌐 公開房間<br><small>快速配對的人也會被配進來，朋友也能用房號進</small></button>`, [['取消','sub',back]]);
+  $('vPriv').onclick = ()=>cb(false); $('vPub').onclick = ()=>cb(true);
+}
+// 房主切換私人／公開
+async function mjSetVis(after){
+  const V = mjCurView(); if(!V || !V.room || !MJO) return;
+  try{ const r = await mjCall('vis', { pub: !!V.priv }); if(r.view) mjApply(r.view, null); mjToast(V.priv ? '已改成公開房間' : '已改成私人房間'); }catch(e){ mjToast(e.message); }
+  if(after) after();
+}
 function mjMenu(){
   mjPanel('選單', `<div class="mjmn">
     <button class="mjmi" id="mmRules">📖<span>${['b2','bc','th'].includes((mjCurView()||{}).game)?'規則':'台數表'}</span></button>
     <button class="mjmi" id="mmBgm">${mjBgmOn?'🎵':'🔕'}<span>音樂${mjBgmOn?'：開':'：關'}</span></button>
     <button class="mjmi" id="mmVg">${mjMyGender==='f'?'👧':'👦'}<span>我的聲音：${mjMyGender==='f'?'女生':'男生'}</span></button>
     <button class="mjmi" id="mmVo">${mjVoiceOn?'🔊':'🔇'}<span>語音${mjVoiceOn?'：開':'：關'}</span></button>
+    ${(()=>{ const V = mjCurView()||{}; return V.room && V.host ? `<button class="mjmi" id="mmVis">${V.priv?'🔒':'🌐'}<span>${V.priv?'私人房間（點了改公開）':'公開房間（點了改私人）'}</span></button>` : ''; })()}
     <button class="mjmi r" id="mmExit">🚪<span>離開牌桌</span></button></div>`, []);
+  if($('mmVis')) $('mmVis').onclick = ()=>mjSetVis(()=>mjMenu());
   $('mmRules').onclick = ()=>{ const V = mjCurView(); if(V && V.game==='b2') b2Rules(); else if(V && V.game==='bc') bcRules(); else if(V && V.game==='th') thRules(); else mjRules(); };
   $('mmVo').onclick = ()=>{ mjVoiceOn=!mjVoiceOn; try{ localStorage.setItem('ytzt_mjvoice', mjVoiceOn?'1':'0'); }catch(e){} if(mjVoiceOn) mjPlayVoice('碰', 0); mjMenu(); };
   $('mmVg').onclick = ()=>{ mjMyGender = mjMyGender==='f'?'m':'f'; try{ localStorage.setItem('ytzt_mjvg', mjMyGender); }catch(e){} mjPlayVoice('碰', mjMe); mjMenu(); };
@@ -479,12 +494,12 @@ function mjRenderWait(V){
   const shoutN = (S && S.me && S.me.items && S.me.items.shout) || 0;
   if(V.status==='wait'){
     const P = (V.wait && V.wait.players) || [];
-    inner = `<div class="mjwt">${V.priv ? '🏠 朋友房間' : '🔍 正在找牌友…'}</div>
-      ${V.priv ? `<div class="mjcode">房號 <b>${esc(V.code||'')}</b><small>把房號告訴朋友，在「${gname}」輸入就能加入</small></div>` : ''}
-      <div class="mjwp">${[0,1,2,3].map(i=>{ const p=P[i]; return p ? `<div class="mjwq"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span></div>` : `<div class="mjwq e"><i>？</i><span>${V.priv?'等朋友加入':'等待中'}</span></div>`; }).join('')}</div>
+    inner = `<div class="mjwt">${V.room ? (V.priv ? '🔒 私人房間' : '🌐 公開房間') : '🔍 正在找牌友…'}${V.room && V.host ? ` <button class="mini sub" id="mjVis" style="vertical-align:middle;margin-left:6px">${V.priv ? '改成公開' : '改成私人'}</button>` : ''}</div>
+      ${V.room ? `<div class="mjcode">房號 <b>${esc(V.code||'')}</b><small>${V.priv ? `只有知道房號的人能進：把房號告訴朋友，在「${gname}」輸入就能加入` : '公開中：快速配對的人也會被配進來，朋友也可以用房號加入'}</small></div>` : ''}
+      <div class="mjwp">${[0,1,2,3].map(i=>{ const p=P[i]; return p ? `<div class="mjwq"><img src="${avSrc(p.av)}" alt=""><span>${esc(p.name)}</span></div>` : `<div class="mjwq e"><i>？</i><span>${V.room?'等朋友加入':'等待中'}</span></div>`; }).join('')}</div>
       <div class="mjws" id="mjWs"></div>
-      ${V.priv && P.length < 4 ? `<button class="btn o mjshb" id="mjShout" ${shoutN>0?'':'disabled'}>📢 用大聲公找人${shoutN>0?`（剩 ${shoutN} 個）`:'（沒有大聲公，可到綜合商店買）'}</button>` : ''}
-      <div class="mjwb">${V.priv && V.host ? `<button class="btn" id="mjStart">立即開始</button>` : ''}<button class="btn sub" id="mjWl">離開</button></div>`;
+      ${V.room && P.length < 4 ? `<button class="btn o mjshb" id="mjShout" ${shoutN>0?'':'disabled'}>📢 用大聲公找人${shoutN>0?`（剩 ${shoutN} 個）`:'（沒有大聲公，可到綜合商店買）'}</button>` : ''}
+      <div class="mjwb">${V.room && V.host ? `<button class="btn" id="mjStart">立即開始</button>` : ''}<button class="btn sub" id="mjWl">離開</button></div>`;
   } else {
     inner = `<div class="mjwt">⏳ 牌桌正在打</div><div class="mjws">這一局結束後你就會入座，請稍等…</div><div class="mjwb"><button class="btn sub" id="mjWl">離開</button></div>`;
   }
@@ -501,6 +516,7 @@ function mjRenderWait(V){
         try{ const r = await rpc('farm_item_use', { p_id:'shout', p_arg:t }); applyState(r.state); try{ refresh(); }catch(e){} mjPanelClose(); mjToast('大聲公已送出！'); mjRender(); }catch(e){ mjToast(e.message); } }]]);
   };
   $('mjWl').onclick = ()=>mjLeave(true);
+  if($('mjVis')) $('mjVis').onclick = ()=>mjSetVis();
 }
 function mjShell(){
   $('mj').style.setProperty('--mjtable', `url("${mjArt('mj_table')}")`); $('mj').style.setProperty('--mjconsole', `url("${mjArt('mj_console')}")`);
