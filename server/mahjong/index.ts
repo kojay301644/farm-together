@@ -219,14 +219,26 @@ async function handle(uid: string, b: any, test = false) {
 }
 
 // 讀後台設定：維護開關、各遊戲調整、百家樂每個押注區的單注上限（0＝不限）
+let CFGC: { at: number, cf: Record<string, string> } = { at: 0, cf: {} };
 async function loadCfg() {
+  if (Date.now() - CFGC.at < 20000) return CFGC.cf;   // 20 秒內不重讀，減輕資料庫負擔
   const { data: cfg } = await sb.from('settings').select('key,value').in('key', ['mj_on', 'casino_cfg', ...BC_LIM_KEYS]);
   const cf: Record<string, string> = {}; let cc: any = null;
   (cfg || []).forEach((r: any) => { if (r.key === 'casino_cfg') cc = r.value; else cf[r.key] = String(r.value); });
   // 各遊戲的桌子數值、抽成、大富翁規則、百家樂籌碼（後台娛樂廳頁設定）
   if (cc) { try { MJ.setCfg(cc.mj); B2.setCfg(cc.b2); TH.setCfg(cc.th); MF.setCfg(cc.mf); BC.setCfg(cc.bc); } catch (e) { console.error('casino_cfg', e); } }
   for (const k of Object.keys(BC.LIMIT)) { const v = +(cf['bc_lim_' + k] ?? 0); BC.LIMIT[k] = v > 0 ? v : Infinity; }
+  CFGC = { at: Date.now(), cf };
   return cf;
+}
+// 登入驗證：同一個 token 2 分鐘內不重複問 Auth（下注連點時每一下都會打進來）
+const UIDC = new Map<string, { uid: string, at: number }>();
+async function uidOf(token: string) {
+  if (!token) return null;
+  const c = UIDC.get(token); if (c && Date.now() - c.at < 120000) return c.uid;
+  const { data } = await sb.auth.getUser(token); const uid = data?.user?.id || null;
+  if (uid) { if (UIDC.size > 500) UIDC.clear(); UIDC.set(token, { uid, at: Date.now() }); }
+  return uid;
 }
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
@@ -235,7 +247,7 @@ Deno.serve(async (req) => {
     let uid: string | null = null;
     const tk = req.headers.get('x-mj-test');
     if (tk) { const { data } = await sb.from('push_config').select('v').eq('k', 'mj_test_key').maybeSingle(); if (data && data.v && tk === data.v) { if (b.a === 'sweep') { await loadCfg(); return J(await sweep()); } if (b.a === 'botplay') { await loadCfg(); return J(await botPlay()); } uid = b.as; } }
-    if (!uid) { const token = (req.headers.get('Authorization') || '').replace('Bearer ', ''); const { data } = await sb.auth.getUser(token); uid = data?.user?.id || null; }
+    if (!uid) { const token = (req.headers.get('Authorization') || '').replace('Bearer ', ''); uid = await uidOf(token); }
     if (!uid) return J({ error: '請先登入' }, 401);
     const cf = await loadCfg();
     if (cf.mj_on === '0') return J({ error: '麻將維護中，等等再來' }, 200);
