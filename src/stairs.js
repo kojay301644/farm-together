@@ -35,6 +35,9 @@ async function stairStart(){
     <button class="stbtn l" id="stL">◀</button><button class="stbtn r" id="stR">▶</button><div id="stEnd"></div>`;
   el.classList.add('on'); document.body.classList.add('mjon');
   const pet = new Image(); pet.src = chrSrc((S && S.me && S.me.chara) || 'bunny1');
+  if(!ST.img){ ST.img = {}; ['backdrop','isl0','isl1','isl2'].forEach(n => { const i = new Image(); i.src = A(n); ST.img[n] = i; }); }
+  // 遠景浮島＋雲（跟農場一樣的天空），慢慢往上飄
+  ST.deco = []; for(let i = 0; i < 7; i++) ST.deco.push(stairDeco(i * 160 + Math.random() * 60));
   SR = { id: s.id, t: 0, scroll: 0, plats: [], x: ST.W/2, y: 0, vy: 0, on: null, hp: ST.HP, inv: 0, skip: null, skipT: 0, l: 0, r: 0, face: 1,
          over: false, started: false, last: 0, pet, hpShown: -1, fShown: -1, flash: 0 };
   // 一開始的平台：前幾層都是田埂，寵物站在中間那塊
@@ -66,6 +69,11 @@ function stairPlat(y, k, x){
   return { k, x: x != null ? x : 6 + Math.random() * (ST.W - ST.PW - 12), y, tOn: 0, flipT: 0, gone: 0, sq: 0 };
 }
 
+function stairDeco(y){
+  const R = Math.random();
+  return R < 0.45 ? { k: 'cloud', x: Math.random() * ST.W, y, s: 0.7 + Math.random() * 0.6 }
+       : { k: ['isl0','isl1','isl2'][Math.floor(Math.random() * 3)], x: Math.random() * (ST.W - 60), y, s: 0.35 + Math.random() * 0.35, a: 0.55 + Math.random() * 0.3 };
+}
 function stairHurt(n){
   const r = SR; if(r.inv > 0) return;
   r.hp = Math.max(0, r.hp - n); r.inv = 1; r.flash = 0.25;
@@ -131,17 +139,28 @@ function stairDraw(r, cv, now){
   const ctx = cv.getContext('2d'), cw = cv.width, ch = cv.height;
   const sc = Math.min(ch / ST.H, cw / ST.W), ox = (cw - ST.W * sc) / 2, oy = (ch - ST.H * sc) / 2;
   ctx.setTransform(1,0,0,1,0,0);
-  ctx.fillStyle = '#3A2516'; ctx.fillRect(0, 0, cw, ch);
+  // 外面：農場的遠景（瀑布、浮島、草地）
+  const bd = ST.img && ST.img.backdrop;
+  const sky0 = ctx.createLinearGradient(0, 0, 0, ch); sky0.addColorStop(0, '#3f9be8'); sky0.addColorStop(.55, '#8fcdfb'); sky0.addColorStop(1, '#d6efff');
+  ctx.fillStyle = sky0; ctx.fillRect(0, 0, cw, ch);
+  if(bd && bd.complete && bd.naturalWidth){ const k = Math.max(cw / bd.naturalWidth, ch / bd.naturalHeight); ctx.drawImage(bd, (cw - bd.naturalWidth * k) / 2, ch - bd.naturalHeight * k, bd.naturalWidth * k, bd.naturalHeight * k); }
   ctx.setTransform(sc, 0, 0, sc, ox, oy);
   ctx.save(); ctx.beginPath(); ctx.rect(0, 0, ST.W, ST.H); ctx.clip();
-  // 穀倉木板牆（跟著捲動）
-  const bg = ctx.createLinearGradient(0, 0, 0, ST.H); bg.addColorStop(0, '#F3D9A8'); bg.addColorStop(1, '#E2BB7C');
+  // 裡面：農場的天空，雲和浮島慢慢往上飄
+  const bg = ctx.createLinearGradient(0, 0, 0, ST.H); bg.addColorStop(0, '#5aaef0'); bg.addColorStop(.6, '#9fd6fb'); bg.addColorStop(1, '#dff3ff');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, ST.W, ST.H);
-  ctx.strokeStyle = 'rgba(140,90,40,.18)'; ctx.lineWidth = 2;
-  for(let x = 40; x < ST.W; x += 40){ ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, ST.H); ctx.stroke(); }
-  const off = -(r.scroll * 0.5 % 130);
-  ctx.fillStyle = 'rgba(140,90,40,.14)';
-  for(let y = off; y < ST.H; y += 130) for(let x = 20; x < ST.W; x += 80){ ctx.beginPath(); ctx.arc(x + ((y - off) / 130 % 2) * 40, y + 30, 3, 0, Math.PI*2); ctx.fill(); }
+  if(ST.deco){
+    if(!r.dLast) r.dLast = r.scroll;
+    const dd = (r.scroll - r.dLast) * 0.35; r.dLast = r.scroll;
+    for(const o of ST.deco) o.y -= dd;
+    ST.deco = ST.deco.filter(o => o.y > -140);
+    while(ST.deco.length < 7){ const lo = ST.deco.reduce((m, o) => Math.max(m, o.y), 0); ST.deco.push(stairDeco(Math.max(ST.H + 20, lo + 120 + Math.random() * 60))); }
+    for(const o of ST.deco){
+      if(o.k === 'cloud'){ ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.beginPath(); const s = o.s * 22;
+        ctx.arc(o.x, o.y, s, 0, Math.PI*2); ctx.arc(o.x + s, o.y + s*0.2, s*0.8, 0, Math.PI*2); ctx.arc(o.x - s, o.y + s*0.25, s*0.7, 0, Math.PI*2); ctx.arc(o.x + s*0.3, o.y - s*0.5, s*0.7, 0, Math.PI*2); ctx.fill(); }
+      else { const im = ST.img[o.k]; if(im && im.complete && im.naturalWidth){ ctx.globalAlpha = o.a; ctx.drawImage(im, o.x, o.y, im.naturalWidth * o.s, im.naturalHeight * o.s); ctx.globalAlpha = 1; } }
+    }
+  }
   // 平台
   for(const p of r.plats) stairDrawPlat(ctx, p, now);
   // 寵物
@@ -162,7 +181,9 @@ function stairDraw(r, cv, now){
   if(r.flash > 0){ ctx.fillStyle = `rgba(255,60,60,${r.flash})`; ctx.fillRect(0, 0, ST.W, ST.H); }
   ctx.restore();
   // 兩邊的木框
-  ctx.fillStyle = '#7A4B25'; ctx.fillRect(-8, 0, 8, ST.H); ctx.fillRect(ST.W, 0, 8, ST.H);
+  ctx.fillStyle = '#8A5A2B'; ctx.fillRect(-8, 0, 8, ST.H); ctx.fillRect(ST.W, 0, 8, ST.H);
+  ctx.fillStyle = '#6CC04A'; ctx.fillRect(-8, 0, 8, 6); ctx.fillRect(ST.W, 0, 8, 6);
+  ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 1; ctx.strokeRect(-8, 0, ST.W + 16, ST.H);
   // HUD（有變才改）
   const f = Math.floor(r.scroll / ST.GAP);
   if(f !== r.fShown){ r.fShown = f; const e = $('stF'); if(e) e.textContent = `地下 ${f.toLocaleString()} 層`; }

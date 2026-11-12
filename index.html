@@ -511,7 +511,7 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 .rnbtn{display:flex;gap:8px;margin-top:12px}.rnbtn .btn{flex:1}
 .rnhd{display:flex;gap:8px;margin-bottom:10px}.rnhd>div{flex:1;background:#FFF1D6;border-radius:14px;padding:8px 10px;text-align:center}.rnhd small{display:block;color:var(--ink2);font-weight:700;font-size:12px}.rnhd b{display:block;font-size:18px;color:#7A4B25}
 .rnl{max-height:40vh;overflow:auto}.rnr{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid #EFE4D2;font-weight:800}.rnr b{width:26px;text-align:center;color:#B07A00}.rnr img{width:30px;height:30px;border-radius:50%}.rnr span{flex:1}.rnr em{font-style:normal;color:#E07A1F}.rnr.me{background:#FFF4D9;border-radius:10px}
-#stair{position:fixed;inset:0;z-index:70;display:none;background:#3A2516;touch-action:none;user-select:none;-webkit-user-select:none}#stair.on{display:block}
+#stair{position:fixed;inset:0;z-index:70;display:none;background:#8fcdfb;touch-action:none;user-select:none;-webkit-user-select:none}#stair.on{display:block}
 #stair canvas{position:absolute;inset:0;display:block}
 .sthp{gap:2px!important;padding:8px 10px!important}.sthp i{display:block;width:8px;height:14px;border-radius:3px;background:#E6D8C4}.sthp i.on{background:#4CC36B}.sthp i.on.lo{background:#E8534A}
 .stbtn{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.85);color:#7A4B25;font-size:34px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.25);touch-action:none;-webkit-tap-highlight-color:transparent;z-index:2}
@@ -1085,21 +1085,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794466803" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794466937" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794466803" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794466803" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794466937" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794466937" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794466803" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794466937" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794466803" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794466803" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794466937" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794466937" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1116,11 +1116,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794466803" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794466937" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794466803";
+const BUILD="1794466937";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -6057,6 +6057,9 @@ async function stairStart(){
     <button class="stbtn l" id="stL">◀</button><button class="stbtn r" id="stR">▶</button><div id="stEnd"></div>`;
   el.classList.add('on'); document.body.classList.add('mjon');
   const pet = new Image(); pet.src = chrSrc((S && S.me && S.me.chara) || 'bunny1');
+  if(!ST.img){ ST.img = {}; ['backdrop','isl0','isl1','isl2'].forEach(n => { const i = new Image(); i.src = A(n); ST.img[n] = i; }); }
+  // 遠景浮島＋雲（跟農場一樣的天空），慢慢往上飄
+  ST.deco = []; for(let i = 0; i < 7; i++) ST.deco.push(stairDeco(i * 160 + Math.random() * 60));
   SR = { id: s.id, t: 0, scroll: 0, plats: [], x: ST.W/2, y: 0, vy: 0, on: null, hp: ST.HP, inv: 0, skip: null, skipT: 0, l: 0, r: 0, face: 1,
          over: false, started: false, last: 0, pet, hpShown: -1, fShown: -1, flash: 0 };
   // 一開始的平台：前幾層都是田埂，寵物站在中間那塊
@@ -6088,6 +6091,11 @@ function stairPlat(y, k, x){
   return { k, x: x != null ? x : 6 + Math.random() * (ST.W - ST.PW - 12), y, tOn: 0, flipT: 0, gone: 0, sq: 0 };
 }
 
+function stairDeco(y){
+  const R = Math.random();
+  return R < 0.45 ? { k: 'cloud', x: Math.random() * ST.W, y, s: 0.7 + Math.random() * 0.6 }
+       : { k: ['isl0','isl1','isl2'][Math.floor(Math.random() * 3)], x: Math.random() * (ST.W - 60), y, s: 0.35 + Math.random() * 0.35, a: 0.55 + Math.random() * 0.3 };
+}
 function stairHurt(n){
   const r = SR; if(r.inv > 0) return;
   r.hp = Math.max(0, r.hp - n); r.inv = 1; r.flash = 0.25;
@@ -6153,17 +6161,28 @@ function stairDraw(r, cv, now){
   const ctx = cv.getContext('2d'), cw = cv.width, ch = cv.height;
   const sc = Math.min(ch / ST.H, cw / ST.W), ox = (cw - ST.W * sc) / 2, oy = (ch - ST.H * sc) / 2;
   ctx.setTransform(1,0,0,1,0,0);
-  ctx.fillStyle = '#3A2516'; ctx.fillRect(0, 0, cw, ch);
+  // 外面：農場的遠景（瀑布、浮島、草地）
+  const bd = ST.img && ST.img.backdrop;
+  const sky0 = ctx.createLinearGradient(0, 0, 0, ch); sky0.addColorStop(0, '#3f9be8'); sky0.addColorStop(.55, '#8fcdfb'); sky0.addColorStop(1, '#d6efff');
+  ctx.fillStyle = sky0; ctx.fillRect(0, 0, cw, ch);
+  if(bd && bd.complete && bd.naturalWidth){ const k = Math.max(cw / bd.naturalWidth, ch / bd.naturalHeight); ctx.drawImage(bd, (cw - bd.naturalWidth * k) / 2, ch - bd.naturalHeight * k, bd.naturalWidth * k, bd.naturalHeight * k); }
   ctx.setTransform(sc, 0, 0, sc, ox, oy);
   ctx.save(); ctx.beginPath(); ctx.rect(0, 0, ST.W, ST.H); ctx.clip();
-  // 穀倉木板牆（跟著捲動）
-  const bg = ctx.createLinearGradient(0, 0, 0, ST.H); bg.addColorStop(0, '#F3D9A8'); bg.addColorStop(1, '#E2BB7C');
+  // 裡面：農場的天空，雲和浮島慢慢往上飄
+  const bg = ctx.createLinearGradient(0, 0, 0, ST.H); bg.addColorStop(0, '#5aaef0'); bg.addColorStop(.6, '#9fd6fb'); bg.addColorStop(1, '#dff3ff');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, ST.W, ST.H);
-  ctx.strokeStyle = 'rgba(140,90,40,.18)'; ctx.lineWidth = 2;
-  for(let x = 40; x < ST.W; x += 40){ ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, ST.H); ctx.stroke(); }
-  const off = -(r.scroll * 0.5 % 130);
-  ctx.fillStyle = 'rgba(140,90,40,.14)';
-  for(let y = off; y < ST.H; y += 130) for(let x = 20; x < ST.W; x += 80){ ctx.beginPath(); ctx.arc(x + ((y - off) / 130 % 2) * 40, y + 30, 3, 0, Math.PI*2); ctx.fill(); }
+  if(ST.deco){
+    if(!r.dLast) r.dLast = r.scroll;
+    const dd = (r.scroll - r.dLast) * 0.35; r.dLast = r.scroll;
+    for(const o of ST.deco) o.y -= dd;
+    ST.deco = ST.deco.filter(o => o.y > -140);
+    while(ST.deco.length < 7){ const lo = ST.deco.reduce((m, o) => Math.max(m, o.y), 0); ST.deco.push(stairDeco(Math.max(ST.H + 20, lo + 120 + Math.random() * 60))); }
+    for(const o of ST.deco){
+      if(o.k === 'cloud'){ ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.beginPath(); const s = o.s * 22;
+        ctx.arc(o.x, o.y, s, 0, Math.PI*2); ctx.arc(o.x + s, o.y + s*0.2, s*0.8, 0, Math.PI*2); ctx.arc(o.x - s, o.y + s*0.25, s*0.7, 0, Math.PI*2); ctx.arc(o.x + s*0.3, o.y - s*0.5, s*0.7, 0, Math.PI*2); ctx.fill(); }
+      else { const im = ST.img[o.k]; if(im && im.complete && im.naturalWidth){ ctx.globalAlpha = o.a; ctx.drawImage(im, o.x, o.y, im.naturalWidth * o.s, im.naturalHeight * o.s); ctx.globalAlpha = 1; } }
+    }
+  }
   // 平台
   for(const p of r.plats) stairDrawPlat(ctx, p, now);
   // 寵物
@@ -6184,7 +6203,9 @@ function stairDraw(r, cv, now){
   if(r.flash > 0){ ctx.fillStyle = `rgba(255,60,60,${r.flash})`; ctx.fillRect(0, 0, ST.W, ST.H); }
   ctx.restore();
   // 兩邊的木框
-  ctx.fillStyle = '#7A4B25'; ctx.fillRect(-8, 0, 8, ST.H); ctx.fillRect(ST.W, 0, 8, ST.H);
+  ctx.fillStyle = '#8A5A2B'; ctx.fillRect(-8, 0, 8, ST.H); ctx.fillRect(ST.W, 0, 8, ST.H);
+  ctx.fillStyle = '#6CC04A'; ctx.fillRect(-8, 0, 8, 6); ctx.fillRect(ST.W, 0, 8, 6);
+  ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 1; ctx.strokeRect(-8, 0, ST.W + 16, ST.H);
   // HUD（有變才改）
   const f = Math.floor(r.scroll / ST.GAP);
   if(f !== r.fShown){ r.fShown = f; const e = $('stF'); if(e) e.textContent = `地下 ${f.toLocaleString()} 層`; }
