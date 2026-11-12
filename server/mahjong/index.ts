@@ -1,5 +1,6 @@
 // 麻將連線版 Edge Function：讀牌桌 → 動作／推進 → 存回（版本號防同時寫入）→ 更新每位玩家的畫面
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import * as BP from './botplay.mjs';
 import MJ from './mj_engine.mjs';
 import B2 from './b2_engine.mjs';
 import BC from './bc_engine.mjs';
@@ -139,6 +140,25 @@ async function sweep() {
   return { swept: done };
 }
 
+// 排程每 10 分鐘：沒在牌桌上的農場電腦（愛賭博的優先）在背景自己湊桌打幾局，輸贏照算進他們的金幣、記進娛樂廳
+async function botPlay() {
+  POOLC.at = 0;
+  const pool = await botPool(-1);
+  const done: any[] = [];
+  for (const ss of BP.plan(pool)) {
+    const res = ss.game === 'bc' ? BP.playBaccarat(ss.bots, ss.n) : BP.playCards(ss.game, ss.lvl, ss.bots, ss.n);
+    if (!res.length) continue;
+    const { data: row } = await sb.from('mj_tables').insert({ game: ss.game, lvl: ss.lvl, priv: false, status: 'closed', state: { botplay: true, bots: ss.bots.map((b: any) => b.id) }, nh: 0 }).select('id').single();
+    if (!row) continue;
+    for (let h = 0; h < res.length; h++) {
+      const r: any = res[h];
+      await sb.rpc('mj_settle2', { p_tid: row.id, p_hand: h + 1, p_delta: r.pay, p_game: ss.game, p_house: Math.round(r.rake ?? r.house ?? 0) });
+    }
+    done.push({ tid: row.id, game: ss.game, lvl: ss.lvl, hands: res.length, bots: ss.bots.map((b: any) => b.name) });
+  }
+  return { played: done };
+}
+
 async function handle(uid: string, b: any, test = false) {
   const a = b.a;
   if (a === 'sim' && test) {   // 測試：把時間快轉到下一個事件，連跑 n 步
@@ -197,7 +217,7 @@ Deno.serve(async (req) => {
     const b = await req.json().catch(() => ({}));
     let uid: string | null = null;
     const tk = req.headers.get('x-mj-test');
-    if (tk) { const { data } = await sb.from('push_config').select('v').eq('k', 'mj_test_key').maybeSingle(); if (data && data.v && tk === data.v) { if (b.a === 'sweep') return J(await sweep()); uid = b.as; } }
+    if (tk) { const { data } = await sb.from('push_config').select('v').eq('k', 'mj_test_key').maybeSingle(); if (data && data.v && tk === data.v) { if (b.a === 'sweep') return J(await sweep()); if (b.a === 'botplay') return J(await botPlay()); uid = b.as; } }
     if (!uid) { const token = (req.headers.get('Authorization') || '').replace('Bearer ', ''); const { data } = await sb.auth.getUser(token); uid = data?.user?.id || null; }
     if (!uid) return J({ error: '請先登入' }, 401);
     const { data: on } = await sb.from('settings').select('value').eq('key', 'mj_on').maybeSingle();
