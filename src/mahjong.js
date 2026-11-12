@@ -120,7 +120,7 @@ const HALL_GAMES = [
 const HALL_FUN = [
   {id:'run', icon:'🏃', name:'寵物跑酷', desc:'帶寵物衝刺撿金幣，每週排行榜', open:true},
   {id:'stair', icon:'🪜', name:'寵物下樓梯', desc:'左右閃躲一路往下，每週排行榜', open:true},
-  {id:'match3', icon:'🍓', name:'農場消消樂', desc:'三個一樣的蔬果連成一線就消掉', open:false},
+  {id:'match3', icon:'🐾', name:'寵物消消樂', desc:'三隻一樣的寵物連成一線就消掉，限時 60 秒', open:true},
   {id:'mole', icon:'🔨', name:'打田鼠', desc:'田鼠冒出來偷菜，快打下去', open:false},
 ];
 function openHall(tab){
@@ -130,7 +130,7 @@ function openHall(tab){
     <div class="rhint">${tab==='fun' ? '靠手感的小遊戲，不用下注，玩得好就能賺農場金幣、衝排行榜' : `用農場金幣跟大家同樂！麻將、大老二每局贏家的獎金，娛樂廳會抽 ${Math.round(MJ.RAKE*100)}% 當場地費`}</div>
     <div class="hallg">${L.map(g=>`<button class="hgc${g.open?'':' off'}" data-hg="${g.id}"><span class="hgi">${g.icon}</span><b>${g.name}</b><small>${g.open ? g.desc : '尚未開放'}</small></button>`).join('')}</div>`);
   document.querySelectorAll('#md [data-ht]').forEach(b=>b.onclick=()=>openHall(b.dataset.ht));
-  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ const g=b.dataset.hg; if(g==='mj') openMjLobby(); else if(g==='big2') openB2Lobby(); else if(g==='bc') openBcLobby(); else if(g==='holdem') openThLobby(); else if(g==='run') openRunLobby(); else if(g==='stair') openStairLobby(); else if(g==='mono') openMfLobby(); else toast('尚未開放，敬請期待！'); });
+  document.querySelectorAll('#md [data-hg]').forEach(b=>b.onclick=()=>{ const g=b.dataset.hg; if(g==='mj') openMjLobby(); else if(g==='big2') openB2Lobby(); else if(g==='bc') openBcLobby(); else if(g==='holdem') openThLobby(); else if(g==='run') openRunLobby(); else if(g==='stair') openStairLobby(); else if(g==='match3') openMatchLobby(); else if(g==='mono') openMfLobby(); else toast('尚未開放，敬請期待！'); });
 }
 function openMjLobby(){
   const gold = S.me.gold;
