@@ -774,6 +774,22 @@ $('bSpin').onclick = ()=>openSpin();
 $('bGift').onclick = ()=>{ if(S) openGifts(false); };
 $('avatar').onclick = ()=>{ if(S && mode==='home') openAvatarPicker(); };
 $('gemBox').onclick = ()=>{ if(S) openTopup(); };
+$('goldBox').onclick = ()=>{ if(S) openGoldBags(); };
+/* 錢袋：用鑽石換金幣（金幣旁邊的 +） */
+async function openGoldBags(){
+  let L = []; try{ L = await rpc('farm_goldbags'); }catch(e){ return toast(e.message); }
+  const gems = S.me.gems||0, icons = ['💰','💰','💰','💰'];
+  modal(`💰 買錢袋　<span style="font-size:14px;color:#5B4ED6">目前 💎 ${gems.toLocaleString()}</span>`,
+    `<div class="rhint">用鑽石換金幣，買越大袋越划算</div>${(L||[]).map((b,i)=>`<div class="gbag"><div class="gbi" style="font-size:${24+i*4}px">${icons[i]||'💰'}</div><div class="tx"><b>${esc(b.name)}</b><div>${(+b.gold).toLocaleString()} 金幣</div></div>
+      <button class="btn${gems<b.gems?' sub':''}" data-gbag="${esc(b.id)}">💎 ${(+b.gems).toLocaleString()}</button></div>`).join('')}`,
+    [['💎 去買鑽石','sub',openTopup]]);
+  document.querySelectorAll('#md [data-gbag]').forEach(btn=>btn.onclick=async()=>{
+    const b = L.find(x=>x.id===btn.dataset.gbag); if(!b) return;
+    if((S.me.gems||0) < b.gems) return toast('鑽石不夠，可以先去買鑽石');
+    if(btn.disabled) return; btn.disabled = true;
+    try{ const r = await rpc('farm_buy_goldbag', { p_id: b.id }); applyState(r.state); refresh(); sfx('coin'); toast(`買到 ${b.name}：+${(+b.gold).toLocaleString()} 金幣`); openGoldBags(); }catch(e){ toast(e.message); btn.disabled = false; }
+  });
+}
 $('tutNext').onclick = ()=>tutNext();
 $('tutSkip').onclick = ()=>tutSkip();
 

@@ -492,7 +492,8 @@ body.lowfx .shoutbar,body.lowfx .sbic,body.lowfx .sbshine,body.lowfx .sbsp{anima
 .tk{position:absolute;white-space:nowrap;top:2px;left:0;font-size:13px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55),0 0 6px rgba(0,0,0,.35);will-change:transform}
 .tk b{color:#FFE27A}.tk .sep{opacity:.6;margin:0 14px}
 
-#gemBox{cursor:pointer;pointer-events:auto}.gplus{display:inline-grid;place-items:center;width:18px;height:18px;margin-left:5px;border-radius:50%;background:#7B6CF6;color:#fff;font-style:normal;font-weight:900;font-size:15px;line-height:1;box-shadow:0 2px 0 #5B4ED6}
+#gemBox,#goldBox{cursor:pointer;pointer-events:auto}.gplus.gp2{background:#F2A417;box-shadow:0 2px 0 #C47D00}
+.gbag{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#FFF8E6;border:2px solid #F5D98B;margin:8px 0}.gbag .gbi{font-size:30px}.gbag .tx{flex:1}.gbag b{font-size:17px}.gbag .tx div{color:#B07A00;font-weight:900;font-size:15px;white-space:nowrap}.gbag .btn{flex:none;width:auto;min-width:86px;padding-left:12px;padding-right:12px}.gplus{display:inline-grid;place-items:center;width:18px;height:18px;margin-left:5px;border-radius:50%;background:#7B6CF6;color:#fff;font-style:normal;font-weight:900;font-size:15px;line-height:1;box-shadow:0 2px 0 #5B4ED6}
 .eqgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}.eqpick{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:2px solid rgba(75,52,35,.2);border-radius:12px;background:#FFF8EC;font-family:inherit;cursor:pointer}.eqpick:active{transform:scale(.97)}.eqpick img{width:52px;height:52px;object-fit:contain}.eqpick b{font-size:13px;color:var(--ink)}.eqpick small{font-size:10px;font-weight:700;color:var(--ink2)}
 .redeem.nn input{text-transform:none;letter-spacing:0}
 .redeem{display:flex;gap:8px;margin-top:6px}.redeem input{flex:1;min-width:0;padding:10px 12px;border:2px solid rgba(75,52,35,.25);border-radius:12px;font:inherit;font-weight:800;text-transform:uppercase}
@@ -1042,21 +1043,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794459790" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794460048" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold"><img class="icn" src="assets/i_coin.webp?v=1794459790" alt=""><span id="pgold">0</span></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794459790" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794460048" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794460048" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794459790" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794460048" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794459790" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794459790" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794460048" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794460048" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1073,11 +1074,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794459790" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794460048" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794459790";
+const BUILD="1794460048";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -6165,6 +6166,22 @@ $('bSpin').onclick = ()=>openSpin();
 $('bGift').onclick = ()=>{ if(S) openGifts(false); };
 $('avatar').onclick = ()=>{ if(S && mode==='home') openAvatarPicker(); };
 $('gemBox').onclick = ()=>{ if(S) openTopup(); };
+$('goldBox').onclick = ()=>{ if(S) openGoldBags(); };
+/* 錢袋：用鑽石換金幣（金幣旁邊的 +） */
+async function openGoldBags(){
+  let L = []; try{ L = await rpc('farm_goldbags'); }catch(e){ return toast(e.message); }
+  const gems = S.me.gems||0, icons = ['💰','💰','💰','💰'];
+  modal(`💰 買錢袋　<span style="font-size:14px;color:#5B4ED6">目前 💎 ${gems.toLocaleString()}</span>`,
+    `<div class="rhint">用鑽石換金幣，買越大袋越划算</div>${(L||[]).map((b,i)=>`<div class="gbag"><div class="gbi" style="font-size:${24+i*4}px">${icons[i]||'💰'}</div><div class="tx"><b>${esc(b.name)}</b><div>${(+b.gold).toLocaleString()} 金幣</div></div>
+      <button class="btn${gems<b.gems?' sub':''}" data-gbag="${esc(b.id)}">💎 ${(+b.gems).toLocaleString()}</button></div>`).join('')}`,
+    [['💎 去買鑽石','sub',openTopup]]);
+  document.querySelectorAll('#md [data-gbag]').forEach(btn=>btn.onclick=async()=>{
+    const b = L.find(x=>x.id===btn.dataset.gbag); if(!b) return;
+    if((S.me.gems||0) < b.gems) return toast('鑽石不夠，可以先去買鑽石');
+    if(btn.disabled) return; btn.disabled = true;
+    try{ const r = await rpc('farm_buy_goldbag', { p_id: b.id }); applyState(r.state); refresh(); sfx('coin'); toast(`買到 ${b.name}：+${(+b.gold).toLocaleString()} 金幣`); openGoldBags(); }catch(e){ toast(e.message); btn.disabled = false; }
+  });
+}
 $('tutNext').onclick = ()=>tutNext();
 $('tutSkip').onclick = ()=>tutSkip();
 
