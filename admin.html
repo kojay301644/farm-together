@@ -127,11 +127,21 @@ let csDays = 1, csGame = '', csQ = '';
 const csAmt = v => `<b style="color:${v>0?'#1E9E55':v<0?'#D3403A':'#666'}">${v>0?'+':''}${(v||0).toLocaleString()}</b>`;
 // 停在娛樂廳頁面時每 30 秒自動更新（看單一玩家、正在打搜尋字、切到別的分頁時不更新）
 let csTimer = 0, csList = false;
+// 百家樂每個押注區的單注上限（0＝不限）
+let csLimDirty = false;
+function csLimCard(CF){
+  if(!CF || !CF.settings) return '';
+  const v = k => +(((CF.settings||[]).find(x=>x.key==='bc_lim_'+k)||{}).value||0);
+  const A = [['p','閒'],['b','莊'],['t','和'],['pp','閒對'],['bp','莊對']];
+  return `<div class="card"><h2>🎴 百家樂單注上限</h2><div class="muted" style="margin-bottom:8px">每個押注區、每位玩家每局最多押多少金幣。0＝不限（只受身上金幣限制）。電腦玩家固定照舊（閒、莊 2 萬，其他 1 萬），不受這裡影響。</div>
+    <div class="row" style="gap:10px;flex-wrap:wrap;align-items:flex-end">${A.map(([k,n])=>`<label style="display:flex;flex-direction:column;gap:4px;font-weight:700">${n}<input class="num" type="number" min="0" step="1000" data-bl="${k}" value="${v(k)}" style="width:110px"></label>`).join('')}
+    <button class="btn" id="blSave">💾 儲存</button></div></div>`;
+}
 async function pageCs(quiet){
   clearInterval(csTimer); csList = true;
-  csTimer = setInterval(()=>{ if(tab!=='cs' || !csList){ clearInterval(csTimer); return; } if(document.hidden || document.activeElement && document.activeElement.id==='csQ') return; pageCs(true); }, 30000);
+  csTimer = setInterval(()=>{ if(tab!=='cs' || !csList){ clearInterval(csTimer); return; } if(document.hidden || document.activeElement && document.activeElement.tagName==='INPUT' || csLimDirty) return; pageCs(true); }, 30000);
   if(quiet!==true) M(`<div class="card"><div class="muted">讀取中…</div></div>`);
-  let R; try{ R = await rpc('adm_casino', { p_days: csDays, p_game: csGame || null, p_q: csQ || null }); }catch(e){ if(quiet===true) return; return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+  let R, CF = null; try{ [R, CF] = await Promise.all([rpc('adm_casino', { p_days: csDays, p_game: csGame || null, p_q: csQ || null }), rpc('adm_config').catch(()=>null)]); }catch(e){ if(quiet===true) return; return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
   if(tab!=='cs' || !csList) return;   // 讀的時候已經換頁
   const btn = (on, attr, t) => `<button class="btn ${on?'':'g'}" ${attr}>${t}</button>`;
   const filt = `<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">${[[1,'今天'],[7,'7 天'],[30,'30 天'],[0,'全部']].map(([d,t])=>btn(csDays===d,`data-cd="${d}"`,t)).join('')}
@@ -144,11 +154,14 @@ async function pageCs(quiet){
   const y = scrollY;
   M(`<div class="card"><h2>🎰 娛樂廳輸贏 <span class="muted" style="font-size:12px;font-weight:400">每 30 秒自動更新・上次 ${new Date().toLocaleTimeString('zh-TW',{hour12:false})}</span></h2>${filt}${sum}</div>
     <div class="row" style="gap:12px;align-items:flex-start;flex-wrap:wrap"><div class="card" style="flex:1;min-width:300px"><h2>🏆 贏最多</h2>${rank(R.winners,'best')}</div><div class="card" style="flex:1;min-width:300px"><h2>💸 輸最多</h2>${rank(R.losers,'worst')}</div></div>
+    ${csLimCard(CF)}
     <div class="card"><h2>📜 最近紀錄</h2><div class="row" style="gap:6px;margin-bottom:8px"><input id="csQ" placeholder="搜尋玩家名字" value="${esc(csQ)}"><button class="btn" id="csGo">搜尋</button></div>
       <div class="muted" style="margin-bottom:6px">單局輸贏超過 ${CS_BIG.toLocaleString()} 會標紅 ⚠️</div>${recent}</div>`);
   document.querySelectorAll('[data-cd]').forEach(b=>b.onclick=()=>{ csDays=+b.dataset.cd; pageCs(); });
   document.querySelectorAll('[data-cg]').forEach(b=>b.onclick=()=>{ csGame=b.dataset.cg; pageCs(); });
   $('csGo').onclick = ()=>{ csQ = $('csQ').value.trim(); pageCs(); };
+  document.querySelectorAll('[data-bl]').forEach(i=>i.oninput=()=>{ csLimDirty = true; });
+  if($('blSave')) $('blSave').onclick = async()=>{ try{ for(const i of document.querySelectorAll('[data-bl]')) await rpc('adm_setting_set',{p_key:'bc_lim_'+i.dataset.bl,p_value:Math.max(0, Math.floor(+i.value||0))}); csLimDirty = false; toast('已儲存，下一次下注就生效'); pageCs(true); }catch(e){ toast(e.message); } };
   $('csQ').onkeydown = e=>{ if(e.key==='Enter') $('csGo').click(); };
   document.querySelectorAll('[data-cp]').forEach(a=>a.onclick=e=>{ e.preventDefault(); csPlayer(a.dataset.cp); });
   if(quiet===true) scrollTo(0, y);   // 自動更新不要跳回最上面
@@ -303,7 +316,7 @@ async function mktAdmin(R){
 }
 async function pageCf(){
   const C = await rpc('adm_config'), SIGN=((C.settings||[]).find(x=>x.key==='sign_rw')||{}).value||[], GB=((C.settings||[]).find(x=>x.key==='gold_bags')||{}).value||[];
-  M(`<div class="savebar"><span id="dirtyN">沒有未儲存的修改</span><button class="btn" id="saveAll">💾 全部儲存</button></div><div class="card"><h2>玩法設定</h2><table>${C.settings.filter(s=>typeof s.value==='number' && !/^(ev_|maint_|bot_last_run|evo_)/.test(s.key)).map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
+  M(`<div class="savebar"><span id="dirtyN">沒有未儲存的修改</span><button class="btn" id="saveAll">💾 全部儲存</button></div><div class="card"><h2>玩法設定</h2><table>${C.settings.filter(s=>typeof s.value==='number' && !/^(ev_|maint_|bot_last_run|evo_|bc_lim_)/.test(s.key)).map(s=>`<tr><td><b>${esc(s.note||s.key)}</b><div class="muted">${s.key}</div></td><td><input class="num" id="s_${s.key}" type="number" step="any" value="${s.value}"></td><td><button class="btn" data-sk="${s.key}">儲存</button></td></tr>`).join('')}</table></div>
     <div class="card"><h2>✍️ 七天簽到獎勵</h2><div class="muted" style="margin-bottom:8px">連續簽到第 1～7 天各送什麼，不送就留空或填 0；道具、種子各可選一種。中斷一天會從第 1 天重新開始。改完按「儲存簽到獎勵」，玩家重新整理後就會看到。</div>
     <table><tr><th>天數</th><th>金幣</th><th>鑽石</th><th>道具</th><th>數量</th><th>種子</th><th>數量</th></tr>${[0,1,2,3,4,5,6].map(i=>{ const r=(SIGN[i]||{}), it=Object.entries(r.items||{})[0]||['',''], sd=Object.entries(r.seeds||{})[0]||['',''];
       return `<tr data-signrow><td><b>第 ${i+1} 天</b></td><td><input class="num" id="sg_${i}_gold" type="number" value="${r.gold??''}"></td><td><input class="num" id="sg_${i}_gems" type="number" value="${r.gems??''}"></td>
