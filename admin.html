@@ -289,8 +289,8 @@ async function pageOv(){
   const o = await rpc('adm_overview');
   const st = (n,l)=>`<div class="stat"><div class="n">${Number(n).toLocaleString()}</div><div class="l">${l}</div></div>`;
   const maxN = Math.max(1, ...o.lv_dist.map(x=>x.n));
-  M(`<div class="card"><h2>今日概況</h2><div class="grid">
-    ${st(o.players,'總玩家數')}${st(o.new_today,'今日新註冊')}${st(o.active_today,'今日上線')}${st(o.active_7d,'7 天內上線')}
+  M(`<div class="card"><h2>今日概況 <span class="muted" style="font-size:13px;font-weight:600">（只算真人，不含 ${o.bots||0} 個電腦玩家）</span></h2><div class="grid">
+    ${st(o.online_now,'🟢 目前在線（5 分鐘內）')}${st(o.players,'總玩家數')}${st(o.new_today,'今日新註冊')}${st(o.active_today,'今日上線')}${st(o.active_7d,'7 天內上線')}
     ${st(o.steals_today,'今日偷菜次數')}${st(o.friendships,'好友配對數')}${st(o.banned,'停權人數')}${st(o.gems_total,'全服鑽石總數')}</div></div>
     <div class="card"><h2>等級分布</h2>${o.lv_dist.map(x=>`<div class="row"><span style="width:50px" class="muted">Lv${x.lv}</span><div style="height:14px;border-radius:7px;background:var(--green);width:${Math.max(4,x.n/maxN*70)}%"></div><b>${x.n}</b></div>`).join('')}</div>`);
 }
