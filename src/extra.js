@@ -228,6 +228,8 @@ async function openTopup(){
   let body = M.open ? '' : `<div class="soon">💎 儲值暫停中，請稍後再來</div>`;
   const wait = (M.orders||[]).find(o=>o.status==='wait' && !o.credited && (o.method==='cvs' || Date.parse(o.created) > now-30*60000));
   if(wait) body += `<div class="soon" style="background:#E8F3FF;cursor:pointer" onclick="payShow('${wait.id}')">⏳ 你有一筆 NT$${wait.nt} 的訂單還沒付款　<b style="color:#2F6FD6">查看 ›</b></div>`;
+  body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard" style="cursor:pointer" onclick="payPick('${p.id}')"><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`).join('')}</div>`;
+  body += `<div style="font-weight:900;margin:14px 0 8px">🎁 超值禮包</div>`;
   body += `<div class="gemcard pack" style="background:#F7F5FF;cursor:pointer" onclick="payPick('month')"><div class="bonus">${mLeft?`剩 ${mLeft} 天`:'最划算'}</div><div style="font-weight:900">${esc(pk('month').name||'🗓️ 農夫月卡')}　NT$${pk('month').price_twd||150}</div>
     <div class="pkd">${esc(pk('month').descr||'')}</div></div>`;
   if(newbieOk) body += `<div class="gemcard pack" style="background:#EFFAF2;cursor:pointer" onclick="payPick('newbie')"><div class="bonus">限時</div><div style="font-weight:900">${esc(pk('newbie').name)}　NT$${pk('newbie').price_twd}</div><div class="pkd">${esc(pk('newbie').descr)}</div></div>`;
@@ -235,7 +237,6 @@ async function openTopup(){
   ['boost1','boost2','boost3'].forEach(id=>{ const b=pk(id); if(!b.id || !(b.price_twd>0)) return; const had=(got[id]||0)>0;
     body += `<div class="gemcard pack" style="background:${BOOST_BG[id]};${had?'opacity:.55':'cursor:pointer'}" ${had?'':`onclick="payPick('${id}')"`}><div class="bonus">${had?'已購買':'限購一次'}</div><div style="font-weight:900">${esc(b.name)}　NT$${b.price_twd}</div><div class="pkd">${esc(b.descr||'')}</div></div>`; });
   if(firstOk) body += `<div class="gemcard pack" style="background:#FFF6E5"><div class="bonus">首儲</div><div style="font-weight:900">${esc(pk('first').name)}</div><div class="pkd">${esc(pk('first').descr)}<br>第一次儲值任何方案就會自動送</div></div>`;
-  body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard" style="cursor:pointer" onclick="payPick('${p.id}')"><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`).join('')}</div>`;
   body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center;line-height:1.7">付款方式：🏤 郵局 / 銀行轉帳${M.cvs?'、🏪 超商代碼':''}</div>`;
   if((M.orders||[]).length) body += `<div style="text-align:center;margin-top:8px"><button class="btn sub" style="font-size:12px;padding:6px 14px" onclick="payHist()">📜 我的儲值紀錄</button></div>`;
   modal(`💎 儲值　<span style="font-size:14px;color:#5B4ED6">目前 💎 ${(me.gems||0).toLocaleString()}</span>`, body);

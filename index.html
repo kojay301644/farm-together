@@ -1147,21 +1147,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794546185" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794547057" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794546185" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794546185" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794547057" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794547057" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794546185" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794547057" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794546185" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794546185" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794547057" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794547057" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1178,11 +1178,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794546185" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794547057" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794546185";
+const BUILD="1794547057";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2301,6 +2301,8 @@ async function openTopup(){
   let body = M.open ? '' : `<div class="soon">💎 儲值暫停中，請稍後再來</div>`;
   const wait = (M.orders||[]).find(o=>o.status==='wait' && !o.credited && (o.method==='cvs' || Date.parse(o.created) > now-30*60000));
   if(wait) body += `<div class="soon" style="background:#E8F3FF;cursor:pointer" onclick="payShow('${wait.id}')">⏳ 你有一筆 NT$${wait.nt} 的訂單還沒付款　<b style="color:#2F6FD6">查看 ›</b></div>`;
+  body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard" style="cursor:pointer" onclick="payPick('${p.id}')"><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`).join('')}</div>`;
+  body += `<div style="font-weight:900;margin:14px 0 8px">🎁 超值禮包</div>`;
   body += `<div class="gemcard pack" style="background:#F7F5FF;cursor:pointer" onclick="payPick('month')"><div class="bonus">${mLeft?`剩 ${mLeft} 天`:'最划算'}</div><div style="font-weight:900">${esc(pk('month').name||'🗓️ 農夫月卡')}　NT$${pk('month').price_twd||150}</div>
     <div class="pkd">${esc(pk('month').descr||'')}</div></div>`;
   if(newbieOk) body += `<div class="gemcard pack" style="background:#EFFAF2;cursor:pointer" onclick="payPick('newbie')"><div class="bonus">限時</div><div style="font-weight:900">${esc(pk('newbie').name)}　NT$${pk('newbie').price_twd}</div><div class="pkd">${esc(pk('newbie').descr)}</div></div>`;
@@ -2308,7 +2310,6 @@ async function openTopup(){
   ['boost1','boost2','boost3'].forEach(id=>{ const b=pk(id); if(!b.id || !(b.price_twd>0)) return; const had=(got[id]||0)>0;
     body += `<div class="gemcard pack" style="background:${BOOST_BG[id]};${had?'opacity:.55':'cursor:pointer'}" ${had?'':`onclick="payPick('${id}')"`}><div class="bonus">${had?'已購買':'限購一次'}</div><div style="font-weight:900">${esc(b.name)}　NT$${b.price_twd}</div><div class="pkd">${esc(b.descr||'')}</div></div>`; });
   if(firstOk) body += `<div class="gemcard pack" style="background:#FFF6E5"><div class="bonus">首儲</div><div style="font-weight:900">${esc(pk('first').name)}</div><div class="pkd">${esc(pk('first').descr)}<br>第一次儲值任何方案就會自動送</div></div>`;
-  body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard" style="cursor:pointer" onclick="payPick('${p.id}')"><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`).join('')}</div>`;
   body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center;line-height:1.7">付款方式：🏤 郵局 / 銀行轉帳${M.cvs?'、🏪 超商代碼':''}</div>`;
   if((M.orders||[]).length) body += `<div style="text-align:center;margin-top:8px"><button class="btn sub" style="font-size:12px;padding:6px 14px" onclick="payHist()">📜 我的儲值紀錄</button></div>`;
   modal(`💎 儲值　<span style="font-size:14px;color:#5B4ED6">目前 💎 ${(me.gems||0).toLocaleString()}</span>`, body);
