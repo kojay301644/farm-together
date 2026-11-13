@@ -60,7 +60,7 @@ button.ok{background:#3BB273!important;color:#fff!important}button.bad{backgroun
 <body>
 <header><h1>🌱 一起種田吧｜營運後台</h1><span class="who" id="who"></span><a href="./" target="_blank">開啟遊戲</a></header>
 <nav id="nav" style="display:none">
-  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="rl">🧑 真人玩家 <span class="nbad" id="rlBad" style="background:#1E9E55"></span></button><button data-t="pl">玩家管理</button><button data-t="cs">🎰 娛樂廳</button><button data-t="py">💳 儲值 <span class="nbad" id="pyBad"></span></button><button data-t="nt">公告</button>
+  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="rt">📈 回流</button><button data-t="rl">🧑 真人玩家 <span class="nbad" id="rlBad" style="background:#1E9E55"></span></button><button data-t="pl">玩家管理</button><button data-t="cs">🎰 娛樂廳</button><button data-t="py">💳 儲值 <span class="nbad" id="pyBad"></span></button><button data-t="nt">公告</button>
   <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="gf">發獎／兌換碼</button><button data-t="ev">活動／維護</button><button data-t="bt">電腦玩家</button><button data-t="lg">操作紀錄</button>
 </nav>
 <main id="main"><div class="center"><div class="muted">讀取中…</div></div></main>
@@ -90,6 +90,39 @@ async function boot(){
   document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
   try{ const c = await rpc('farm_config'); CFG=c; c.crops.forEach(x=>CROPN[x.id]=x.name); }catch(e){}
   go('ov'); rpBadge(); setInterval(rpBadge, 60000); pyBadge(); setInterval(pyBadge, 60000); rlBadge(); setInterval(rlBadge, 60000);
+}
+/* ================= 📈 回流統計、玩家今日玩了什麼 ================= */
+const ACT_NAME = {plant:'🌱 種菜', harvest:'🧺 收成', water:'💧 澆水', weed:'🌿 除草', bug:'🐛 除蟲', till:'⛏️ 開墾', steal:'🥷 偷菜', steal_val:'偷到價值',
+  help:'🤝 幫忙', help_water:'🤝 幫澆水', help_weed:'🤝 幫除草', help_bug:'🤝 幫除蟲', prank:'😈 惡作劇', prank_weed:'😈 放草', prank_bug:'😈 放蟲',
+  stolen:'被偷', sign:'✍️ 簽到', r_feed:'🐔 餵動物', r_collect:'🥚 收牧場', r_swat:'🦟 拍蚊子', r_steal:'🥷 偷牧場', r_prank:'😈 放蚊子',
+  bin_collect:'📦 收集倉', dog:'🐕 被狗咬', scare:'🐕 狗趕走小偷', auto_harvest:'🐾 寵物收成', auto_collect:'🐾 寵物收集', sell_gold:'💰 賣出金幣',
+  g_stair:'🪜 下樓梯', g_run:'🏃 跑酷', g_match:'🧩 消消樂', c_mj:'🀄 麻將', c_b2:'🃏 大老二', c_th:'♠️ 德州', c_mf:'🎲 大富翁', c_bc:'🎴 百家樂'};
+let rtDay = null;
+const rst = (n,l)=>`<div class="stat"><div class="n">${typeof n==='number'?n.toLocaleString():n}</div><div class="l">${l}</div></div>`;
+const pct = (a,b) => b ? Math.round(a*100/b)+'%' : '—';
+const hm = s => s ? new Date(s).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false}) : '';
+async function pageRt(){
+  M(`<div class="card"><div class="muted">讀取中…</div></div>`);
+  let R, P; try{ [R, P] = await Promise.all([rpc('adm_retention', {p_days:14}), rpc('adm_day_players', {p_day: rtDay})]); }catch(e){ return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+  const today = R.days[0] || {}, day = rtDay || today.d;
+  const cards = `<div class="grid">${rst(today.dau||0,'今日上線人數')}${rst(today.new_users||0,'今日新玩家')}${rst(today.back3||0,'🔁 今日回流（3 天沒來又回來）')}${rst(today.stay||0,'連續兩天都有來')}${rst('NT$'+(today.revenue||0).toLocaleString(),'今日儲值')}</div>`;
+  const days = `<table class="tb" style="width:100%;font-size:13px;margin-top:8px"><tr><th>日期</th><th>上線</th><th>新玩家</th><th>回流</th><th>昨天也有來</th><th>儲值</th></tr>${R.days.map(x=>`<tr style="cursor:pointer" data-day="${x.d}"><td>${x.d.slice(5)}${x.d===day?' 👈':''}</td><td><b>${x.dau}</b></td><td>${x.new_users}</td><td>${x.back3}</td><td>${x.stay}</td><td>${x.revenue?'NT$'+x.revenue.toLocaleString():'—'}</td></tr>`).join('')}</table>`;
+  const coh = `<table class="tb" style="width:100%;font-size:13px;margin-top:8px"><tr><th>註冊日</th><th>人數</th><th>隔天還在</th><th>第 3 天</th><th>第 7 天</th></tr>${R.cohorts.map(c=>`<tr><td>${c.d.slice(5)}</td><td>${c.n}</td><td>${c.age>=1?`${pct(c.d1,c.n)} <span class="muted">(${c.d1})</span>`:'<span class="muted">還沒到</span>'}</td><td>${c.age>=3?`${pct(c.d3,c.n)} <span class="muted">(${c.d3})</span>`:'<span class="muted">還沒到</span>'}</td><td>${c.age>=7?`${pct(c.d7,c.n)} <span class="muted">(${c.d7})</span>`:'<span class="muted">還沒到</span>'}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">沒有新玩家</td></tr>'}</table>`;
+  const tot = {}; P.forEach(p=>Object.entries(p.acts||{}).forEach(([k,v])=>{ if(k!=='steal_val'&&k!=='sell_gold') tot[k]=(tot[k]||0)+ +v; }));
+  const chips = o => Object.entries(o).filter(([k])=>k!=='steal_val'&&k!=='sell_gold').sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="tag" style="margin:2px">${ACT_NAME[k]||k} ${v}</span>`).join('') || '<span class="muted">只有上線，沒有動作</span>';
+  const gap = p => { if(p.is_new) return '<span class="tag" style="background:#DFF5E5;color:#14733C">新玩家</span>'; if(!p.prev_day) return ''; const g=Math.round((Date.parse(day)-Date.parse(p.prev_day))/86400000); return g>=4?`<span class="tag" style="background:#FFF2D9;color:#B26A00">🔁 隔 ${g-1} 天回流</span>`:g===1?'<span class="tag">昨天也有來</span>':`<span class="tag">隔 ${g-1} 天</span>`; };
+  const list = P.map(p=>`<div style="border-bottom:1px solid #EEE;padding:8px 0"><div><a href="#" data-pid="${p.uid}"><b>${esc(p.nickname||'（未取名）')}</b></a> <span class="muted">Lv${p.lv}</span> ${gap(p)} ${p.paid?`<span class="tag" style="background:#E8F3FF;color:#2F6FD6">儲值 NT$${p.paid}</span>`:''}
+    <span class="muted" style="font-size:12px">　${hm(p.first_at)}～${hm(p.last_at)}・上線 ${p.opens||1} 次</span></div><div style="margin-top:4px">${chips(p.acts||{})}</div></div>`).join('') || '<div class="muted">這天沒有真人玩家上線</div>';
+  M(`<div id="pdet"></div><div class="card"><h2>📈 回流統計 <span class="muted" style="font-size:13px;font-weight:600">只算真人，不含電腦玩家</span></h2>${cards}
+    <div class="muted" style="margin-top:6px;line-height:1.7">「回流」＝老玩家前 3 天都沒上線、今天又回來。點表格某一天，下面會換成那天的玩家明細。<br>⚠️ 詳細動作從 11/13 晚上開始完整記錄；更早的日子只有部分資料（上線日、小遊戲、娛樂廳、偷菜）。</div>${days}</div>
+    <div class="card"><h2>新玩家留存</h2><div class="muted">每天新註冊的玩家，隔天、第 3 天、第 7 天還有幾 % 會回來玩</div>${coh}</div>
+    <div class="card"><h2>${day===today.d?'今天':day.slice(5)} 玩家玩了什麼 <span class="muted" style="font-size:13px;font-weight:600">${P.length} 人</span></h2>
+      <div class="row" style="gap:6px;margin-bottom:6px"><input type="date" id="rtD" value="${day}" max="${today.d}"><button class="btn g" id="rtGo">查詢</button>${rtDay?'<button class="btn g" id="rtToday">回到今天</button>':''}</div>
+      <div style="margin:6px 0"><b>全部加總：</b>${chips(tot)}</div>${list}</div>`);
+  document.querySelectorAll('[data-day]').forEach(r=>r.onclick=()=>{ rtDay = r.dataset.day===today.d?null:r.dataset.day; pageRt(); });
+  $('rtGo').onclick=()=>{ const v=$('rtD').value; rtDay = (!v||v===today.d)?null:v; pageRt(); };
+  if($('rtToday')) $('rtToday').onclick=()=>{ rtDay=null; pageRt(); };
+  document.querySelectorAll('[data-pid]').forEach(a=>a.onclick=e=>{ e.preventDefault(); showPlayer(a.dataset.pid); });
 }
 /* ================= 🧑 真人玩家（不含電腦），誰在線上 ================= */
 let rlTimer = 0, rlQ = '';
@@ -304,7 +337,7 @@ function showLogin(){
   $('li').onclick = async()=>{ const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('pw').value}); if(error) return toast('登入失敗：'+error.message); location.reload(); };
   $('gl').onclick = ()=>sb.auth.signInWithOAuth({provider:'google', options:{redirectTo: location.origin+location.pathname}});
 }
-function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({rl:pageRl,py:pagePay,rp:pageRp,cs:pageCs,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
+function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({rt:pageRt,rl:pageRl,py:pagePay,rp:pageRp,cs:pageCs,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
 const M = h => $('main').innerHTML = h;
 
 /* 總覽 */
