@@ -60,7 +60,7 @@ button.ok{background:#3BB273!important;color:#fff!important}button.bad{backgroun
 <body>
 <header><h1>🌱 一起種田吧｜營運後台</h1><span class="who" id="who"></span><a href="./" target="_blank">開啟遊戲</a></header>
 <nav id="nav" style="display:none">
-  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="pl">玩家管理</button><button data-t="cs">🎰 娛樂廳</button><button data-t="py">💳 儲值 <span class="nbad" id="pyBad"></span></button><button data-t="nt">公告</button>
+  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="rl">🧑 真人玩家 <span class="nbad" id="rlBad" style="background:#1E9E55"></span></button><button data-t="pl">玩家管理</button><button data-t="cs">🎰 娛樂廳</button><button data-t="py">💳 儲值 <span class="nbad" id="pyBad"></span></button><button data-t="nt">公告</button>
   <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="gf">發獎／兌換碼</button><button data-t="ev">活動／維護</button><button data-t="bt">電腦玩家</button><button data-t="lg">操作紀錄</button>
 </nav>
 <main id="main"><div class="center"><div class="muted">讀取中…</div></div></main>
@@ -89,7 +89,31 @@ async function boot(){
   $('nav').style.display='flex';
   document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
   try{ const c = await rpc('farm_config'); CFG=c; c.crops.forEach(x=>CROPN[x.id]=x.name); }catch(e){}
-  go('ov'); rpBadge(); setInterval(rpBadge, 60000); pyBadge(); setInterval(pyBadge, 60000);
+  go('ov'); rpBadge(); setInterval(rpBadge, 60000); pyBadge(); setInterval(pyBadge, 60000); rlBadge(); setInterval(rlBadge, 60000);
+}
+/* ================= 🧑 真人玩家（不含電腦），誰在線上 ================= */
+let rlTimer = 0, rlQ = '';
+async function rlBadge(){ try{ const o = await rpc('adm_overview'); $('rlBad').textContent = o.online_now ? o.online_now : ''; }catch(e){} }
+async function pageRl(silent){
+  if(!silent) M(`<div class="card"><div class="muted">讀取中…</div></div>`);
+  let L; try{ L = await rpc('adm_real_players'); }catch(e){ return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+  if(tab!=='rl') return;
+  const on = L.filter(x=>x.online), q = rlQ.toLowerCase();
+  $('rlBad').textContent = on.length ? on.length : '';
+  const show = q ? L.filter(x=>(x.nickname||'').toLowerCase().includes(q) || (x.email||'').toLowerCase().includes(q)) : L;
+  const row = x => `<tr style="${x.online?'background:#EFFAF2':''}"><td>${x.online?'🟢':'⚪'}</td>
+    <td><a href="#" data-pid="${x.id}"><b>${esc(x.nickname||'（未取名）')}</b></a>${x.anon?' <span class="tag">試玩</span>':''}${x.banned?' <span class="tag r">停權</span>':''}<div class="muted" style="font-size:11px">${esc(x.email||'')}</div></td>
+    <td>Lv${x.lv}</td><td>${(x.gold||0).toLocaleString()}</td><td>💎${(x.gems||0).toLocaleString()}</td><td>${x.paid?`<b style="color:#1E9E55">NT$${x.paid.toLocaleString()}</b>`:'—'}</td>
+    <td>${x.online?'<b style="color:#1E9E55">在線</b>':ago(Date.parse(x.last_seen))}</td><td class="muted">${dt(Date.parse(x.created_at))}</td></tr>`;
+  const keepQ = document.activeElement && document.activeElement.id==='rlQ';
+  M(`<div id="pdet"></div><div class="card"><h2>🧑 真人玩家 <span class="muted" style="font-size:13px;font-weight:600">共 ${L.length} 人・🟢 目前在線 ${on.length} 人（5 分鐘內有動作）・每 30 秒自動更新</span></h2>
+    ${on.length?`<div style="margin:6px 0 10px;line-height:2">${on.map(x=>`<a href="#" data-pid="${x.id}" class="tag" style="background:#DFF5E5;color:#14733C;text-decoration:none;margin-right:4px">🟢 ${esc(x.nickname||'（未取名）')} Lv${x.lv}</a>`).join('')}</div>`:'<div class="muted" style="margin:6px 0 10px">目前沒有真人玩家在線</div>'}
+    <div class="row" style="gap:6px"><input id="rlQ" placeholder="搜尋暱稱或 Email" value="${esc(rlQ)}" style="flex:1"></div>
+    <div style="overflow-x:auto"><table class="tb" style="width:100%;margin-top:10px;font-size:13px"><tr><th></th><th>玩家</th><th>等級</th><th>金幣</th><th>鑽石</th><th>累積儲值</th><th>最後上線</th><th>註冊</th></tr>${show.map(row).join('') || '<tr><td colspan="8" class="muted">沒有資料</td></tr>'}</table></div></div>`);
+  const qi=$('rlQ'); qi.oninput=()=>{ rlQ=qi.value.trim(); clearTimeout(qi._t); qi._t=setTimeout(()=>pageRl(true),300); };
+  if(keepQ){ qi.focus(); qi.setSelectionRange(qi.value.length, qi.value.length); }
+  document.querySelectorAll('[data-pid]').forEach(a=>a.onclick=e=>{ e.preventDefault(); clearInterval(rlTimer); showPlayer(a.dataset.pid); });
+  clearInterval(rlTimer); rlTimer = setInterval(()=>{ if(tab!=='rl'){ clearInterval(rlTimer); return; } if(document.hidden || ($('pdet') && $('pdet').innerHTML)) return; pageRl(true); }, 30000);
 }
 /* ================= 💳 儲值：訂單、補查金流、手動入帳、郵局入帳通知 ================= */
 const PYS = {wait:'⏳ 待付款', paid:'✅ 已入帳', expired:'⌛ 逾時', cancel:'取消', fail:'❌ 建立失敗', short:'⚠️ 金額不足', new:'建立中'};
@@ -280,7 +304,7 @@ function showLogin(){
   $('li').onclick = async()=>{ const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('pw').value}); if(error) return toast('登入失敗：'+error.message); location.reload(); };
   $('gl').onclick = ()=>sb.auth.signInWithOAuth({provider:'google', options:{redirectTo: location.origin+location.pathname}});
 }
-function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({py:pagePay,rp:pageRp,cs:pageCs,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
+function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({rl:pageRl,py:pagePay,rp:pageRp,cs:pageCs,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
 const M = h => $('main').innerHTML = h;
 
 /* 總覽 */
@@ -306,7 +330,9 @@ async function pagePl(q){
   document.querySelectorAll('[data-id]').forEach(r=>r.onclick=()=>showPlayer(r.dataset.id));
 }
 async function showPlayer(id, data){
+  if(!$('pdet')) $('main').insertAdjacentHTML('afterbegin','<div id="pdet"></div>');
   const p = data || await rpc('adm_player', {p_id:id});
+  setTimeout(()=>{ try{ $('pdet').scrollIntoView({behavior:'smooth'}); }catch(e){} }, 50);
   const plots = p.plots.map(x=>`<div class="plot">${x.i+1}. ${x.s==='wild'?'荒地':x.s==='empty'?'空地':x.s==='dead'?'枯萎':esc(CROPN[x.c]||x.c)}${x.s==='grow'?`<br><span class="muted">${Math.round(x.g)}秒 草${x.w} 蟲${x.b} 被偷${x.st}</span>`:''}</div>`).join('');
   const kv = o => Object.entries(o||{}).map(([k,v])=>`${esc(CROPN[k]||k)}×${v}`).join('、') || '無';
   $('pdet').innerHTML = `<div class="card"><h2>${esc(p.nickname)} <span class="tag">Lv${p.lv}</span> ${p.banned?`<span class="tag r">停權中：${esc(p.ban_reason||'')}</span>`:''}</h2>
