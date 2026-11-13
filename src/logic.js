@@ -403,7 +403,7 @@ async function openSettings(){
     <div class="admquick"><button class="mini" data-q="lv">等級 30</button><button class="mini" data-q="gold">金幣 +10萬</button><button class="mini" data-q="gems">鑽石 +1000</button><button class="mini o" data-q="seeds">每種種子 +20</button></div>
     <div class="homebtns"><button class="btn" id="aSave">儲存</button><a class="btn sub" href="admin.html" target="_blank" style="text-align:center;text-decoration:none">營運後台</a></div>
     <div class="rhint">只會改到你自己的帳號，每次修改都記錄在後台的操作紀錄</div></div>`;
-  body += `<div style="text-align:center;margin-top:12px"><a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`;
+  body += `<div style="text-align:center;margin-top:12px"><a class="plink" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener">💬 客服聯絡（FB 粉專）</a>　<a class="plink" href="privacy.html" target="_blank" rel="noopener">隱私權政策</a></div>`;
   modal('設定', body); renderPushBox();
   if($('sRep')) $('sRep').onclick=()=>openReport(); if($('sRepMine')) $('sRepMine').onclick=openMyReports;
   $('tBgm').onclick = ()=>{ BGM_ON=!BGM_ON; SETPREF('bgm',BGM_ON); bgmSync(); openSettings(); };
