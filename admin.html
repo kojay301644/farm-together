@@ -327,7 +327,7 @@ async function showPlayer(id, data){
       建築外觀：${Object.keys(p.skins||{}).map(k=>esc(SN(k))).join('、')||'無'}｜色調：${Object.keys(p.tones||{}).map(k=>esc(TN(k))).join('、')||'無'}（使用中：${esc(TN(p.tone||'spring'))}）<br>
       牧場：${(p.ranch||[]).map(r=>esc(AN(r.k))).join('、')||'無'}｜牧場產品：${Object.entries(p.goods||{}).map(([k,n])=>`${esc(k)}×${n}`).join('、')||'無'}</p></div>
     <div class="card"><h2>發禮包（玩家付款後按這裡）</h2><div class="muted" style="margin-bottom:8px">金流還沒串好前，玩家付款後由你在這裡手動發放；玩家會收到通知。</div>
-      <div class="row"><button class="btn" data-pk="first">🎁 首儲禮包</button><button class="btn" data-pk="newbie">📦 新手禮包（NT$30）</button><button class="btn" data-pk="month">🗓️ 農夫月卡（NT$150）</button></div></div>
+      <div class="row"><button class="btn" data-pk="first">🎁 首儲禮包</button><button class="btn" data-pk="newbie">📦 新手禮包（NT$100）</button><button class="btn" data-pk="month">🗓️ 農夫月卡（NT$150）</button></div></div>
     <div class="card"><h2>發東西給這位玩家</h2>${rwBuilder('pg')}<div class="row" style="margin-top:8px"><input id="pgWhy" placeholder="原因（會記在操作紀錄）" style="flex:1"><button class="btn o" id="pgGo">發送</button></div></div>
     <div class="card"><h2>讓這位玩家重玩</h2><div class="row"><span class="muted">等級、金幣、鑽石、田、牧場、寵物、裝備、裝飾、外觀全部回到新手狀態（保留帳號、暱稱、頭像、好友）。</span><button class="btn" style="background:#F2545B" id="prGo">重玩</button></div></div>
     <div class="card"><h2>停權</h2><div class="row">${p.banned?`<button class="btn" id="unban">解除停權</button>`:`<input id="bWhy" placeholder="停權原因（玩家會看到）" style="flex:1"><button class="btn r" id="ban">停權</button>`}</div></div>
