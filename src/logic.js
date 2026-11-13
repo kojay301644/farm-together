@@ -518,7 +518,7 @@ async function visit(id){
   catch(e){ return toast(e.message); }
   closeModal(); mode = 'visit'; plotSig = plotSig.map(()=> '');
   buildTools(); setTool('steal'); refresh();
-  $('bHome').textContent = '🏠 回我的農場';
+  $('bHome').innerHTML = '<i>🏠</i>回我的農場';
   centerOn(...FARM_C, true);
   toast(`來到 ${V.owner.nickname} 的農場`);
 }
@@ -526,7 +526,7 @@ async function goHome(){
   if(mode==='home'){ centerOn(...FARM_C, true); return; }
   mode = 'home'; V = null; plotSig = plotSig.map(()=> '');
   buildTools(); setTool('hand'); refresh();
-  $('bHome').textContent = '🌾 回到農田';
+  $('bHome').innerHTML = '<i>🌾</i>回到農田';
   centerOn(...FARM_C, true);
   sync();
 }
@@ -773,7 +773,7 @@ function startGame(st){
   if(!built){ buildWorld(); requestAnimationFrame(animate); built = true; }
   plotSig = plotSig.map(()=> '');
   buildTools(); layout(); setTool('hand'); refresh();
-  $('bHome').textContent = '🌾 回到農田';
+  $('bHome').innerHTML = '<i>🌾</i>回到農田';
   requestAnimationFrame(()=>centerOn(...FARM_C));
   toast(`歡迎回到小鎮，${S.me.nickname}！`);
   setTimeout(tutMaybeStart, 900);
