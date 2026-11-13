@@ -103,6 +103,8 @@ const HOLD = (() => {
       G.curBet = to;
       G.seats.forEach((q, i) => { if (i !== si && canAct(G, i)) q.acted = false; });
       p.last = p.allin ? '全下' : prev === 0 ? '下注' : '加注';
+      // 記下誰在翻牌前常常全下／超大注（最近 12 手），電腦會看人放寬跟注
+      if (G.street === 'pre' && (p.allin || to >= thT(G).bb * 10)) { G.shv = G.shv || {}; const k = p.id || si; G.shv[k] = (G.shv[k] || []).filter(h => h > G.handNo - 12).concat(G.handNo); }
     } else throw new Error('不支援的動作');
     p.acted = true;
     G.log.push({ k: 'act', s: si, a: p.last, amt: p.bet });
@@ -187,6 +189,13 @@ const HOLD = (() => {
         return { a: o.canCheck ? 'check' : 'call' };
       }
       if (o.canCheck) return { a: 'check' };
+      if (facing > 8) {   // 面對全下或超大注：算勝率對底池賠率；對方最近常亂推就放寬
+        const sh = G.seats.find(q => q && q.inHand && !q.folded && q.bet === G.curBet);
+        const n = sh ? ((G.shv || {})[sh.id || G.seats.indexOf(sh)] || []).filter(h => h > G.handNo - 12).length : 0;
+        const wild = n >= 2, eqp = equity(p.hole, [], 1, 400);
+        const need = wild ? Math.max(odds + 0.01, 0.45) : Math.max(odds + 0.12, 0.6);
+        return { a: eqp > need ? 'call' : 'fold' };
+      }
       if (sc >= 15 && facing <= 3) return { a: 'call' };
       if (sc >= 12 && facing <= 1.01 && r < 0.6) return { a: 'call' };            // 便宜進場
       if (sc >= 19 && facing <= 8) return { a: 'call' };
