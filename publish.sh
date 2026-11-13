@@ -3,7 +3,7 @@
 set -e
 cd "$(dirname "$0")"
 rm -rf public && mkdir -p public
-cp index.html 404.html admin.html privacy.html manifest.json sw.js supabase.js robots.txt sitemap.xml og.jpg icon-192.png icon-512.png icon-maskable-512.png apple-touch-icon.png public/
+cp index.html version.txt 404.html admin.html privacy.html manifest.json sw.js supabase.js robots.txt sitemap.xml og.jpg icon-192.png icon-512.png icon-maskable-512.png apple-touch-icon.png public/
 cp -r assets guide public/
 cp _headers public/
 # 娛樂廳伺服器程式（Supabase 部署時讀取，路徑不公開、不列出）

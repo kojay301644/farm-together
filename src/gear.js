@@ -181,8 +181,7 @@ let newBuild = null;
 function goUpdate(){ const u=new URL(location.href); u.searchParams.set('v', newBuild||Date.now()); location.replace(u.toString()); }
 async function checkUpdate(fromWake){
   try{
-    const t = await (await fetch('index.html?u='+Date.now(), {cache:'no-store'})).text();
-    const v = (t.match(/const BUILD="(\d+)"/)||[])[1];
+    const v = ((await (await fetch('version.txt?u='+Date.now(), {cache:'no-store'})).text())||'').trim().match(/^\d+$/)?.[0];
     if(!v || v===BUILD) return;
     newBuild = v;
     // 剛切回遊戲、沒有開視窗、沒在操作：直接換新版
@@ -190,7 +189,7 @@ async function checkUpdate(fromWake){
     if(!$('updBar')){ const d=document.createElement('button'); d.id='updBar'; d.innerHTML='✨ 有新版本！點這裡更新'; d.onclick=goUpdate; document.body.appendChild(d); }
   }catch(e){}
 }
-setInterval(()=>checkUpdate(false), 60000);
+setInterval(()=>{ if(!document.hidden) checkUpdate(false); }, 180000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkUpdate(true); });
 setTimeout(()=>checkUpdate(false), 3000);
 

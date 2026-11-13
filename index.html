@@ -1185,21 +1185,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794584301" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794585154" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794584301" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794584301" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794585154" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794585154" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794584301" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794585154" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794584301" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794584301" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794585154" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794585154" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 132px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
   <button class="sidebtn dot" id="bInv" style="top:calc(100% + 198px);height:62px"><span style="font-size:24px;line-height:26px">💌</span><small style="font-size:10px;line-height:1.15;text-align:center">好友邀請<br>任務</small></button>
 </div>
@@ -1218,11 +1218,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794584301" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794585154" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794584301";
+const BUILD="1794585154";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2674,8 +2674,7 @@ let newBuild = null;
 function goUpdate(){ const u=new URL(location.href); u.searchParams.set('v', newBuild||Date.now()); location.replace(u.toString()); }
 async function checkUpdate(fromWake){
   try{
-    const t = await (await fetch('index.html?u='+Date.now(), {cache:'no-store'})).text();
-    const v = (t.match(/const BUILD="(\d+)"/)||[])[1];
+    const v = ((await (await fetch('version.txt?u='+Date.now(), {cache:'no-store'})).text())||'').trim().match(/^\d+$/)?.[0];
     if(!v || v===BUILD) return;
     newBuild = v;
     // 剛切回遊戲、沒有開視窗、沒在操作：直接換新版
@@ -2683,7 +2682,7 @@ async function checkUpdate(fromWake){
     if(!$('updBar')){ const d=document.createElement('button'); d.id='updBar'; d.innerHTML='✨ 有新版本！點這裡更新'; d.onclick=goUpdate; document.body.appendChild(d); }
   }catch(e){}
 }
-setInterval(()=>checkUpdate(false), 60000);
+setInterval(()=>{ if(!document.hidden) checkUpdate(false); }, 180000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkUpdate(true); });
 setTimeout(()=>checkUpdate(false), 3000);
 
@@ -6974,7 +6973,7 @@ function showKicked(dev){
   d.innerHTML=`<div class="kbox"><div style="font-size:40px">⚠️</div><h3>帳號已在其他裝置登入</h3><p>你的帳號剛剛在${dev?`「${esc(dev)}」`:'另一台裝置'}開啟，這台已經暫停，避免兩邊同時玩造成進度錯亂。</p><p class="mut">如果不是你本人登入，請盡快修改密碼。</p><button class="btn" id="kickGo">在這台繼續玩</button></div>`;
   document.body.appendChild(d); $('kickGo').onclick=()=>location.reload();
 }
-setInterval(sessionPing, 30000);
+setInterval(()=>{ if(!document.hidden) sessionPing(); }, 60000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sessionPing(); });
 
 /* ================= 遊戲狀態 ================= */
@@ -7571,7 +7570,9 @@ let lastTouch = Date.now();
 ['pointerdown','keydown','wheel','touchstart'].forEach(ev=>addEventListener(ev, ()=>{ lastTouch = Date.now(); document.body.classList.remove('idle'); }, {passive:true, capture:true}));
 setInterval(()=>{ document.body.classList.toggle('idle', Date.now() - lastTouch > 30000); }, 1000);
 setInterval(()=>{ if(S && $('map').style.display!=='none' && !document.body.classList.contains('mjon')){ renderPlots(); renderHUD(); try{ syncRanchMovers(); setCoopDot(); syncParkMovers(); }catch(e){} } }, 1000);
-setInterval(()=>{ if(!document.body.classList.contains('mjon')) sync(); }, 15000);   // 在遊戲廳時不用一直更新農場
+// 背景更新：有在操作時 25 秒一次，2 分鐘沒動就 60 秒一次；在遊戲廳、切到背景時不更新
+let lastSync = 0;
+setInterval(()=>{ if(document.body.classList.contains('mjon') || document.hidden) return; const gap = (Date.now() - lastTouch > 120000) ? 60000 : 25000; if(Date.now() - lastSync >= gap){ lastSync = Date.now(); sync(); } }, 5000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sync(); });
 
 /* ================= 登入流程 ================= */
@@ -7805,7 +7806,7 @@ function sbLoop(now){ requestAnimationFrame(sbLoop); const el=$('sbTx'); if(!el|
   if(sbX < -sbW){ sbIdx = (sbIdx+1) % sbList.length; sbShow(); }
   el.style.transform=`translate(${sbX.toFixed(1)}px,-50%)`; }
 requestAnimationFrame(sbLoop);
-setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 45000);
+setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 90000);
 
 /* ================= 禮物信箱、獎勵顯示、活動 ================= */
 function rewardList(rw){ rw=rw||{}; const out=[];
@@ -7901,7 +7902,7 @@ async function checkSteals(){
   $('saX').onclick = ()=>{ el.classList.remove('show'); };
   clearTimeout(stealAlertT); stealAlertT = setTimeout(()=>el.classList.remove('show'), 12000);
 }
-setInterval(checkSteals, 30000); setTimeout(checkSteals, 6000);
+setInterval(()=>{ if(Date.now() - lastTouch < 300000) checkSteals(); }, 45000); setTimeout(checkSteals, 6000);
 
 /* 偷陌生人次數：用掉後每 N 分鐘回 1 次 */
 function regenTxt(me, k){ if(!me || !(+me[k+'_regen']>0)) return ''; if(me[k+'_next']==null) return `，每 ${+me[k+'_regen']} 分鐘回 1 點`;

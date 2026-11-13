@@ -54,7 +54,7 @@ function showKicked(dev){
   d.innerHTML=`<div class="kbox"><div style="font-size:40px">⚠️</div><h3>帳號已在其他裝置登入</h3><p>你的帳號剛剛在${dev?`「${esc(dev)}」`:'另一台裝置'}開啟，這台已經暫停，避免兩邊同時玩造成進度錯亂。</p><p class="mut">如果不是你本人登入，請盡快修改密碼。</p><button class="btn" id="kickGo">在這台繼續玩</button></div>`;
   document.body.appendChild(d); $('kickGo').onclick=()=>location.reload();
 }
-setInterval(sessionPing, 30000);
+setInterval(()=>{ if(!document.hidden) sessionPing(); }, 60000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sessionPing(); });
 
 /* ================= 遊戲狀態 ================= */
@@ -651,7 +651,9 @@ let lastTouch = Date.now();
 ['pointerdown','keydown','wheel','touchstart'].forEach(ev=>addEventListener(ev, ()=>{ lastTouch = Date.now(); document.body.classList.remove('idle'); }, {passive:true, capture:true}));
 setInterval(()=>{ document.body.classList.toggle('idle', Date.now() - lastTouch > 30000); }, 1000);
 setInterval(()=>{ if(S && $('map').style.display!=='none' && !document.body.classList.contains('mjon')){ renderPlots(); renderHUD(); try{ syncRanchMovers(); setCoopDot(); syncParkMovers(); }catch(e){} } }, 1000);
-setInterval(()=>{ if(!document.body.classList.contains('mjon')) sync(); }, 15000);   // 在遊戲廳時不用一直更新農場
+// 背景更新：有在操作時 25 秒一次，2 分鐘沒動就 60 秒一次；在遊戲廳、切到背景時不更新
+let lastSync = 0;
+setInterval(()=>{ if(document.body.classList.contains('mjon') || document.hidden) return; const gap = (Date.now() - lastTouch > 120000) ? 60000 : 25000; if(Date.now() - lastSync >= gap){ lastSync = Date.now(); sync(); } }, 5000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) sync(); });
 
 /* ================= 登入流程 ================= */
@@ -885,7 +887,7 @@ function sbLoop(now){ requestAnimationFrame(sbLoop); const el=$('sbTx'); if(!el|
   if(sbX < -sbW){ sbIdx = (sbIdx+1) % sbList.length; sbShow(); }
   el.style.transform=`translate(${sbX.toFixed(1)}px,-50%)`; }
 requestAnimationFrame(sbLoop);
-setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 45000);
+setInterval(()=>{ if(S && !document.hidden) loadTicker(); }, 90000);
 
 /* ================= 禮物信箱、獎勵顯示、活動 ================= */
 function rewardList(rw){ rw=rw||{}; const out=[];
@@ -981,7 +983,7 @@ async function checkSteals(){
   $('saX').onclick = ()=>{ el.classList.remove('show'); };
   clearTimeout(stealAlertT); stealAlertT = setTimeout(()=>el.classList.remove('show'), 12000);
 }
-setInterval(checkSteals, 30000); setTimeout(checkSteals, 6000);
+setInterval(()=>{ if(Date.now() - lastTouch < 300000) checkSteals(); }, 45000); setTimeout(checkSteals, 6000);
 
 /* 偷陌生人次數：用掉後每 N 分鐘回 1 次 */
 function regenTxt(me, k){ if(!me || !(+me[k+'_regen']>0)) return ''; if(me[k+'_next']==null) return `，每 ${+me[k+'_regen']} 分鐘回 1 點`;
