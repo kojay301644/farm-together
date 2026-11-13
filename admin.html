@@ -60,7 +60,7 @@ button.ok{background:#3BB273!important;color:#fff!important}button.bad{backgroun
 <body>
 <header><h1>🌱 一起種田吧｜營運後台</h1><span class="who" id="who"></span><a href="./" target="_blank">開啟遊戲</a></header>
 <nav id="nav" style="display:none">
-  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="pl">玩家管理</button><button data-t="cs">🎰 娛樂廳</button><button data-t="nt">公告</button>
+  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="pl">玩家管理</button><button data-t="cs">🎰 娛樂廳</button><button data-t="py">💳 儲值 <span class="nbad" id="pyBad"></span></button><button data-t="nt">公告</button>
   <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="gf">發獎／兌換碼</button><button data-t="ev">活動／維護</button><button data-t="bt">電腦玩家</button><button data-t="lg">操作紀錄</button>
 </nav>
 <main id="main"><div class="center"><div class="muted">讀取中…</div></div></main>
@@ -89,7 +89,60 @@ async function boot(){
   $('nav').style.display='flex';
   document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
   try{ const c = await rpc('farm_config'); CFG=c; c.crops.forEach(x=>CROPN[x.id]=x.name); }catch(e){}
-  go('ov'); rpBadge(); setInterval(rpBadge, 60000);
+  go('ov'); rpBadge(); setInterval(rpBadge, 60000); pyBadge(); setInterval(pyBadge, 60000);
+}
+/* ================= 💳 儲值：訂單、補查金流、手動入帳、郵局入帳通知 ================= */
+const PYS = {wait:'⏳ 待付款', paid:'✅ 已入帳', expired:'⌛ 逾時', cancel:'取消', fail:'❌ 建立失敗', short:'⚠️ 金額不足', new:'建立中'};
+const PYK = {g30:'💎60', g150:'💎330', g490:'💎1150', g990:'💎2500', month:'🗓️ 月卡', newbie:'🎁 新手禮包'};
+const PMS = {new:'新', paid:'✅ 已入帳', manual:'⚠️ 待人工'};
+let pyQ = '', pyView = 'ord';
+async function pyBadge(){ try{ const L = await rpc('adm_post_list'); const n=L.filter(x=>x.status==='manual').length; $('pyBad').textContent = n ? n : ''; }catch(e){} }
+async function pagePay(){
+  M(`<div class="card"><div class="muted">讀取中…</div></div>`);
+  let C, O, P; try{ [C, O, P] = await Promise.all([rpc('adm_pay_cfg', {}), rpc('adm_pay_orders', {p_q: pyQ||null}), rpc('adm_post_list')]); }catch(e){ return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+  const nMan = P.filter(x=>x.status==='manual').length; $('pyBad').textContent = nMan ? nMan : '';
+  const today = new Date().toDateString(), paidT = O.filter(o=>o.credited && o.paid_at && new Date(o.paid_at).toDateString()===today).reduce((a,o)=>a+o.nt,0);
+  const head = `<div class="card"><h2>💳 儲值</h2>
+    <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn ${C.open?'':'g'}" id="pyOpen">${C.open?'🟢 儲值開放中（按一下暫停）':'🔴 儲值暫停中（按一下開放）'}</button>
+      <button class="btn ${C.cvs?'':'g'}" id="pyCvs">${C.cvs?'🟢 超商代碼開啟中':'⚪ 超商代碼關閉中'}</button>
+      <span class="muted">收款帳號：${esc(C.acct||'')}</span><span class="muted">｜今天入帳 NT$${paidT.toLocaleString()}（最近 200 筆內）</span></div>
+    <div class="muted" style="margin-top:8px;line-height:1.7">郵局轉帳：玩家建立訂單時填轉出帳號末 5 碼，Gmail 腳本收到郵局入帳通知後呼叫 post_notify，「末 5 碼＋金額＋時間」只對到一張訂單就自動入帳；對不到或對到多張會放到「郵局入帳通知」等你手動對單。<br>超商代碼：金流平台通知後，系統一律再向金流查詢確認才入帳，每分鐘也會自動補查。</div>
+    <div class="row" style="gap:6px;margin-top:10px"><button class="btn ${pyView==='ord'?'':'g'}" data-pv="ord">🧾 訂單</button><button class="btn ${pyView==='post'?'':'g'}" data-pv="post">🏤 郵局入帳通知${nMan?`（${nMan} 筆待處理）`:''}</button></div></div>`;
+  let body = '';
+  if(pyView==='ord'){
+    body = `<div class="card"><div class="row" style="gap:6px"><input id="pyQ" placeholder="訂單編號／暱稱／末 5 碼／金流序號" value="${esc(pyQ)}" style="flex:1"><button class="btn" id="pyGo">搜尋</button>${pyQ?'<button class="btn g" id="pyClr">清除</button>':''}</div>
+      <table class="tb" style="width:100%;margin-top:10px;font-size:13px"><tr><th>時間</th><th>玩家</th><th>方案</th><th>金額</th><th>方式</th><th>狀態</th><th>操作</th></tr>
+      ${O.map(o=>`<tr><td>${dt(Date.parse(o.created))}<div class="muted" style="font-size:11px">${esc(o.id)}</div></td>
+        <td><a href="#" data-pid="${o.uid}">${esc(o.name)}</a></td>
+        <td>${PYK[o.pkg]||esc(o.pkg)}${o.bonus?`<div class="muted" style="font-size:11px">首儲 +💎${o.bonus}</div>`:''}</td>
+        <td>NT$${o.nt}${o.paid_amt!=null&&o.paid_amt!==o.nt?`<div style="color:#D3403A;font-size:11px">實付 ${o.paid_amt}</div>`:''}</td>
+        <td>${o.method==='post'?'🏤 轉帳':'🏪 超商'}<div class="muted" style="font-size:11px">${o.method==='post'?'末5碼 '+esc(o.payer||''):esc(o.payer||'')}</div></td>
+        <td>${o.credited?'✅ 已入帳':(PYS[o.status]||esc(o.status))}${o.manual?`<div class="muted" style="font-size:11px">✋ 手動：${esc(o.mnote||'')}</div>`:''}${o.err&&!o.credited?`<div class="muted" style="font-size:11px">${esc(o.err)}</div>`:''}${o.paid_at?`<div class="muted" style="font-size:11px">${dt(Date.parse(o.paid_at))}</div>`:''}</td>
+        <td>${o.credited?'':`${o.method==='cvs'?`<button class="btn g" style="padding:4px 8px;font-size:12px" data-prc="${esc(o.id)}">🔄 向金流補查</button> `:''}<button class="btn" style="padding:4px 8px;font-size:12px" data-pmn="${esc(o.id)}|${o.nt}|${esc(o.name)}">✋ 手動入帳</button>`}</td></tr>`).join('') || '<tr><td colspan="7" class="muted">沒有訂單</td></tr>'}</table></div>`;
+  } else {
+    const waitO = O.filter(o=>o.method==='post' && !o.credited);
+    body = `<div class="card"><table class="tb" style="width:100%;font-size:13px"><tr><th>入帳時間</th><th>金額</th><th>轉出末 5 碼</th><th>銀行</th><th>狀態</th><th>對應訂單／手動對單</th></tr>
+      ${P.map(m=>`<tr><td>${dt(Date.parse(m.at))}<div class="muted" style="font-size:11px">${esc(m.no)}</div></td><td>NT$${m.amt}</td><td>${esc(m.last5||'')}</td><td>${esc(m.bank||'')}</td>
+        <td>${PMS[m.status]||esc(m.status)}${m.note&&m.status!=='paid'?`<div class="muted" style="font-size:11px">${esc(m.note)}</div>`:''}</td>
+        <td>${m.status==='paid'?esc(m.order_id||''):`<select id="pm_${esc(m.no)}" style="max-width:260px"><option value="">選擇要入帳的訂單…</option>${waitO.map(o=>`<option value="${esc(o.id)}" ${o.payer===m.last5&&o.nt===m.amt?'selected':''}>${o.payer===m.last5?'⭐ ':''}${esc(o.name)}｜NT$${o.nt}｜末5碼 ${esc(o.payer||'')}｜${dt(Date.parse(o.created))}</option>`).join('')}</select> <button class="btn" style="padding:4px 8px;font-size:12px" data-pmt="${esc(m.no)}">對單入帳</button>`}</td></tr>`).join('') || '<tr><td colspan="6" class="muted">還沒有收到郵局入帳通知</td></tr>'}</table>
+      <div class="muted" style="margin-top:8px">下拉選單只列郵局轉帳、還沒入帳的訂單（含逾時）；⭐ 是末 5 碼對得上的。玩家沒建訂單就轉帳的話，請到「發獎」直接補發。</div></div>`;
+  }
+  M(head + body);
+  document.querySelectorAll('[data-pv]').forEach(b=>b.onclick=()=>{ pyView=b.dataset.pv; pagePay(); });
+  $('pyOpen').onclick = async()=>{ if(!confirm(C.open?'確定要暫停儲值？玩家會無法建立新訂單':'確定要開放儲值？')) return; try{ await rpc('adm_pay_cfg', {p_open: !C.open}); toast('已更新'); pagePay(); }catch(e){ toast(e.message); } };
+  $('pyCvs').onclick = async()=>{ if(!confirm(C.cvs?'關閉超商代碼？':'開啟超商代碼？（金流金鑰 TW148_KEY / TW148_SN 要先設定好）')) return; try{ await rpc('adm_pay_cfg', {p_cvs: !C.cvs}); toast('已更新'); pagePay(); }catch(e){ toast(e.message); } };
+  if($('pyGo')){ $('pyGo').onclick=()=>{ pyQ=$('pyQ').value.trim(); pagePay(); }; $('pyQ').onkeydown=e=>{ if(e.key==='Enter') $('pyGo').click(); }; }
+  if($('pyClr')) $('pyClr').onclick=()=>{ pyQ=''; pagePay(); };
+  document.querySelectorAll('[data-pid]').forEach(a=>a.onclick=e=>{ e.preventDefault(); showPlayer(a.dataset.pid); });
+  document.querySelectorAll('[data-prc]').forEach(b=>b.onclick=async()=>{ b.disabled=true; b.textContent='查詢中…'; try{ await rpc('adm_pay_recheck', {p_id:b.dataset.prc}); toast('已送出補查，幾秒後重新整理'); setTimeout(pagePay, 4000); }catch(e){ toast(e.message); b.disabled=false; b.textContent='🔄 向金流補查'; } });
+  document.querySelectorAll('[data-pmn]').forEach(b=>b.onclick=async()=>{ const [id,nt,nm]=b.dataset.pmn.split('|');
+    const note = prompt(`手動入帳：${nm}　NT$${nt}\n訂單 ${id}\n\n請確認錢真的已經收到，並填寫入帳原因（例如：郵局 11/13 14:05 末5碼 12345）`); if(note===null) return;
+    if(note.trim().length<2) return toast('請填寫入帳原因');
+    try{ await rpc('adm_pay_manual', {p_id:id, p_note:note.trim()}); toast('✅ 已入帳，玩家會收到通知'); pagePay(); }catch(e){ toast(e.message); } });
+  document.querySelectorAll('[data-pmt]').forEach(b=>b.onclick=async()=>{ const no=b.dataset.pmt, oid=$('pm_'+no).value; if(!oid) return toast('請先選擇訂單');
+    if(!confirm(`把這筆郵局入帳對到訂單 ${oid} 並入帳？`)) return;
+    try{ await rpc('adm_post_match', {p_no:no, p_order:oid}); toast('✅ 已入帳'); pagePay(); }catch(e){ toast(e.message); } });
 }
 /* ================= 玩家回報 ================= */
 const RPK = {bug:'🐞 遊戲錯誤',idea:'💡 建議',pay:'💎 儲值問題',abuse:'🚨 檢舉玩家',other:'💬 其他',crash:'💥 自動錯誤'};
@@ -227,7 +280,7 @@ function showLogin(){
   $('li').onclick = async()=>{ const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('pw').value}); if(error) return toast('登入失敗：'+error.message); location.reload(); };
   $('gl').onclick = ()=>sb.auth.signInWithOAuth({provider:'google', options:{redirectTo: location.origin+location.pathname}});
 }
-function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({rp:pageRp,cs:pageCs,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
+function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({py:pagePay,rp:pageRp,cs:pageCs,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
 const M = h => $('main').innerHTML = h;
 
 /* 總覽 */

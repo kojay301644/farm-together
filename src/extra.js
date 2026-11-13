@@ -204,29 +204,106 @@ async function invite(){
   copyText(text + '\n' + GAME_URL, '邀請訊息已複製，貼給朋友吧！');
 }
 
-/* ================= 儲值（即將開放） ================= */
+/* ================= 儲值：郵局轉帳（自動對帳）＋超商代碼（金流） ================= */
 const GEM_PACKS = [
-  {name:'小袋鑽石', price:30, gems:60},
-  {name:'中袋鑽石', price:150, gems:330, extra:'多 10%'},
-  {name:'大袋鑽石', price:490, gems:1150, extra:'多 17%'},
-  {name:'超值鑽石', price:990, gems:2500, extra:'多 26%'},
+  {id:'g30', name:'小袋鑽石', price:30, gems:60},
+  {id:'g150', name:'中袋鑽石', price:150, gems:330, extra:'多 10%'},
+  {id:'g490', name:'大袋鑽石', price:490, gems:1150, extra:'多 17%'},
+  {id:'g990', name:'超值鑽石', price:990, gems:2500, extra:'多 26%'},
 ];
+const PAY = {mine:null, poll:0, cd:0};
+const PAY_ST = {wait:'⏳ 等待付款', paid:'✅ 已到帳', expired:'⌛ 已逾時', cancel:'已取消', fail:'❌ 建立失敗', short:'⚠️ 金額不足', new:'建立中'};
+async function payMine(){ try{ PAY.mine = await rpc('pay_mine'); }catch(e){ PAY.mine = PAY.mine || {cvs:false, open:false, firsts:[], orders:[]}; } return PAY.mine; }
+function payStop(){ clearInterval(PAY.poll); clearInterval(PAY.cd); PAY.poll=0; PAY.cd=0; }
 
 /* 儲值（右上鑽石旁的 +） */
 async function openTopup(){
+  payStop();
   try{ const {data:{user}} = await sb.auth.getUser(); if(user && user.is_anonymous)
     return modal('💎 儲值', `<div style="text-align:center;font-weight:800;line-height:1.8">試玩帳號不能儲值<br><small style="color:var(--ink2)">先綁定帳號，進度和買的東西才不會不見</small></div>`, [['之後再說','sub',closeModal],['🔒 綁定帳號','',()=>openBind()]]); }catch(e){}
-  const me=S.me, now=Date.now()+(S.off||0), P=(window.PACKS||[]), got=me.packs||{};
+  const M = await payMine();
+  const me=S.me, now=Date.now()+(S.off||0), P=(window.PACKS||[]), got=me.packs||{}, firsts=M.firsts||[];
   const newbieOk = !got.newbie && (+me.created||0) > now - 7*86400000, firstOk = !got.first, mLeft = me.month_until && +me.month_until>now ? Math.ceil((+me.month_until-now)/86400000) : 0;
-  let body = `<div class="soon">💎 線上付款即將開放！目前想購買請聯絡客服，付款後會直接發到你的帳號</div>`;
   const pk = id => P.find(x=>x.id===id) || {};
-  body += `<div class="gemcard pack" style="background:#F7F5FF"><div class="bonus">${mLeft?`剩 ${mLeft} 天`:'最划算'}</div><div style="font-weight:900">${esc(pk('month').name||'🗓️ 農夫月卡')}　NT$${pk('month').price_twd||150}</div>
+  let body = M.open ? '' : `<div class="soon">💎 儲值暫停中，請稍後再來</div>`;
+  const wait = (M.orders||[]).find(o=>o.status==='wait' && !o.credited && (o.method==='cvs' || Date.parse(o.created) > now-30*60000));
+  if(wait) body += `<div class="soon" style="background:#E8F3FF;cursor:pointer" onclick="payShow('${wait.id}')">⏳ 你有一筆 NT$${wait.nt} 的訂單還沒付款　<b style="color:#2F6FD6">查看 ›</b></div>`;
+  body += `<div class="gemcard pack" style="background:#F7F5FF;cursor:pointer" onclick="payPick('month')"><div class="bonus">${mLeft?`剩 ${mLeft} 天`:'最划算'}</div><div style="font-weight:900">${esc(pk('month').name||'🗓️ 農夫月卡')}　NT$${pk('month').price_twd||150}</div>
     <div class="pkd">${esc(pk('month').descr||'')}</div></div>`;
-  if(newbieOk) body += `<div class="gemcard pack" style="background:#EFFAF2"><div class="bonus">限時</div><div style="font-weight:900">${esc(pk('newbie').name)}　NT$${pk('newbie').price_twd}</div><div class="pkd">${esc(pk('newbie').descr)}</div></div>`;
-  if(firstOk) body += `<div class="gemcard pack" style="background:#FFF6E5"><div class="bonus">首儲</div><div style="font-weight:900">${esc(pk('first').name)}</div><div class="pkd">${esc(pk('first').descr)}</div></div>`;
-  body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard"><div class="bonus">首儲 ×2</div><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`).join('')}</div>`;
-  body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center">每個方案第一次購買，鑽石加倍送</div>`;
+  if(newbieOk) body += `<div class="gemcard pack" style="background:#EFFAF2;cursor:pointer" onclick="payPick('newbie')"><div class="bonus">限時</div><div style="font-weight:900">${esc(pk('newbie').name)}　NT$${pk('newbie').price_twd}</div><div class="pkd">${esc(pk('newbie').descr)}</div></div>`;
+  if(firstOk) body += `<div class="gemcard pack" style="background:#FFF6E5"><div class="bonus">首儲</div><div style="font-weight:900">${esc(pk('first').name)}</div><div class="pkd">${esc(pk('first').descr)}<br>第一次儲值任何方案就會自動送</div></div>`;
+  body += `<div class="gemgrid">${GEM_PACKS.map(p=>{ const dbl=!firsts.includes(p.id); return `<div class="gemcard" style="cursor:pointer" onclick="payPick('${p.id}')">${dbl?'<div class="bonus">首儲 ×2</div>':''}<div>💎</div><b>${(dbl?p.gems*2:p.gems).toLocaleString()}</b>${dbl?`<div style="font-size:11px;color:var(--ink2);text-decoration:line-through">${p.gems.toLocaleString()}</div>`:''}<div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`; }).join('')}</div>`;
+  body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center;line-height:1.7">每個方案第一次購買，鑽石加倍送<br>付款方式：🏤 郵局 / 銀行轉帳${M.cvs?'、🏪 超商代碼':''}</div>`;
+  if((M.orders||[]).length) body += `<div style="text-align:center;margin-top:8px"><button class="btn sub" style="font-size:12px;padding:6px 14px" onclick="payHist()">📜 我的儲值紀錄</button></div>`;
   modal(`💎 儲值　<span style="font-size:14px;color:#5B4ED6">目前 💎 ${(me.gems||0).toLocaleString()}</span>`, body);
+}
+function payPkgInfo(id){
+  const g = GEM_PACKS.find(p=>p.id===id); if(g) return {id, name:g.name, nt:g.price, desc:`💎 ${g.gems.toLocaleString()}${(PAY.mine&&PAY.mine.firsts||[]).includes(id)?'':`（首儲加倍 → 💎 ${(g.gems*2).toLocaleString()}）`}`};
+  const p = (window.PACKS||[]).find(x=>x.id===id) || {}; return {id, name:p.name||id, nt:p.price_twd||0, desc:p.descr||''};
+}
+function payPick(id){
+  const M=PAY.mine||{}; if(!M.open) return toast('儲值暫停中，請稍後再來');
+  const k = payPkgInfo(id), cvsOk = M.cvs && k.nt >= 100;
+  modal('💳 選擇付款方式', `<div style="text-align:center;margin-bottom:10px"><div style="font-weight:900;font-size:16px">${esc(k.name)}</div><div class="pkd" style="text-align:center">${esc(k.desc)}</div><div style="font-weight:900;font-size:20px;color:#5B4ED6;margin-top:4px">NT$${k.nt}</div></div>
+    <div class="gemcard pack" style="cursor:pointer;background:#F3F8FF" onclick="payPostForm('${id}')"><div style="font-weight:900">🏤 郵局 / 銀行轉帳</div><div class="pkd">ATM、網銀、手機銀行都可以，轉帳後約 1～3 分鐘自動到帳</div></div>
+    ${M.cvs?`<div class="gemcard pack" style="cursor:pointer;background:${cvsOk?'#FFF8EE':'#F2F2F2'};${cvsOk?'':'opacity:.6'}" onclick="${cvsOk?`payCvsForm('${id}')`:`toast('超商代碼最低 NT$100，這個方案請用轉帳')`}"><div style="font-weight:900">🏪 超商代碼繳費</div><div class="pkd">${cvsOk?'7-11 / 全家 / 萊爾富 / OK 都能繳，繳費後自動到帳':'超商代碼最低 NT$100'}</div></div>`:''}`,
+    [['← 返回','sub',openTopup]]);
+}
+function payPostForm(id){
+  const k = payPkgInfo(id);
+  modal('🏤 郵局 / 銀行轉帳', `<div style="font-weight:800;line-height:1.7;font-size:14px">請填你<b style="color:#D6453D">要用來轉帳的帳號末 5 碼</b>，系統會用它自動對帳</div>
+    <input id="payL5" inputmode="numeric" maxlength="5" placeholder="例如 12345" style="width:100%;font-size:22px;text-align:center;letter-spacing:6px;padding:10px;border:2px solid #DDD;border-radius:12px;margin:10px 0;box-sizing:border-box">
+    <div class="pkd">・方案：${esc(k.name)}　NT$${k.nt}<br>・訂單建立後 <b>30 分鐘內</b>完成轉帳，金額要一模一樣<br>・一定要用這個帳號轉出，不然系統對不到帳</div>`,
+    [['← 返回','sub',()=>payPick(id)],['建立訂單','',async()=>{
+      const v=($('payL5').value||'').replace(/\D/g,''); if(v.length!==5) return toast('請填 5 碼數字');
+      try{ const o = await rpc('pay_post_new', {p_pkg:id, p_last5:v}); await payMine(); payShow(o.id); }catch(e){ toast(e.message); }
+    }]]);
+  setTimeout(()=>{ try{ $('payL5').focus(); }catch(e){} }, 200);
+}
+function payCvsForm(id){
+  const k = payPkgInfo(id);
+  modal('🏪 超商代碼繳費', `<div style="font-weight:800;font-size:14px">繳費人姓名</div>
+    <input id="payNm" maxlength="32" placeholder="你的名字" style="width:100%;font-size:18px;padding:10px;border:2px solid #DDD;border-radius:12px;margin:10px 0;box-sizing:border-box">
+    <div class="pkd">・方案：${esc(k.name)}　NT$${k.nt}<br>・拿到代碼後到超商機台（ibon / FamiPort…）輸入繳費<br>・繳費完成約幾分鐘內自動到帳</div>`,
+    [['← 返回','sub',()=>payPick(id)],['取得繳費代碼','',async(ev)=>{
+      const nm=($('payNm').value||'').trim(); if(!nm) return toast('請填繳費人姓名');
+      const b=ev&&ev.target; if(b){ b.disabled=true; b.textContent='建立中…'; }
+      try{ const {data, error} = await sb.functions.invoke('pay', {body:{pkg:id, payer:nm}});
+        let d=data; if(error){ try{ d = await error.context.json(); }catch(_){ d={error:'建立付款失敗，請稍後再試'}; } }
+        if(!d || d.error) throw new Error((d&&d.error)||'建立付款失敗');
+        await payMine(); payShow(d.id);
+      }catch(e){ toast(e.message); if(b){ b.disabled=false; b.textContent='取得繳費代碼'; } }
+    }]]);
+}
+const payRow = (lb, v, cp) => `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px dashed #E5E5E5"><span style="color:var(--ink2);font-weight:700;font-size:13px;white-space:nowrap">${lb}</span><b style="font-size:16px;word-break:break-all;text-align:right">${esc(String(v))}</b>${cp?`<button class="btn sub" style="padding:4px 10px;font-size:12px;flex:none" onclick="copyText('${esc(String(cp))}','已複製')">複製</button>`:''}</div>`;
+function payShow(oid){
+  payStop();
+  const o = ((PAY.mine&&PAY.mine.orders)||[]).find(x=>x.id===oid); if(!o) return openTopup();
+  const k = payPkgInfo(o.pkg), I = o.info||{};
+  if(o.credited || o.status==='paid'){ return modal('✅ 已到帳', `<div style="text-align:center;font-weight:900;font-size:18px;line-height:1.8">${esc(k.name)}<br>已存入你的帳號 🎉</div>`, [['好','',()=>{ closeModal(); try{ sync(); }catch(e){} }]]); }
+  let body = '', title;
+  if(o.method==='post'){
+    title='🏤 請在 30 分鐘內轉帳';
+    body += `<div style="text-align:center;font-weight:900;font-size:13px;color:#D6453D" id="payCd"></div>`;
+    body += payRow('銀行代碼', `${I.BankNumber||'700'} ${I.BankName||'中華郵政'}`, I.BankNumber||'700') + payRow('轉入帳號', I.AccountNumber, I.AccountNumber) + payRow('轉帳金額', 'NT$'+o.nt, String(o.nt)) + payRow('你的帳號末 5 碼', I.PayerTail||'');
+    body += `<div class="pkd" style="margin-top:10px;line-height:1.8">・金額要<b>剛好 NT$${o.nt}</b>，不能多也不能少<br>・一定要用末 5 碼 <b>${esc(I.PayerTail||'')}</b> 的帳號轉出<br>・轉帳後約 1～3 分鐘自動到帳，這個畫面會自己更新<br>・超過 30 分鐘才轉也沒關係，客服會人工幫你入帳，<b>不要重複轉</b></div>`;
+  } else {
+    title='🏪 超商繳費代碼';
+    const code = I.PaymentCode||I.IbonCode||'';
+    if(code) body += payRow('繳費代碼', code, code);
+    body += payRow('繳費金額', 'NT$'+(I.BillAmount||I.TransactionAmount||o.nt)) + (I.ExpireDate?payRow('繳費期限', I.ExpireDate):'');
+    const url = I.ShortUrl||I.PaymentUrl||I.PaymentPageUrl||I.PayUrl; if(url) body += `<div style="text-align:center;margin-top:10px"><a class="btn" href="${esc(url)}" target="_blank" rel="noopener">開啟繳費頁面</a></div>`;
+    body += `<div class="pkd" style="margin-top:10px;line-height:1.8">・到 7-11 ibon、全家 FamiPort 等機台輸入代碼列印繳費單，到櫃檯繳費<br>・繳費後幾分鐘內自動到帳，這個畫面會自己更新</div>`;
+  }
+  body += `<div style="text-align:center;font-size:11px;color:var(--ink2);margin-top:8px">訂單編號 ${esc(o.id)}</div>`;
+  modal(title, body, [['先關掉，稍後再看','sub',()=>{ payStop(); closeModal(); }]]);
+  if(o.method==='post'){ const end = Date.parse(o.created)+30*60000; const tick=()=>{ const el=$('payCd'); if(!el) return payStop(); const s=Math.max(0, Math.floor((end-Date.now()-(S.off||0))/1000)); el.textContent = s>0 ? `剩下 ${Math.floor(s/60)} 分 ${String(s%60).padStart(2,'0')} 秒` : '已超過 30 分鐘，如果已轉帳請等客服確認'; }; tick(); PAY.cd=setInterval(tick,1000); }
+  PAY.poll = setInterval(async()=>{ if(!$('ov').classList.contains('show')) return payStop(); const M=await payMine(); const x=(M.orders||[]).find(z=>z.id===oid); if(x && (x.credited||x.status==='paid')){ payStop(); toast('💎 已到帳！'); try{ await sync(); }catch(e){} payShow(oid); } }, 8000);
+}
+function payHist(){
+  const L=(PAY.mine&&PAY.mine.orders)||[];
+  modal('📜 儲值紀錄', L.length ? L.map(o=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #EEE;${o.status==='wait'?'cursor:pointer':''}" ${o.status==='wait'?`onclick="payShow('${o.id}')"`:''}><div><b>${esc(payPkgInfo(o.pkg).name)}</b>　NT$${o.nt}<div style="font-size:11px;color:var(--ink2)">${o.method==='post'?'🏤 轉帳':'🏪 超商'}・${new Date(o.created).toLocaleString('zh-TW',{hour12:false})}</div></div><span style="font-size:12px;font-weight:800">${o.credited?'✅ 已到帳':(PAY_ST[o.status]||o.status)}</span></div>`).join('') : '<div style="text-align:center">還沒有紀錄</div>',
+    [['← 返回','sub',openTopup]]);
 }
 
 /* ================= 每日簽到（7 天一輪） ================= */
