@@ -1116,6 +1116,14 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 .mjmi span{font-size:13px;font-weight:900}.mjmi.r{background:#FFECEC;box-shadow:0 3px 0 #F3C9C9}
 .mjtoast{position:absolute;left:50%;top:30%;transform:translateX(-50%);background:rgba(40,30,20,.9);color:#fff;font-weight:900;font-size:14px;padding:8px 16px;border-radius:12px;z-index:40;opacity:0;transition:opacity .2s;pointer-events:none}
 .mjtoast.show{opacity:1}
+.login{flex-direction:column;align-items:stretch!important;justify-content:flex-start!important;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0!important}
+.lwrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:10px;flex:none}
+.lmore{color:#fff;font-weight:900;font-size:14px;text-decoration:none;text-shadow:0 1px 3px rgba(0,0,0,.5);padding:4px 12px}
+.lintro{background:rgba(255,253,246,.97);max-width:720px;width:calc(100% - 40px);margin:0 auto 30px;border-radius:24px;border:2.5px solid #4B3423;padding:22px;line-height:1.8;color:var(--ink);flex:none}
+.lintro h2{margin:0 0 8px;color:#2E9660;font-size:22px}.lintro p{margin:6px 0;font-size:15px}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:12px 0}
+.lgrid div{background:#fff;border:2px solid #EFE6D8;border-radius:14px;padding:10px 12px}.lgrid b{display:block;color:#2E9660}.lgrid span{font-size:13px;color:var(--ink2)}
+.llinks a{color:#2E9660;font-weight:700}.ltop{display:block;text-align:center;margin-top:12px;text-decoration:none}
 </style>
 </head>
 <body>
@@ -1125,6 +1133,7 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <p><a href="guide/">玩法攻略</a>・<a href="guide/beginner/">新手攻略</a>・<a href="guide/crops/">作物圖鑑</a>・<a href="guide/steal/">偷菜技巧</a>・<a href="guide/pets/">寵物與自動農場</a>・<a href="guide/faq/">常見問題</a></p></div></noscript>
 
 <div class="login" id="login" style="display:flex">
+<div class="lwrap">
   <div class="card" id="loginCard">
     <svg viewBox="0 0 120 70" width="130" aria-hidden="true">
       <rect x="10" y="40" width="100" height="26" rx="12" fill="#A06F49"/>
@@ -1154,27 +1163,43 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
     <button class="btn" id="nickBtn" style="width:100%">開始種田</button>
     <button class="link" id="nickOut">換一個帳號</button>
   </div>
+  <a class="lmore" href="#lintro" onclick="document.getElementById('lintro').scrollIntoView({behavior:'smooth'});return false">遊戲介紹 ⌄</a>
+</div>
+<section class="lintro" id="lintro">
+  <h2>一起種田吧是什麼遊戲？</h2>
+  <p>「一起種田吧」是一款免費的線上種田網頁遊戲。在自己的小島上種菜、收成、賣錢升級，加好友互相拜訪：好友的菜成熟了沒收，就可以偷一把；也能幫忙澆水、除蟲，或放草放蟲惡作劇。不用下載 App，手機、平板、電腦打開網頁就能玩，不註冊也能先試玩。</p>
+  <div class="lgrid">
+    <div><b>🌱 種菜收成</b><span>15 種作物加 4 種會發光的稀有作物，從 2 分鐘到 18 小時，配合上線時間種最划算。</span></div>
+    <div><b>🥕 好友偷菜</b><span>好友的菜熟了沒收？偷一把！被偷了還能一鍵復仇，也有看門狗幫你顧田。</span></div>
+    <div><b>🐔 牧場</b><span>養小雞、小鴨、綿羊、乳牛、小豬，用作物餵食產出雞蛋、牛奶、羊毛。</span></div>
+    <div><b>🐾 寵物自動農場</b><span>18 隻萌寵夥伴、9 種裝備，自動澆水、播種、收成，離線也不停。</span></div>
+    <div><b>🎮 休閒小遊戲</b><span>寵物跑酷、下樓梯、消消樂，每週排行前三名有獎勵。</span></div>
+    <div><b>🎁 每日福利</b><span>每日簽到、免費轉盤、成就獎勵，不花錢也能慢慢收集鑽石。</span></div>
+  </div>
+  <p class="llinks"><a href="guide/">玩法攻略</a>・<a href="guide/beginner/">新手攻略</a>・<a href="guide/crops/">作物圖鑑</a>・<a href="guide/steal/">偷菜技巧</a>・<a href="guide/pets/">寵物與自動農場</a>・<a href="guide/faq/">常見問題</a></p>
+  <a class="btn ltop" href="#" onclick="document.getElementById('login').scrollTo({top:0,behavior:'smooth'});return false">⬆ 回到上面開始玩</a>
+</section>
 </div>
 
 <div id="map" style="display:none"><svg id="world" xmlns="http://www.w3.org/2000/svg"></svg></div>
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794562697" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794571052" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794562697" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794562697" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794571052" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794571052" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794562697" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794571052" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794562697" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794562697" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794571052" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794571052" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 132px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
 
@@ -1192,11 +1217,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794562697" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794571052" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794562697";
+const BUILD="1794571052";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
