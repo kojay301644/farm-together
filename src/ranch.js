@@ -115,10 +115,11 @@ async function ranchAct(action, slot, kind){
     else if(action==='collect'){ sfx('harvest'); fxConfetti(); toast(`收成 ${r.amt} 個，放進穀倉了`); }
     else if(action==='swat'){ sfx('poof'); toast('拍掉一隻蚊子！'); }
     else if(action==='sell_goods'){ sfx('coin'); toast(`賣出牧場產品，獲得 ${r.amt} 金`); }
+    else if(action==='sell_good'){ sfx('coin'); const g=ANIMALS.find(x=>x.good===kind); toast(`賣出${g?g.good_name:'牧場產品'}，獲得 ${r.amt} 金`); }
     if(r.xp) toast(`+${r.xp} 經驗`);
     if(r.lvup) setTimeout(showLevelUp, 400);
     if(r.gift) setTimeout(()=>showGift(r.gift), r.lvup?1600:500);
-    if(action!=='sell_goods') openRanch(); else openBag();
+    if(action!=='sell_goods' && action!=='sell_good') openRanch(); else openBag();
   }catch(e){ sfx('err'); toast(e.message); }
   finally{ ui.busy=false; }
 }
@@ -161,6 +162,6 @@ function goodsHTML(me){
   if(!g.length) return '';
   const total = Math.ceil(g.reduce((s,[k,n])=>s + n*mktUnit('g',k), 0));
   return `<div class="sec">牧場產品</div>` + g.map(([k,n])=>{ const a=ANIMALS.find(x=>x.good===k)||{good_name:k,good_price:0};
-    return `<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${GOOD_ICON[k]||'⭐'}</div><div class="tx"><b>${a.good_name}</b> <span class="tag">×${n}</span> ${mktTag('g',k)}<div>現在每個 ${mktFmt(mktUnit('g',k))} 金・共 ${Math.ceil(n*mktUnit('g',k)).toLocaleString()} 金</div></div></div>`; }).join('')
+    return `<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${GOOD_ICON[k]||'⭐'}</div><div class="tx"><b>${a.good_name}</b> <span class="tag">×${n}</span> ${mktTag('g',k)}<div>現在每個 ${mktFmt(mktUnit('g',k))} 金・共 ${Math.ceil(n*mktUnit('g',k)).toLocaleString()} 金</div></div><button class="mini o" data-sellg="${k}">全部賣出</button></div>`; }).join('')
     + `<button class="btn o" id="sellGoods" style="width:100%;margin-top:6px">賣出全部牧場產品（${total.toLocaleString()} 金）</button>`;
 }

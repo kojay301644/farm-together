@@ -1185,21 +1185,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794571052" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794582644" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794571052" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794571052" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794582644" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794582644" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794571052" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794582644" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794571052" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794571052" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794582644" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794582644" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 132px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
 
@@ -1217,11 +1217,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794571052" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794582644" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794571052";
+const BUILD="1794582644";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2788,10 +2788,11 @@ async function ranchAct(action, slot, kind){
     else if(action==='collect'){ sfx('harvest'); fxConfetti(); toast(`收成 ${r.amt} 個，放進穀倉了`); }
     else if(action==='swat'){ sfx('poof'); toast('拍掉一隻蚊子！'); }
     else if(action==='sell_goods'){ sfx('coin'); toast(`賣出牧場產品，獲得 ${r.amt} 金`); }
+    else if(action==='sell_good'){ sfx('coin'); const g=ANIMALS.find(x=>x.good===kind); toast(`賣出${g?g.good_name:'牧場產品'}，獲得 ${r.amt} 金`); }
     if(r.xp) toast(`+${r.xp} 經驗`);
     if(r.lvup) setTimeout(showLevelUp, 400);
     if(r.gift) setTimeout(()=>showGift(r.gift), r.lvup?1600:500);
-    if(action!=='sell_goods') openRanch(); else openBag();
+    if(action!=='sell_goods' && action!=='sell_good') openRanch(); else openBag();
   }catch(e){ sfx('err'); toast(e.message); }
   finally{ ui.busy=false; }
 }
@@ -2834,7 +2835,7 @@ function goodsHTML(me){
   if(!g.length) return '';
   const total = Math.ceil(g.reduce((s,[k,n])=>s + n*mktUnit('g',k), 0));
   return `<div class="sec">牧場產品</div>` + g.map(([k,n])=>{ const a=ANIMALS.find(x=>x.good===k)||{good_name:k,good_price:0};
-    return `<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${GOOD_ICON[k]||'⭐'}</div><div class="tx"><b>${a.good_name}</b> <span class="tag">×${n}</span> ${mktTag('g',k)}<div>現在每個 ${mktFmt(mktUnit('g',k))} 金・共 ${Math.ceil(n*mktUnit('g',k)).toLocaleString()} 金</div></div></div>`; }).join('')
+    return `<div class="row"><div class="ic" style="display:grid;place-items:center;font-size:26px">${GOOD_ICON[k]||'⭐'}</div><div class="tx"><b>${a.good_name}</b> <span class="tag">×${n}</span> ${mktTag('g',k)}<div>現在每個 ${mktFmt(mktUnit('g',k))} 金・共 ${Math.ceil(n*mktUnit('g',k)).toLocaleString()} 金</div></div><button class="mini o" data-sellg="${k}">全部賣出</button></div>`; }).join('')
     + `<button class="btn o" id="sellGoods" style="width:100%;margin-top:6px">賣出全部牧場產品（${total.toLocaleString()} 金）</button>`;
 }
 
@@ -7250,6 +7251,7 @@ async function openBag(){
     if(r){ sfx('coin'); toast(`賣出 ${CROP[id].name}，獲得 ${r.amt} 金`); openBag(); }
   });
   if($('sellGoods')) $('sellGoods').onclick=()=>ranchAct('sell_goods');
+  $('md').querySelectorAll('[data-sellg]').forEach(b=>b.onclick=()=>ranchAct('sell_good', null, b.dataset.sellg));
   $('md').querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{ ui.seed=b.dataset.use; setTool('seed'); closeModal(); toast(`點空地就能種下${CROP[ui.seed].name}`); });
 }
 async function openHome(){

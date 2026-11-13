@@ -372,6 +372,7 @@ async function openBag(){
     if(r){ sfx('coin'); toast(`賣出 ${CROP[id].name}，獲得 ${r.amt} 金`); openBag(); }
   });
   if($('sellGoods')) $('sellGoods').onclick=()=>ranchAct('sell_goods');
+  $('md').querySelectorAll('[data-sellg]').forEach(b=>b.onclick=()=>ranchAct('sell_good', null, b.dataset.sellg));
   $('md').querySelectorAll('[data-use]').forEach(b=>b.onclick=()=>{ ui.seed=b.dataset.use; setTool('seed'); closeModal(); toast(`點空地就能種下${CROP[ui.seed].name}`); });
 }
 async function openHome(){

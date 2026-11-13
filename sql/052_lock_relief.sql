@@ -17,3 +17,5 @@ end $$;
 revoke execute on function public._tick_try(uuid) from public, anon, authenticated;
 -- farm_neighbors / farm_friends / _tick_all 內的 _tick(其他玩家) 改成 _tick_try(...)
 -- _bot_run 開頭加 set_config('lock_timeout','300ms',true)
+
+-- 053：牧場產品可以單項賣出（farm_ranch_act 新增動作 'sell_good'，p_kind = 產品 id，賣掉該產品全部數量）
