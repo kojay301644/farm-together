@@ -39,8 +39,8 @@ end $$;
 -- 方案：鑽石（每個方案第一次買鑽石加倍）、月卡、新手禮包（禮包內容在 packs 表，後台可改）
 create or replace function public.pay_pkg(p_pkg text) returns jsonb language sql stable set search_path to 'public' as $$
   select case p_pkg
-    when 'g30'    then '{"nt":30,"g":60,"name":"小袋鑽石"}'::jsonb
-    when 'g150'   then '{"nt":150,"g":330,"name":"中袋鑽石"}'::jsonb
+    when 'g100'   then '{"nt":100,"g":200,"name":"小袋鑽石"}'::jsonb
+    when 'g290'   then '{"nt":290,"g":640,"name":"中袋鑽石"}'::jsonb
     when 'g490'   then '{"nt":490,"g":1150,"name":"大袋鑽石"}'::jsonb
     when 'g990'   then '{"nt":990,"g":2500,"name":"超值鑽石"}'::jsonb
     when 'month'  then (select jsonb_build_object('nt', price_twd, 'g', 0, 'name', name, 'pack', true) from packs where id = 'month')
@@ -126,9 +126,8 @@ begin
     msg := '「' || pk.name || '」已送達：' || coalesce(pk.descr, '');
   else
     insert into pay_first(uid, pkg) values (o.uid, o.pkg) on conflict do nothing; fst := found;
-    if fst then b := o.g; end if;
     perform _grant(o.uid, jsonb_build_object('gems', o.g + b));
-    msg := '💎' || (o.g + b) || ' 已存入你的帳號' || case when fst then '（含首儲加倍）' else '' end;
+    msg := '💎' || (o.g + b) || ' 已存入你的帳號';
   end if;
   if first_ever then
     select * into pk from packs where id = 'first';

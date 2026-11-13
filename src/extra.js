@@ -206,8 +206,8 @@ async function invite(){
 
 /* ================= 儲值：郵局轉帳（自動對帳）＋超商代碼（金流） ================= */
 const GEM_PACKS = [
-  {id:'g30', name:'小袋鑽石', price:30, gems:60},
-  {id:'g150', name:'中袋鑽石', price:150, gems:330, extra:'多 10%'},
+  {id:'g100', name:'小袋鑽石', price:100, gems:200},
+  {id:'g290', name:'中袋鑽石', price:290, gems:640, extra:'多 10%'},
   {id:'g490', name:'大袋鑽石', price:490, gems:1150, extra:'多 17%'},
   {id:'g990', name:'超值鑽石', price:990, gems:2500, extra:'多 26%'},
 ];
@@ -222,7 +222,7 @@ async function openTopup(){
   try{ const {data:{user}} = await sb.auth.getUser(); if(user && user.is_anonymous)
     return modal('💎 儲值', `<div style="text-align:center;font-weight:800;line-height:1.8">試玩帳號不能儲值<br><small style="color:var(--ink2)">先綁定帳號，進度和買的東西才不會不見</small></div>`, [['之後再說','sub',closeModal],['🔒 綁定帳號','',()=>openBind()]]); }catch(e){}
   const M = await payMine();
-  const me=S.me, now=Date.now()+(S.off||0), P=(window.PACKS||[]), got=me.packs||{}, firsts=M.firsts||[];
+  const me=S.me, now=Date.now()+(S.off||0), P=(window.PACKS||[]), got=me.packs||{};
   const newbieOk = !got.newbie && (+me.created||0) > now - 7*86400000, firstOk = !got.first, mLeft = me.month_until && +me.month_until>now ? Math.ceil((+me.month_until-now)/86400000) : 0;
   const pk = id => P.find(x=>x.id===id) || {};
   let body = M.open ? '' : `<div class="soon">💎 儲值暫停中，請稍後再來</div>`;
@@ -232,13 +232,13 @@ async function openTopup(){
     <div class="pkd">${esc(pk('month').descr||'')}</div></div>`;
   if(newbieOk) body += `<div class="gemcard pack" style="background:#EFFAF2;cursor:pointer" onclick="payPick('newbie')"><div class="bonus">限時</div><div style="font-weight:900">${esc(pk('newbie').name)}　NT$${pk('newbie').price_twd}</div><div class="pkd">${esc(pk('newbie').descr)}</div></div>`;
   if(firstOk) body += `<div class="gemcard pack" style="background:#FFF6E5"><div class="bonus">首儲</div><div style="font-weight:900">${esc(pk('first').name)}</div><div class="pkd">${esc(pk('first').descr)}<br>第一次儲值任何方案就會自動送</div></div>`;
-  body += `<div class="gemgrid">${GEM_PACKS.map(p=>{ const dbl=!firsts.includes(p.id); return `<div class="gemcard" style="cursor:pointer" onclick="payPick('${p.id}')">${dbl?'<div class="bonus">首儲 ×2</div>':''}<div>💎</div><b>${(dbl?p.gems*2:p.gems).toLocaleString()}</b>${dbl?`<div style="font-size:11px;color:var(--ink2);text-decoration:line-through">${p.gems.toLocaleString()}</div>`:''}<div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`; }).join('')}</div>`;
-  body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center;line-height:1.7">每個方案第一次購買，鑽石加倍送<br>付款方式：🏤 郵局 / 銀行轉帳${M.cvs?'、🏪 超商代碼':''}</div>`;
+  body += `<div class="gemgrid">${GEM_PACKS.map(p=>`<div class="gemcard" style="cursor:pointer" onclick="payPick('${p.id}')"><div>💎</div><b>${p.gems.toLocaleString()}</b><div style="font-size:12px;color:var(--ink2);font-weight:700">NT$${p.price}${p.extra?`・${p.extra}`:''}</div></div>`).join('')}</div>`;
+  body += `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin-top:10px;text-align:center;line-height:1.7">付款方式：🏤 郵局 / 銀行轉帳${M.cvs?'、🏪 超商代碼':''}</div>`;
   if((M.orders||[]).length) body += `<div style="text-align:center;margin-top:8px"><button class="btn sub" style="font-size:12px;padding:6px 14px" onclick="payHist()">📜 我的儲值紀錄</button></div>`;
   modal(`💎 儲值　<span style="font-size:14px;color:#5B4ED6">目前 💎 ${(me.gems||0).toLocaleString()}</span>`, body);
 }
 function payPkgInfo(id){
-  const g = GEM_PACKS.find(p=>p.id===id); if(g) return {id, name:g.name, nt:g.price, desc:`💎 ${g.gems.toLocaleString()}${(PAY.mine&&PAY.mine.firsts||[]).includes(id)?'':`（首儲加倍 → 💎 ${(g.gems*2).toLocaleString()}）`}`};
+  const g = GEM_PACKS.find(p=>p.id===id); if(g) return {id, name:g.name, nt:g.price, desc:`💎 ${g.gems.toLocaleString()}`};
   const p = (window.PACKS||[]).find(x=>x.id===id) || {}; return {id, name:p.name||id, nt:p.price_twd||0, desc:p.descr||''};
 }
 function payPick(id){

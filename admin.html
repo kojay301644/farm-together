@@ -93,7 +93,7 @@ async function boot(){
 }
 /* ================= 💳 儲值：訂單、補查金流、手動入帳、郵局入帳通知 ================= */
 const PYS = {wait:'⏳ 待付款', paid:'✅ 已入帳', expired:'⌛ 逾時', cancel:'取消', fail:'❌ 建立失敗', short:'⚠️ 金額不足', new:'建立中'};
-const PYK = {g30:'💎60', g150:'💎330', g490:'💎1150', g990:'💎2500', month:'🗓️ 月卡', newbie:'🎁 新手禮包'};
+const PYK = {g100:'💎200', g290:'💎640', g490:'💎1150', g990:'💎2500', g30:'💎60(舊)', g150:'💎330(舊)', month:'🗓️ 月卡', newbie:'🎁 新手禮包'};
 const PMS = {new:'新', paid:'✅ 已入帳', manual:'⚠️ 待人工'};
 let pyQ = '', pyView = 'ord';
 async function pyBadge(){ try{ const L = await rpc('adm_post_list'); const n=L.filter(x=>x.status==='manual').length; $('pyBad').textContent = n ? n : ''; }catch(e){} }
@@ -115,7 +115,7 @@ async function pagePay(){
       <table class="tb" style="width:100%;margin-top:10px;font-size:13px"><tr><th>時間</th><th>玩家</th><th>方案</th><th>金額</th><th>方式</th><th>狀態</th><th>操作</th></tr>
       ${O.map(o=>`<tr><td>${dt(Date.parse(o.created))}<div class="muted" style="font-size:11px">${esc(o.id)}</div></td>
         <td><a href="#" data-pid="${o.uid}">${esc(o.name)}</a></td>
-        <td>${PYK[o.pkg]||esc(o.pkg)}${o.bonus?`<div class="muted" style="font-size:11px">首儲 +💎${o.bonus}</div>`:''}</td>
+        <td>${PYK[o.pkg]||esc(o.pkg)}</td>
         <td>NT$${o.nt}${o.paid_amt!=null&&o.paid_amt!==o.nt?`<div style="color:#D3403A;font-size:11px">實付 ${o.paid_amt}</div>`:''}</td>
         <td>${o.method==='post'?'🏤 轉帳':'🏪 超商'}<div class="muted" style="font-size:11px">${o.method==='post'?'末5碼 '+esc(o.payer||''):esc(o.payer||'')}</div></td>
         <td>${o.credited?'✅ 已入帳':(PYS[o.status]||esc(o.status))}${o.manual?`<div class="muted" style="font-size:11px">✋ 手動：${esc(o.mnote||'')}</div>`:''}${o.err&&!o.credited?`<div class="muted" style="font-size:11px">${esc(o.err)}</div>`:''}${o.paid_at?`<div class="muted" style="font-size:11px">${dt(Date.parse(o.paid_at))}</div>`:''}</td>
