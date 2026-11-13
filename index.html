@@ -1185,22 +1185,23 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794584165" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794584253" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794584165" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794584165" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794584253" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794584253" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794584165" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794584253" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794584165" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794584165" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794584253" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794584253" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 132px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
+  <button class="sidebtn dot" id="bInv" style="top:calc(100% + 198px);height:62px"><span style="font-size:24px;line-height:26px">💌</span><small style="font-size:10px;line-height:1.15;text-align:center">好友邀請<br>任務</small></button>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1217,11 +1218,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794584165" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794584253" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794584165";
+const BUILD="1794584253";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2334,7 +2335,7 @@ async function invite(){
     <div class="sec">我邀請的朋友（${(I.list||[]).length}）</div>${rows || '<div class="empty">還沒有朋友填你的邀請碼</div>'}`;
   if(I.can_use) body += `<div class="sec">朋友邀請你來的嗎？</div><div style="display:flex;gap:6px"><input id="refIn" maxlength="8" placeholder="輸入朋友的邀請碼" style="flex:1;text-transform:uppercase;padding:10px;border:2px solid #DDD;border-radius:12px;font-size:16px"><button class="btn" id="refUse">送出</button></div><div style="font-size:12px;color:var(--ink2);margin-top:4px">註冊 7 天內可以填一次${I.anon?'（試玩帳號要先綁定帳號）':''}</div>`;
   else if(I.used_by) body += `<div style="font-size:12px;color:var(--ink2);margin-top:10px;text-align:center">你是被「${esc(I.used_by)}」邀請來的 🌱</div>`;
-  modal('💌 邀請朋友', body);
+  modal('💌 好友邀請任務', body);
   $('refShare').onclick = async()=>{
     if(navigator.share){ try{ await navigator.share({title:'一起種田吧', text, url:link}); return; }catch(e){ if(e && e.name==='AbortError') return; } }
     copyText(text + '\n' + link, '邀請訊息已複製，貼給朋友吧！');
@@ -7305,7 +7306,7 @@ async function openSettings(){
     <div class="sec">遊戲設定</div>
     <div class="seg" style="margin-top:6px"><button id="tBgm" class="${BGM_ON?'on':''}">🎵 音樂</button><button id="tSfx" class="${SFX_ON?'on':''}">🔊 音效</button><button id="tVib" class="${VIB_ON?'on':''}">📳 震動</button><button id="tLow" class="${LOWFX?'on':''}">🔋 省電模式</button></div>
     <div class="rhint">手機容易發燙或耗電快，可以開「🔋 省電模式」：畫面更新變慢、關掉裝飾動畫和大部分特效</div>
-    <div class="homebtns"><button class="btn o" id="sA2hs">📱 加到桌面</button><button class="btn sub" id="sInv">💌 邀請朋友</button></div>
+    <div class="homebtns"><button class="btn o" id="sA2hs">📱 加到桌面</button></div>
     ${pushBoxHTML()}
     <div class="sec">🐞 回報問題</div><div class="homebtns"><button class="btn sub" id="sRep">🐞 回報問題／建議</button><button class="btn sub" id="sRepMine">📋 我的回報</button></div>
     <div class="sec">兌換碼</div><div class="redeem"><input id="rCode" placeholder="輸入兌換碼" maxlength="20" autocomplete="off"><button class="btn" id="rGo">兌換</button></div>`;
@@ -7321,7 +7322,7 @@ async function openSettings(){
   $('tSfx').onclick = ()=>{ SFX_ON=!SFX_ON; SETPREF('sfx',SFX_ON); if(SFX_ON) sfx('coin'); openSettings(); };
   $('tVib').onclick = ()=>{ VIB_ON=!VIB_ON; SETPREF('vib',VIB_ON); vib(30); openSettings(); };
   $('tLow').onclick = ()=>{ LOWFX=!LOWFX; LOW_AUTO=false; SETPREF('low',LOWFX); document.body.classList.toggle('lowfx',LOWFX); openSettings(); };
-  $('sInv').onclick = invite; $('sA2hs').onclick = openA2HS;
+  $('sA2hs').onclick = openA2HS;
   $('rGo').onclick = async()=>{ const c=$('rCode').value.trim(); if(!c) return toast('請輸入兌換碼');
     try{ const r=await rpc('farm_redeem',{p_code:c}); applyState(r.state); refresh(); sfx('lvup'); fxConfetti(); closeModal(); modal('🎁 兌換成功！', `<div class="rwbox">${rewardHTML(r.reward)}</div>`); if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } };
   if($('sBind')) $('sBind').onclick = openBind;
@@ -7542,7 +7543,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bInv').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -7689,6 +7690,8 @@ function startGame(st){
   setTimeout(refAutoUse, 2000);
 }
 
+$('bInv').onclick = ()=>{ $('bInv').classList.remove('dot'); try{ localStorage.setItem('farm_inv_seen','1'); }catch(e){} invite(); };
+try{ if(localStorage.getItem('farm_inv_seen')) $('bInv').classList.remove('dot'); }catch(e){}
 $('authBtn').onclick = doAuth;
 $('tryBtn').onclick = async()=>{ const b=$('tryBtn'); b.disabled=true;
   try{ const {error} = await sb.auth.signInAnonymously(); if(error) authMsg(zhErr(error.message)); }

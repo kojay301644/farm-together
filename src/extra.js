@@ -222,7 +222,7 @@ async function invite(){
     <div class="sec">我邀請的朋友（${(I.list||[]).length}）</div>${rows || '<div class="empty">還沒有朋友填你的邀請碼</div>'}`;
   if(I.can_use) body += `<div class="sec">朋友邀請你來的嗎？</div><div style="display:flex;gap:6px"><input id="refIn" maxlength="8" placeholder="輸入朋友的邀請碼" style="flex:1;text-transform:uppercase;padding:10px;border:2px solid #DDD;border-radius:12px;font-size:16px"><button class="btn" id="refUse">送出</button></div><div style="font-size:12px;color:var(--ink2);margin-top:4px">註冊 7 天內可以填一次${I.anon?'（試玩帳號要先綁定帳號）':''}</div>`;
   else if(I.used_by) body += `<div style="font-size:12px;color:var(--ink2);margin-top:10px;text-align:center">你是被「${esc(I.used_by)}」邀請來的 🌱</div>`;
-  modal('💌 邀請朋友', body);
+  modal('💌 好友邀請任務', body);
   $('refShare').onclick = async()=>{
     if(navigator.share){ try{ await navigator.share({title:'一起種田吧', text, url:link}); return; }catch(e){ if(e && e.name==='AbortError') return; } }
     copyText(text + '\n' + link, '邀請訊息已複製，貼給朋友吧！');
