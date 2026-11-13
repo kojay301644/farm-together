@@ -208,20 +208,29 @@ async function invite(){
   const link = `${GAME_URL}?r=${I.code}`;
   const text = `我在玩「一起種田吧」🌱 種菜、偷菜、養寵物的小島種田遊戲！用我的邀請碼「${I.code}」一起來玩，註冊就送 💎30＋金蘋果種子～`;
   const rows = (I.list||[]).map(x=>`<div class="row"><div class="tx"><b>${esc(x.name||'新朋友')}</b> <span class="tag">Lv${x.lv}</span><div>${x.s2?'✅':'⬜'} 升到 Lv5　${x.s3?'✅':'⬜'} 升到 Lv10</div></div></div>`).join('');
-  const ach = [[3,'稱號「招募農夫」'],[10,'頭像框「招募之星框」'],[20,'稱號「傳奇村長」＋💎300']].map(([n,t])=>`<div>${I.lv5>=n?'✅':'⬜'} ${n} 位好友升到 Lv5：${t}</div>`).join('');
-  let body = `<div style="text-align:center"><div style="font-size:13px;color:var(--ink2);font-weight:700">我的邀請碼</div>
-    <div style="font-size:34px;font-weight:900;letter-spacing:6px;color:#2E9660;margin:4px 0">${esc(I.code)}</div>
-    <div class="homebtns"><button class="btn o" id="refShare">📤 分享邀請連結</button><button class="btn sub" id="refCopy">複製邀請碼</button></div></div>
-    <div class="sec">邀請獎勵</div>
-    <div style="font-size:13px;line-height:1.9;font-weight:600">
-      <div>🎁 朋友填了你的邀請碼：<b>你 💎20</b>・朋友 💎30＋金蘋果種子 ×3，自動成為好友</div>
-      <div>🌱 朋友升到 Lv5：<b>你 💎50</b>・朋友 豐收卡 ×2</div>
-      <div>🌾 朋友升到 Lv10：<b>你 💎100＋彩虹玉米種子 ×3</b>・朋友 💎50</div>
-      <div style="color:var(--ink2);font-size:12px">獎勵會寄到禮物信箱。朋友要綁定帳號、在註冊 7 天內填碼才算；邀請獎勵每人最多算 30 位朋友。</div></div>
-    <div class="sec">邀請成就（已有 ${I.lv5} 位好友升到 Lv5）</div><div style="font-size:13px;line-height:1.9;font-weight:600">${ach}</div>
-    <div class="sec">我邀請的朋友（${(I.list||[]).length}）</div>${rows || '<div class="empty">還沒有朋友填你的邀請碼</div>'}`;
-  if(I.can_use) body += `<div class="sec">朋友邀請你來的嗎？</div><div style="display:flex;gap:6px"><input id="refIn" maxlength="8" placeholder="輸入朋友的邀請碼" style="flex:1;text-transform:uppercase;padding:10px;border:2px solid #DDD;border-radius:12px;font-size:16px"><button class="btn" id="refUse">送出</button></div><div style="font-size:12px;color:var(--ink2);margin-top:4px">註冊 7 天內可以填一次${I.anon?'（試玩帳號要先綁定帳號）':''}</div>`;
-  else if(I.used_by) body += `<div style="font-size:12px;color:var(--ink2);margin-top:10px;text-align:center">你是被「${esc(I.used_by)}」邀請來的 🌱</div>`;
+  const task = (done, title, rw, prog) => `<div class="row" style="${done?'background:#F1FAF2':''}"><div class="ic" style="display:grid;place-items:center;font-size:24px">${done?'✅':'🎯'}</div>
+    <div class="tx"><b>${title}</b><div>獎勵：${rw}</div></div><span class="tag" style="white-space:nowrap;${done?'background:#DFF5E5;color:#14733C':''}">${prog}</span></div>`;
+  const rep = n => n ? `已完成 ${n} 次` : '可重複';
+  let body = `<div style="background:#FFF6E5;border-radius:14px;padding:10px 12px;font-size:13px;font-weight:700;line-height:1.7;margin-bottom:8px">🌱 找朋友一起種田才好玩！把邀請碼分享給朋友，朋友填了以後一起升級，雙方都有獎勵，獎勵會寄到禮物信箱。</div>
+    <div class="sec">📋 邀請任務（每位朋友都算一次）</div>
+    ${task(false,'邀請 1 位朋友填你的邀請碼','你 💎20・朋友 💎30＋金蘋果種子 ×3', rep(I.n1))}
+    ${task(false,'你邀請的朋友升到 Lv5','你 💎50・朋友 豐收卡 ×2', rep(I.lv5))}
+    ${task(false,'你邀請的朋友升到 Lv10','你 💎100＋彩虹玉米種子 ×3・朋友 💎50', rep(I.lv10))}
+    <div class="sec">🏅 累積成就（好友升到 Lv5 的人數）</div>
+    ${task(I.lv5>=3,'3 位好友升到 Lv5','永久稱號「招募農夫」', `${Math.min(I.lv5,3)}/3`)}
+    ${task(I.lv5>=10,'10 位好友升到 Lv5','永久頭像框「招募之星框」', `${Math.min(I.lv5,10)}/10`)}
+    ${task(I.lv5>=20,'20 位好友升到 Lv5','永久稱號「傳奇村長」＋💎300', `${Math.min(I.lv5,20)}/20`)}`;
+  if(I.used_by) body += `<div class="sec">🌱 新人任務（你是被「${esc(I.used_by)}」邀請來的）</div>
+    ${task(true,'填好友的邀請碼','💎30＋金蘋果種子 ×3','完成')}
+    ${task(I.my_s2,'自己升到 Lv5','豐收卡 ×2', I.my_s2?'完成':`Lv${I.my_lv}/5`)}
+    ${task(I.my_s3,'自己升到 Lv10','💎50', I.my_s3?'完成':`Lv${I.my_lv}/10`)}`;
+  body += `<div class="sec">📤 我的邀請碼</div><div style="text-align:center">
+    <div style="font-size:34px;font-weight:900;letter-spacing:6px;color:#2E9660;margin:2px 0">${esc(I.code)}</div>
+    <div class="homebtns"><button class="btn o" id="refShare">📤 分享邀請連結</button><button class="btn sub" id="refCopy">複製邀請碼</button></div>
+    <div style="font-size:12px;color:var(--ink2);margin-top:4px">朋友點你的連結註冊，會自動填好邀請碼</div></div>`;
+  if(I.can_use) body += `<div class="sec">✍️ 朋友邀請你來的嗎？</div><div style="display:flex;gap:6px"><input id="refIn" maxlength="8" placeholder="輸入朋友的邀請碼" style="flex:1;text-transform:uppercase;padding:10px;border:2px solid #DDD;border-radius:12px;font-size:16px"><button class="btn" id="refUse">送出</button></div><div style="font-size:12px;color:var(--ink2);margin-top:4px">註冊 7 天內可以填一次，填了就能做新人任務${I.anon?'（試玩帳號要先綁定帳號）':''}</div>`;
+  body += `<div class="sec">👥 我邀請的朋友（${(I.list||[]).length}）</div>${rows || '<div class="empty">還沒有朋友填你的邀請碼，快分享出去吧！</div>'}
+    <div style="font-size:12px;color:var(--ink2);margin-top:8px;line-height:1.7">・朋友要綁定帳號，並在註冊 7 天內填碼才算<br>・填碼前就已經達到的等級不會補發<br>・邀請獎勵每人最多算 30 位朋友，成就不受限制</div>`;
   modal('💌 好友邀請任務', body);
   $('refShare').onclick = async()=>{
     if(navigator.share){ try{ await navigator.share({title:'一起種田吧', text, url:link}); return; }catch(e){ if(e && e.name==='AbortError') return; } }
