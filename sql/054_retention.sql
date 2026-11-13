@@ -76,7 +76,7 @@ select _day_mark(uid, 'g_run', 1, started) from run_sess;
 select _day_mark(uid, 'g_match', 1, started) from match_sess;
 select _day_mark(k::uuid, 'c_' || coalesce(game,'mj'), 1, created_at) from mj_log, jsonb_object_keys(coalesce(pay,'{}'::jsonb)) k where k ~ '^[0-9a-f-]{36}$';
 select _day_mark(thief, 'steal', 1, created_at) from steals;
-select _day_mark(actor, kind, 1, created_at) from farm_logs where actor is not null;
+select _day_mark(actor, kind, 1, created_at) from farm_logs where actor is not null and kind <> 'steal';
 
 -- 後台：回流總覽（最近 p_days 天）
 create or replace function public.adm_retention(p_days int default 14) returns jsonb language plpgsql security definer set search_path to 'public' as $$
@@ -84,7 +84,7 @@ declare a uuid := _adm(); today date := _tpe_day();
 begin
   return jsonb_build_object(
     'days', coalesce((select jsonb_agg(x order by x.d desc) from (
-      select dd::date d,
+      select dd d,
         (select count(*) from farm_days f where f.d = dd) dau,
         (select count(*) from players p where _tpe_day(p.created_at) = dd and not exists (select 1 from bots b where b.id = p.id)) new_users,
         (select count(*) from farm_days f join players p on p.id = f.uid where f.d = dd and _tpe_day(p.created_at) < dd
@@ -92,7 +92,7 @@ begin
         (select count(*) from farm_days f join players p on p.id = f.uid where f.d = dd and _tpe_day(p.created_at) < dd
            and exists (select 1 from farm_days g where g.uid = f.uid and g.d = dd - 1)) stay,
         (select coalesce(sum(nt), 0) from pay_orders o where o.credited and _tpe_day(o.paid_at) = dd) revenue
-      from generate_series(today - (p_days - 1), today, interval '1 day') dd) x), '[]'::jsonb),
+      from (select today - g dd from generate_series(0, p_days - 1) g) gs) x), '[]'::jsonb),
     'cohorts', coalesce((select jsonb_agg(c order by c.d desc) from (
       select cd d, count(*) n,
         count(*) filter (where exists (select 1 from farm_days f where f.uid = p.id and f.d = cd + 1)) d1,
