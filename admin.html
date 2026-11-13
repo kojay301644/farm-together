@@ -60,7 +60,7 @@ button.ok{background:#3BB273!important;color:#fff!important}button.bad{backgroun
 <body>
 <header><h1>🌱 一起種田吧｜營運後台</h1><span class="who" id="who"></span><a href="./" target="_blank">開啟遊戲</a></header>
 <nav id="nav" style="display:none">
-  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="rt">📈 回流</button><button data-t="rl">🧑 真人玩家 <span class="nbad" id="rlBad" style="background:#1E9E55"></span></button><button data-t="pl">玩家管理</button><button data-t="cs">🎰 娛樂廳</button><button data-t="py">💳 儲值 <span class="nbad" id="pyBad"></span></button><button data-t="nt">公告</button>
+  <button data-t="ov" class="on">總覽</button><button data-t="rp">🐞 回報 <span class="nbad" id="rpBad"></span></button><button data-t="rt">📈 回流</button><button data-t="rf">💌 邀請</button><button data-t="rl">🧑 真人玩家 <span class="nbad" id="rlBad" style="background:#1E9E55"></span></button><button data-t="pl">玩家管理</button><button data-t="cs">🎰 娛樂廳</button><button data-t="py">💳 儲值 <span class="nbad" id="pyBad"></span></button><button data-t="nt">公告</button>
   <button data-t="cf">遊戲數值</button><button data-t="cl">更新紀錄</button><button data-t="gf">發獎／兌換碼</button><button data-t="ev">活動／維護</button><button data-t="bt">電腦玩家</button><button data-t="lg">操作紀錄</button>
 </nav>
 <main id="main"><div class="center"><div class="muted">讀取中…</div></div></main>
@@ -122,6 +122,22 @@ async function pageRt(){
   document.querySelectorAll('[data-day]').forEach(r=>r.onclick=()=>{ rtDay = r.dataset.day===today.d?null:r.dataset.day; pageRt(); });
   $('rtGo').onclick=()=>{ const v=$('rtD').value; rtDay = (!v||v===today.d)?null:v; pageRt(); };
   if($('rtToday')) $('rtToday').onclick=()=>{ rtDay=null; pageRt(); };
+  document.querySelectorAll('[data-pid]').forEach(a=>a.onclick=e=>{ e.preventDefault(); showPlayer(a.dataset.pid); });
+}
+/* ================= 💌 好友邀請統計 ================= */
+async function pageRf(){
+  M(`<div class="card"><div class="muted">讀取中…</div></div>`);
+  let R; try{ R = await rpc('adm_ref_stats'); }catch(e){ return M(`<div class="card">讀取失敗：${esc(e.message)}</div>`); }
+  const dt = s => s ? new Date(s).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}) : '—';
+  const cards = `<div class="grid">${rst(R.total,'總共填碼人數')}${rst(R.today,'今天填碼')}${rst(R.inviters,'有邀請到人的玩家')}${rst(R.lv5,'被邀請者到 Lv5')}${rst(R.lv10,'被邀請者到 Lv10')}${rst('💎'+R.gems.toLocaleString(),'已送出鑽石（雙方合計）')}</div>`;
+  const daily = `<table class="tb" style="width:100%;font-size:13px;margin-top:8px"><tr><th>日期</th><th>填碼</th><th>到 Lv5</th><th>到 Lv10</th></tr>${R.daily.map(x=>`<tr><td>${x.d.slice(5)}</td><td><b>${x.n||'—'}</b></td><td>${x.lv5||'—'}</td><td>${x.lv10||'—'}</td></tr>`).join('')}</table>`;
+  const rank = R.rank.length ? `<table class="tb" style="width:100%;font-size:13px;margin-top:8px"><tr><th>#</th><th>邀請人</th><th>邀請</th><th>到 Lv5</th><th>到 Lv10</th></tr>${R.rank.map((r,i)=>`<tr><td>${i+1}</td><td><a href="#" data-pid="${r.id}"><b>${esc(r.nickname||'（未取名）')}</b></a> <span class="muted">Lv${r.lv}</span><div class="muted" style="font-size:12px;margin-top:2px">${r.friends.map(f=>`${esc(f.nickname||'（未取名）')} Lv${f.lv}`).join('、')}</div></td><td><b>${r.n}</b></td><td>${r.lv5}</td><td>${r.lv10}</td></tr>`).join('')}</table>` : '<div class="muted">還沒有人邀請成功</div>';
+  const list = R.list.length ? `<table class="tb" style="width:100%;font-size:13px;margin-top:8px"><tr><th>被邀請玩家</th><th>等級</th><th>填碼時間</th><th>邀請人</th><th>最後上線</th></tr>${R.list.map(p=>`<tr><td><a href="#" data-pid="${p.id}"><b>${esc(p.nickname||'（未取名）')}</b></a></td><td>Lv${p.lv}${p.lv>=10?' 🌾':p.lv>=5?' 🌱':''}</td><td>${dt(p.at)}</td><td><a href="#" data-pid="${p.inviter_id}">${esc(p.inviter||'（未取名）')}</a></td><td>${dt(p.last_seen)}</td></tr>`).join('')}</table>` : '<div class="muted">還沒有人填邀請碼</div>';
+  M(`<div id="pdet"></div><div class="card"><h2>💌 好友邀請統計</h2>${cards}
+    <div class="muted" style="margin-top:6px;line-height:1.7">已送出鑽石＝填碼（邀請人 💎20＋朋友 💎30）＋到 Lv5（邀請人 💎50）＋到 Lv10（邀請人 💎100＋朋友 💎50）＋20 人成就 💎300。</div></div>
+    <div class="card"><h2>🏆 邀請排行榜</h2><div class="muted">灰字是他邀請的朋友和目前等級</div>${rank}</div>
+    <div class="card"><h2>📅 每日趨勢 <span class="muted" style="font-size:13px;font-weight:600">最近 14 天</span></h2>${daily}</div>
+    <div class="card"><h2>👥 被邀請玩家名單 <span class="muted" style="font-size:13px;font-weight:600">${R.list.length} 人</span></h2>${list}</div>`);
   document.querySelectorAll('[data-pid]').forEach(a=>a.onclick=e=>{ e.preventDefault(); showPlayer(a.dataset.pid); });
 }
 /* ================= 🧑 真人玩家（不含電腦），誰在線上 ================= */
@@ -337,7 +353,7 @@ function showLogin(){
   $('li').onclick = async()=>{ const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('pw').value}); if(error) return toast('登入失敗：'+error.message); location.reload(); };
   $('gl').onclick = ()=>sb.auth.signInWithOAuth({provider:'google', options:{redirectTo: location.origin+location.pathname}});
 }
-function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({rt:pageRt,rl:pageRl,py:pagePay,rp:pageRp,cs:pageCs,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
+function go(t){ tab=t; document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t)); ({rf:pageRf,rt:pageRt,rl:pageRl,py:pagePay,rp:pageRp,cs:pageCs,ov:pageOv,pl:pagePl,nt:pageNt,cf:pageCf,cl:pageCl,gf:pageGf,ev:pageEv,bt:pageBt,lg:pageLg})[t](); }
 const M = h => $('main').innerHTML = h;
 
 /* 總覽 */
