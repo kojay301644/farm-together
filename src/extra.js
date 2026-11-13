@@ -1,6 +1,6 @@
 
 /* ================= 新手教學 ================= */
-const GAME_URL = 'https://kojay301644.github.io/farm-together/';
+const GAME_URL = 'https://farm.cutebeastplanet.com/';
 const bEl = id => document.querySelector(`[data-b="${id}"]`);
 const TUT_STEPS = [
   {text:'歡迎來到你的農場！先點一塊<b>空地</b>，選「白蘿蔔」種下去吧 🌱', target:()=>plotEls[S.plots.findIndex(p=>p.s==='empty'||p.s==='grow')], done:()=>S.plots.some(p=>p.s==='grow'), next:true},
