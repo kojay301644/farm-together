@@ -189,11 +189,12 @@ const HOLD = (() => {
         return { a: o.canCheck ? 'check' : 'call' };
       }
       if (o.canCheck) return { a: 'check' };
-      if (facing > 8) {   // 面對全下或超大注：算勝率對底池賠率；對方最近常亂推就放寬
+      if (facing > 8) {   // 面對全下或超大注：算勝率對底池賠率；對方最近 12 手推了 3 次以上才放寬（但爛牌照樣丟）
         const sh = G.seats.find(q => q && q.inHand && !q.folded && q.bet === G.curBet);
         const n = sh ? ((G.shv || {})[sh.id || G.seats.indexOf(sh)] || []).filter(h => h > G.handNo - 12).length : 0;
-        const wild = n >= 2, eqp = equity(p.hole, [], 1, 400);
-        const need = wild ? Math.max(odds + 0.01, 0.45) : Math.max(odds + 0.12, 0.6);
+        const callers = G.seats.filter((q, i) => i !== si && q && q.inHand && !q.folded && q !== sh && q.bet >= G.curBet).length;   // 已經有人跟了：要更好的牌
+        const wild = n >= 3, eqp = equity(p.hole, [], 1, 500);
+        const need = (wild ? Math.max(odds + 0.06, 0.55) : Math.max(odds + 0.12, 0.62)) + callers * 0.08;
         return { a: eqp > need ? 'call' : 'fold' };
       }
       if (sc >= 15 && facing <= 3) return { a: 'call' };
