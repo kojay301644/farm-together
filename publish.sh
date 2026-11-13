@@ -7,4 +7,4 @@ cp index.html admin.html privacy.html manifest.json sw.js supabase.js robots.txt
 cp -r assets guide public/
 cp _headers public/
 # 娛樂廳伺服器程式（Supabase 部署時讀取，路徑不公開、不列出）
-mkdir -p public/se2d1f464f9ecbfc2aa18fb0a && cp server/mahjong/*.ts server/mahjong/*.mjs public/se2d1f464f9ecbfc2aa18fb0a/
+mkdir -p public/se2d1f464f9ecbfc2aa18fb0a && cp server/dist/*.js public/se2d1f464f9ecbfc2aa18fb0a/
