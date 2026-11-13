@@ -415,7 +415,7 @@ body.lowfx #map .bob, body.lowfx #map .cloud, body.lowfx #map [class*="spark"], 
 /* 頭像框（萌獸星球） */
 .avimg.fr{border-radius:50%}
 .fr.f1{box-shadow:0 0 0 3px #c4824e}.fr.f2{box-shadow:0 0 0 3px #c8d4e8,0 0 0 5px #8a98ad}.fr.f3{box-shadow:0 0 0 3px #ffd84a,0 0 0 5px #c08a10,0 0 10px #ffd84a}
-.fr.f4{box-shadow:0 0 0 3px #8ad0ff,0 0 0 5px #3a7aff,0 0 14px #4a8cff;animation:frg 2s ease-in-out infinite}.fr.f5{box-shadow:0 0 0 3px #ffe27a,0 0 0 6px #a95cff,0 0 18px #c87aff;animation:frg 1.6s ease-in-out infinite}
+.fr.f4{box-shadow:0 0 0 3px #8ad0ff,0 0 0 5px #3a7aff,0 0 14px #4a8cff;animation:frg 2s ease-in-out infinite}.fr.f_ref{box-shadow:0 0 0 3px #7FD86A,0 0 0 6px #2E9660,0 0 14px #FFD84A;animation:frg 1.8s ease-in-out infinite}.fr.f5{box-shadow:0 0 0 3px #ffe27a,0 0 0 6px #a95cff,0 0 18px #c87aff;animation:frg 1.6s ease-in-out infinite}
 @keyframes frg{50%{filter:brightness(1.15)}}
 .ttl{display:inline-block;margin-left:4px;padding:0 7px;border-radius:999px;font-size:11px;font-weight:900;color:#fff;background:linear-gradient(90deg,#FF9F43,#F2545B);vertical-align:middle;line-height:18px}
 .ttl.big{font-size:13px;line-height:24px;padding:0 10px;margin:0}
@@ -1185,21 +1185,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794582644" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794584165" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794582644" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794582644" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794584165" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794584165" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794582644" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794584165" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794582644" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794582644" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794584165" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794584165" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 132px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
 
@@ -1217,11 +1217,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794582644" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794584165" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794582644";
+const BUILD="1794584165";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2306,14 +2306,45 @@ async function copyText(t, okMsg){
   catch(e){ toast('複製失敗，請手動選取文字'); }
 }
 
-/* ================= 邀請朋友 ================= */
+/* ================= 邀請朋友（邀請碼） ================= */
+try{ const _r=new URLSearchParams(location.search).get('r'); if(_r){ localStorage.setItem('farm_ref', _r.toUpperCase().slice(0,12)); history.replaceState(null,'',location.pathname+location.hash); } }catch(e){}
+async function refAutoUse(){
+  let c=null; try{ c=localStorage.getItem('farm_ref'); }catch(e){} if(!c) return;
+  try{ const {data:{user}} = await sb.auth.getUser(); if(!user || user.is_anonymous) return; }catch(e){ return; }
+  try{ const r = await rpc('farm_ref_use', {p_code:c}); toast(`🎁 已填入 ${r.name} 的邀請碼，你們成為好友了！見面禮在禮物信箱`); setTimeout(()=>openGifts(true), 1500); }
+  catch(e){ /* 已填過、過期、找不到都不再打擾 */ }
+  try{ localStorage.removeItem('farm_ref'); }catch(e){}
+}
 async function invite(){
-  const text = `我在玩「一起種田吧」🌱 一起種菜、偷菜、打牌的小鎮種田遊戲！我的暱稱是「${S.me.nickname}」，加我好友來偷菜吧～`;
-  if(navigator.share){
-    try{ await navigator.share({title:'一起種田吧', text, url:GAME_URL}); return; }
-    catch(e){ if(e && e.name==='AbortError') return; }
-  }
-  copyText(text + '\n' + GAME_URL, '邀請訊息已複製，貼給朋友吧！');
+  let I; try{ I = await rpc('farm_ref_info'); }catch(e){ return toast(e.message); }
+  const link = `${GAME_URL}?r=${I.code}`;
+  const text = `我在玩「一起種田吧」🌱 種菜、偷菜、養寵物的小島種田遊戲！用我的邀請碼「${I.code}」一起來玩，註冊就送 💎30＋金蘋果種子～`;
+  const rows = (I.list||[]).map(x=>`<div class="row"><div class="tx"><b>${esc(x.name||'新朋友')}</b> <span class="tag">Lv${x.lv}</span><div>${x.s2?'✅':'⬜'} 升到 Lv5　${x.s3?'✅':'⬜'} 升到 Lv10</div></div></div>`).join('');
+  const ach = [[3,'稱號「招募農夫」'],[10,'頭像框「招募之星框」'],[20,'稱號「傳奇村長」＋💎300']].map(([n,t])=>`<div>${I.lv5>=n?'✅':'⬜'} ${n} 位好友升到 Lv5：${t}</div>`).join('');
+  let body = `<div style="text-align:center"><div style="font-size:13px;color:var(--ink2);font-weight:700">我的邀請碼</div>
+    <div style="font-size:34px;font-weight:900;letter-spacing:6px;color:#2E9660;margin:4px 0">${esc(I.code)}</div>
+    <div class="homebtns"><button class="btn o" id="refShare">📤 分享邀請連結</button><button class="btn sub" id="refCopy">複製邀請碼</button></div></div>
+    <div class="sec">邀請獎勵</div>
+    <div style="font-size:13px;line-height:1.9;font-weight:600">
+      <div>🎁 朋友填了你的邀請碼：<b>你 💎20</b>・朋友 💎30＋金蘋果種子 ×3，自動成為好友</div>
+      <div>🌱 朋友升到 Lv5：<b>你 💎50</b>・朋友 豐收卡 ×2</div>
+      <div>🌾 朋友升到 Lv10：<b>你 💎100＋彩虹玉米種子 ×3</b>・朋友 💎50</div>
+      <div style="color:var(--ink2);font-size:12px">獎勵會寄到禮物信箱。朋友要綁定帳號、在註冊 7 天內填碼才算；邀請獎勵每人最多算 30 位朋友。</div></div>
+    <div class="sec">邀請成就（已有 ${I.lv5} 位好友升到 Lv5）</div><div style="font-size:13px;line-height:1.9;font-weight:600">${ach}</div>
+    <div class="sec">我邀請的朋友（${(I.list||[]).length}）</div>${rows || '<div class="empty">還沒有朋友填你的邀請碼</div>'}`;
+  if(I.can_use) body += `<div class="sec">朋友邀請你來的嗎？</div><div style="display:flex;gap:6px"><input id="refIn" maxlength="8" placeholder="輸入朋友的邀請碼" style="flex:1;text-transform:uppercase;padding:10px;border:2px solid #DDD;border-radius:12px;font-size:16px"><button class="btn" id="refUse">送出</button></div><div style="font-size:12px;color:var(--ink2);margin-top:4px">註冊 7 天內可以填一次${I.anon?'（試玩帳號要先綁定帳號）':''}</div>`;
+  else if(I.used_by) body += `<div style="font-size:12px;color:var(--ink2);margin-top:10px;text-align:center">你是被「${esc(I.used_by)}」邀請來的 🌱</div>`;
+  modal('💌 邀請朋友', body);
+  $('refShare').onclick = async()=>{
+    if(navigator.share){ try{ await navigator.share({title:'一起種田吧', text, url:link}); return; }catch(e){ if(e && e.name==='AbortError') return; } }
+    copyText(text + '\n' + link, '邀請訊息已複製，貼給朋友吧！');
+  };
+  $('refCopy').onclick = ()=>copyText(I.code, '邀請碼已複製');
+  if($('refUse')) $('refUse').onclick = async()=>{
+    const c = ($('refIn').value||'').trim(); if(!c) return toast('請輸入邀請碼');
+    try{ const r = await rpc('farm_ref_use', {p_code:c}); toast(`🎁 已填入 ${r.name} 的邀請碼，見面禮在禮物信箱！`); closeModal(); setTimeout(()=>openGifts(true), 800); }
+    catch(e){ toast(e.message); }
+  };
 }
 
 /* ================= 儲值：郵局轉帳（自動對帳）＋超商代碼（金流） ================= */
@@ -7655,6 +7686,7 @@ function startGame(st){
   toast(`歡迎回到小鎮，${S.me.nickname}！`);
   setTimeout(tutMaybeStart, 900);
   setTimeout(showNotices, 1200);
+  setTimeout(refAutoUse, 2000);
 }
 
 $('authBtn').onclick = doAuth;

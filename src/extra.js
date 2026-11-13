@@ -194,14 +194,45 @@ async function copyText(t, okMsg){
   catch(e){ toast('複製失敗，請手動選取文字'); }
 }
 
-/* ================= 邀請朋友 ================= */
+/* ================= 邀請朋友（邀請碼） ================= */
+try{ const _r=new URLSearchParams(location.search).get('r'); if(_r){ localStorage.setItem('farm_ref', _r.toUpperCase().slice(0,12)); history.replaceState(null,'',location.pathname+location.hash); } }catch(e){}
+async function refAutoUse(){
+  let c=null; try{ c=localStorage.getItem('farm_ref'); }catch(e){} if(!c) return;
+  try{ const {data:{user}} = await sb.auth.getUser(); if(!user || user.is_anonymous) return; }catch(e){ return; }
+  try{ const r = await rpc('farm_ref_use', {p_code:c}); toast(`🎁 已填入 ${r.name} 的邀請碼，你們成為好友了！見面禮在禮物信箱`); setTimeout(()=>openGifts(true), 1500); }
+  catch(e){ /* 已填過、過期、找不到都不再打擾 */ }
+  try{ localStorage.removeItem('farm_ref'); }catch(e){}
+}
 async function invite(){
-  const text = `我在玩「一起種田吧」🌱 一起種菜、偷菜、打牌的小鎮種田遊戲！我的暱稱是「${S.me.nickname}」，加我好友來偷菜吧～`;
-  if(navigator.share){
-    try{ await navigator.share({title:'一起種田吧', text, url:GAME_URL}); return; }
-    catch(e){ if(e && e.name==='AbortError') return; }
-  }
-  copyText(text + '\n' + GAME_URL, '邀請訊息已複製，貼給朋友吧！');
+  let I; try{ I = await rpc('farm_ref_info'); }catch(e){ return toast(e.message); }
+  const link = `${GAME_URL}?r=${I.code}`;
+  const text = `我在玩「一起種田吧」🌱 種菜、偷菜、養寵物的小島種田遊戲！用我的邀請碼「${I.code}」一起來玩，註冊就送 💎30＋金蘋果種子～`;
+  const rows = (I.list||[]).map(x=>`<div class="row"><div class="tx"><b>${esc(x.name||'新朋友')}</b> <span class="tag">Lv${x.lv}</span><div>${x.s2?'✅':'⬜'} 升到 Lv5　${x.s3?'✅':'⬜'} 升到 Lv10</div></div></div>`).join('');
+  const ach = [[3,'稱號「招募農夫」'],[10,'頭像框「招募之星框」'],[20,'稱號「傳奇村長」＋💎300']].map(([n,t])=>`<div>${I.lv5>=n?'✅':'⬜'} ${n} 位好友升到 Lv5：${t}</div>`).join('');
+  let body = `<div style="text-align:center"><div style="font-size:13px;color:var(--ink2);font-weight:700">我的邀請碼</div>
+    <div style="font-size:34px;font-weight:900;letter-spacing:6px;color:#2E9660;margin:4px 0">${esc(I.code)}</div>
+    <div class="homebtns"><button class="btn o" id="refShare">📤 分享邀請連結</button><button class="btn sub" id="refCopy">複製邀請碼</button></div></div>
+    <div class="sec">邀請獎勵</div>
+    <div style="font-size:13px;line-height:1.9;font-weight:600">
+      <div>🎁 朋友填了你的邀請碼：<b>你 💎20</b>・朋友 💎30＋金蘋果種子 ×3，自動成為好友</div>
+      <div>🌱 朋友升到 Lv5：<b>你 💎50</b>・朋友 豐收卡 ×2</div>
+      <div>🌾 朋友升到 Lv10：<b>你 💎100＋彩虹玉米種子 ×3</b>・朋友 💎50</div>
+      <div style="color:var(--ink2);font-size:12px">獎勵會寄到禮物信箱。朋友要綁定帳號、在註冊 7 天內填碼才算；邀請獎勵每人最多算 30 位朋友。</div></div>
+    <div class="sec">邀請成就（已有 ${I.lv5} 位好友升到 Lv5）</div><div style="font-size:13px;line-height:1.9;font-weight:600">${ach}</div>
+    <div class="sec">我邀請的朋友（${(I.list||[]).length}）</div>${rows || '<div class="empty">還沒有朋友填你的邀請碼</div>'}`;
+  if(I.can_use) body += `<div class="sec">朋友邀請你來的嗎？</div><div style="display:flex;gap:6px"><input id="refIn" maxlength="8" placeholder="輸入朋友的邀請碼" style="flex:1;text-transform:uppercase;padding:10px;border:2px solid #DDD;border-radius:12px;font-size:16px"><button class="btn" id="refUse">送出</button></div><div style="font-size:12px;color:var(--ink2);margin-top:4px">註冊 7 天內可以填一次${I.anon?'（試玩帳號要先綁定帳號）':''}</div>`;
+  else if(I.used_by) body += `<div style="font-size:12px;color:var(--ink2);margin-top:10px;text-align:center">你是被「${esc(I.used_by)}」邀請來的 🌱</div>`;
+  modal('💌 邀請朋友', body);
+  $('refShare').onclick = async()=>{
+    if(navigator.share){ try{ await navigator.share({title:'一起種田吧', text, url:link}); return; }catch(e){ if(e && e.name==='AbortError') return; } }
+    copyText(text + '\n' + link, '邀請訊息已複製，貼給朋友吧！');
+  };
+  $('refCopy').onclick = ()=>copyText(I.code, '邀請碼已複製');
+  if($('refUse')) $('refUse').onclick = async()=>{
+    const c = ($('refIn').value||'').trim(); if(!c) return toast('請輸入邀請碼');
+    try{ const r = await rpc('farm_ref_use', {p_code:c}); toast(`🎁 已填入 ${r.name} 的邀請碼，見面禮在禮物信箱！`); closeModal(); setTimeout(()=>openGifts(true), 800); }
+    catch(e){ toast(e.message); }
+  };
 }
 
 /* ================= 儲值：郵局轉帳（自動對帳）＋超商代碼（金流） ================= */

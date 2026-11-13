@@ -776,6 +776,7 @@ function startGame(st){
   toast(`歡迎回到小鎮，${S.me.nickname}！`);
   setTimeout(tutMaybeStart, 900);
   setTimeout(showNotices, 1200);
+  setTimeout(refAutoUse, 2000);
 }
 
 $('authBtn').onclick = doAuth;
