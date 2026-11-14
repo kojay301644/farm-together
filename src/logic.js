@@ -1018,7 +1018,7 @@ document.addEventListener('gesturestart', e => e.preventDefault(), { passive: fa
 document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 
 /* 被看門狗咬：付醫藥費＋掉東西 */
-function dogMsg(r){ const d = (r && r.dog) || {}; let m = '被看門狗咬了！什麼都沒偷到';
-  if(+d.fine > 0) m += `，看醫生花了 ${(+d.fine).toLocaleString()} 金`;
-  if(+d.qty > 0) m += `，還嚇得掉了 ${d.qty} 個${(CROP[d.crop]&&CROP[d.crop].name)||'作物'}`;
-  return m + ' 🩹'; }
+function dogMsg(r){ const d = (r && r.dog) || {}, x = [];
+  if(+d.fine > 0) x.push(`🩹 醫藥費 ${(+d.fine).toLocaleString()} 金`);
+  if(+d.qty > 0) x.push(`掉了 ${d.qty} 個${(CROP[d.crop]&&CROP[d.crop].name)||'作物'}`);
+  return '被看門狗咬了！什麼都沒偷到' + (x.length ? '\n' + x.join('・') : ''); }
