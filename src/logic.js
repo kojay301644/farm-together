@@ -269,7 +269,7 @@ async function actVisit(i){
   const owner = V.owner.id;
   const r = await queueRpc('farm_friend_act', {p_owner:owner, p_action:action, p_idx:i}, r=>{ applyState(r.state); if(mode==='visit' && V && V.owner.id===owner){ applyVisit(r.visit); } refresh(); });
   if(!r) return;
-  if(r.ab==='dog'){ dogBite('被看門狗咬了！什麼都沒偷到'); floatAt(el, '被看門狗咬了！🐶', '#FFD6E5'); }
+  if(r.ab==='dog'){ dogBite(dogMsg(r)); floatAt(el, '被看門狗咬了！🐶', '#FFD6E5'); }
   else if(r.ab==='scare'){ sfx('err'); floatAt(el, '被稻草人擋下了！🎃', '#FFD6E5'); }
   else if(action==='steal'){ fxSteal(i, c); floatAt(el, `偷到 ${c.name} ×${r.qty}`, '#FFE066'); }
   xpFloat(el, r.xp);
@@ -438,7 +438,7 @@ const LOG_TXT = {
   party: l=>`來參加你的派對 🎉，你們都拿到經驗`,help_water:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}澆了水`, steal:(l)=>`偷走了你 ${l.qty} 個${CROP[l.crop]?.name||''}`, help_weed:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了草`, help_bug:(l)=>`幫你的${CROP[l.crop]?.name||'作物'}除了蟲`,
   prank_weed:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一棵草 😈`, prank_bug:(l)=>`在你的${CROP[l.crop]?.name||'田'}放了一隻蟲 😈`,
   r_steal:(l)=>`偷走了你牧場的 ${l.qty} 個${(ANIMALS.find(a=>a.good===l.crop)||{}).good_name||'產品'}`, r_feed:(l)=>`幫你餵了${(ANI[l.crop]||{}).name||'動物'} 🌾`, r_swat:(l)=>`幫你的${(ANI[l.crop]||{}).name||'動物'}拍掉蚊子`, r_prank:(l)=>`在你的${(ANI[l.crop]||{}).name||'動物'}旁邊放了蚊子 😈`,
-  dog:(l)=>`想偷你的${CROP[l.crop]?.name||'作物'}，被看門狗趕走了 🐶`, scare:(l)=>`想惡作劇，被稻草人擋下了 🎃`, auto_harvest:(l)=>`幫你自動收成了 ${l.qty} 個${CROP[l.crop]?.name||''} 🧺`, auto_collect:(l)=>`幫你自動收了牧場的 ${l.qty} 個${(ANIMALS.find(a=>a.good===l.crop)||{}).good_name||'產品'} 🧺`};
+  dog:(l)=>l.qty>0 ? `想來偷東西，被看門狗咬了 🐶 嚇得掉了 ${l.qty} 個${CROP[l.crop]?.name||'作物'}，狗叼回你的收集倉了` : `想來偷東西，被看門狗咬跑了 🐶`, scare:(l)=>`想惡作劇，被稻草人擋下了 🎃`, auto_harvest:(l)=>`幫你自動收成了 ${l.qty} 個${CROP[l.crop]?.name||''} 🧺`, auto_collect:(l)=>`幫你自動收了牧場的 ${l.qty} 個${(ANIMALS.find(a=>a.good===l.crop)||{}).good_name||'產品'} 🧺`};
 
 async function openBoard(tab){
   if(tab) boardTab = tab;
@@ -931,7 +931,7 @@ function openBin(){
     const why = !n ? '收集倉是空的' : b.mine ? '這一批你已經偷過了' : !(b.left>0) ? '已經被偷光了，留點給主人吧' : V.protected ? '對方還在新手保護中' : '';
     modal(`🧺 ${esc(V.owner.nickname)} 的收集倉`, `<div class="rhint" style="margin-bottom:6px">寵物自動收成的東西會先放在這裡，主人還沒收走前可以偷一點（每次最多 ${+(CFG_SET.bin_steal_max??2)} 個）</div>${binListHTML(b.items)}`,
       why ? [[why,'sub',closeModal]] : [['🧺 偷一點','r',async()=>{ try{ const r=await rpc('farm_bin_steal',{p_owner:V.owner.id}); applyState(r.state); applyVisit(r.visit); refresh(); closeModal();
-        if(r.ab==='dog'){ dogBite('被看門狗咬了！什麼都沒偷到'); } else { sfx('steal'); toast(`偷到 ${r.qty} 個！`); } if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } }]]);
+        if(r.ab==='dog'){ dogBite(dogMsg(r)); } else { sfx('steal'); toast(`偷到 ${r.qty} 個！`); } if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } }]]);
     return;
   }
   const b=S.me.bin||{}, n=binCount(b), cap=+(S.me.bin_cap||200);
@@ -997,3 +997,9 @@ const stealRegenTxt = me => regenTxt(me, 'steal');
 try{ mjNoZoom(document.body); }catch(e){}
 document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
 document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+
+/* 被看門狗咬：付醫藥費＋掉東西 */
+function dogMsg(r){ const d = (r && r.dog) || {}; let m = '被看門狗咬了！什麼都沒偷到';
+  if(+d.fine > 0) m += `，看醫生花了 ${(+d.fine).toLocaleString()} 金`;
+  if(+d.qty > 0) m += `，還嚇得掉了 ${d.qty} 個${(CROP[d.crop]&&CROP[d.crop].name)||'作物'}`;
+  return m + ' 🩹'; }
