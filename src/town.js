@@ -173,6 +173,7 @@ function farmerPose(m, dt, moving){
     if(act==='look') h=Math.sin(m.anim*2.5)*.1; }
   if(!moving && (act==='cheer'||act==='wave'||act==='stretch')){ m.jump=(m.jump||0)+dt; if(m.jump>(act==='cheer'?.55:.9)) m.jump=0; } else m.jump=0;
   if(m.jump>0 && m.jump<.45){ const k=Math.sin(m.jump/.45*Math.PI); f+=k*n*(act==='cheer'?.35:.18); p*=1+k*.08; u*=1-k*.05; }
+  if(PARTY_ON && !moving && !m.task && !m.jump){ const k=Math.abs(Math.sin(m.anim*4.2)); f+=k*n*.1; h+=Math.sin(m.anim*2.1)*.07; }  // 派對中：原地跳舞
   P.root.setAttribute('transform',`translate(0 ${(-f).toFixed(2)}) rotate(${(h*57.3).toFixed(2)}) scale(${u.toFixed(3)} ${p.toFixed(3)})`);
   P.sh.setAttribute('transform',`scale(${Math.max(.3,1-f/n*.6).toFixed(3)} 1)`);
   if(P.a){ const E=c.type==='quad'?1:1.15, i=m.ph;
@@ -327,7 +328,7 @@ function buildWorld(){
   // 飛鳥
   for(let k=0;k<2;k++) cloud += `<g class="bird" style="animation-delay:${-k*17}s"><g transform="translate(0 ${120+k*90})"><path d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path transform="translate(26 14) scale(.8)" d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/></g></g>`;
 
-  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="decorL"></g><g id="movers" style="pointer-events:none"></g><g id="toneL" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
+  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="decorL"></g><g id="movers" style="pointer-events:none"></g><g id="toneL" style="pointer-events:none"></g><g id="partyL" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
 
   OBST_FIXED=OBST.slice(); decorSig=''; bindDecorLayer();
   // 田地元素與標籤
@@ -523,3 +524,43 @@ addEventListener('pointerup',()=>{ drag=null; map.classList.remove('drag'); });
 map.addEventListener('click',e=>{ if(moved){ e.stopPropagation(); e.preventDefault(); moved=false; } },true);
 addEventListener('resize',()=>{ if(S){ layout(); centerOn(...FARM_C); } });
 
+
+/* ================= 🎉 派對特效：彩旗、氣球、派對帽、跳舞 ================= */
+let PARTY_ON = false;
+function partyOnNow(){
+  const vis = mode==='visit' && typeof V!=='undefined' && V, ow = vis ? V.owner : (typeof S!=='undefined' && S && S.me);
+  if(!ow || !ow.buffs) return false; const off = (vis ? V.off : S && S.off) || 0;
+  return +(ow.buffs.party||0) > Date.now() + off; }
+const PCOL = ['#F2545B','#FFB13D','#FFE066','#5CCB6E','#3DA5F4','#B98CFF','#FF8FB1'];
+function partyBunting(p1, p2, n, c0){
+  const sag = 22, cx = (p1[0]+p2[0])/2, cy = (p1[1]+p2[1])/2 + sag*2;
+  const at = t => [(1-t)*(1-t)*p1[0] + 2*(1-t)*t*cx + t*t*p2[0], (1-t)*(1-t)*p1[1] + 2*(1-t)*t*cy + t*t*p2[1]];
+  let h = `<path d="M${p1[0].toFixed(1)} ${p1[1].toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}" fill="none" stroke="${INK}" stroke-width="1.6"/>`;
+  for(let i=1;i<n;i++){ const [x,y] = at(i/n), c = PCOL[(i+c0)%PCOL.length];
+    h += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><path class="pflag" style="animation-delay:${(i*.17%1.6).toFixed(2)}s" d="M-7 0 L7 0 L0 15 Z" fill="${c}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/></g>`; }
+  return h; }
+function partyPole(p, H){ return `<rect x="${(p[0]-2.5).toFixed(1)}" y="${(p[1]-H).toFixed(1)}" width="5" height="${H}" rx="2" fill="#C98B4E" stroke="${INK}" stroke-width="1.4"/><circle cx="${p[0].toFixed(1)}" cy="${(p[1]-H).toFixed(1)}" r="4" fill="#FFE066" stroke="${INK}" stroke-width="1.4"/>`; }
+function partyBalloons(p, k){ let h = '';
+  [[-14,-34,0],[0,-46,1],[14,-36,2]].forEach(([dx,dy,j],i)=>{ const c = PCOL[(k*3+j)%PCOL.length], x = p[0]+dx, y = p[1]+dy;
+    h += `<g class="pball" style="animation-delay:${((k+i)*.7%3).toFixed(2)}s"><path d="M${p[0].toFixed(1)} ${p[1].toFixed(1)} Q${(x-3).toFixed(1)} ${(y+18).toFixed(1)} ${x.toFixed(1)} ${(y+12).toFixed(1)}" fill="none" stroke="${INK}" stroke-width="1"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="9" ry="11.5" fill="${c}" stroke="${INK}" stroke-width="1.4"/><ellipse cx="${(x-3).toFixed(1)}" cy="${(y-4).toFixed(1)}" rx="2.4" ry="3.6" fill="#fff" opacity=".55"/><path d="M${(x-2).toFixed(1)} ${(y+12).toFixed(1)} l2 -2 l2 2z" fill="${c}" stroke="${INK}" stroke-width="1"/></g>`; });
+  return h; }
+function partyLayerSVG(){
+  const H = 82, A0 = iso(4.0, 6.35), B0 = iso(14.4, 6.35), C0 = iso(4.0, 12.1), D0 = iso(14.4, 12.1);
+  const top = p => [p[0], p[1]-H];
+  return partyPole(A0,H) + partyPole(B0,H) + partyPole(C0,H) + partyPole(D0,H)
+    + partyBunting(top(A0), top(B0), 12, 0) + partyBunting(top(A0), top(C0), 12, 3)
+    + partyBunting(top(B0), top(D0), 12, 5) + partyBunting(top(C0), top(D0), 12, 1)
+    + partyBalloons(top(A0), 0) + partyBalloons(top(B0), 1) + partyBalloons(top(C0), 2) + partyBalloons(top(D0), 3); }
+function partyHatSVG(n){ const s = n*.32, x = n*.02, y = -n*.86;
+  return `<g class="phat" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(-14)"><path d="M${(-s*.42).toFixed(1)} 0 L0 ${(-s).toFixed(1)} L${(s*.42).toFixed(1)} 0 Z" fill="#FF6FA8" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M${(-s*.28).toFixed(1)} ${(-s*.33).toFixed(1)} L${(s*.28).toFixed(1)} ${(-s*.33).toFixed(1)} M${(-s*.14).toFixed(1)} ${(-s*.66).toFixed(1)} L${(s*.14).toFixed(1)} ${(-s*.66).toFixed(1)}" stroke="#FFE066" stroke-width="${(s*.12).toFixed(1)}" stroke-linecap="round"/>
+    <ellipse cx="0" cy="0" rx="${(s*.48).toFixed(1)}" ry="${(s*.1).toFixed(1)}" fill="#FFE066" stroke="${INK}" stroke-width="1.2"/><circle cx="0" cy="${(-s).toFixed(1)}" r="${(s*.13).toFixed(1)}" fill="#7ED6FF" stroke="${INK}" stroke-width="1.2"/></g>`; }
+function partyFxSync(){
+  const on = partyOnNow(), L = $('partyL'); if(!L) return;
+  if(on !== PARTY_ON || (on && !L.firstChild)){ PARTY_ON = on; L.innerHTML = on ? partyLayerSVG() : ''; }
+  const ms = [farmerMover].concat(partyMovers||[]).filter(m=>m && m.parts && m.parts.root);
+  ms.forEach(m=>{ const hat = m.parts.root.querySelector('.phat');
+    if(on && !hat){ const g = document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML = partyHatSVG(m.n||60); m.parts.root.appendChild(g.firstChild); }
+    else if(!on && hat) hat.remove(); });
+}

@@ -50,6 +50,12 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 body.modalopen #map *,body.mjon #map *,body.idle #map *,body.mjon .hud *,body.mjon .dock *,body.modalopen .hud *{animation-play-state:paused!important}
 body.mjon #map{visibility:hidden}
 #world{display:block}
+.pflag{transform-box:fill-box;transform-origin:50% 0;animation:pflag 1.6s ease-in-out infinite alternate}
+@keyframes pflag{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+.pball{animation:pball 3s ease-in-out infinite alternate}
+@keyframes pball{from{transform:translateY(0)}to{transform:translateY(-7px)}}
+body.lowfx .pflag,body.lowfx .pball{animation:none}
+
 .tap{cursor:pointer}
 .tap.hit{animation:hit .25s ease-out}
 @keyframes hit{50%{transform:translateY(-4px)}}
@@ -1191,21 +1197,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794653430" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794654420" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794653430" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794653430" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794654420" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794654420" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794653430" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794654420" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794653430" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794653430" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794654420" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794654420" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <button class="sidebtn dot" id="bBindR" style="top:calc(100% + 132px);height:62px;display:none"><span style="font-size:22px;line-height:26px">🔒</span><small style="font-size:10px;line-height:1.15;text-align:center">綁定<br>送💎</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 202px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
@@ -1224,11 +1230,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794653430" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794654420" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794653430";
+const BUILD="1794654420";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1563,6 +1569,7 @@ function farmerPose(m, dt, moving){
     if(act==='look') h=Math.sin(m.anim*2.5)*.1; }
   if(!moving && (act==='cheer'||act==='wave'||act==='stretch')){ m.jump=(m.jump||0)+dt; if(m.jump>(act==='cheer'?.55:.9)) m.jump=0; } else m.jump=0;
   if(m.jump>0 && m.jump<.45){ const k=Math.sin(m.jump/.45*Math.PI); f+=k*n*(act==='cheer'?.35:.18); p*=1+k*.08; u*=1-k*.05; }
+  if(PARTY_ON && !moving && !m.task && !m.jump){ const k=Math.abs(Math.sin(m.anim*4.2)); f+=k*n*.1; h+=Math.sin(m.anim*2.1)*.07; }  // 派對中：原地跳舞
   P.root.setAttribute('transform',`translate(0 ${(-f).toFixed(2)}) rotate(${(h*57.3).toFixed(2)}) scale(${u.toFixed(3)} ${p.toFixed(3)})`);
   P.sh.setAttribute('transform',`scale(${Math.max(.3,1-f/n*.6).toFixed(3)} 1)`);
   if(P.a){ const E=c.type==='quad'?1:1.15, i=m.ph;
@@ -1717,7 +1724,7 @@ function buildWorld(){
   // 飛鳥
   for(let k=0;k<2;k++) cloud += `<g class="bird" style="animation-delay:${-k*17}s"><g transform="translate(0 ${120+k*90})"><path d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path transform="translate(26 14) scale(.8)" d="M0 0 q6 -6 12 0 q6 -6 12 0" stroke="${INK}" stroke-width="2.2" fill="none" stroke-linecap="round"/></g></g>`;
 
-  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="decorL"></g><g id="movers" style="pointer-events:none"></g><g id="toneL" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
+  W.innerHTML = `${defs}<g>${sea}</g><g>${island}</g><g>${ground}</g><g id="objs">${objs.map(o=>o.svg).join('')}</g><g id="decorL"></g><g id="movers" style="pointer-events:none"></g><g id="toneL" style="pointer-events:none"></g><g id="partyL" style="pointer-events:none"></g><g id="fxw"></g><g class="sky" style="pointer-events:none">${cloud}</g><g id="labels">${lab}<g id="plabs"></g></g>`;
 
   OBST_FIXED=OBST.slice(); decorSig=''; bindDecorLayer();
   // 田地元素與標籤
@@ -1913,6 +1920,46 @@ addEventListener('pointerup',()=>{ drag=null; map.classList.remove('drag'); });
 map.addEventListener('click',e=>{ if(moved){ e.stopPropagation(); e.preventDefault(); moved=false; } },true);
 addEventListener('resize',()=>{ if(S){ layout(); centerOn(...FARM_C); } });
 
+
+/* ================= 🎉 派對特效：彩旗、氣球、派對帽、跳舞 ================= */
+let PARTY_ON = false;
+function partyOnNow(){
+  const vis = mode==='visit' && typeof V!=='undefined' && V, ow = vis ? V.owner : (typeof S!=='undefined' && S && S.me);
+  if(!ow || !ow.buffs) return false; const off = (vis ? V.off : S && S.off) || 0;
+  return +(ow.buffs.party||0) > Date.now() + off; }
+const PCOL = ['#F2545B','#FFB13D','#FFE066','#5CCB6E','#3DA5F4','#B98CFF','#FF8FB1'];
+function partyBunting(p1, p2, n, c0){
+  const sag = 22, cx = (p1[0]+p2[0])/2, cy = (p1[1]+p2[1])/2 + sag*2;
+  const at = t => [(1-t)*(1-t)*p1[0] + 2*(1-t)*t*cx + t*t*p2[0], (1-t)*(1-t)*p1[1] + 2*(1-t)*t*cy + t*t*p2[1]];
+  let h = `<path d="M${p1[0].toFixed(1)} ${p1[1].toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}" fill="none" stroke="${INK}" stroke-width="1.6"/>`;
+  for(let i=1;i<n;i++){ const [x,y] = at(i/n), c = PCOL[(i+c0)%PCOL.length];
+    h += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><path class="pflag" style="animation-delay:${(i*.17%1.6).toFixed(2)}s" d="M-7 0 L7 0 L0 15 Z" fill="${c}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/></g>`; }
+  return h; }
+function partyPole(p, H){ return `<rect x="${(p[0]-2.5).toFixed(1)}" y="${(p[1]-H).toFixed(1)}" width="5" height="${H}" rx="2" fill="#C98B4E" stroke="${INK}" stroke-width="1.4"/><circle cx="${p[0].toFixed(1)}" cy="${(p[1]-H).toFixed(1)}" r="4" fill="#FFE066" stroke="${INK}" stroke-width="1.4"/>`; }
+function partyBalloons(p, k){ let h = '';
+  [[-14,-34,0],[0,-46,1],[14,-36,2]].forEach(([dx,dy,j],i)=>{ const c = PCOL[(k*3+j)%PCOL.length], x = p[0]+dx, y = p[1]+dy;
+    h += `<g class="pball" style="animation-delay:${((k+i)*.7%3).toFixed(2)}s"><path d="M${p[0].toFixed(1)} ${p[1].toFixed(1)} Q${(x-3).toFixed(1)} ${(y+18).toFixed(1)} ${x.toFixed(1)} ${(y+12).toFixed(1)}" fill="none" stroke="${INK}" stroke-width="1"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="9" ry="11.5" fill="${c}" stroke="${INK}" stroke-width="1.4"/><ellipse cx="${(x-3).toFixed(1)}" cy="${(y-4).toFixed(1)}" rx="2.4" ry="3.6" fill="#fff" opacity=".55"/><path d="M${(x-2).toFixed(1)} ${(y+12).toFixed(1)} l2 -2 l2 2z" fill="${c}" stroke="${INK}" stroke-width="1"/></g>`; });
+  return h; }
+function partyLayerSVG(){
+  const H = 82, A0 = iso(4.0, 6.35), B0 = iso(14.4, 6.35), C0 = iso(4.0, 12.1), D0 = iso(14.4, 12.1);
+  const top = p => [p[0], p[1]-H];
+  return partyPole(A0,H) + partyPole(B0,H) + partyPole(C0,H) + partyPole(D0,H)
+    + partyBunting(top(A0), top(B0), 12, 0) + partyBunting(top(A0), top(C0), 12, 3)
+    + partyBunting(top(B0), top(D0), 12, 5) + partyBunting(top(C0), top(D0), 12, 1)
+    + partyBalloons(top(A0), 0) + partyBalloons(top(B0), 1) + partyBalloons(top(C0), 2) + partyBalloons(top(D0), 3); }
+function partyHatSVG(n){ const s = n*.32, x = n*.02, y = -n*.86;
+  return `<g class="phat" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(-14)"><path d="M${(-s*.42).toFixed(1)} 0 L0 ${(-s).toFixed(1)} L${(s*.42).toFixed(1)} 0 Z" fill="#FF6FA8" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M${(-s*.28).toFixed(1)} ${(-s*.33).toFixed(1)} L${(s*.28).toFixed(1)} ${(-s*.33).toFixed(1)} M${(-s*.14).toFixed(1)} ${(-s*.66).toFixed(1)} L${(s*.14).toFixed(1)} ${(-s*.66).toFixed(1)}" stroke="#FFE066" stroke-width="${(s*.12).toFixed(1)}" stroke-linecap="round"/>
+    <ellipse cx="0" cy="0" rx="${(s*.48).toFixed(1)}" ry="${(s*.1).toFixed(1)}" fill="#FFE066" stroke="${INK}" stroke-width="1.2"/><circle cx="0" cy="${(-s).toFixed(1)}" r="${(s*.13).toFixed(1)}" fill="#7ED6FF" stroke="${INK}" stroke-width="1.2"/></g>`; }
+function partyFxSync(){
+  const on = partyOnNow(), L = $('partyL'); if(!L) return;
+  if(on !== PARTY_ON || (on && !L.firstChild)){ PARTY_ON = on; L.innerHTML = on ? partyLayerSVG() : ''; }
+  const ms = [farmerMover].concat(partyMovers||[]).filter(m=>m && m.parts && m.parts.root);
+  ms.forEach(m=>{ const hat = m.parts.root.querySelector('.phat');
+    if(on && !hat){ const g = document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML = partyHatSVG(m.n||60); m.parts.root.appendChild(g.firstChild); }
+    else if(!on && hat) hat.remove(); });
+}
 
 /* ================= 效能、設定 ================= */
 const PREF = (k, d) => { try{ const v = localStorage.getItem('ytzt_'+k); return v===null ? d : v==='1'; }catch(e){ return d; } };
@@ -7420,7 +7467,7 @@ async function openBoard(tab){
   if(boardTab==='friends'){
     body = F.friends.length ? F.friends.map(f=>`<div class="row">
         ${avImg(f)}
-        <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>
+        <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>${f.party?' <span class="tag" style="background:#FFE3F0;color:#D6336C">🎉 派對中</span>':''}
           <div>${(f.ripe||f.bin)?`<span style="color:var(--orange-d)">${f.ripe?`🥕 有 ${f.ripe} 塊地可以偷`:''}${f.ripe&&f.bin?'・':''}${f.bin?'🧺 收集倉可以偷':''}</span>`:'目前沒有可偷的菜'}${f.issues?`・🐛 需要幫忙 ${f.issues}`:''}</div></div>
         <div class="ibtns"><button class="mini ${(f.ripe||f.bin)?'o':''}" data-visit="${f.id}">拜訪</button><button class="mini sub" data-gift="${f.id}" data-gn="${esc(f.nickname)}">💌 送禮</button></div></div>`).join('')
       : `<div class="empty">還沒有好友，<br>到「加好友」輸入朋友的暱稱吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
@@ -7435,7 +7482,7 @@ async function openBoard(tab){
   } else if(boardTab==='near'){
     body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（偷陌生人要用偷菜體力：<b style="color:var(--orange-d)">⚡${S.me.steal_left}</b>${S.me.steal_max?' / '+S.me.steal_max:''}${stealRegenTxt(S.me)}）</div>`;
     body += NB.length ? NB.map(f=>`<div class="row">${avImg(f)}
-        <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}
+        <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}${f.party?' <span class="tag" style="background:#FFE3F0;color:#D6336C">🎉 派對中</span>':''}
           <div>${(f.ripe||f.bin)?`<span style="color:var(--orange-d)">${f.ripe?`🥕 有 ${f.ripe} 塊地可以偷`:''}${f.ripe&&f.bin?'・':''}${f.bin?'🧺 收集倉可以偷':''}</span>`:'目前沒有可偷的菜'}</div></div>
         <button class="mini ${(f.ripe||f.bin)?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('') + `<button class="btn sub" id="nbMore" style="width:100%;margin-top:8px">換一批</button>`
       : `<div class="empty">附近還沒有其他玩家種菜，<br>邀請朋友一起來玩吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
@@ -7594,7 +7641,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); bindBtn(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bInv').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); bindBtn(); partyFxSync(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bInv').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;

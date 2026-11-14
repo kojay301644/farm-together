@@ -50,6 +50,12 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 body.modalopen #map *,body.mjon #map *,body.idle #map *,body.mjon .hud *,body.mjon .dock *,body.modalopen .hud *{animation-play-state:paused!important}
 body.mjon #map{visibility:hidden}
 #world{display:block}
+.pflag{transform-box:fill-box;transform-origin:50% 0;animation:pflag 1.6s ease-in-out infinite alternate}
+@keyframes pflag{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+.pball{animation:pball 3s ease-in-out infinite alternate}
+@keyframes pball{from{transform:translateY(0)}to{transform:translateY(-7px)}}
+body.lowfx .pflag,body.lowfx .pball{animation:none}
+
 .tap{cursor:pointer}
 .tap.hit{animation:hit .25s ease-out}
 @keyframes hit{50%{transform:translateY(-4px)}}
