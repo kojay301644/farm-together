@@ -132,10 +132,8 @@ function openToneShop(){
   if(mode==='visit') return toast('回到自己的農場才能換色調');
   const me=S.me, own=me.tones||{}, cur=me.tone||'spring';
   let body = shopNav('tone') + `<div class="skgrid">${TONES.map(t=>{ const fx=TONE_FX[t.id]||TONE_FX.spring, have=t.id==='spring'||own[t.id], on=t.id===cur;
-    const cost=t.gold!=null?`${t.gold.toLocaleString()} 金`:t.gems!=null?`💎${t.gems}`:'';
-    const poor=t.gold!=null?me.gold<t.gold:(me.gems||0)<(t.gems||0);
     return `<div class="skcard${on?' on':''}"><div class="tsw" data-tpv="${t.id}" style="background:linear-gradient(${fx.sky[0]},${fx.sky[1]} 60%,${fx.sky[2]})"><img alt="" src="${A('home_island')}"><span>${TONE_ICON[fx.fx]||'🌼'}</span></div><b>${esc(t.name)}</b><small style="font-size:10px;font-weight:700;color:var(--ink2);min-height:2.4em">${esc(t.descr||'')}</small>
-      ${on?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-tuse="${t.id}">套用</button>`:`<button class="mini ${t.gems!=null?'gem':''}" data-tbuy="${t.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('')}</div>
+      ${on?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-tuse="${t.id}">套用</button>`:`<div class="skbuy">${t.gold!=null?`<button class="mini" data-tbuy="${t.id}" data-pay="gold" ${me.gold<t.gold?'disabled':''}>💰 ${t.gold.toLocaleString()}</button>`:''}${t.gems!=null?`<button class="mini gem" data-tbuy="${t.id}" data-pay="gems" ${(me.gems||0)<t.gems?'disabled':''}>💎${t.gems}</button>`:''}</div>`}</div>`; }).join('')}</div>
     <div class="rhint" style="text-align:center;margin-top:8px">色調會改變天空、整座島的色彩和飄落特效，買過可以隨時切換，好友來拜訪也看得到</div>`;
   modal(shopTitle(), body); bindShopNav();
   const md=$('md');
@@ -143,5 +141,5 @@ function openToneShop(){
     tonedURL(A('home_island'),id).then(u=>{ im.src=u; });
     if(f.post) d.insertAdjacentHTML('beforeend',`<i style="position:absolute;inset:0;background:${f.post[1]};opacity:${f.post[2]};mix-blend-mode:${f.post[0]}"></i>`); });
   md.querySelectorAll('[data-tuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_tone',{p_id:b.dataset.tuse})); refresh(); sfx('coin'); openToneShop(); }catch(e){ toast(e.message); } });
-  md.querySelectorAll('[data-tbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_tone',{p_id:b.dataset.tbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('色調已套用！'); openToneShop(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-tbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_tone',{p_id:b.dataset.tbuy, p_pay:b.dataset.pay})); refresh(); fxConfetti(); sfx('lvup'); toast('色調已套用！'); openToneShop(); }catch(e){ toast(e.message); } });
 }

@@ -1198,21 +1198,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794654555" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794654731" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794654555" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794654555" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794654731" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794654731" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794654555" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794654731" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794654555" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794654555" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794654731" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794654731" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <button class="sidebtn dot" id="bBindR" style="top:calc(100% + 132px);height:62px;display:none"><span style="font-size:22px;line-height:26px">🔒</span><small style="font-size:10px;line-height:1.15;text-align:center">綁定<br>送💎</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 202px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
@@ -1231,11 +1231,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794654555" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794654731" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794654555";
+const BUILD="1794654731";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -3008,11 +3008,10 @@ function openDecorShop(t){
   const me=S.me, inv=me.decor_inv||{}, placed={}; (me.decor_place||[]).forEach(d=>placed[d.i]=(placed[d.i]||0)+1);
   let body = shopNav(decorTab==='shop'?'decor':'mine');
   if(decorTab==='shop'){
-    body += DECOR.map(d=>{ const lock=me.lv<d.lv, n=inv[d.id]||0, cost=d.gold!=null?`${d.gold.toLocaleString()} 金`:`💎${d.gems}`;
-      const poor = d.gold!=null ? me.gold<d.gold : (me.gems||0)<d.gems;
+    body += DECOR.map(d=>{ const lock=me.lv<d.lv, n=inv[d.id]||0;
       return `<div class="row" style="${lock?'opacity:.55':''}"><div class="ic"><img src="${A('dc_'+d.id)}" style="width:44px;height:44px;object-fit:contain" alt=""></div>
         <div class="tx"><b>${esc(d.name)}</b>${n?` <span class="tag">已有 ${n}</span>`:''}${d.bonus?`<div style="color:#7B6CF6">${bonusTxt(d)}</div>`:'<div>&nbsp;</div>'}</div>
-        ${lock?`<span class="lock">Lv${d.lv} 解鎖</span>`:`<button class="mini ${d.gems!=null?'gem':''}" data-bd="${d.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('');
+        ${lock?`<span class="lock">Lv${d.lv} 解鎖</span>`:`<div class="skbuy">${d.gold!=null?`<button class="mini" data-bd="${d.id}" data-pay="gold" ${me.gold<d.gold?'disabled':''}>💰 ${d.gold.toLocaleString()}</button>`:''}${d.gems!=null?`<button class="mini gem" data-bd="${d.id}" data-pay="gems" ${(me.gems||0)<d.gems?'disabled':''}>💎${d.gems}</button>`:''}</div>`}</div>`; }).join('');
   } else {
     const own = DECOR.filter(d=>(inv[d.id]||0)>0);
     body += own.length ? own.map(d=>`<div class="row"><div class="ic"><img src="${A('dc_'+d.id)}" style="width:44px;height:44px;object-fit:contain" alt=""></div>
@@ -3024,7 +3023,7 @@ function openDecorShop(t){
   modal(shopTitle(), body, [['🖐️ 擺放模式','o',()=>enterDecorEdit()]]);
   bindShopNav(); const md=$('md');
   md.querySelectorAll('[data-bd]').forEach(b=>b.onclick=async()=>{ const d=DEC[b.dataset.bd];
-    try{ applyState(await rpc('farm_buy_decor',{p_id:d.id,p_n:1})); refresh(); sfx('coin');
+    try{ applyState(await rpc('farm_buy_decor',{p_id:d.id,p_n:1,p_pay:b.dataset.pay})); refresh(); sfx('coin');
       modal('買到了！', `<div style="text-align:center;padding:6px 0"><img src="${A('dc_'+d.id)}" style="width:110px;height:110px;object-fit:contain"><div style="font-weight:900;font-size:18px;margin-top:6px">${esc(d.name)}</div>${d.bonus?`<div style="color:#7B6CF6;font-weight:700">${bonusTxt(d)}</div>`:''}</div>`,
         [['馬上擺放','',()=>enterDecorEdit(d.id)],['繼續逛','sub',()=>openDecorShop('shop')]]);
     }catch(e){ toast(e.message); } });
@@ -3407,10 +3406,8 @@ function openToneShop(){
   if(mode==='visit') return toast('回到自己的農場才能換色調');
   const me=S.me, own=me.tones||{}, cur=me.tone||'spring';
   let body = shopNav('tone') + `<div class="skgrid">${TONES.map(t=>{ const fx=TONE_FX[t.id]||TONE_FX.spring, have=t.id==='spring'||own[t.id], on=t.id===cur;
-    const cost=t.gold!=null?`${t.gold.toLocaleString()} 金`:t.gems!=null?`💎${t.gems}`:'';
-    const poor=t.gold!=null?me.gold<t.gold:(me.gems||0)<(t.gems||0);
     return `<div class="skcard${on?' on':''}"><div class="tsw" data-tpv="${t.id}" style="background:linear-gradient(${fx.sky[0]},${fx.sky[1]} 60%,${fx.sky[2]})"><img alt="" src="${A('home_island')}"><span>${TONE_ICON[fx.fx]||'🌼'}</span></div><b>${esc(t.name)}</b><small style="font-size:10px;font-weight:700;color:var(--ink2);min-height:2.4em">${esc(t.descr||'')}</small>
-      ${on?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-tuse="${t.id}">套用</button>`:`<button class="mini ${t.gems!=null?'gem':''}" data-tbuy="${t.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('')}</div>
+      ${on?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-tuse="${t.id}">套用</button>`:`<div class="skbuy">${t.gold!=null?`<button class="mini" data-tbuy="${t.id}" data-pay="gold" ${me.gold<t.gold?'disabled':''}>💰 ${t.gold.toLocaleString()}</button>`:''}${t.gems!=null?`<button class="mini gem" data-tbuy="${t.id}" data-pay="gems" ${(me.gems||0)<t.gems?'disabled':''}>💎${t.gems}</button>`:''}</div>`}</div>`; }).join('')}</div>
     <div class="rhint" style="text-align:center;margin-top:8px">色調會改變天空、整座島的色彩和飄落特效，買過可以隨時切換，好友來拜訪也看得到</div>`;
   modal(shopTitle(), body); bindShopNav();
   const md=$('md');
@@ -3418,7 +3415,7 @@ function openToneShop(){
     tonedURL(A('home_island'),id).then(u=>{ im.src=u; });
     if(f.post) d.insertAdjacentHTML('beforeend',`<i style="position:absolute;inset:0;background:${f.post[1]};opacity:${f.post[2]};mix-blend-mode:${f.post[0]}"></i>`); });
   md.querySelectorAll('[data-tuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_tone',{p_id:b.dataset.tuse})); refresh(); sfx('coin'); openToneShop(); }catch(e){ toast(e.message); } });
-  md.querySelectorAll('[data-tbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_tone',{p_id:b.dataset.tbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('色調已套用！'); openToneShop(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-tbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_tone',{p_id:b.dataset.tbuy, p_pay:b.dataset.pay})); refresh(); fxConfetti(); sfx('lvup'); toast('色調已套用！'); openToneShop(); }catch(e){ toast(e.message); } });
 }
 /* ================= 背包：商店買到的東西都分類放在這裡 ================= */
 const BAG_TABS = [['item','🧪 道具'],['gear','🐾 寵物裝備'],['decor','🎨 裝飾'],['skin','🏠 建築外觀'],['tone','🌈 城鎮色調']];

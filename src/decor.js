@@ -39,11 +39,10 @@ function openDecorShop(t){
   const me=S.me, inv=me.decor_inv||{}, placed={}; (me.decor_place||[]).forEach(d=>placed[d.i]=(placed[d.i]||0)+1);
   let body = shopNav(decorTab==='shop'?'decor':'mine');
   if(decorTab==='shop'){
-    body += DECOR.map(d=>{ const lock=me.lv<d.lv, n=inv[d.id]||0, cost=d.gold!=null?`${d.gold.toLocaleString()} 金`:`💎${d.gems}`;
-      const poor = d.gold!=null ? me.gold<d.gold : (me.gems||0)<d.gems;
+    body += DECOR.map(d=>{ const lock=me.lv<d.lv, n=inv[d.id]||0;
       return `<div class="row" style="${lock?'opacity:.55':''}"><div class="ic"><img src="${A('dc_'+d.id)}" style="width:44px;height:44px;object-fit:contain" alt=""></div>
         <div class="tx"><b>${esc(d.name)}</b>${n?` <span class="tag">已有 ${n}</span>`:''}${d.bonus?`<div style="color:#7B6CF6">${bonusTxt(d)}</div>`:'<div>&nbsp;</div>'}</div>
-        ${lock?`<span class="lock">Lv${d.lv} 解鎖</span>`:`<button class="mini ${d.gems!=null?'gem':''}" data-bd="${d.id}" ${poor?'disabled':''}>${cost}</button>`}</div>`; }).join('');
+        ${lock?`<span class="lock">Lv${d.lv} 解鎖</span>`:`<div class="skbuy">${d.gold!=null?`<button class="mini" data-bd="${d.id}" data-pay="gold" ${me.gold<d.gold?'disabled':''}>💰 ${d.gold.toLocaleString()}</button>`:''}${d.gems!=null?`<button class="mini gem" data-bd="${d.id}" data-pay="gems" ${(me.gems||0)<d.gems?'disabled':''}>💎${d.gems}</button>`:''}</div>`}</div>`; }).join('');
   } else {
     const own = DECOR.filter(d=>(inv[d.id]||0)>0);
     body += own.length ? own.map(d=>`<div class="row"><div class="ic"><img src="${A('dc_'+d.id)}" style="width:44px;height:44px;object-fit:contain" alt=""></div>
@@ -55,7 +54,7 @@ function openDecorShop(t){
   modal(shopTitle(), body, [['🖐️ 擺放模式','o',()=>enterDecorEdit()]]);
   bindShopNav(); const md=$('md');
   md.querySelectorAll('[data-bd]').forEach(b=>b.onclick=async()=>{ const d=DEC[b.dataset.bd];
-    try{ applyState(await rpc('farm_buy_decor',{p_id:d.id,p_n:1})); refresh(); sfx('coin');
+    try{ applyState(await rpc('farm_buy_decor',{p_id:d.id,p_n:1,p_pay:b.dataset.pay})); refresh(); sfx('coin');
       modal('買到了！', `<div style="text-align:center;padding:6px 0"><img src="${A('dc_'+d.id)}" style="width:110px;height:110px;object-fit:contain"><div style="font-weight:900;font-size:18px;margin-top:6px">${esc(d.name)}</div>${d.bonus?`<div style="color:#7B6CF6;font-weight:700">${bonusTxt(d)}</div>`:''}</div>`,
         [['馬上擺放','',()=>enterDecorEdit(d.id)],['繼續逛','sub',()=>openDecorShop('shop')]]);
     }catch(e){ toast(e.message); } });
