@@ -500,6 +500,8 @@ body.editing .dec image{filter:drop-shadow(0 0 2px rgba(255,255,255,.9))}
   background:linear-gradient(90deg,#FF7A1A,#FFB628 30%,#FFE066 50%,#FFB628 70%,#FF7A1A);background-size:200% 100%;animation:sbbg 4s linear infinite,sbglow 1.6s ease-in-out infinite;
   border:2.5px solid #7A3B0A;box-shadow:0 0 0 2px #FFE9A8 inset,0 3px 0 #7A3B0A,0 0 14px rgba(255,170,40,.9)}
 .shoutbar.off{display:none}
+.shoutbar.go{pointer-events:auto;cursor:pointer}
+.sbgo{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;background:#fff;color:#D6336C;font-weight:900}
 .shoutbar.pop{animation:sbbg 4s linear infinite,sbpop .7s cubic-bezier(.3,1.6,.5,1)}
 .sbic{position:absolute;left:4px;top:50%;transform:translateY(-50%);z-index:3;width:28px;height:28px;border-radius:50%;background:#C2410C;border:2px solid #FFE9A8;display:flex;align-items:center;justify-content:center;font-size:15px;animation:sbic 1s ease-in-out infinite}
 .sbwin{position:absolute;left:36px;right:8px;top:0;bottom:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
@@ -1198,21 +1200,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794654731" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794654853" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794654731" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794654731" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794654853" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794654853" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794654731" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794654853" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794654731" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794654731" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794654853" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794654853" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <button class="sidebtn dot" id="bBindR" style="top:calc(100% + 132px);height:62px;display:none"><span style="font-size:22px;line-height:26px">🔒</span><small style="font-size:10px;line-height:1.15;text-align:center">綁定<br>送💎</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 202px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
@@ -1231,11 +1233,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794654731" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794654853" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794654731";
+const BUILD="1794654853";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -7885,8 +7887,12 @@ function shoutSet(list){
   if(fresh){ bar.classList.remove('pop'); void bar.offsetWidth; bar.classList.add('pop'); sbIdx = list.length-1; sbShow(); }
   else if(!same){ sbIdx = Math.min(sbIdx, list.length-1); sbShow(); }
 }
-function sbShow(){ const e=sbList[sbIdx]; if(!e) return; const el=$('sbTx');
-  el.innerHTML = `<b>${esc(e.a)}</b>：${esc(e.m||'')}`; sbW = el.scrollWidth; sbX = el.parentNode.clientWidth; }
+function sbShow(){ const e=sbList[sbIdx]; if(!e) return; const el=$('sbTx'), bar=$('shoutBar');
+  const go = e.p && e.u && !(S && S.me && e.u===S.me.id);   // 派對廣播：點一下就過去
+  el.innerHTML = `<b>${esc(e.a)}</b>：${esc(e.m||'')}${go?' <span class="sbgo">👉 點我前往</span>':''}`;
+  bar.classList.toggle('go', !!go); bar.dataset.u = go ? e.u : '';
+  sbW = el.scrollWidth; sbX = el.parentNode.clientWidth; }
+$('shoutBar').onclick = ()=>{ const u=$('shoutBar').dataset.u; if(!u) return; try{ closeModal(); }catch(e){} visit(u); };
 function sbLoop(now){ requestAnimationFrame(sbLoop); const el=$('sbTx'); if(!el||!sbW||!sbList.length) return;
   if(PAUSED() || now-sbT < 1000/FPS_CAP()-2){ if(PAUSED()) sbT=now; return; }
   const k=Math.min(4,(now-(sbT||now))/16.7); sbT=now;

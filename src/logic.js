@@ -880,8 +880,12 @@ function shoutSet(list){
   if(fresh){ bar.classList.remove('pop'); void bar.offsetWidth; bar.classList.add('pop'); sbIdx = list.length-1; sbShow(); }
   else if(!same){ sbIdx = Math.min(sbIdx, list.length-1); sbShow(); }
 }
-function sbShow(){ const e=sbList[sbIdx]; if(!e) return; const el=$('sbTx');
-  el.innerHTML = `<b>${esc(e.a)}</b>：${esc(e.m||'')}`; sbW = el.scrollWidth; sbX = el.parentNode.clientWidth; }
+function sbShow(){ const e=sbList[sbIdx]; if(!e) return; const el=$('sbTx'), bar=$('shoutBar');
+  const go = e.p && e.u && !(S && S.me && e.u===S.me.id);   // 派對廣播：點一下就過去
+  el.innerHTML = `<b>${esc(e.a)}</b>：${esc(e.m||'')}${go?' <span class="sbgo">👉 點我前往</span>':''}`;
+  bar.classList.toggle('go', !!go); bar.dataset.u = go ? e.u : '';
+  sbW = el.scrollWidth; sbX = el.parentNode.clientWidth; }
+$('shoutBar').onclick = ()=>{ const u=$('shoutBar').dataset.u; if(!u) return; try{ closeModal(); }catch(e){} visit(u); };
 function sbLoop(now){ requestAnimationFrame(sbLoop); const el=$('sbTx'); if(!el||!sbW||!sbList.length) return;
   if(PAUSED() || now-sbT < 1000/FPS_CAP()-2){ if(PAUSED()) sbT=now; return; }
   const k=Math.min(4,(now-(sbT||now))/16.7); sbT=now;
