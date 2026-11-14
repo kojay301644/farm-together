@@ -1191,22 +1191,23 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794652006" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794652969" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794652006" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794652006" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794652969" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794652969" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794652006" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794652969" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794652006" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794652006" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
-  <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 132px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794652969" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794652969" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn dot" id="bBindR" style="top:calc(100% + 132px);height:62px;display:none"><span style="font-size:22px;line-height:26px">🔒</span><small style="font-size:10px;line-height:1.15;text-align:center">綁定<br>送💎</small></button>
+  <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 202px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
 
 <div class="dock" id="dock" style="display:none">
@@ -1223,11 +1224,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794652006" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794652969" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794652006";
+const BUILD="1794652969";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2496,6 +2497,42 @@ function panSync(){ const max=map.scrollWidth-map.clientWidth;
 $('panL').onclick=()=>{ map.scrollBy({left:-innerWidth*0.6, behavior:'smooth'}); sfx && sfx('tap'); };
 $('panR').onclick=()=>{ map.scrollBy({left: innerWidth*0.6, behavior:'smooth'}); sfx && sfx('tap'); };
 map.addEventListener('scroll', panSync, {passive:true}); addEventListener('resize', panSync); setTimeout(panSync, 1500);
+
+/* ================= 試玩帳號綁定：獎勵＋提醒 ================= */
+let IS_ANON = false;
+async function bindInit(){
+  try{ const {data:{user}} = await sb.auth.getUser(); IS_ANON = !!(user && user.is_anonymous); }catch(e){}
+  bindBtn();
+  if(!IS_ANON) return bindClaim();
+  try{ // 玩超過一天的試玩玩家，每天最多提醒一次
+    let f = +localStorage.getItem('farm_first_seen'); if(!f){ f = Date.now(); localStorage.setItem('farm_first_seen', f); }
+    const today = new Date().toDateString();
+    if(Date.now() - f > 86400e3 && localStorage.getItem('farm_bind_nag') !== today){ localStorage.setItem('farm_bind_nag', today); setTimeout(()=>bindNudge('day'), 8000); }
+  }catch(e){}
+}
+function bindBtn(){ const b = $('bBindR'); if(b) b.style.display = (IS_ANON && mode !== 'visit') ? '' : 'none'; }
+function bindNudge(why){
+  if(!IS_ANON) return;
+  if($('ov').classList.contains('show')) return setTimeout(()=>bindNudge(why), 15000);
+  const gm = +(CFG_SET.bind_gems ?? 30), sd = +(CFG_SET.bind_seeds ?? 2);
+  const msg = why === 'lv3' ? '你的農場開始有規模了 🌱<br>綁定帳號，進度就不會不見！'
+    : why === 'day' ? '試玩帳號 30 天沒上線會被清除，<br>換手機或清除瀏覽器資料進度也會不見。<br>綁定一下才安心 🔒'
+    : '綁定帳號後，換手機也能找回農場，<br>還能儲值、填好友邀請碼！';
+  modal('🔒 綁定帳號送獎勵', `<div style="text-align:center;font-weight:800;line-height:1.8">${msg}
+    <div style="margin:12px auto 4px;padding:10px;border-radius:14px;background:#FFF6E0;display:inline-block">🎁 第一次綁定送<br><b>💎${gm}</b> ＋ <b>金蘋果種子 ×${sd}</b></div></div>`,
+    [['之後再說','sub',closeModal],['🔒 馬上綁定','',()=>openBind()]]);
+}
+async function bindClaim(){
+  try{
+    if(localStorage.getItem('farm_bind_rw_' + (S && S.me && S.me.id))) return;
+    const r = await rpc('farm_bind_reward');
+    if(S && S.me) localStorage.setItem('farm_bind_rw_' + S.me.id, '1');
+    if(!r || !r.ok) return;
+    if(r.state){ applyState(r.state); refresh(); }
+    fxConfetti();
+    modal('🎉 綁定成功！', `<div style="text-align:center;font-weight:800;line-height:1.8">你的農場已經安全保存了 🔒<br>送你 <b>💎${r.gems}</b> ＋ <b>金蘋果種子 ×${r.seeds}</b>！<br><small style="color:var(--ink2)">現在也可以儲值、填好友的邀請碼了</small></div>`, [['太好了','',closeModal]]);
+  }catch(e){}
+}
 
 /* ================= 寵物進化與裝備 ================= */
 let GEAR = {}, GEAR_LIST = [], EVO = [10,20];
@@ -6989,7 +7026,8 @@ const ui = {tool:'hand', seed:'radish', busy:false};
 
 function applyState(st){ if(!st) return; const old=S;
   if(st.me && st.me.ovf && st.me.ovf.n > 0) setTimeout(()=>toast(`📦 倉庫滿了！多出來的 ${st.me.ovf.n} 個已照現價賣掉，獲得 ${(+st.me.ovf.g).toLocaleString()} 金`), 400); S = {me:st.me, plots:st.plots, ranch:st.ranch||[], off:st.now - Date.now()}; S.me._stAt = Date.now();
-  try{ if(old && mode==='home' && Date.now()-(ui.lastLocal||0) > 3000) autoJobs(old, S); }catch(e){} }
+  try{ if(old && mode==='home' && Date.now()-(ui.lastLocal||0) > 3000) autoJobs(old, S); }catch(e){}
+  try{ if(old && old.me && old.me.id===S.me.id && old.me.lv < 3 && S.me.lv >= 3 && typeof IS_ANON!=='undefined' && IS_ANON) setTimeout(()=>bindNudge('lv3'), 2500); }catch(e){} }
 /* 比對前後狀態，看出是寵物裝備自動做的事 → 叫對應的寵物跑過去 */
 function autoJobs(a, b){
   if(typeof petDo!=='function') return;
@@ -7556,7 +7594,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bInv').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); bindBtn(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bInv').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -7655,7 +7693,7 @@ function openBind(){
       const {data, error} = await sb.auth.updateUser({email:u+ACCT_DOMAIN, password:p});
       if(error) return toast(zhErr(error.message));
       if(!data.user || !isAcctMail(data.user.email)) return toast('伺服器還沒開啟帳號綁定，請稍後再試');
-      sfx('lvup'); fxConfetti(); toast('綁定成功！之後用「' + u + '」登入就能找回進度'); openSettings(); }]]);
+      IS_ANON = false; bindBtn(); toast('綁定成功！之後用「' + u + '」登入就能找回進度'); closeModal(); bindClaim(); }]]);
 }
 async function createNick(){
   const v = $('nickIn').value.trim(); if(!v) return toast('請輸入暱稱');
@@ -7702,10 +7740,12 @@ function startGame(st){
   toast(`歡迎回到小鎮，${S.me.nickname}！`);
   setTimeout(tutMaybeStart, 900);
   setTimeout(showNotices, 1200);
+  setTimeout(bindInit, 3000);
   setTimeout(refAutoUse, 2000);
 }
 
 $('bInv').onclick = ()=>invite();  // 紅點一直亮著，提醒玩家邀請朋友
+$('bBindR').onclick = ()=>bindNudge('btn');
 $('authBtn').onclick = doAuth;
 $('tryBtn').onclick = async()=>{ const b=$('tryBtn'); b.disabled=true;
   try{ const {error} = await sb.auth.signInAnonymously(); if(error) authMsg(zhErr(error.message)); }

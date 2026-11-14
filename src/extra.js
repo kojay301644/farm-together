@@ -378,3 +378,39 @@ function panSync(){ const max=map.scrollWidth-map.clientWidth;
 $('panL').onclick=()=>{ map.scrollBy({left:-innerWidth*0.6, behavior:'smooth'}); sfx && sfx('tap'); };
 $('panR').onclick=()=>{ map.scrollBy({left: innerWidth*0.6, behavior:'smooth'}); sfx && sfx('tap'); };
 map.addEventListener('scroll', panSync, {passive:true}); addEventListener('resize', panSync); setTimeout(panSync, 1500);
+
+/* ================= 試玩帳號綁定：獎勵＋提醒 ================= */
+let IS_ANON = false;
+async function bindInit(){
+  try{ const {data:{user}} = await sb.auth.getUser(); IS_ANON = !!(user && user.is_anonymous); }catch(e){}
+  bindBtn();
+  if(!IS_ANON) return bindClaim();
+  try{ // 玩超過一天的試玩玩家，每天最多提醒一次
+    let f = +localStorage.getItem('farm_first_seen'); if(!f){ f = Date.now(); localStorage.setItem('farm_first_seen', f); }
+    const today = new Date().toDateString();
+    if(Date.now() - f > 86400e3 && localStorage.getItem('farm_bind_nag') !== today){ localStorage.setItem('farm_bind_nag', today); setTimeout(()=>bindNudge('day'), 8000); }
+  }catch(e){}
+}
+function bindBtn(){ const b = $('bBindR'); if(b) b.style.display = (IS_ANON && mode !== 'visit') ? '' : 'none'; }
+function bindNudge(why){
+  if(!IS_ANON) return;
+  if($('ov').classList.contains('show')) return setTimeout(()=>bindNudge(why), 15000);
+  const gm = +(CFG_SET.bind_gems ?? 30), sd = +(CFG_SET.bind_seeds ?? 2);
+  const msg = why === 'lv3' ? '你的農場開始有規模了 🌱<br>綁定帳號，進度就不會不見！'
+    : why === 'day' ? '試玩帳號 30 天沒上線會被清除，<br>換手機或清除瀏覽器資料進度也會不見。<br>綁定一下才安心 🔒'
+    : '綁定帳號後，換手機也能找回農場，<br>還能儲值、填好友邀請碼！';
+  modal('🔒 綁定帳號送獎勵', `<div style="text-align:center;font-weight:800;line-height:1.8">${msg}
+    <div style="margin:12px auto 4px;padding:10px;border-radius:14px;background:#FFF6E0;display:inline-block">🎁 第一次綁定送<br><b>💎${gm}</b> ＋ <b>金蘋果種子 ×${sd}</b></div></div>`,
+    [['之後再說','sub',closeModal],['🔒 馬上綁定','',()=>openBind()]]);
+}
+async function bindClaim(){
+  try{
+    if(localStorage.getItem('farm_bind_rw_' + (S && S.me && S.me.id))) return;
+    const r = await rpc('farm_bind_reward');
+    if(S && S.me) localStorage.setItem('farm_bind_rw_' + S.me.id, '1');
+    if(!r || !r.ok) return;
+    if(r.state){ applyState(r.state); refresh(); }
+    fxConfetti();
+    modal('🎉 綁定成功！', `<div style="text-align:center;font-weight:800;line-height:1.8">你的農場已經安全保存了 🔒<br>送你 <b>💎${r.gems}</b> ＋ <b>金蘋果種子 ×${r.seeds}</b>！<br><small style="color:var(--ink2)">現在也可以儲值、填好友的邀請碼了</small></div>`, [['太好了','',closeModal]]);
+  }catch(e){}
+}

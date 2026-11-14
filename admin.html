@@ -151,12 +151,13 @@ async function pageRl(silent){
   $('rlBad').textContent = on.length ? on.length : '';
   const show = q ? L.filter(x=>(x.nickname||'').toLowerCase().includes(q) || (x.email||'').toLowerCase().includes(q)) : L;
   const row = x => `<tr style="${x.online?'background:#EFFAF2':''}"><td>${x.online?'🟢':'⚪'}</td>
-    <td><a href="#" data-pid="${x.id}"><b>${esc(x.nickname||'（未取名）')}</b></a>${x.anon?' <span class="tag">試玩</span>':''}${x.banned?' <span class="tag r">停權</span>':''}<div class="muted" style="font-size:11px">${esc(x.email||'')}</div></td>
+    <td><a href="#" data-pid="${x.id}"><b>${esc(x.nickname||'（未取名）')}</b></a>${x.anon?' <span class="tag">試玩</span>':x.bind_rw?' <span class="tag" style="background:#DFF5E5;color:#14733C">🔒 試玩轉綁定</span>':''}${x.banned?' <span class="tag r">停權</span>':''}<div class="muted" style="font-size:11px">${esc(x.email||'')}</div></td>
     <td>Lv${x.lv}</td><td>${(x.gold||0).toLocaleString()}</td><td>💎${(x.gems||0).toLocaleString()}</td><td>${x.paid?`<b style="color:#1E9E55">NT$${x.paid.toLocaleString()}</b>`:'—'}</td>
     <td>${x.online?'<b style="color:#1E9E55">在線</b>':ago(Date.parse(x.last_seen))}</td><td class="muted">${dt(Date.parse(x.created_at))}</td></tr>`;
   const keepQ = document.activeElement && document.activeElement.id==='rlQ';
   M(`<div id="pdet"></div><div class="card"><h2>🧑 真人玩家 <span class="muted" style="font-size:13px;font-weight:600">共 ${L.length} 人・🟢 目前在線 ${on.length} 人（5 分鐘內有動作）・每 30 秒自動更新</span></h2>
     ${on.length?`<div style="margin:6px 0 10px;line-height:2">${on.map(x=>`<a href="#" data-pid="${x.id}" class="tag" style="background:#DFF5E5;color:#14733C;text-decoration:none;margin-right:4px">🟢 ${esc(x.nickname||'（未取名）')} Lv${x.lv}</a>`).join('')}</div>`:'<div class="muted" style="margin:6px 0 10px">目前沒有真人玩家在線</div>'}
+    ${(()=>{ const an=L.filter(x=>x.anon).length, bd=L.filter(x=>x.bind_rw).length, reg=L.length-an; return `<div class="grid" style="margin-bottom:8px">${rst(reg,'已綁定帳號')}${rst(an,'試玩中（還沒綁定）')}${rst(Math.round(reg*100/Math.max(1,L.length))+'%','綁定率')}${rst(bd,'🔒 試玩轉綁定（領過綁定獎勵）')}</div>`; })()}
     <div class="row" style="gap:6px"><input id="rlQ" placeholder="搜尋暱稱或 Email" value="${esc(rlQ)}" style="flex:1"></div>
     <div style="overflow-x:auto"><table class="tb" style="width:100%;margin-top:10px;font-size:13px"><tr><th></th><th>玩家</th><th>等級</th><th>金幣</th><th>鑽石</th><th>累積儲值</th><th>最後上線</th><th>註冊</th></tr>${show.map(row).join('') || '<tr><td colspan="8" class="muted">沒有資料</td></tr>'}</table></div></div>`);
   const qi=$('rlQ'); qi.oninput=()=>{ rlQ=qi.value.trim(); clearTimeout(qi._t); qi._t=setTimeout(()=>pageRl(true),300); };

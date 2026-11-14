@@ -65,7 +65,8 @@ const ui = {tool:'hand', seed:'radish', busy:false};
 
 function applyState(st){ if(!st) return; const old=S;
   if(st.me && st.me.ovf && st.me.ovf.n > 0) setTimeout(()=>toast(`📦 倉庫滿了！多出來的 ${st.me.ovf.n} 個已照現價賣掉，獲得 ${(+st.me.ovf.g).toLocaleString()} 金`), 400); S = {me:st.me, plots:st.plots, ranch:st.ranch||[], off:st.now - Date.now()}; S.me._stAt = Date.now();
-  try{ if(old && mode==='home' && Date.now()-(ui.lastLocal||0) > 3000) autoJobs(old, S); }catch(e){} }
+  try{ if(old && mode==='home' && Date.now()-(ui.lastLocal||0) > 3000) autoJobs(old, S); }catch(e){}
+  try{ if(old && old.me && old.me.id===S.me.id && old.me.lv < 3 && S.me.lv >= 3 && typeof IS_ANON!=='undefined' && IS_ANON) setTimeout(()=>bindNudge('lv3'), 2500); }catch(e){} }
 /* 比對前後狀態，看出是寵物裝備自動做的事 → 叫對應的寵物跑過去 */
 function autoJobs(a, b){
   if(typeof petDo!=='function') return;
@@ -632,7 +633,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bInv').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); bindBtn(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bInv').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
@@ -731,7 +732,7 @@ function openBind(){
       const {data, error} = await sb.auth.updateUser({email:u+ACCT_DOMAIN, password:p});
       if(error) return toast(zhErr(error.message));
       if(!data.user || !isAcctMail(data.user.email)) return toast('伺服器還沒開啟帳號綁定，請稍後再試');
-      sfx('lvup'); fxConfetti(); toast('綁定成功！之後用「' + u + '」登入就能找回進度'); openSettings(); }]]);
+      IS_ANON = false; bindBtn(); toast('綁定成功！之後用「' + u + '」登入就能找回進度'); closeModal(); bindClaim(); }]]);
 }
 async function createNick(){
   const v = $('nickIn').value.trim(); if(!v) return toast('請輸入暱稱');
@@ -778,10 +779,12 @@ function startGame(st){
   toast(`歡迎回到小鎮，${S.me.nickname}！`);
   setTimeout(tutMaybeStart, 900);
   setTimeout(showNotices, 1200);
+  setTimeout(bindInit, 3000);
   setTimeout(refAutoUse, 2000);
 }
 
 $('bInv').onclick = ()=>invite();  // 紅點一直亮著，提醒玩家邀請朋友
+$('bBindR').onclick = ()=>bindNudge('btn');
 $('authBtn').onclick = doAuth;
 $('tryBtn').onclick = async()=>{ const b=$('tryBtn'); b.disabled=true;
   try{ const {error} = await sb.auth.signInAnonymously(); if(error) authMsg(zhErr(error.message)); }
