@@ -758,12 +758,26 @@ async function loadConfig(){
     setGearConfig(c.gear, c.settings, c.skins); setRanchConfig(c.animals, c.settings); setDecorConfig(c.decor, c.settings); setBeastConfig(c.beasts, c.pet_skins); setItemConfig(c.items); SPIN=c.spin||[]; COS=c.cosmetics||[]; window.PACKS=c.packs||[]; setToneConfig(c.tones); CFG_SET=c.settings||{};
   }catch(e){}
 }
+let NOTES = [];
+const noteSeen = () => { try{ return JSON.parse(localStorage.getItem('ytzt_seen_notices')||'[]'); }catch(e){ return []; } };
+function noteMark(ids){ const seen = noteSeen(); ids.forEach(i=>{ if(!seen.includes(i)) seen.push(i); }); try{ localStorage.setItem('ytzt_seen_notices', JSON.stringify(seen.slice(-50))); }catch(e){} noteDot(); }
+function noteDot(){ const b=$('bNote'); if(b){ const seen=noteSeen(); b.classList.toggle('nd', NOTES.some(x=>!seen.includes(x.id))); } }
+/* 📢 公告列表：主畫面右上角，可以隨時重看 */
+async function openNotes(){
+  try{ NOTES = await rpc('farm_notices'); }catch(e){ return toast(e.message); }
+  const seen = noteSeen(), d = t => t ? new Date(t).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'}) : '';
+  const body = NOTES.length ? NOTES.map((n,i)=>`<details class="note"${i===0?' open':''}><summary><b>${esc(n.title)}</b>${seen.includes(n.id)?'':' <span class="tag" style="background:#FFE3E3;color:#D63B3B">NEW</span>'}<span class="ndt">${d(n.at)}</span></summary><div class="nbody">${esc(n.body)}</div></details>`).join('')
+    : '<div class="empty">目前沒有公告</div>';
+  modal('📢 公告', body);
+  noteMark(NOTES.map(n=>n.id));
+}
 async function showNotices(){
   if(mjOn()) return setTimeout(showNotices, 20000);
   let L; try{ L = await rpc('farm_notices'); }catch(e){ return; }
-  let seen = []; try{ seen = JSON.parse(localStorage.getItem('ytzt_seen_notices')||'[]'); }catch(e){}
+  NOTES = L; noteDot();
+  let seen = noteSeen();
   const n = L.find(x=>!seen.includes(x.id)); if(!n) return;
-  seen.push(n.id); try{ localStorage.setItem('ytzt_seen_notices', JSON.stringify(seen.slice(-50))); }catch(e){}
+  noteMark([n.id]);
   modal('📢 ' + esc(n.title), `<div style="white-space:pre-wrap;font-size:14px;font-weight:500;line-height:1.8">${esc(n.body)}</div>`, [['知道了','',()=>{ closeModal(); setTimeout(showNotices, 300); }]]);
 }
 function startGame(st){
@@ -810,6 +824,7 @@ $('bHelp').onclick = ()=>{ if(S) openHelp(); };
 $('bSign').onclick = ()=>openSign();
 $('bSpin').onclick = ()=>openSpin();
 $('bGift').onclick = ()=>{ if(S) openGifts(false); };
+$('bNote').onclick = ()=>{ if(S) openNotes(); };
 $('avatar').onclick = ()=>{ if(S && mode==='home') openAvatarPicker(); };
 $('gemBox').onclick = ()=>{ if(S) openTopup(); };
 $('goldBox').onclick = ()=>{ if(S) openGoldBags(); };
