@@ -165,15 +165,14 @@ function openSkinShop(t){
   const tabs=`<div class="tabs sktabs">${Object.keys(SKIN_BLD).map(k=>`<button data-skt="${k}" class="${skinTab===k?'on':''}">${SKIN_BLD[k]}</button>`).join('')}</div>`;
   const styles=[SKIN_DEF[skinTab], ...SKINS.filter(x=>x.bld===skinTab).map(x=>x.style)];
   const body=shopNav('skin')+tabs+`<div class="skgrid">${styles.map(st=>{ const def=st===SKIN_DEF[skinTab], k=SKINS.find(x=>x.bld===skinTab&&x.style===st), have=def||owned[skinTab+'_'+st], cur=st===on;
-    const price = k ? (k.gold!=null?`${k.gold.toLocaleString()} 金`:`💎${k.gems}`) : '';
     return `<div class="skcard${cur?' on':''}"><img src="${A('th_'+st+'_'+SKIN_PART[skinTab])}" alt=""><b>${def?'預設':(k?k.name:SKIN_NAME[st])}</b>
-      ${cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-skuse="${def?'def':st}">套用</button>`:`<button class="mini ${k&&k.gems!=null?'gem':''}" data-skbuy="${k.id}" ${(k.gold!=null?me.gold<k.gold:(me.gems||0)<k.gems)?'disabled':''}>${price}</button>`}</div>`; }).join('')}</div>
+      ${cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-skuse="${def?'def':st}">套用</button>`:`<div class="skbuy">${k.gold!=null?`<button class="mini" data-skbuy="${k.id}" data-pay="gold" ${me.gold<k.gold?'disabled':''}>💰 ${k.gold.toLocaleString()}</button>`:''}${k.gems!=null?`<button class="mini gem" data-skbuy="${k.id}" data-pay="gems" ${(me.gems||0)<k.gems?'disabled':''}>💎${k.gems}</button>`:''}</div>`}</div>`; }).join('')}</div>
     <div class="rhint" style="text-align:center;margin-top:8px">買過的外觀可以隨時免費切換，好友來拜訪也看得到</div>`;
   modal(shopTitle(), body); bindShopNav();
   const md=$('md');
   md.querySelectorAll('[data-skt]').forEach(b=>b.onclick=()=>openSkinShop(b.dataset.skt));
   md.querySelectorAll('[data-skuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_skin',{p_bld:skinTab,p_style:b.dataset.skuse})); refresh(); sfx('coin'); openSkinShop(); }catch(e){ toast(e.message); } });
-  md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy, p_pay:b.dataset.pay})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
 }
 
 /* ================= 自動更新：發現新版就提示玩家更新 ================= */

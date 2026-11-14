@@ -50,6 +50,7 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 body.modalopen #map *,body.mjon #map *,body.idle #map *,body.mjon .hud *,body.mjon .dock *,body.modalopen .hud *{animation-play-state:paused!important}
 body.mjon #map{visibility:hidden}
 #world{display:block}
+.skbuy{display:flex;flex-direction:column;gap:4px;align-items:center}.skbuy .mini{min-width:86px}
 .pflag{transform-box:fill-box;transform-origin:50% 0;animation:pflag 1.6s ease-in-out infinite alternate}
 @keyframes pflag{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
 .pball{animation:pball 3s ease-in-out infinite alternate}
@@ -1197,21 +1198,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794654420" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794654555" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794654420" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794654420" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794654555" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794654555" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794654420" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794654555" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794654420" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794654420" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794654555" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794654555" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <button class="sidebtn dot" id="bBindR" style="top:calc(100% + 132px);height:62px;display:none"><span style="font-size:22px;line-height:26px">🔒</span><small style="font-size:10px;line-height:1.15;text-align:center">綁定<br>送💎</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 202px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
@@ -1230,11 +1231,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794654420" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794654555" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794654420";
+const BUILD="1794654555";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2747,15 +2748,14 @@ function openSkinShop(t){
   const tabs=`<div class="tabs sktabs">${Object.keys(SKIN_BLD).map(k=>`<button data-skt="${k}" class="${skinTab===k?'on':''}">${SKIN_BLD[k]}</button>`).join('')}</div>`;
   const styles=[SKIN_DEF[skinTab], ...SKINS.filter(x=>x.bld===skinTab).map(x=>x.style)];
   const body=shopNav('skin')+tabs+`<div class="skgrid">${styles.map(st=>{ const def=st===SKIN_DEF[skinTab], k=SKINS.find(x=>x.bld===skinTab&&x.style===st), have=def||owned[skinTab+'_'+st], cur=st===on;
-    const price = k ? (k.gold!=null?`${k.gold.toLocaleString()} 金`:`💎${k.gems}`) : '';
     return `<div class="skcard${cur?' on':''}"><img src="${A('th_'+st+'_'+SKIN_PART[skinTab])}" alt=""><b>${def?'預設':(k?k.name:SKIN_NAME[st])}</b>
-      ${cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-skuse="${def?'def':st}">套用</button>`:`<button class="mini ${k&&k.gems!=null?'gem':''}" data-skbuy="${k.id}" ${(k.gold!=null?me.gold<k.gold:(me.gems||0)<k.gems)?'disabled':''}>${price}</button>`}</div>`; }).join('')}</div>
+      ${cur?'<span class="tag" style="background:#E8F8EE;color:#2E9660">使用中</span>':have?`<button class="mini" data-skuse="${def?'def':st}">套用</button>`:`<div class="skbuy">${k.gold!=null?`<button class="mini" data-skbuy="${k.id}" data-pay="gold" ${me.gold<k.gold?'disabled':''}>💰 ${k.gold.toLocaleString()}</button>`:''}${k.gems!=null?`<button class="mini gem" data-skbuy="${k.id}" data-pay="gems" ${(me.gems||0)<k.gems?'disabled':''}>💎${k.gems}</button>`:''}</div>`}</div>`; }).join('')}</div>
     <div class="rhint" style="text-align:center;margin-top:8px">買過的外觀可以隨時免費切換，好友來拜訪也看得到</div>`;
   modal(shopTitle(), body); bindShopNav();
   const md=$('md');
   md.querySelectorAll('[data-skt]').forEach(b=>b.onclick=()=>openSkinShop(b.dataset.skt));
   md.querySelectorAll('[data-skuse]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_set_skin',{p_bld:skinTab,p_style:b.dataset.skuse})); refresh(); sfx('coin'); openSkinShop(); }catch(e){ toast(e.message); } });
-  md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
+  md.querySelectorAll('[data-skbuy]').forEach(b=>b.onclick=async()=>{ try{ applyState(await rpc('farm_buy_skin',{p_id:b.dataset.skbuy, p_pay:b.dataset.pay})); refresh(); fxConfetti(); sfx('lvup'); toast('外觀已套用！'); openSkinShop(); }catch(e){ toast(e.message); } });
 }
 
 /* ================= 自動更新：發現新版就提示玩家更新 ================= */
