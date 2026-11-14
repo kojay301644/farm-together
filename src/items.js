@@ -75,7 +75,7 @@ function renderBuffs(){
   if(me) for(const k of ['shield','harvest','exp','grow','party']){ const s=buffLeft(me,k); if(s>0) h+=`<span class="buff">${BUFF_TXT[k][0]} ${BUFF_TXT[k][1]} ${hms(s)}${k==='party'?`・👥 ${+(me.party_n||0)} 人來過`:''}</span>`; }
   if(mode==='visit' && V && V.owner){ const o=V.owner, b=o.buffs||{}, now=Date.now()+(S.off||0);
     if(+b.shield>now) h+=`<span class="buff bad">🛡️ 對方開了防盜罩</span>`;
-    if(+b.party>now){ const pn=+(o.party_n||0); h+= o.party_got ? `<span class="buff">🎉 派對中（已領過）・👥 ${pn} 人來過</span>` : `<button class="buff party" id="partyGo">🎉 派對中！領派對禮物${pn?`（已有 ${pn} 人來）`:''}</button>`; } }
+    if(+b.party>now){ const pn=+(o.party_n||0); h+= o.party_got ? `<span class="buff">🎉 派對中（已領過）・👥 ${pn} 人來過</span>` : `<button class="buff party" id="partyGo">🎉 領派對禮物${o.party_gift?`（💰${(+o.party_gift.g).toLocaleString()}・⭐${o.party_gift.x}）`:''}${pn?`・已有 ${pn} 人來`:''}</button>`; } }
   if(el.innerHTML!==h) el.innerHTML=h;
   const pg=$('partyGo'); if(pg) pg.onclick=async()=>{ try{ const r=await rpc('farm_party_join',{p_owner:V.owner.id}); applyState(r.state); if(r.visit) applyVisit(r.visit); refresh(); sfx('lvup'); fxConfetti(); toast(`🎉 派對禮物：${r.gold} 金、經驗 +${r.exp}`); if(r.gift) toast(r.gift); }catch(e){ toast(e.message); } };
 }
