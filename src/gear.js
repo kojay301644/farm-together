@@ -36,11 +36,12 @@ function bindBeastPanel(){ document.querySelectorAll('#md [data-pg]').forEach(b=
 function autoSeedN(me){ return Math.max(0, ...partyOf(me).map(p=>GEAR[p.g]).filter(g=>g&&g.func==='plant').map(g=>+g.val)); }
 function autoSeedHTML(){ const me=S.me, N=autoSeedN(me);
   const opt = sel => CROPS.filter(c=>me.lv>=c.lv || c.id===sel).map(c=>`<option value="${c.id}" ${sel===c.id?'selected':''}>${c.rare?'✨':''}${c.name}（${me.seeds[c.id]||0} 包）</option>`).join('');
-  const n1 = me.auto_seed ? (me.auto_n1!=null ? me.auto_n1 : N) : '', n2 = me.auto_seed2 ? (me.auto_n2||0) : '';
+  const n1 = me.auto_seed ? (me.auto_n1!=null ? me.auto_n1 : N) : '', n2 = me.auto_seed2 ? (me.auto_n2||0) : '', n3 = me.auto_seed3 ? (me.auto_n3||0) : '';
   return `<div class="autoseed2">
     <div class="autoseed">🌱 1️⃣<select id="aSeed"><option value="">（不種）</option>${opt(me.auto_seed)}</select> 種 <input id="aN1" type="number" min="0" max="${N||99}" value="${n1}" class="anum"> 塊</div>
     <div class="autoseed">🌱 2️⃣<select id="aSeed2"><option value="">（不選）</option>${opt(me.auto_seed2)}</select> 種 <input id="aN2" type="number" min="0" max="${N||99}" value="${n2}" class="anum"> 塊</div>
-    <div class="rhint">自動播種範圍：共 <b>${N}</b> 塊田${N?'':'（要先讓夥伴戴上自動播種裝備）'}。前面幾塊種 1️⃣，接下來種 2️⃣；某一種的種子用完會改種另一種，兩種都沒有才空著。</div>
+    <div class="autoseed">🌱 3️⃣<select id="aSeed3"><option value="">（不選）</option>${opt(me.auto_seed3)}</select> 種 <input id="aN3" type="number" min="0" max="${N||99}" value="${n3}" class="anum"> 塊</div>
+    <div class="rhint">自動播種範圍：共 <b>${N}</b> 塊田${N?'':'（要先讓夥伴戴上自動播種裝備）'}。前面幾塊種 1️⃣，接下來種 2️⃣，再來種 3️⃣；某一種的種子用完會依序改種其他種，全部都沒有才空著。</div>
     <div style="text-align:right"><button class="btn" id="aSeedSave">儲存自動播種</button></div></div>`; }
 function autoFeedHTML(){ const me=S.me;
   const opts = CROPS.filter(c=>(me.crops[c.id]||0)>0 || me.auto_feed===c.id).map(c=>`<option value="${c.id}" ${me.auto_feed===c.id?'selected':''}>${c.name}（穀倉 ${me.crops[c.id]||0} 個）</option>`).join('');
@@ -49,11 +50,15 @@ function bindAutoSel(){
   if($('aSeed')){ const N=autoSeedN(S.me);
     $('aSeed').onchange=()=>{ if($('aSeed').value && $('aN1').value==='') $('aN1').value = Math.max(0, N - (+$('aN2').value||0)); };
     $('aSeed2').onchange=()=>{ if($('aSeed2').value && $('aN2').value==='') $('aN2').value = Math.max(0, N - (+$('aN1').value||0)); };
-    $('aSeedSave').onclick=async()=>{ const c1=$('aSeed').value||null, c2=c1?($('aSeed2').value||null):null, n1=c1?Math.max(0,+$('aN1').value||0):null, n2=c2?Math.max(0,+$('aN2').value||0):null;
+    $('aSeed3').onchange=()=>{ if($('aSeed3').value && $('aN3').value==='') $('aN3').value = Math.max(0, N - (+$('aN1').value||0) - (+$('aN2').value||0)); };
+    $('aSeedSave').onclick=async()=>{ const c1=$('aSeed').value||null, c2=c1?($('aSeed2').value||null):null, c3=c2?($('aSeed3').value||null):null,
+        n1=c1?Math.max(0,+$('aN1').value||0):null, n2=c2?Math.max(0,+$('aN2').value||0):null, n3=c3?Math.max(0,+$('aN3').value||0):null;
+      if(!c2 && $('aSeed3').value) return toast('要先選第二種，才能選第三種');
       if(c2 && c2===c1) return toast('第二種要選不同的作物');
-      if(N && (n1||0)+(n2||0) > N) return toast(`兩種加起來最多 ${N} 塊`);
-      try{ applyState(await rpc('farm_set_auto_seed2',{p_c1:c1,p_n1:n1,p_c2:c2,p_n2:n2})); refresh(); sfx('coin');
-        toast(!c1?'不自動播種':`會自動種${CROP[c1].name} ${n1} 塊${c2?`、${CROP[c2].name} ${n2} 塊`:''}`); }catch(err){ toast(err.message); } };
+      if(c3 && (c3===c1 || c3===c2)) return toast('第三種要選不同的作物');
+      if(N && (n1||0)+(n2||0)+(n3||0) > N) return toast(`加起來最多 ${N} 塊`);
+      try{ applyState(await rpc('farm_set_auto_seed3',{p_c1:c1,p_n1:n1,p_c2:c2,p_n2:n2,p_c3:c3,p_n3:n3})); refresh(); sfx('coin');
+        toast(!c1?'不自動播種':`會自動種${CROP[c1].name} ${n1} 塊${c2?`、${CROP[c2].name} ${n2} 塊`:''}${c3?`、${CROP[c3].name} ${n3} 塊`:''}`); }catch(err){ toast(err.message); } };
   }
   if($('aFeed')) $('aFeed').onchange=async e=>{ try{ applyState(await rpc('farm_set_auto_feed',{p_crop:e.target.value||null})); refresh(); toast(e.target.value?`會用${CROP[e.target.value].name}餵動物`:'自動挑最便宜的作物來餵'); }catch(err){ toast(err.message); } };
 }
