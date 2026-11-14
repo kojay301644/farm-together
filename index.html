@@ -1200,21 +1200,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794654853" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794655092" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794654853" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794654853" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794655092" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794655092" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794654853" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794655092" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794654853" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794654853" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794655092" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794655092" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <button class="sidebtn dot" id="bBindR" style="top:calc(100% + 132px);height:62px;display:none"><span style="font-size:22px;line-height:26px">🔒</span><small style="font-size:10px;line-height:1.15;text-align:center">綁定<br>送💎</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 202px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
@@ -1233,11 +1233,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794654853" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794655092" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794654853";
+const BUILD="1794655092";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -2307,7 +2307,7 @@ function openHelp(){
     <ul><li><b>偷菜</b>：成熟的作物每塊地每人只能偷一次，每塊地最多被偷走 4 成，主人一定拿得到 6 成</li>
     <li><b>幫忙</b>：幫好友除草除蟲可以拿經驗</li>
     <li><b>惡作劇</b>：在別人還沒成熟的作物放草、放蟲，或在牧場放蚊子，每次用 1 點 😈惡作劇體力。上限 ${+(CFG_SET.prank_daily??10)} 點，用掉後每 ${+(CFG_SET.prank_regen_min??10)} 分鐘回 1 點，每天凌晨補滿</li>
-    <li><b>偷陌生人</b>：在「鄰居」可以偷不是好友的玩家（偷好友不用體力）。每偷一次用 1 點 ⚡偷菜體力，上限 ${+(CFG_SET.stranger_steal_daily??30)} 點，用掉後每 ${+(CFG_SET.steal_regen_min??10)} 分鐘回 1 點，每天凌晨補滿；擺出鳥居、龍雕像等裝飾可以提高體力上限</li></ul>
+    <li><b>偷菜體力</b>：在「鄰居」可以偷不是好友的玩家，也可以偷好友。不管偷誰，每偷一次都用 1 點 ⚡偷菜體力，上限 ${+(CFG_SET.stranger_steal_daily??30)} 點，用掉後每 ${+(CFG_SET.steal_regen_min??10)} 分鐘回 1 點，每天凌晨補滿；擺出鳥居、龍雕像等裝飾可以提高體力上限</li></ul>
     <p>Lv${+(CFG_SET.newbie_lv??3)} 以下是<b>新手保護</b>，別人偷不了你，你也偷不了別人。</p>
     <p>作物成熟後要快點收，不然會被偷走喔！有人偷你的菜、放草放蟲時，畫面上方會跳出提醒，<b>好友廣場</b>也會出現紅點；到「動態」可以看是誰做的，按「😤 復仇」直接去他的農場。</p>
     <h4>🐔 牧場</h4>
@@ -7479,7 +7479,7 @@ async function openBoard(tab){
         <button class="mini" data-acc="${f.id}">接受</button><button class="mini sub" data-rej="${f.id}">拒絕</button></div>`).join('') : `<div class="empty" style="padding:10px 0">沒有新的邀請</div>`);
     if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row">${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
   } else if(boardTab==='near'){
-    body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（偷陌生人要用偷菜體力：<b style="color:var(--orange-d)">⚡${S.me.steal_left}</b>${S.me.steal_max?' / '+S.me.steal_max:''}${stealRegenTxt(S.me)}）</div>`;
+    body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（偷菜要用偷菜體力，偷好友也一樣：<b style="color:var(--orange-d)">⚡${S.me.steal_left}</b>${S.me.steal_max?' / '+S.me.steal_max:''}${stealRegenTxt(S.me)}）</div>`;
     body += NB.length ? NB.map(f=>`<div class="row">${avImg(f)}
         <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}${f.party?' <span class="tag" style="background:#FFE3F0;color:#D6336C">🎉 派對中</span>':''}
           <div>${(f.ripe||f.bin)?`<span style="color:var(--orange-d)">${f.ripe?`🥕 有 ${f.ripe} 塊地可以偷`:''}${f.ripe&&f.bin?'・':''}${f.bin?'🧺 收集倉可以偷':''}</span>`:'目前沒有可偷的菜'}</div></div>

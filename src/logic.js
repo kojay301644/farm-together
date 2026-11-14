@@ -472,7 +472,7 @@ async function openBoard(tab){
         <button class="mini" data-acc="${f.id}">接受</button><button class="mini sub" data-rej="${f.id}">拒絕</button></div>`).join('') : `<div class="empty" style="padding:10px 0">沒有新的邀請</div>`);
     if(F.outgoing.length) body += `<div class="sec">已送出、等對方確認</div>` + F.outgoing.map(f=>`<div class="row">${avImg(f)}<div class="tx"><b>${esc(f.nickname)}</b><div>等待確認中</div></div></div>`).join('');
   } else if(boardTab==='near'){
-    body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（偷陌生人要用偷菜體力：<b style="color:var(--orange-d)">⚡${S.me.steal_left}</b>${S.me.steal_max?' / '+S.me.steal_max:''}${stealRegenTxt(S.me)}）</div>`;
+    body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（偷菜要用偷菜體力，偷好友也一樣：<b style="color:var(--orange-d)">⚡${S.me.steal_left}</b>${S.me.steal_max?' / '+S.me.steal_max:''}${stealRegenTxt(S.me)}）</div>`;
     body += NB.length ? NB.map(f=>`<div class="row">${avImg(f)}
         <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}${f.party?' <span class="tag" style="background:#FFE3F0;color:#D6336C">🎉 派對中</span>':''}
           <div>${(f.ripe||f.bin)?`<span style="color:var(--orange-d)">${f.ripe?`🥕 有 ${f.ripe} 塊地可以偷`:''}${f.ripe&&f.bin?'・':''}${f.bin?'🧺 收集倉可以偷':''}</span>`:'目前沒有可偷的菜'}</div></div>
