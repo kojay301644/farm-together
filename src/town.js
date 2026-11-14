@@ -23,7 +23,7 @@ const FARM_C=[9.2,9.2];
 
 /* ================= 美術元件 ================= */
 const INK='#4B3423';
-let HOME_LBL=null, homeLblCur='', BIN_LBL=null, binLblCur='';
+let HOME_LBL=null, homeLblCur='', BIN_LBL=null, binLblCur='', COOP_LBL=null, coopLblCur='';
 const binItems = () => (mode==='visit' && typeof V!=='undefined' && V) ? ((V.bin||{}).items||{}) : ((typeof S!=='undefined' && S && S.me && S.me.bin)||{});
 const binCount = b => ['c','g'].reduce((a,t)=>a+Object.values((b||{})[t]||{}).reduce((x,y)=>x+(+y||0),0),0);
 /* 拜訪別人時，收集倉有東西可以偷 → 顯示會跳動的「可以偷」大標籤 */
@@ -298,6 +298,7 @@ function buildWorld(){
     const [lx,ly]=iso(gx,gy);
     if(o.id==='home'){ HOME_LBL=[lx, ly - h*0.12]; homeLblCur=homeLblName(); lab += `<g id="homeLbl">${labelPill(lx, ly - h*0.12, '🏠 '+esc(homeLblCur)+'的家', {big:1})}</g>`; }  // 放在大門前面，不會被上方玩家欄擋住
     else if(o.id==='bin'){ BIN_LBL=[lx, ly-h*o.foot-18]; lab += `<g id="binLbl">${labelPill(lx, ly-h*o.foot-18, binLblText(), {bg:'#FFF1DC'})}</g>`; }
+    else if(o.id==='coop'){ COOP_LBL=[lx, ly-20, !!o.locked]; coopLblCur=coopLblText(); lab += `<g id="coopLbl">${labelPill(lx, ly-20, coopLblCur, {locked:!!o.locked, bg:coopLblCur!==o.name?'#FFF1DC':null})}</g>`; }
     else lab += labelPill(lx, ly - (o.id==='coop'?20:o.id==='barn'?h*0.42:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':o.id==='pen'?'#FFE7A8':null});
     if(o.id==='coop'){ const bx=lx + ([...o.name].length*19+30)/2 + 4, by=ly-20-16;   // 牧場紅點：自己的動物有蚊子時亮
       lab += `<g id="coopDot" style="display:none;pointer-events:none" transform="translate(${bx.toFixed(1)} ${by.toFixed(1)})"><circle r="12" fill="#F2545B" stroke="#fff" stroke-width="3"/><text id="coopDotN" y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="Noto Sans TC,sans-serif">1</text></g>`; }
@@ -564,3 +565,16 @@ function partyFxSync(){
     if(on && !hat){ const g = document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML = partyHatSVG(m.n||60); m.parts.root.appendChild(g.firstChild); }
     else if(!on && hat) hat.remove(); });
 }
+
+/* 牧場標籤：拜訪時有動物可以偷、自己家有產品可以收，就換成提示 */
+function coopLblText(){
+  const vis = mode==='visit' && typeof V!=='undefined' && V;
+  const list = vis ? (V.ranch||[]) : ((typeof S!=='undefined' && S && S.ranch) || []), off = vis ? V.off : (S && S.off) || 0;
+  if(typeof aniState!=='function') return '牧場';
+  if(vis){ const now = Date.now() + (V.off||0), sh = +((V.owner&&V.owner.buffs||{}).shield||0) > now;
+    const k = (V.protected || sh) ? 0 : list.filter(r=>aniState(r,off)==='ready' && !r.mine && r.st < r.cap).length;
+    return k ? `✋ 牧場可以偷 ${k}` : '牧場'; }
+  const k = list.filter(r=>aniState(r,off)==='ready').length;
+  return k ? `🥚 牧場可以收 ${k}` : '牧場'; }
+function setCoopLabel(){ const el=$('coopLbl'); if(!el||!COOP_LBL) return; const t=coopLblText(); if(t===coopLblCur) return; coopLblCur=t;
+  el.innerHTML = labelPill(COOP_LBL[0], COOP_LBL[1], t, {locked:COOP_LBL[2], bg:t!=='牧場'?'#FFF1DC':null}); }

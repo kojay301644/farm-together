@@ -1203,21 +1203,21 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 
 <div class="hud" id="hud" style="display:none">
   <div class="top">
-    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794659112" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
+    <div class="avw" id="avWrap"><img class="avatar avimg" id="avatar" src="assets/av11.webp?v=1794659521" alt="" style="cursor:pointer"><i class="aved">✎</i></div>
     <div class="who">
       <div class="nm" id="pname"></div>
       <div class="lvrow"><span class="lvtag" id="plv">Lv1</span><div class="bar"><i id="pexp"></i></div><span id="pexpt"></span></div>
     </div>
-    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794659112" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794659112" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
+    <div class="cur"><div class="gold" id="goldBox"><img class="icn" src="assets/i_coin.webp?v=1794659521" alt=""><span id="pgold">0</span><i class="gplus gp2">+</i></div><div class="gold gem" id="gemBox"><img class="icn" src="assets/i_gem.webp?v=1794659521" alt=""><span id="pgems">0</span><i class="gplus">+</i></div></div>
     <button class="setbtn eb" id="bNote" aria-label="公告">📢</button><button class="setbtn eb" id="bGift" aria-label="禮物信箱">📬</button><button class="setbtn eb" id="bHelp" aria-label="遊戲說明">📖</button>
-    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794659112" alt=""></button>
+    <button class="setbtn" id="bSet" aria-label="設定"><img src="assets/n_set.webp?v=1794659521" alt=""></button>
   </div>
   <div class="hint" id="hint"></div>
   <div class="ticker" id="ticker"><div class="tk" id="tk"></div></div>
   <div class="shoutbar off" id="shoutBar"><span class="sbic">📢</span><div class="sbwin"><div class="sbtx" id="sbTx"></div></div><i class="sbshine"></i><span class="sbsp s1">✦</span><span class="sbsp s2">✦</span><span class="sbsp s3">✦</span></div>
   <div class="buffs" id="buffs"></div>
-  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794659112" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
-  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794659112" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
+  <button class="sidebtn" id="bSign"><img src="assets/n_sign.webp?v=1794659521" alt="" style="width:30px;height:30px;object-fit:contain"><small>簽到</small></button>
+  <button class="sidebtn" id="bSpin" style="top:calc(100% + 70px)"><img src="assets/i_tix.webp?v=1794659521" alt="" style="width:30px;height:30px;object-fit:contain"><small>轉盤</small></button>
   <button class="sidebtn dot" id="bBindR" style="top:calc(100% + 132px);height:62px;display:none"><span style="font-size:22px;line-height:26px">🔒</span><small style="font-size:10px;line-height:1.15;text-align:center">綁定<br>送💎</small></button>
   <a class="sidebtn" id="bCS" href="https://www.facebook.com/share/1Cr56DSjjR/" target="_blank" rel="noopener" style="top:calc(100% + 202px);text-decoration:none"><span style="font-size:26px;line-height:30px">💬</span><small>客服</small></a>
 </div>
@@ -1236,11 +1236,11 @@ body.mjon .hud,body.mjon .dock{visibility:hidden}
 <div class="toast" id="toast"></div>
 <div id="tint"></div>
 <div id="fx"></div>
-<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794659112" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
+<div id="loader"><img class="sp" src="assets/c_bunny1.webp?v=1794659521" alt=""><div class="lg">一起種田吧</div><div class="lb"><i id="ldbar"></i></div><div style="font-weight:700;color:#5E7A4A;font-size:13px">小鎮準備中…</div></div>
 
 <script src="supabase.js"></script>
 <script>
-const BUILD="1794659112";
+const BUILD="1794659521";
 /* ================= 遊戲資料 ================= */
 const CROPS = [
   {id:'radish',    name:'白蘿蔔', lv:1, seed:10,  time:120,   yield:8,  price:3,  exp:4,   type:'root',  color:'#F7F4EA', edge:'#D9D2C0'},
@@ -1425,7 +1425,7 @@ const FARM_C=[9.2,9.2];
 
 /* ================= 美術元件 ================= */
 const INK='#4B3423';
-let HOME_LBL=null, homeLblCur='', BIN_LBL=null, binLblCur='';
+let HOME_LBL=null, homeLblCur='', BIN_LBL=null, binLblCur='', COOP_LBL=null, coopLblCur='';
 const binItems = () => (mode==='visit' && typeof V!=='undefined' && V) ? ((V.bin||{}).items||{}) : ((typeof S!=='undefined' && S && S.me && S.me.bin)||{});
 const binCount = b => ['c','g'].reduce((a,t)=>a+Object.values((b||{})[t]||{}).reduce((x,y)=>x+(+y||0),0),0);
 /* 拜訪別人時，收集倉有東西可以偷 → 顯示會跳動的「可以偷」大標籤 */
@@ -1700,6 +1700,7 @@ function buildWorld(){
     const [lx,ly]=iso(gx,gy);
     if(o.id==='home'){ HOME_LBL=[lx, ly - h*0.12]; homeLblCur=homeLblName(); lab += `<g id="homeLbl">${labelPill(lx, ly - h*0.12, '🏠 '+esc(homeLblCur)+'的家', {big:1})}</g>`; }  // 放在大門前面，不會被上方玩家欄擋住
     else if(o.id==='bin'){ BIN_LBL=[lx, ly-h*o.foot-18]; lab += `<g id="binLbl">${labelPill(lx, ly-h*o.foot-18, binLblText(), {bg:'#FFF1DC'})}</g>`; }
+    else if(o.id==='coop'){ COOP_LBL=[lx, ly-20, !!o.locked]; coopLblCur=coopLblText(); lab += `<g id="coopLbl">${labelPill(lx, ly-20, coopLblCur, {locked:!!o.locked, bg:coopLblCur!==o.name?'#FFF1DC':null})}</g>`; }
     else lab += labelPill(lx, ly - (o.id==='coop'?20:o.id==='barn'?h*0.42:h*o.foot-18), o.name, {locked:!!o.locked, bg:o.id==='shop'?'#FFF1DC':o.id==='pen'?'#FFE7A8':null});
     if(o.id==='coop'){ const bx=lx + ([...o.name].length*19+30)/2 + 4, by=ly-20-16;   // 牧場紅點：自己的動物有蚊子時亮
       lab += `<g id="coopDot" style="display:none;pointer-events:none" transform="translate(${bx.toFixed(1)} ${by.toFixed(1)})"><circle r="12" fill="#F2545B" stroke="#fff" stroke-width="3"/><text id="coopDotN" y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="Noto Sans TC,sans-serif">1</text></g>`; }
@@ -1966,6 +1967,19 @@ function partyFxSync(){
     if(on && !hat){ const g = document.createElementNS('http://www.w3.org/2000/svg','g'); g.innerHTML = partyHatSVG(m.n||60); m.parts.root.appendChild(g.firstChild); }
     else if(!on && hat) hat.remove(); });
 }
+
+/* 牧場標籤：拜訪時有動物可以偷、自己家有產品可以收，就換成提示 */
+function coopLblText(){
+  const vis = mode==='visit' && typeof V!=='undefined' && V;
+  const list = vis ? (V.ranch||[]) : ((typeof S!=='undefined' && S && S.ranch) || []), off = vis ? V.off : (S && S.off) || 0;
+  if(typeof aniState!=='function') return '牧場';
+  if(vis){ const now = Date.now() + (V.off||0), sh = +((V.owner&&V.owner.buffs||{}).shield||0) > now;
+    const k = (V.protected || sh) ? 0 : list.filter(r=>aniState(r,off)==='ready' && !r.mine && r.st < r.cap).length;
+    return k ? `✋ 牧場可以偷 ${k}` : '牧場'; }
+  const k = list.filter(r=>aniState(r,off)==='ready').length;
+  return k ? `🥚 牧場可以收 ${k}` : '牧場'; }
+function setCoopLabel(){ const el=$('coopLbl'); if(!el||!COOP_LBL) return; const t=coopLblText(); if(t===coopLblCur) return; coopLblCur=t;
+  el.innerHTML = labelPill(COOP_LBL[0], COOP_LBL[1], t, {locked:COOP_LBL[2], bg:t!=='牧場'?'#FFF1DC':null}); }
 
 /* ================= 效能、設定 ================= */
 const PREF = (k, d) => { try{ const v = localStorage.getItem('ytzt_'+k); return v===null ? d : v==='1'; }catch(e){ return d; } };
@@ -7648,7 +7662,7 @@ function renderHUD(){
 /* 提示欄：內容變了才閃現 4 秒，然後自動收起 */
 let hintLast='', hintT=null;
 function setHint(html){ if(html===hintLast) return; hintLast=html; const el=$('hint'); el.innerHTML=html; el.classList.remove('hide'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.add('hide'), 4000); }
-function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); bindBtn(); partyFxSync(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bInv').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
+function refresh(){ renderPlots(); renderHUD(); try{ setHomeLabel(); setBinLabel();  syncParty(); if(mode==='visit' && V){ applySkins(V.owner.skin_on); applyTone(V.owner.tone); } else if(S){ applySkins(S.me.skin_on); applyTone(S.me.tone); } syncRanchMovers(); setCoopDot(); setCoopLabel(); syncParkMovers(); renderDecor(); signBadge(); spinBadge(); bindBtn(); partyFxSync(); $('bSign').style.display = $('bSpin').style.display = $('bCS').style.display = $('bInv').style.display = $('bBag').style.display = $('bPals').style.display = mode==='visit'?'none':''; }catch(e){} }
 
 /* ================= 同步 ================= */
 let syncing = false;
