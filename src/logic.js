@@ -460,8 +460,8 @@ async function openBoard(tab){
     body = F.friends.length ? F.friends.map(f=>`<div class="row">
         ${avImg(f)}
         <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>${f.party?` <span class="tag" style="background:#FFE3F0;color:#D6336C">🎉 派對中${f.party_n?`・${f.party_n}人`:''}</span>`:''}
-          <div>${(f.ripe||f.bin)?`<span style="color:var(--orange-d)">${f.ripe?`🥕 有 ${f.ripe} 塊地可以偷`:''}${f.ripe&&f.bin?'・':''}${f.bin?'🧺 收集倉可以偷':''}</span>`:'目前沒有可偷的菜'}${f.issues?`・🐛 需要幫忙 ${f.issues}`:''}</div></div>
-        <div class="ibtns"><button class="mini ${(f.ripe||f.bin)?'o':''}" data-visit="${f.id}">拜訪</button><button class="mini sub" data-gift="${f.id}" data-gn="${esc(f.nickname)}">💌 送禮</button></div></div>`).join('')
+          <div>${lootTxt(f)}${f.issues?`・🐛 需要幫忙 ${f.issues}`:''}</div></div>
+        <div class="ibtns"><button class="mini ${(f.ripe||f.bin||f.ranch)?'o':''}" data-visit="${f.id}">拜訪</button><button class="mini sub" data-gift="${f.id}" data-gn="${esc(f.nickname)}">💌 送禮</button></div></div>`).join('')
       : `<div class="empty">還沒有好友，<br>到「加好友」輸入朋友的暱稱吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
   } else if(boardTab==='add'){
     body = `<button class="btn o" id="invBtn" style="width:100%;margin:4px 0 6px">💌 邀請朋友來玩</button><div class="sec">用暱稱加好友</div>
@@ -475,8 +475,8 @@ async function openBoard(tab){
     body = `<div style="font-size:12px;color:var(--ink2);font-weight:700;margin:2px 0 6px">隨機列出小鎮上的玩家，不是好友也能偷菜、惡作劇（偷菜要用偷菜體力，偷好友也一樣：<b style="color:var(--orange-d)">⚡${S.me.steal_left}</b>${S.me.steal_max?' / '+S.me.steal_max:''}${stealRegenTxt(S.me)}）</div>`;
     body += NB.length ? NB.map(f=>`<div class="row">${avImg(f)}
         <div class="tx"><b>${esc(f.nickname)}</b>${ttlTag(f)} <span class="tag">Lv${f.lv}</span>${f.friend?' <span class="tag">好友</span>':''}${f.party?` <span class="tag" style="background:#FFE3F0;color:#D6336C">🎉 派對中${f.party_n?`・${f.party_n}人`:''}</span>`:''}
-          <div>${(f.ripe||f.bin)?`<span style="color:var(--orange-d)">${f.ripe?`🥕 有 ${f.ripe} 塊地可以偷`:''}${f.ripe&&f.bin?'・':''}${f.bin?'🧺 收集倉可以偷':''}</span>`:'目前沒有可偷的菜'}</div></div>
-        <button class="mini ${(f.ripe||f.bin)?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('') + `<button class="btn sub" id="nbMore" style="width:100%;margin-top:8px">換一批</button>`
+          <div>${lootTxt(f)}</div></div>
+        <button class="mini ${(f.ripe||f.bin||f.ranch)?'o':''}" data-visit="${f.id}">拜訪</button></div>`).join('') + `<button class="btn sub" id="nbMore" style="width:100%;margin-top:8px">換一批</button>`
       : `<div class="empty">附近還沒有其他玩家種菜，<br>邀請朋友一起來玩吧！</div><button class="btn o" id="invBtn" style="width:100%">💌 邀請朋友來玩</button>`;
   } else if(boardTab==='rank'){
     const medal = r => r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
@@ -1022,3 +1022,8 @@ function dogMsg(r){ const d = (r && r.dog) || {}, x = [];
   if(+d.fine > 0) x.push(`🩹 醫藥費 ${(+d.fine).toLocaleString()} 金`);
   if(+d.qty > 0) x.push(`掉了 ${d.qty} 個${(CROP[d.crop]&&CROP[d.crop].name)||'作物'}`);
   return '被看門狗咬了！什麼都沒偷到' + (x.length ? '\n' + x.join('・') : ''); }
+
+/* 好友廣場：這個農場有什麼可以偷 */
+function lootTxt(f){ const x=[];
+  if(f.ripe) x.push(`🥕 ${f.ripe} 塊地`); if(f.ranch) x.push(`🐔 牧場 ${f.ranch} 隻`); if(f.bin) x.push('🧺 收集倉');
+  return x.length ? `<span style="color:var(--orange-d)">可以偷：${x.join('・')}</span>` : '目前沒有可偷的東西'; }
