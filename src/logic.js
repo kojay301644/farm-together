@@ -781,8 +781,7 @@ function startGame(st){
   setTimeout(refAutoUse, 2000);
 }
 
-$('bInv').onclick = ()=>{ $('bInv').classList.remove('dot'); try{ localStorage.setItem('farm_inv_seen','1'); }catch(e){} invite(); };
-try{ if(localStorage.getItem('farm_inv_seen')) $('bInv').classList.remove('dot'); }catch(e){}
+$('bInv').onclick = ()=>invite();  // 紅點一直亮著，提醒玩家邀請朋友
 $('authBtn').onclick = doAuth;
 $('tryBtn').onclick = async()=>{ const b=$('tryBtn'); b.disabled=true;
   try{ const {error} = await sb.auth.signInAnonymously(); if(error) authMsg(zhErr(error.message)); }
